@@ -1,0 +1,65 @@
+<div class="page-header">
+  <h2>Colony State</h2>
+  <p>Track current campaign progress and colony-wide metrics.</p>
+</div>
+
+@if (form(); as f) {
+  <div class="form-layout">
+    <!-- Campaign State -->
+    <div class="card">
+      <h3 class="section-title">Campaign Progress</h3>
+      <div class="grid-3">
+        <div class="form-group">
+          <label>Act</label>
+          <input type="number" min="1" [value]="f.act"
+            (input)="form.update(s => s ? {...s, act: +$any($event.target).value} : s)" />
+        </div>
+        <div class="form-group">
+          <label>Week</label>
+          <input type="number" min="1" [value]="f.week"
+            (input)="form.update(s => s ? {...s, week: +$any($event.target).value} : s)" />
+        </div>
+        <div class="form-group stress-control">
+          <label>Colony Stress (0–10)</label>
+          <div class="stress-input-row">
+            <input type="range" min="0" max="10" step="1" [value]="f.colonyStress"
+              (input)="form.update(s => s ? {...s, colonyStress: +$any($event.target).value} : s)" />
+            <span [class]="'stress-number ' + stressClass()">{{ f.colonyStress }}</span>
+          </div>
+          <div class="stress-bar-wrap">
+            <div class="stress-bar" [style.width]="stressBarWidth()"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Session Summary</label>
+        <textarea rows="3" [value]="f.sessionSummary ?? ''"
+          (input)="form.update(s => s ? {...s, sessionSummary: $any($event.target).value} : s)"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Dominant Factions</label>
+        <input type="text" [value]="f.dominantFactions ?? ''"
+          (input)="form.update(s => s ? {...s, dominantFactions: $any($event.target).value} : s)" />
+      </div>
+      <div class="form-group">
+        <label>Influence Notes</label>
+        <textarea rows="2" [value]="f.influenceNotes ?? ''"
+          (input)="form.update(s => s ? {...s, influenceNotes: $any($event.target).value} : s)"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Major Consequences Unlocked</label>
+        <textarea rows="2" [value]="f.majorConsequences ?? ''"
+          (input)="form.update(s => s ? {...s, majorConsequences: $any($event.target).value} : s)"></textarea>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="save-bar">
+    <button class="btn btn-primary" (click)="save()">Save Colony State</button>
+    @if (saved()) {
+      <span class="saved-msg">Saved!</span>
+    }
+  </div>
+}

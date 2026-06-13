@@ -1,0 +1,81 @@
+.filter-bar {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--color-text-muted, #94a3b8);
+    font-weight: 500;
+  }
+
+  select {
+    padding: 0.35rem 0.6rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color, #334155);
+    background: var(--bg-card, #1e293b);
+    color: var(--color-text, #e2e8f0);
+    font-size: 0.85rem;
+    min-width: 140px;
+  }
+}
+
+.table-card { padding: 0; overflow: auto; }
+
+.char-link {
+  color: var(--color-text, #e2e8f0);
+  font-weight: 600;
+  text-decoration: none;
+  &:hover { text-decoration: underline; color: #60a5fa; }
+}
+
+.occupation-tag {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--color-text-muted, #94a3b8);
+  font-weight: 400;
+}
+
+.type-badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #1e293b;
+  color: #94a3b8;
+  border: 1px solid #334155;
+  &.party  { background: #1e3a5f; color: #93c5fd; border-color: #3b82f6; }
+  &.leader { background: #3b1e5f; color: #c4b5fd; border-color: #8b5cf6; }
+}
+
+.conviction {
+  &.high   { color: #4ade80; }
+  &.mid    { color: #fbbf24; }
+  &.low    { color: #f87171; }
+}
+
+.pressure {
+  &.max    { color: #ef4444; font-weight: 700; }
+  &.high   { color: #f87171; }
+  &.mid    { color: #fbbf24; }
+  &.low    { color: #94a3b8; }
+}
+
+.drift {
+  font-weight: 600;
+  &.high    { color: #ef4444; }
+  &.mid     { color: #f97316; }
+  &.neutral { color: #94a3b8; }
+  &.low     { color: #4ade80; }
+}
+
+.actions { white-space: nowrap; }
+
+.btn-xs { padding: 2px 8px; font-size: 0.75rem; margin-left: 0.25rem; }
+.btn-danger { background: #7f1d1d; color: #fca5a5; border: 1px solid #b91c1c; }
+
+.empty-row { text-align: center; color: var(--color-text-muted, #94a3b8); padding: 2rem; }

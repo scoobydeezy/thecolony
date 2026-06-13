@@ -1,0 +1,200 @@
+<div class="page-header">
+  <h2>Dashboard</h2>
+  <p>The Colony — Act {{ store.colonyState()?.act }}, Week {{ store.colonyState()?.week }}</p>
+</div>
+
+<!-- Stats Row -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-value">{{ activeFactionCount }}</div>
+    <div class="stat-label">Active Factions</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ totalRelationshipCount }}</div>
+    <div class="stat-label">Relationships Tracked</div>
+  </div>
+  <div class="stat-card danger">
+    <div class="stat-value">{{ hostileCount }}</div>
+    <div class="stat-label">Hostile / Opposed</div>
+  </div>
+  <div class="stat-card success">
+    <div class="stat-value">{{ alignedCount }}</div>
+    <div class="stat-label">Friendly / Aligned</div>
+  </div>
+</div>
+
+<!-- Colony Stress + Darkwing State -->
+<div class="two-col">
+  @if (store.colonyState(); as cs) {
+    <div class="card">
+      <h3 class="section-title">Colony Stress</h3>
+      <div class="stress-row">
+        <div [class]="stressClass()">{{ cs.colonyStress }}</div>
+        <div class="stress-bar-wrap">
+          <div class="stress-bar" [style.width]="stressBarWidth()"></div>
+        </div>
+        <div class="stress-max">/ 10</div>
+      </div>
+      @if (cs.sessionSummary) {
+        <p class="session-summary">{{ cs.sessionSummary }}</p>
+      }
+      <a routerLink="/colony-state" class="btn btn-secondary btn-sm" style="margin-top:1rem">Edit Colony State</a>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Darkwing Position</h3>
+      <div class="darkwing-grid">
+        <div class="dw-item"><span class="dw-label">Ritual</span><span class="dw-value">{{ cs.darkwingRitual }}</span></div>
+        <div class="dw-item"><span class="dw-label">Knowledge</span><span class="dw-value">{{ cs.darkwingKnowledge }}</span></div>
+        <div class="dw-item"><span class="dw-label">Change</span><span class="dw-value">{{ cs.darkwingChange }}</span></div>
+        <div class="dw-item"><span class="dw-label">Desires</span><span class="dw-value desires">{{ primaryValue(cs.darkwingValues) }}</span></div>
+        <div class="dw-item"><span class="dw-label">Maintains</span><span class="dw-value maintains">{{ secondaryValue(cs.darkwingValues) }}</span></div>
+        <div class="dw-item"><span class="dw-label">Sacrifices</span><span class="dw-value sacrifices">{{ sacrificedValue(cs.darkwingValues) }}</span></div>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Most Hostile + Strongest Alliances -->
+<div class="two-col">
+  <div class="card">
+    <h3 class="section-title">Most Hostile Relationships</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>From</th>
+          <th>To</th>
+          <th>Label</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of store.mostHostile(); track r.sourceId + r.targetId) {
+          <tr>
+            <td>{{ factionName(r.sourceId) }}</td>
+            <td>{{ factionName(r.targetId) }}</td>
+            <td><span [class]="labelClass(r.label)">{{ r.label }}</span></td>
+            <td><span [class]="scoreClass(r.finalScore)">{{ r.finalScore }}</span></td>
+          </tr>
+        }
+        @empty {
+          <tr><td colspan="4" style="color: var(--text-muted); text-align:center">No relationships yet</td></tr>
+        }
+      </tbody>
+    </table>
+    <a routerLink="/relationships" class="btn btn-secondary btn-sm" style="margin-top:1rem">View All</a>
+  </div>
+
+  <div class="card">
+    <h3 class="section-title">Strongest Alliances</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>From</th>
+          <th>To</th>
+          <th>Label</th>
+          <th>Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (r of store.strongestAlliances(); track r.sourceId + r.targetId) {
+          <tr>
+            <td>{{ factionName(r.sourceId) }}</td>
+            <td>{{ factionName(r.targetId) }}</td>
+            <td><span [class]="labelClass(r.label)">{{ r.label }}</span></td>
+            <td><span [class]="scoreClass(r.finalScore)">{{ r.finalScore }}</span></td>
+          </tr>
+        }
+        @empty {
+          <tr><td colspan="4" style="color: var(--text-muted); text-align:center">No relationships yet</td></tr>
+        }
+      </tbody>
+    </table>
+    <a routerLink="/relationships" class="btn btn-secondary btn-sm" style="margin-top:1rem">View All</a>
+  </div>
+</div>
+
+<!-- Characters: Most At-Risk + Potential Defections -->
+@if (store.characters().length > 0) {
+  <div class="two-col" style="margin-top: 1.5rem;">
+    <div class="card">
+      <h3 class="section-title">Most At-Risk Characters</h3>
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Faction</th><th>Drift</th></tr>
+        </thead>
+        <tbody>
+          @for (c of store.mostAtRisk(); track c.id) {
+            <tr>
+              <td><a [routerLink]="['/characters', c.id]" class="char-link">{{ c.name }}</a></td>
+              <td>{{ factionName(c.factionId) }}</td>
+              <td>
+                <span [class]="driftScore(c) >= 30 ? 'score neg-high' : driftScore(c) >= 10 ? 'score neg-mid' : 'score neutral'">
+                  {{ driftScore(c) > 0 ? '+' : '' }}{{ driftScore(c) }}
+                </span>
+              </td>
+            </tr>
+          }
+          @empty {
+            <tr><td colspan="3" style="color: var(--text-muted); text-align:center">No characters yet</td></tr>
+          }
+        </tbody>
+      </table>
+      <a routerLink="/characters" class="btn btn-secondary btn-sm" style="margin-top:1rem">View All</a>
+    </div>
+
+    <div class="card">
+      <h3 class="section-title">Potential Defections</h3>
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Current</th><th>Most Compatible</th></tr>
+        </thead>
+        <tbody>
+          @for (c of store.potentialDefections(); track c.id) {
+            <tr>
+              <td><a [routerLink]="['/characters', c.id]" class="char-link">{{ c.name }}</a></td>
+              <td>{{ factionName(c.factionId) }}</td>
+              <td class="defect-target">{{ mostCompatibleFactionName(c.id) }}</td>
+            </tr>
+          }
+          @empty {
+            <tr><td colspan="3" style="color: var(--text-muted); text-align:center">None detected</td></tr>
+          }
+        </tbody>
+      </table>
+      <a routerLink="/characters" class="btn btn-secondary btn-sm" style="margin-top:1rem">View All</a>
+    </div>
+  </div>
+}
+
+<!-- Darkwing Relationships -->
+<div class="card" style="margin-top: 1.5rem;">
+  <h3 class="section-title">Faction → Darkwing Relationships</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Faction</th>
+        <th>Label</th>
+        <th>Score</th>
+        <th>Ritual</th>
+        <th>Knowledge</th>
+        <th>Change</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (r of store.darkwingRelationships(); track r.sourceId) {
+        <tr>
+          <td>{{ factionName(r.sourceId) }}</td>
+          <td><span [class]="labelClass(r.label)">{{ r.label }}</span></td>
+          <td><span [class]="scoreClass(r.finalScore)">{{ r.finalScore }}</span></td>
+          <td [class]="r.contributions.ritual >= 0 ? 'pos' : 'neg'">{{ r.contributions.ritual > 0 ? '+' : '' }}{{ r.contributions.ritual }}</td>
+          <td [class]="r.contributions.knowledge >= 0 ? 'pos' : 'neg'">{{ r.contributions.knowledge > 0 ? '+' : '' }}{{ r.contributions.knowledge }}</td>
+          <td [class]="r.contributions.change >= 0 ? 'pos' : 'neg'">{{ r.contributions.change > 0 ? '+' : '' }}{{ r.contributions.change }}</td>
+        </tr>
+      }
+      @empty {
+        <tr><td colspan="6" style="color: var(--text-muted); text-align:center">Loading...</td></tr>
+      }
+    </tbody>
+  </table>
+</div>

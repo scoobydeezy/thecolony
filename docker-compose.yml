@@ -1,0 +1,15 @@
+# Development mode: run only the API in Docker, run Angular locally with hot reload
+services:
+  api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./colony-data:/app/data
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__Default=Data Source=/app/data/colony.db
+    restart: unless-stopped

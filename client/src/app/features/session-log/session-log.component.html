@@ -1,0 +1,134 @@
+<div class="page-header">
+  <h2>Session Log</h2>
+  <p>Record what happened each session.</p>
+</div>
+
+<div class="toolbar">
+  <button class="btn btn-primary" (click)="openAdd()">+ New Session Entry</button>
+</div>
+
+@if (store.sessionLog().length === 0) {
+  <div class="card empty-state">
+    <p>No sessions logged yet. Start by adding your first entry.</p>
+  </div>
+} @else {
+  <div class="session-list">
+    @for (entry of store.sessionLog(); track entry.id) {
+      <div class="session-card card">
+        <div class="session-header">
+          <div class="session-meta">
+            <span class="session-date">{{ formatDate(entry.date) }}</span>
+            <span class="session-act">Act {{ entry.act }}, Week {{ entry.week }}</span>
+          </div>
+          <div class="session-actions">
+            @if (entry.colonyStressChange !== 0) {
+              <span [class]="entry.colonyStressChange > 0 ? 'stress-change up' : 'stress-change down'">
+                Stress {{ entry.colonyStressChange > 0 ? '+' : '' }}{{ entry.colonyStressChange }}
+              </span>
+            }
+            <button class="btn btn-secondary btn-sm" (click)="openEdit(entry)">Edit</button>
+            <button class="btn btn-danger btn-sm" (click)="delete(entry.id)">Delete</button>
+          </div>
+        </div>
+
+        @if (entry.summary) {
+          <p class="session-summary">{{ entry.summary }}</p>
+        }
+
+        <div class="session-details">
+          @if (entry.darkwingActions) {
+            <div class="detail-section">
+              <span class="detail-label">Darkwing Actions</span>
+              <p>{{ entry.darkwingActions }}</p>
+            </div>
+          }
+          @if (entry.factionChanges) {
+            <div class="detail-section">
+              <span class="detail-label">Faction Changes</span>
+              <p>{{ entry.factionChanges }}</p>
+            </div>
+          }
+          @if (entry.relationshipBumps) {
+            <div class="detail-section">
+              <span class="detail-label">Relationship Bumps</span>
+              <p>{{ entry.relationshipBumps }}</p>
+            </div>
+          }
+          @if (entry.futureConsequences) {
+            <div class="detail-section future">
+              <span class="detail-label">Future Consequences</span>
+              <p>{{ entry.futureConsequences }}</p>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}
+
+@if (showModal()) {
+  <div class="modal-backdrop" (click)="close()">
+    <div class="modal modal-wide" (click)="$event.stopPropagation()">
+      <h3>{{ editingEntry().id ? 'Edit' : 'New' }} Session Entry</h3>
+
+      <div class="grid-3">
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" [value]="editingEntry().date"
+            (input)="editingEntry.update(e => ({...e, date: $any($event.target).value}))" />
+        </div>
+        <div class="form-group">
+          <label>Act</label>
+          <input type="number" min="1" [value]="editingEntry().act"
+            (input)="editingEntry.update(e => ({...e, act: +$any($event.target).value}))" />
+        </div>
+        <div class="form-group">
+          <label>Week</label>
+          <input type="number" min="1" [value]="editingEntry().week"
+            (input)="editingEntry.update(e => ({...e, week: +$any($event.target).value}))" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Summary</label>
+        <textarea rows="3" [value]="editingEntry().summary ?? ''"
+          (input)="editingEntry.update(e => ({...e, summary: $any($event.target).value}))"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Darkwing Actions</label>
+        <textarea rows="2" [value]="editingEntry().darkwingActions ?? ''"
+          (input)="editingEntry.update(e => ({...e, darkwingActions: $any($event.target).value}))"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Faction Changes</label>
+        <textarea rows="2" [value]="editingEntry().factionChanges ?? ''"
+          (input)="editingEntry.update(e => ({...e, factionChanges: $any($event.target).value}))"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Colony Stress Change</label>
+        <input type="number" [value]="editingEntry().colonyStressChange"
+          (input)="editingEntry.update(e => ({...e, colonyStressChange: +$any($event.target).value}))" />
+      </div>
+
+      <div class="form-group">
+        <label>Relationship Bumps</label>
+        <textarea rows="2" [value]="editingEntry().relationshipBumps ?? ''"
+          (input)="editingEntry.update(e => ({...e, relationshipBumps: $any($event.target).value}))"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Future Consequences</label>
+        <textarea rows="2" [value]="editingEntry().futureConsequences ?? ''"
+          (input)="editingEntry.update(e => ({...e, futureConsequences: $any($event.target).value}))"></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" (click)="close()">Cancel</button>
+        <button class="btn btn-primary" (click)="save()">Save</button>
+      </div>
+    </div>
+  </div>
+}

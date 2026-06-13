@@ -1,0 +1,517 @@
+.global-view-bar {
+  margin-bottom: 1rem;
+}
+
+.global-view-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.5rem;
+
+  .section-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    align-self: flex-start;
+  }
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+
+  .toolbar-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+  }
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+
+  button {
+    background: none;
+    border: none;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    border-right: 1px solid var(--border);
+
+    &:last-child { border-right: none; }
+    &:hover { background: var(--bg-hover); color: var(--text-primary); }
+    &.active { background: var(--bg-active); color: var(--accent); font-weight: 600; }
+  }
+}
+
+.faction-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  gap: 1.25rem;
+}
+
+.faction-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
+  transition: border-color 0.15s, opacity 0.15s;
+  cursor: grab;
+
+  &:hover { border-color: var(--accent); }
+
+  &.inactive {
+    opacity: 0.5;
+    border-style: dashed;
+  }
+
+  &.drag-over {
+    border-color: var(--accent);
+    border-style: dashed;
+    background: var(--bg-active);
+  }
+
+  &:active { cursor: grabbing; }
+}
+
+.faction-header {
+  margin-bottom: 0.75rem;
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .represents {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-top: 0.2rem;
+  }
+}
+
+.faction-name-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.2rem;
+}
+
+.type-chip {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: #1d4ed8;
+  color: #bfdbfe;
+
+  &.social {
+    background: #4a1d96;
+    color: #e9d5ff;
+  }
+}
+
+.fact-group {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.fact-group-label {
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  min-width: 3.5rem;
+  flex-shrink: 0;
+}
+
+.fact-group-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.belief-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--bg-base);
+  border-radius: 4px;
+  padding: 0.2rem 0.5rem;
+}
+
+.belief-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+
+.belief-val {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-primary);
+
+  &.ritual-good    { color: #4ade80; }
+  &.ritual-neutral { color: #94a3b8; }
+  &.ritual-bad     { color: #f87171; }
+  &.change-yes     { color: #60a5fa; }
+  &.change-no      { color: #fbbf24; }
+  &.truth          { color: var(--color-truth); }
+  &.stability      { color: var(--color-stability); }
+  &.agency         { color: var(--color-agency); }
+}
+
+.core-tenet {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.belief-conflict {
+  outline: 1.5px solid #f87171;
+  border-radius: 4px;
+}
+
+.belief-conflict-group {
+  select {
+    border-color: #f87171;
+  }
+}
+
+.label-conflict {
+  color: #f87171 !important;
+}
+
+.belief-conflict-hint {
+  font-size: 0.75rem;
+  color: #f87171;
+  margin: -0.5rem 0 0.75rem;
+}
+
+.single-sentence {
+  font-size: 0.825rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-bottom: 1.5rem;
+}
+
+.notes {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+  background: var(--bg-base);
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.faction-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border);
+}
+
+.field-error {
+  font-size: 0.75rem;
+  color: #f87171;
+  margin-top: 0.25rem;
+}
+
+.separator {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  padding: 0.5rem 0;
+  border-top: 1px solid var(--border);
+  margin: 0.5rem 0 1rem;
+}
+
+.modal-wide {
+  min-width: 600px;
+  max-width: 760px;
+}
+
+.card-body {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+
+  app-ternary-plot {
+    flex-shrink: 0;
+  }
+}
+
+.beliefs-col {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.ternary-edit-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.ternary-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+// ── Faction Detail Modal ──────────────────────────────────────────────────────
+
+.modal-detail {
+  min-width: 680px;
+  max-width: 900px;
+  width: 90vw;
+}
+
+.detail-header {
+  margin-bottom: 1rem;
+}
+
+.detail-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+  }
+}
+
+.inactive-chip {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  background: var(--bg-base);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.detail-represents {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0 0 0.35rem;
+}
+
+.detail-single-sentence {
+  font-size: 0.9rem;
+  font-style: italic;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.detail-body {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  margin-bottom: 0.25rem;
+}
+
+.detail-left {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.detail-beliefs {
+  width: 100%;
+
+  .belief-item {
+    margin-bottom: 0.3rem;
+  }
+}
+
+.detail-right {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-section {
+  margin-bottom: 1rem;
+}
+
+.detail-text {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.25rem;
+  line-height: 1.5;
+}
+
+.detail-notes {
+  background: var(--bg-base);
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  white-space: pre-wrap;
+}
+
+.detail-field {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  font-size: 0.875rem;
+  padding: 0.2rem 0;
+  border-bottom: 1px solid var(--border);
+
+  &:last-child { border-bottom: none; }
+}
+
+.detail-field-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  min-width: 6rem;
+  flex-shrink: 0;
+}
+
+.detail-field-value {
+  color: var(--text-primary);
+  font-size: 0.875rem;
+}
+
+.detail-beliefs-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.detail-field-empty {
+  color: var(--text-muted);
+}
+
+// ── Characters list inside detail modal ──────────────────────────────────────
+
+.detail-characters {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: 380px;
+  overflow-y: auto;
+  margin-bottom: 0.5rem;
+  padding-right: 0.25rem;
+}
+
+.no-members {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.character-row {
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+}
+
+.character-row-main {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.char-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.char-type-chip {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  background: #374151;
+  color: #9ca3af;
+
+  &.party  { background: #1d4ed8; color: #bfdbfe; }
+  &.leader { background: #3b1e5f; color: #c4b5fd; border: 1px solid #8b5cf6; }
+}
+
+.char-meta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+
+  &::before { content: '·'; margin-right: 0.35rem; }
+}
+
+.char-summary {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0.25rem 0 0;
+  line-height: 1.45;
+}
+
+.members-subsection-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  margin: 0.5rem 0 0.25rem;
+
+  &:first-child { margin-top: 0; }
+}
+
+.character-row.drift-risk {
+  border-color: #7c3aed44;
+  background: #1a0f2e;
+}
+
+.char-drift-score {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  margin-left: auto;
+
+  &.drift-high { background: #7f1d1d; color: #fca5a5; }
+  &.drift-mid  { background: #78350f; color: #fcd34d; }
+  &.drift-low  { background: #1c3a2b; color: #6ee7b7; }
+  &.drift-none { background: #1e293b; color: #64748b; }
+}
+
+.char-misfit-badge {
+  font-size: 0.68rem;
+  color: #f87171;
+  white-space: nowrap;
+}

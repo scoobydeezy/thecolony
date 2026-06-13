@@ -1,0 +1,477 @@
+<div class="page-header">
+  <div class="header-left">
+    <a routerLink="/characters" class="back-link">← Characters</a>
+    <h2>{{ editMode() ? (editForm().name || 'New Character') : character().name }}</h2>
+  </div>
+  <div class="header-actions">
+    @if (!editMode()) {
+      <button class="btn btn-primary" (click)="enterEditMode()">Edit</button>
+    } @else {
+      <button class="btn btn-primary" (click)="save()">Save</button>
+      <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+    }
+  </div>
+</div>
+
+@if (editMode()) {
+  <!-- ── EDIT MODE ─────────────────────────────────────────── -->
+  <div class="edit-layout">
+
+    <!-- Identity -->
+    <div class="card">
+      <h3 class="section-title">Identity</h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Name *</label>
+          <input type="text" [formField]="f.name" placeholder="Character name" />
+          @if (f.name().invalid() && f.name().touched()) {
+            <p class="field-error">Name is required</p>
+          }
+        </div>
+        <div class="form-group">
+          <label>Role</label>
+          <select [formField]="f.characterType">
+            @for (opt of roleOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Gender</label>
+          <select [formField]="f.gender">
+            <option value="">—</option>
+            @for (opt of genderOptions; track opt) {
+              <option [value]="opt">{{ opt }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Age</label>
+          <input type="number" [formField]="f.age" />
+        </div>
+        <div class="form-group">
+          <label>Occupation</label>
+          <input type="text" [formField]="f.occupation" placeholder="e.g. Merchant, Ritual Keeper" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Pathfinder (optional) -->
+    <div class="card">
+      <h3 class="section-title">Pathfinder <span class="optional-label">(optional)</span></h3>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Ancestry</label>
+          <select [formField]="f.ancestry">
+            <option value="">—</option>
+            @for (opt of ancestryOptions; track opt) {
+              <option [value]="opt">{{ opt }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Heritage</label>
+          <input type="text" [formField]="f.heritage" />
+        </div>
+        <div class="form-group">
+          <label>Class</label>
+          <select [formField]="f.class">
+            <option value="">—</option>
+            @for (opt of classOptions; track opt) {
+              <option [value]="opt">{{ opt }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Background</label>
+          <input type="text" [formField]="f.background" />
+        </div>
+        <div class="form-group">
+          <label>Level</label>
+          <input type="number" [formField]="f.level" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Beliefs & Values (merged: membership + plot + doubt/pressure) -->
+    <div class="card beliefs-card">
+      <h3 class="section-title">Beliefs &amp; Values</h3>
+      <div class="beliefs-layout">
+
+        <div class="beliefs-plot-col">
+          <app-ternary-plot
+            [values]="editValues()"
+            [editable]="true"
+            [overlays]="editTernaryOverlays()"
+            [size]="360"
+            [driftTarget]="editDriftTarget()"
+            [conviction]="editEffectiveConviction()"
+            [pressure]="editPressure()"
+            (valuesChange)="editValues.set($event)"
+          />
+        </div>
+
+        <div class="beliefs-fields-col">
+          <div class="affiliations-group two-col">
+            <div class="form-group">
+              <label>Social Class</label>
+              <select [formField]="f.socialClassId">
+                <option value="">None</option>
+                @for (sc of socialClassOptions(); track sc.id) {
+                  <option [value]="sc.id">{{ sc.name }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Faction</label>
+              <select [formField]="f.factionId">
+                <option value="">None</option>
+                @for (faction of factionOptions(); track faction.id) {
+                  <option [value]="faction.id">{{ faction.name }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="form-group belief-override-group">
+            <label>Belief Overrides <span class="optional-label">(override derived beliefs)</span></label>
+            <div class="belief-override-row">
+              <div class="form-group">
+                <label>Ritual</label>
+                <select [formField]="f.ritual">
+                  <option value="">— Derived —</option>
+                  @for (opt of ritualOptions; track opt) {
+                    <option [value]="opt">{{ opt }}</option>
+                  }
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Knowledge</label>
+                <select [formField]="f.knowledge">
+                  <option value="">— Derived —</option>
+                  @for (opt of knowledgeOptions; track opt) {
+                    <option [value]="opt">{{ opt }}</option>
+                  }
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Change</label>
+                <select [formField]="f.change">
+                  <option value="">— Derived —</option>
+                  @for (opt of changeOptions; track opt) {
+                    <option [value]="opt">{{ opt }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Doubted Belief</label>
+            <select [formField]="f.doubtDirection">
+              <option value="">None</option>
+              @for (d of doubtDirections; track d) {
+                <option [value]="d">{{ d }}</option>
+              }
+            </select>
+          </div>
+          <div class="belief-override-row two-col">
+            <div class="form-group">
+              <label>Conviction (0–100)</label>
+              <input type="number" [formField]="f.conviction" />
+            </div>
+            <div class="form-group">
+              <label>Base Pressure (0–100)</label>
+              <input type="number" [formField]="f.pressure" />
+            </div>
+            <p class="pressure-hint">Effective pressure = base + (colony stress × 10). Colony stress is currently {{ colonyStress() }}.</p>
+          </div>
+          <div class="belief-override-row two-col">
+            <div class="form-group">
+              <label>Influence (0–100)</label>
+              <input type="number" [formField]="f.influence" />
+            </div>
+            <div class="form-group">
+              <label>Impressionable (0–100)</label>
+              <input type="number" [formField]="f.impressionable" />
+            </div>
+            <p class="pressure-hint">Influence stabilizes faction-mates' conviction. Impressionable controls how much others' influence affects this character.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Narrative -->
+    <div class="card narrative-card">
+      <h3 class="section-title">Narrative</h3>
+      <div class="form-stack">
+        <div class="form-group">
+          <label>Summary</label>
+          <textarea rows="3" [formField]="f.summary" placeholder="One or two sentences about this character."></textarea>
+        </div>
+        <div class="form-group">
+          <label>Goals</label>
+          <textarea rows="2" [formField]="f.goals"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Fears</label>
+          <textarea rows="2" [formField]="f.fears"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <textarea rows="3" [formField]="f.notes" placeholder="Session notes, secrets, GM info."></textarea>
+        </div>
+      </div>
+    </div>
+
+  </div>
+} @else {
+  <!-- ── READ MODE ─────────────────────────────────────────── -->
+  <div class="detail-layout">
+
+    <!-- Identity -->
+    <div class="card">
+      <h3 class="section-title">Identity</h3>
+      <div class="detail-grid">
+        <div class="detail-item"><span class="detail-label">Name</span><span>{{ character().name }}</span></div>
+        <div class="detail-item"><span class="detail-label">Type</span>
+          <span class="type-badge"
+            [class.party]="character().characterType === 'PartyMember'"
+            [class.leader]="character().characterType === 'FactionLeader'">
+            {{ character().characterType === 'PartyMember' ? 'Party Member' : character().characterType === 'FactionLeader' ? 'Faction Leader' : 'NPC' }}
+          </span>
+        </div>
+        @if (character().gender || character().ancestry) {
+          <div class="detail-item"><span class="detail-label">Race & Gender</span><span>{{ character().ancestry }} {{ character().gender }}</span></div>
+        }
+        @if (character().age) {
+          <div class="detail-item"><span class="detail-label">Age</span><span>{{ character().age }}</span></div>
+        }
+        @if (character().heritage) {
+          <div class="detail-item"><span class="detail-label">Heritage</span><span>{{ character().heritage }}</span></div>
+        }
+        @if (character().class || character().level) {
+          <div class="detail-item">
+            <span class="detail-label">Class & Level</span>
+            <span>
+              @if (character().class) { {{ character().class }} }
+              @if (character().level) { Lv {{ character().level }} }
+            </span>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Membership -->
+    <div class="card">
+      <h3 class="section-title">Society</h3>
+      <div class="detail-grid">
+        <div class="detail-item"><span class="detail-label">Faction</span><span>{{ factionName(character().factionId) }}</span></div>
+        <div class="detail-item"><span class="detail-label">Social Class</span><span>{{ factionName(character().socialClassId) }}</span></div>
+        @if (character().background) {
+          <div class="detail-item"><span class="detail-label">Background</span><span>{{ character().background }}</span></div>
+        }
+        @if (character().occupation) {
+          <div class="detail-item"><span class="detail-label">Occupation</span><span>{{ character().occupation }}</span></div>
+        }
+      </div>
+    </div>
+
+    <!-- Values + Doubt stacked in left column -->
+    <div class="values-doubt-col">
+
+    <div class="card values-card">
+      <h3 class="section-title">Values</h3>
+      <app-ternary-plot
+        [values]="character().values"
+        [editable]="false"
+        [overlays]="ternaryOverlays()"
+        [showValueLabels]="true"
+        [size]="360"
+        [driftTarget]="driftTarget()"
+        [conviction]="effectiveConvictionValue()"
+        [pressure]="effectivePressureValue()"
+      />
+    </div>
+
+    <!-- Doubt -->
+    <div class="card">
+      <h3 class="section-title">Doubt &amp; Pressure</h3>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <span class="detail-label">Doubted Value</span>
+          <span class="doubt-value">{{ character().doubtDirection ?? '—' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Drift Score</span>
+          @let eds = effectivePressureValue() - effectiveConvictionValue();
+          <span [class]="driftClass(eds)">
+            {{ eds > 0 ? '+' : '' }}{{ eds | number:'1.0-1' }}
+          </span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Impressionable</span>
+          <span>{{ character().impressionable }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Conviction</span>
+          <span class="conviction-value">{{ formatPercent(effectiveConvictionValue()) }}</span>
+          @if (influenceBonus() > 0) {
+            <span class="pressure-breakdown">base {{ character().conviction }}% + {{ influenceBonus() | number:'1.0-1' }} influence</span>
+          }
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Influence</span>
+          <span>{{ character().influence }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="detail-label">Pressured</span>
+          <span class="pressure-value">{{ formatPercent(effectivePressureValue()) }}</span>
+          @if (colonyStress() > 0) {
+            <span class="pressure-breakdown">base {{ character().pressure }}% + stress {{ colonyStress() * 10 }}%</span>
+          }
+        </div>
+      </div>
+      <p class="drift-explanation">Conviction and Pressure shown as percentages. Drift = Effective Pressure − Effective Conviction. Colony stress {{ colonyStress() }} adds {{ colonyStress() * 10 }}% to pressure. Influential faction-mates boost effective conviction.</p>
+    </div>
+
+    </div><!-- /values-doubt-col -->
+
+    <!-- Alignment Analysis -->
+    <div class="card alignment-card">
+      <h3 class="section-title">Alignment Analysis</h3>
+
+      <div class="beliefs-pills-row">
+        <div class="belief-item">
+          <span class="belief-label">Ritual</span>
+          <span class="belief-val ritual-{{ derivedBeliefs().ritual.toLowerCase() }}">{{ derivedBeliefs().ritual }}</span>
+          @if (character().ritual) { <span class="override-badge">override</span> }
+        </div>
+        <div class="belief-item">
+          <span class="belief-label">Knowledge</span>
+          <span class="belief-val">{{ derivedBeliefs().knowledge }}</span>
+          @if (character().knowledge) { <span class="override-badge">override</span> }
+        </div>
+        <div class="belief-item">
+          <span class="belief-label">Change</span>
+          <span class="belief-val change-{{ derivedBeliefs().change.toLowerCase() }}">{{ derivedBeliefs().change }}</span>
+          @if (character().change) { <span class="override-badge">override</span> }
+        </div>
+      </div>
+
+      <div class="alignment-columns">
+
+        <!-- Current position -->
+        <div class="alignment-col current-col">
+          <h4 class="alignment-col-title">Current</h4>
+
+          @if (character().factionId) {
+            <div class="compat-row">
+              <span class="compat-label">Member Of</span>
+              <span class="compat-faction">{{ factionName(character().factionId) }}</span>
+              @if (currentFactionCompatibility(); as cfc) {
+                <span [class]="valueScoreClass(cfc.score)">{{ cfc.score > 0 ? '+' : '' }}{{ cfc.score }}</span>
+              }
+            </div>
+          }
+
+          @if (mostCompatibleFaction(); as best) {
+            <div class="compat-row highlight" [class.defection-risk]="isPotentialDefection()">
+              <span class="compat-label">Best Fit</span>
+              <span class="compat-faction">{{ best.name }}</span>
+              <span [class]="valueScoreClass(compatibilityList()[0].score)">{{ compatibilityList()[0].score > 0 ? '+' : '' }}{{ compatibilityList()[0].score }}</span>
+              @if (isPotentialDefection()) {
+                <span class="defection-badge">Misfit</span>
+              }
+            </div>
+          }
+
+          @if (top3Compatible().length > 0) {
+            <table class="compat-table">
+              <thead><tr><th>Faction</th><th>Score</th></tr></thead>
+              <tbody>
+                @for (fc of top3Compatible(); track fc.factionId) {
+                  <tr [class.current-faction]="fc.factionId === character().factionId">
+                    <td>{{ factionName(fc.factionId) }}</td>
+                    <td><span [class]="valueScoreClass(fc.score)">{{ fc.score > 0 ? '+' : '' }}{{ fc.score }}</span></td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          }
+        </div>
+
+        <!-- At-max-pressure (drifted) position -->
+        @if (driftedCompatibilityList(); as drifted) {
+          <div class="alignment-col drifted-col">
+            <h4 class="alignment-col-title">
+              At Max Pressure
+              <span class="col-title-hint">(conviction {{ character().conviction }}%)</span>
+            </h4>
+
+            @if (driftedTopFaction(); as driftBest) {
+              <div class="compat-row highlight" [class.defection-risk]="isDriftRiskFactionDifferent()">
+                <span class="compat-label">Best Fit</span>
+                <span class="compat-faction">{{ driftBest.name }}</span>
+                <span [class]="valueScoreClass(drifted[0].score)">{{ drifted[0].score > 0 ? '+' : '' }}{{ drifted[0].score }}</span>
+                @if (isDriftRiskFactionDifferent()) {
+                  <span class="defection-badge">Drift Risk</span>
+                }
+              </div>
+            }
+
+            @if (driftedTop3(); as top3) {
+              <table class="compat-table">
+                <thead><tr><th>Faction</th><th>Score</th></tr></thead>
+                <tbody>
+                  @for (fc of top3; track fc.factionId) {
+                    <tr [class.current-faction]="fc.factionId === character().factionId">
+                      <td>{{ factionName(fc.factionId) }}</td>
+                      <td><span [class]="valueScoreClass(fc.score)">{{ fc.score > 0 ? '+' : '' }}{{ fc.score }}</span></td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </div>
+        } @else if (character().doubtDirection) {
+          <div class="alignment-col drifted-col no-drift">
+            <h4 class="alignment-col-title">At Max Pressure</h4>
+            <p class="no-drift-note">Conviction is 100% — no drift possible.</p>
+          </div>
+        }
+
+      </div>
+
+      @if (character().doubtDirection) {
+        @let eds = effectivePressureValue() - effectiveConvictionValue();
+        <div class="doubt-analysis">
+          <span class="detail-label">Doubts</span>
+          <span class="doubt-direction">{{ character().doubtDirection }}</span>
+          @if (eds > 0) {
+            <span class="drift-note">Drift Score +{{ eds | number:'1.0-1' }} — under pressure toward {{ character().doubtDirection === 'Truth' ? 'hidden knowledge' : character().doubtDirection === 'Stability' ? 'embracing change' : 'collective ritual' }}.</span>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Narrative -->
+    @if (character().summary || character().goals || character().fears || character().notes) {
+      <div class="card narrative-card">
+        <h3 class="section-title">Narrative</h3>
+        @if (character().summary) {
+          <div class="narrative-block"><span class="narrative-label">Summary</span><p>{{ character().summary }}</p></div>
+        }
+        @if (character().goals) {
+          <div class="narrative-block"><span class="narrative-label">Goals</span><p>{{ character().goals }}</p></div>
+        }
+        @if (character().fears) {
+          <div class="narrative-block"><span class="narrative-label">Fears</span><p>{{ character().fears }}</p></div>
+        }
+        @if (character().notes) {
+          <div class="narrative-block"><span class="narrative-label">Notes</span><p>{{ character().notes }}</p></div>
+        }
+      </div>
+    }
+
+  </div>
+}

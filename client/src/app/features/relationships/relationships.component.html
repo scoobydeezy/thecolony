@@ -1,0 +1,330 @@
+<div class="page-header">
+  <h2>Relationships</h2>
+  <button class="btn btn-secondary" (click)="exportCsv()">Export CSV</button>
+  <p>Tune scoring rules and view faction relationships. Changes apply automatically.</p>
+</div>
+
+@if (rules(); as r) {
+
+  <!-- ── Stress ─────────────────────────────────────────────────────────── -->
+  <div class="card tuner-card" style="margin-bottom:1rem">
+    <div class="stress-row">
+      <span class="tuner-label">Colony Stress</span>
+      <input type="range" min="0" max="10" step="1"
+        [value]="stress"
+        (input)="setStress(+$any($event.target).value)" />
+      <span class="stress-value" [class]="stress >= 7 ? 'danger' : stress >= 4 ? 'warn' : 'ok'">
+        {{ stress }} / 10
+      </span>
+    </div>
+  </div>
+
+  <!-- ── Tuners ─────────────────────────────────────────────────────────── -->
+  <div class="tuner-row" style="margin-bottom:1rem">
+
+    <div class="card tuner-card" [class.tuner-disabled]="!r.positiveEnabled">
+      <div class="tuner-header positive">
+        Positive Relationships
+        <label class="tuner-toggle" title="Enable positive relationship scoring">
+          <input type="checkbox"
+            [checked]="r.positiveEnabled"
+            (change)="setRuleBool('positiveEnabled', $any($event.target).checked)" />
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+      <div class="tuner-group">
+        <label class="tuner-label">Value Match Scale</label>
+        <div class="tuner-control">
+          <input type="range" min="0" max="10" step="0.5"
+            [value]="r.valueAlignmentScale"
+            [disabled]="!r.positiveEnabled"
+            (input)="setRule('valueAlignmentScale', $any($event.target).value)" />
+          <span class="tuner-val">{{ r.valueAlignmentScale | number:'1.1-1' }}</span>
+        </div>
+      </div>
+      <div class="tuner-group">
+        <label class="tuner-label">Belief Match</label>
+        <div class="tuner-control">
+          <input type="range" min="0" max="3" step="0.1"
+            [value]="r.beliefMatch"
+            [disabled]="!r.positiveEnabled"
+            (input)="setRule('beliefMatch', $any($event.target).value)" />
+          <span class="tuner-val">{{ r.beliefMatch | number:'1.2-2' }}</span>
+        </div>
+      </div>
+      <div class="tuner-group">
+        <label class="tuner-label">Positive Stress Multiplier</label>
+        <div class="tuner-control">
+          <input type="range" min="0" max="0.5" step="0.05"
+            [value]="r.stressPositiveMultiplierPerPoint"
+            [disabled]="!r.positiveEnabled"
+            (input)="setRule('stressPositiveMultiplierPerPoint', $any($event.target).value)" />
+          <span class="tuner-val">{{ r.stressPositiveMultiplierPerPoint | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card tuner-card" [class.tuner-disabled]="!r.negativeEnabled">
+      <div class="tuner-header negative">
+        Negative Relationships
+        <label class="tuner-toggle" title="Enable negative relationship scoring">
+          <input type="checkbox"
+            [checked]="r.negativeEnabled"
+            (change)="setRuleBool('negativeEnabled', $any($event.target).checked)" />
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+      <div class="tuner-group">
+        <label class="tuner-label">Value Conflict Scale</label>
+        <div class="tuner-control">
+          <input type="range" min="0" max="10" step="0.5"
+            [value]="r.valueConflictScale"
+            [disabled]="!r.negativeEnabled"
+            (input)="setRule('valueConflictScale', $any($event.target).value)" />
+          <span class="tuner-val">{{ r.valueConflictScale | number:'1.1-1' }}</span>
+        </div>
+      </div>
+      <div class="tuner-group">
+        <label class="tuner-label">Belief Conflict</label>
+        <div class="tuner-control">
+          <input type="range" min="-3" max="0" step="0.1"
+            [value]="r.beliefConflict"
+            [disabled]="!r.negativeEnabled"
+            (input)="setRule('beliefConflict', $any($event.target).value)" />
+          <span class="tuner-val">{{ r.beliefConflict | number:'1.2-2' }}</span>
+        </div>
+      </div>
+      <div class="tuner-group">
+        <label class="tuner-label">Negative Stress Multiplier</label>
+        <div class="tuner-control">
+          <input type="range" min="0" max="0.5" step="0.05"
+            [value]="r.stressNegativeMultiplierPerPoint"
+            [disabled]="!r.negativeEnabled"
+            (input)="setRule('stressNegativeMultiplierPerPoint', $any($event.target).value)" />
+          <span class="tuner-val">{{ r.stressNegativeMultiplierPerPoint | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="tuner-reset-row">
+    <button class="btn btn-secondary btn-sm" (click)="resetRules()">Reset to defaults</button>
+  </div>
+
+}
+
+<!-- ── Matrix ──────────────────────────────────────────────────────────────── -->
+<div class="card matrix-card" style="margin-top:1.5rem">
+  <div class="matrix-wrap">
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th class="corner-cell">From ↓ / To →</th>
+          @for (target of factions(); track target.id) {
+            <th class="col-header">
+              <div class="col-label">{{ target.name }}</div>
+            </th>
+          }
+          <th class="col-header darkwing-col">Darkwing</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (source of factions(); track source.id) {
+          <tr>
+            <td class="row-header">{{ source.name }}</td>
+            @for (target of factions(); track target.id) {
+              @if (source.id === target.id) {
+                <td class="cell cell-self">—</td>
+              } @else {
+                @let r = getRelationship(source.id, target.id);
+                <td [class]="'cell ' + cellStyle(r)"
+                    (click)="openBreakdown(r)"
+                    title="{{ r ? r.label + ' (' + r.finalScore + ')' : '' }}">
+                  @if (r) {
+                    <div class="cell-score">{{ r.finalScore }}</div>
+                    <div class="cell-label">{{ r.label }}</div>
+                  }
+                </td>
+              }
+            }
+            @let dw = getRelationship(source.id, 'darkwing');
+            <td [class]="'cell darkwing-cell ' + cellStyle(dw)"
+                (click)="openBreakdown(dw)"
+                title="{{ dw ? dw.label + ' (' + dw.finalScore + ')' : '' }}">
+              @if (dw) {
+                <div class="cell-score">{{ dw.finalScore }}</div>
+                <div class="cell-label">{{ dw.label }}</div>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── Legend + Thresholds ────────────────────────────────────────────────── -->
+<div class="legend card" style="margin-top:1rem">
+  <span class="legend-title">Legend:</span>
+  <span class="badge badge-aligned">Aligned</span>
+  <span class="badge badge-cooperative">Cooperative</span>
+  <span class="badge badge-friendly">Friendly</span>
+  <span class="badge badge-tolerated">Tolerated</span>
+  <span class="badge badge-strained">Strained</span>
+  <span class="badge badge-opposed">Opposed</span>
+  <span class="badge badge-hostile">Hostile</span>
+  <button class="btn btn-secondary btn-sm legend-edit-btn" (click)="openThresholds()">Edit Thresholds</button>
+</div>
+
+<!-- ── Manual Overrides ───────────────────────────────────────────────────── -->
+<div class="card" style="margin-top:1.5rem">
+  <div class="section-header">
+    <h3 class="section-title">Manual Score Bumps</h3>
+    <button class="btn btn-primary btn-sm" (click)="openAddOverride()">+ Add Override</button>
+  </div>
+  @if (store.overrides().length > 0) {
+    <table>
+      <thead>
+        <tr>
+          <th>From</th><th>To</th><th>Score Bump</th><th>Notes</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (o of store.overrides(); track o.id) {
+          <tr>
+            <td>{{ sourceName(o.sourceId) }}</td>
+            <td>{{ sourceName(o.targetId) }}</td>
+            <td [class]="o.scoreBump >= 0 ? 'pos' : 'neg'">{{ o.scoreBump > 0 ? '+' : '' }}{{ o.scoreBump }}</td>
+            <td>{{ o.notes ?? '—' }}</td>
+            <td>
+              <button class="btn btn-secondary btn-sm" (click)="openEditOverride(o.id)">Edit</button>
+              <button class="btn btn-danger btn-sm" (click)="deleteOverride(o.id)" style="margin-left:0.5rem">Delete</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else {
+    <p class="empty-msg">No manual overrides.</p>
+  }
+</div>
+
+<!-- ── Score Breakdown Modal ─────────────────────────────────────────────── -->
+@if (selectedBreakdown(); as r) {
+  <div class="modal-backdrop" (click)="closeBreakdown()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>{{ sourceName(r.sourceId) }} → {{ sourceName(r.targetId) }}</h3>
+      <div class="breakdown-result">
+        <span [class]="labelClass(r.label)">{{ r.label }}</span>
+        <span [class]="scoreClass(r.finalScore)" style="font-size:1.5rem; margin-left:1rem">{{ r.finalScore }}</span>
+      </div>
+      <div class="breakdown-section">
+        <h4>Score Contributions</h4>
+        @for (c of breakdownContribs(r); track c.label) {
+          <div class="contrib-row">
+            <span class="contrib-label">{{ c.label }}</span>
+            <span [class]="c.value >= 0 ? 'contrib-val pos' : 'contrib-val neg'">
+              {{ c.value > 0 ? '+' : '' }}{{ c.value }}
+            </span>
+          </div>
+        }
+      </div>
+      <div class="breakdown-totals">
+        <div class="total-row">
+          <span>Base Score</span><strong>{{ r.baseScore }}</strong>
+        </div>
+        <div class="total-row">
+          <span>After Stress ({{ store.colonyState()?.colonyStress ?? 0 }})</span>
+          <strong>{{ r.stressedScore }}</strong>
+        </div>
+        @if (r.manualBump !== 0) {
+          <div class="total-row bump">
+            <span>Manual Bump</span>
+            <strong>{{ r.manualBump > 0 ? '+' : '' }}{{ r.manualBump }}</strong>
+          </div>
+        }
+        <div class="total-row final">
+          <span>Final Score</span><strong>{{ r.finalScore }}</strong>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" (click)="closeBreakdown()">Close</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Threshold Editor Modal ─────────────────────────────────────────────── -->
+@if (editingThresholds()) {
+  <div class="modal-backdrop" (click)="closeThresholds()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>Edit Relationship Thresholds</h3>
+      <p class="help-text" style="margin-bottom:1rem">
+        Each label applies when the final score is at or above its minimum.
+      </p>
+      <table class="threshold-table">
+        <thead>
+          <tr><th>Label</th><th>Min Score</th></tr>
+        </thead>
+        <tbody>
+          @for (t of thresholdEdits(); track t.label; let i = $index) {
+            <tr>
+              <td><span [class]="labelClass(t.label)">{{ t.label }}</span></td>
+              <td>
+                <input type="number" step="1"
+                  [value]="t.minScore"
+                  (input)="setThresholdScore(i, $any($event.target).value)"
+                  class="threshold-input" />
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" (click)="closeThresholds()">Cancel</button>
+        <button class="btn btn-primary" (click)="saveThresholds()">Save</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Override Modal ────────────────────────────────────────────────────── -->
+@if (showOverrideModal()) {
+  <div class="modal-backdrop" (click)="showOverrideModal.set(false)">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>{{ overrideEditId() ? 'Edit' : 'Add' }} Score Override</h3>
+      <div class="form-group">
+        <label>Source Faction</label>
+        <select [(ngModel)]="overrideSourceId" [ngModelOptions]="{standalone: true}">
+          <option value="">— Select —</option>
+          @for (f of store.allActiveFactions(); track f.id) {
+            <option [value]="f.id">{{ f.name }}</option>
+          }
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Target Faction</label>
+        <select [(ngModel)]="overrideTargetId" [ngModelOptions]="{standalone: true}">
+          <option value="">— Select —</option>
+          @for (f of store.allActiveFactions(); track f.id) {
+            <option [value]="f.id">{{ f.name }}</option>
+          }
+          <option value="darkwing">Darkwing</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Score Bump</label>
+        <input type="number" [(ngModel)]="overrideScoreBump" [ngModelOptions]="{standalone: true}" />
+      </div>
+      <div class="form-group">
+        <label>Notes (Optional)</label>
+        <textarea [(ngModel)]="overrideNotes" [ngModelOptions]="{standalone: true}" rows="3"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" (click)="showOverrideModal.set(false)">Cancel</button>
+        <button class="btn btn-primary" (click)="saveOverride()">Save</button>
+      </div>
+    </div>
+  </div>
+}

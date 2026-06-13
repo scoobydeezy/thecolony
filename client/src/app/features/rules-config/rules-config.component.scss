@@ -1,0 +1,130 @@
+.section-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.help-text {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.rules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.rule-group {
+  h4 {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+  }
+
+  &.conflict h4 { color: #f87171; }
+}
+
+.rule-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  gap: 0.75rem;
+
+  .rule-label {
+    font-size: 0.825rem;
+    color: var(--text-secondary);
+    flex: 1;
+  }
+
+  input[type=number] {
+    width: 70px;
+    background: var(--bg-base);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.35rem 0.5rem;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    text-align: center;
+    outline: none;
+    &:focus { border-color: var(--accent); }
+  }
+}
+
+.weights-table {
+  display: grid;
+  grid-template-columns: 120px repeat(3, 1fr);
+  gap: 0.5rem;
+  align-items: center;
+  max-width: 500px;
+}
+
+.weights-header {
+  display: contents;
+
+  span {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    padding: 0 0.25rem;
+    text-align: center;
+  }
+}
+
+.weights-row {
+  display: contents;
+
+  input[type=number] {
+    background: var(--bg-base);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.35rem;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    text-align: center;
+    outline: none;
+    &:focus { border-color: var(--accent); }
+  }
+}
+
+.value-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  &.truth     { color: var(--color-truth); }
+  &.stability { color: var(--color-stability); }
+  &.agency    { color: var(--color-agency); }
+}
+
+small {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.threshold-legend {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.save-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.saved-msg {
+  color: var(--color-success);
+  font-size: 0.875rem;
+  font-weight: 600;
+}

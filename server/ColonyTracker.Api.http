@@ -1,0 +1,6 @@
+@ColonyTracker.Api_HostAddress = http://localhost:5285
+
+GET {{ColonyTracker.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

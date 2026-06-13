@@ -1,0 +1,405 @@
+.section-title {
+  margin-bottom: 0.5rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.back-link {
+  font-size: 0.8rem;
+  color: var(--color-text-muted, #94a3b8);
+  text-decoration: none;
+  &:hover { color: #60a5fa; text-decoration: underline; }
+}
+
+.header-actions { display: flex; gap: 0.5rem; }
+
+// ── Shared layouts ────────────────────────────────────────────────────
+.edit-layout,
+.detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Left column wrapper: Values + Doubt stacked
+.values-doubt-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.values-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+// Edit-mode merged card: spans both columns
+.beliefs-card,
+.narrative-card {
+  grid-column: span 2;
+
+  @media (max-width: 900px) {
+    grid-column: span 1;
+  }
+}
+
+.beliefs-layout {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1.5rem;
+  align-items: start;
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.beliefs-plot-col {
+  display: flex;
+  justify-content: center;
+}
+
+.beliefs-fields-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+// ── Edit form ────────────────────────────────────────────────────────
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text-muted, #94a3b8);
+  }
+
+  input, select {
+    padding: 0.4rem 0.6rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color, #334155);
+    background: var(--bg-input, #0f172a);
+    color: var(--color-text, #e2e8f0);
+    font-size: 0.875rem;
+  }
+}
+
+.form-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--color-text-muted, #94a3b8);
+  }
+
+  textarea {
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color, #334155);
+    background: var(--bg-input, #0f172a);
+    color: var(--color-text, #e2e8f0);
+    font-size: 0.875rem;
+    resize: vertical;
+    font-family: inherit;
+  }
+}
+
+.optional-label {
+  font-weight: 400;
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #64748b);
+}
+
+// ── Detail view ──────────────────────────────────────────────────────
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.detail-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted, #64748b);
+}
+
+.type-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #1e293b;
+  color: #94a3b8;
+  border: 1px solid #334155;
+  &.party  { background: #1e3a5f; color: #93c5fd; border-color: #3b82f6; }
+  &.leader { background: #3b1e5f; color: #c4b5fd; border-color: #8b5cf6; }
+}
+
+.narrative-block {
+  margin-bottom: 0.75rem;
+  p { margin: 0.15rem 0 0; line-height: 1.6; font-size: 0.9rem; color: var(--color-text, #e2e8f0); }
+}
+
+.narrative-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted, #64748b);
+}
+
+// ── Conviction/Pressure/Drift ────────────────────────────────────────
+.conviction-value { font-size: 1.25rem; font-weight: 600; color: #4ade80; }
+.pressure-value   { font-size: 1.25rem; font-weight: 600; color: #f87171; }
+.out-of           { font-size: 0.8rem; color: var(--color-text-muted, #64748b); margin-left: 2px; }
+.doubt-value      { font-size: 1rem; font-weight: 600; color: #fbbf24; }
+
+.drift {
+  font-size: 1.25rem;
+  font-weight: 700;
+  &.high    { color: #ef4444; }
+  &.mid     { color: #f97316; }
+  &.neutral { color: #94a3b8; }
+}
+
+.drift-explanation {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #64748b);
+  margin-top: 0.75rem;
+}
+
+.pressure-breakdown {
+  font-size: 0.7rem;
+  color: var(--color-text-muted, #64748b);
+  margin-top: 0.1rem;
+}
+
+.pressure-hint {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #64748b);
+  margin-top: 0.5rem;
+}
+
+.conviction-value { &.max { color: #f87171; } }
+.pressure-value   { &.max { color: #ef4444; font-weight: 800; } }
+
+// ── Alignment Analysis layout ────────────────────────────────────────
+.alignment-card {}
+
+.beliefs-pills-row {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.belief-item {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--bg-base);
+  border-radius: 4px;
+  padding: 0.2rem 0.5rem;
+}
+
+.belief-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted, #64748b);
+}
+
+.belief-val {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-text, #e2e8f0);
+
+  &.ritual-good    { color: #4ade80; }
+  &.ritual-neutral { color: #94a3b8; }
+  &.ritual-bad     { color: #f87171; }
+  &.change-yes     { color: #60a5fa; }
+  &.change-no      { color: #fbbf24; }
+}
+
+.override-badge {
+  display: inline-block;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  background: #1e3a5f;
+  color: #93c5fd;
+  border: 1px solid #3b82f6;
+  margin-left: 2px;
+}
+
+.alignment-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.alignment-col-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted, #64748b);
+  margin: 0 0 0.5rem;
+}
+
+.col-title-hint {
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.72rem;
+}
+
+.current-col,
+.drifted-col { border-top: 1px solid var(--border-color, #334155); padding-top: 1rem; }
+
+.no-drift-note {
+  font-size: 0.78rem;
+  color: var(--color-text-muted, #64748b);
+  font-style: italic;
+}
+
+.compat-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; font-size: 0.85rem; }
+.compat-table th { font-size: 0.72rem; font-weight: 600; text-align: left; color: var(--color-text-muted, #64748b); padding: 0.25rem 0; border-bottom: 1px solid var(--border-color, #334155); }
+.compat-table td { padding: 0.3rem 0; border-bottom: 1px solid rgba(51,65,85,0.4); }
+
+.belief-override-group {
+  margin-top: 0.25rem;
+}
+
+.belief-override-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+
+  &.two-col {
+    grid-template-columns: 1fr 1fr;
+
+    > p {
+      grid-column: 1 / -1;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+  }
+}
+
+.affiliations-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.5rem;
+
+  &.two-col {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+// ── Compatibility analysis ────────────────────────────────────────────
+.compat-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border-color, #334155);
+  font-size: 0.875rem;
+
+  &.highlight { background: rgba(96,165,250,0.04); border-radius: 6px; padding: 0.5rem; }
+  &.defection-risk { background: rgba(239,68,68,0.06); }
+}
+
+.compat-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted, #64748b);
+  min-width: 110px;
+}
+
+.compat-faction { flex: 1; font-weight: 600; }
+
+.compat-score {
+  font-weight: 700;
+  &.pos-high { color: #4ade80; }
+  &.neutral  { color: #94a3b8; }
+  &.neg      { color: #f87171; }
+}
+
+.defection-badge {
+  background: #7f1d1d;
+  color: #fca5a5;
+  border: 1px solid #b91c1c;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.sub-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-muted, #94a3b8);
+  margin: 0.75rem 0 0.4rem;
+}
+
+.current-faction td { color: #60a5fa; }
+
+.doubt-analysis {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  flex-wrap: wrap;
+}
+
+.doubt-direction { font-weight: 700; color: #fbbf24; }
+
+.drift-note {
+  font-size: 0.75rem;
+  color: #f87171;
+}

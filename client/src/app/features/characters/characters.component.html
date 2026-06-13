@@ -1,0 +1,87 @@
+<div class="page-header">
+  <h2>Characters</h2>
+  <div class="toolbar-actions">
+    <button class="btn btn-secondary" (click)="exportCsv()">Export CSV</button>
+    <a routerLink="/characters/new" class="btn btn-primary">+ New Character</a>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="filter-bar">
+  <label>
+    Type
+    <select [value]="filterType()" (change)="filterType.set($any($event.target).value)">
+      <option value="all">All Types</option>
+      <option value="NPC">NPC</option>
+      <option value="FactionLeader">Faction Leader</option>
+      <option value="PartyMember">Party Member</option>
+    </select>
+  </label>
+
+  <label>
+    Faction
+    <select [value]="filterFaction()" (change)="filterFaction.set($any($event.target).value)">
+      <option value="all">All Factions</option>
+      <option value="">None</option>
+      @for (f of factionOptions(); track f.id) {
+        <option [value]="f.id">{{ f.name }}</option>
+      }
+    </select>
+  </label>
+
+  <label>
+    Social Class
+    <select [value]="filterClass()" (change)="filterClass.set($any($event.target).value)">
+      <option value="all">All Classes</option>
+      <option value="">None</option>
+      @for (c of socialClassOptions(); track c.id) {
+        <option [value]="c.id">{{ c.name }}</option>
+      }
+    </select>
+  </label>
+</div>
+
+<!-- Character Table -->
+<div class="card table-card">
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Faction</th>
+        <th>Social Class</th>
+        <th>Conviction</th>
+        <th>Pressure</th>
+        <th>Drift</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (c of displayCharacters(); track c.id) {
+        <tr>
+          <td>
+            <a [routerLink]="['/characters', c.id]" class="char-link">{{ c.name }}</a>
+            @if (c.occupation) {
+              <span class="occupation-tag">{{ c.occupation }}</span>
+            }
+          </td>
+          <td><span class="type-badge" [class.party]="c.characterType === 'PartyMember'" [class.leader]="c.characterType === 'FactionLeader'">{{ typeLabel(c.characterType) }}</span></td>
+          <td>{{ factionName(c.factionId) }}</td>
+          <td>{{ factionName(c.socialClassId) }}</td>
+          <td><span [class]="convictionClass(c.conviction)">{{ formatPct(c.conviction) }}</span></td>
+          <td><span [class]="pressureClass(effectivePressure(c, colonyStress()))">{{ formatPct(effectivePressure(c, colonyStress())) }}</span></td>
+          <td><span [class]="driftClass(effectiveDriftScore(c))">{{ effectiveDriftScore(c) > 0 ? '+' : '' }}{{ effectiveDriftScore(c) }}</span></td>
+          <td class="actions">
+            <a [routerLink]="['/characters', c.id]" class="btn btn-secondary btn-xs">View</a>
+            <button class="btn btn-danger btn-xs" (click)="delete(c)">Delete</button>
+          </td>
+        </tr>
+      }
+      @empty {
+        <tr>
+          <td colspan="8" class="empty-row">No characters yet.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

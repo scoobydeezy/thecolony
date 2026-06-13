@@ -1,0 +1,35 @@
+<div class="app-shell">
+  <nav class="sidebar">
+    <div class="sidebar-header">
+      <h1 class="app-title">The Colony</h1>
+      <p class="app-subtitle">Campaign Tracker</p>
+    </div>
+
+    <ul class="nav-list">
+      <li class="nav-section-label">Overview</li>
+      <li><a routerLink="/dashboard" routerLinkActive="active">Dashboard</a></li>
+
+      <li class="nav-section-label">World</li>
+      <li><a routerLink="/factions" routerLinkActive="active">Factions</a></li>
+      <li><a routerLink="/relationships" routerLinkActive="active">Relationships</a></li>
+      <li><a routerLink="/colony-state" routerLinkActive="active">Colony State</a></li>
+
+      <li class="nav-section-label">Campaign</li>
+      <li><a routerLink="/party" routerLinkActive="active">{{ partyName() }}</a></li>
+      <li><a routerLink="/characters" routerLinkActive="active">Characters</a></li>
+      <li><a routerLink="/session-log" routerLinkActive="active">Session Log</a></li>
+
+    </ul>
+
+    @if (store.colonyState()) {
+      <div class="stress-badge">
+        <span class="stress-label">Colony Stress</span>
+        <span [class]="stressClass()">{{ store.colonyState()!.colonyStress }}/10</span>
+      </div>
+    }
+  </nav>
+
+  <main class="main-content">
+    <router-outlet />
+  </main>
+</div>
