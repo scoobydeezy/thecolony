@@ -7,7 +7,7 @@ public class SessionLogEntry
     public int Act { get; set; } = 1;
     public int Week { get; set; } = 1;
     public string? Summary { get; set; }
-    public string? DarkwingActions { get; set; }
+    public string? PartyActions { get; set; }
     public string? FactionChanges { get; set; }
     public int ColonyStressChange { get; set; } = 0;
     public string? RelationshipBumps { get; set; }

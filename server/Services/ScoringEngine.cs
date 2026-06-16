@@ -12,7 +12,7 @@ public interface IScoringEngine
         int manualBump,
         RulesConfig rules);
 
-    RelationshipBreakdownDto ScoreRelationshipToDarkwing(
+    RelationshipBreakdownDto ScoreRelationshipToParty(
         Faction source,
         ColonyState colonyState,
         int manualBump,
@@ -37,18 +37,18 @@ public class ScoringEngine : IScoringEngine
             colonyStress, manualBump, rules);
     }
 
-    public RelationshipBreakdownDto ScoreRelationshipToDarkwing(
+    public RelationshipBreakdownDto ScoreRelationshipToParty(
         Faction source,
         ColonyState cs,
         int manualBump,
         RulesConfig rules)
     {
         return Score(
-            source.Id, "darkwing",
+            source.Id, "party",
             source.TruthValue, source.StabilityValue, source.AgencyValue,
             source.Ritual, source.Knowledge, source.Change,
-            cs.DarkwingTruthValue, cs.DarkwingStabilityValue, cs.DarkwingAgencyValue,
-            cs.DarkwingRitual, cs.DarkwingKnowledge, cs.DarkwingChange,
+            cs.PartyTruthValue, cs.PartyStabilityValue, cs.PartyAgencyValue,
+            cs.PartyRitual, cs.PartyKnowledge, cs.PartyChange,
             cs.ColonyStress, manualBump, rules);
     }
 

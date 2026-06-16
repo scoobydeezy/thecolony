@@ -32,7 +32,7 @@ export class PartyComponent {
   }
 
   updateValues(v: ValueVector): void {
-    this.form.update(s => s ? { ...s, darkwingValues: v } : s);
+    this.form.update(s => s ? { ...s, partyValues: v } : s);
   }
 
   exportCsv(): void {
@@ -47,9 +47,9 @@ export class PartyComponent {
     ];
     const row = [
       f.partyName, f.act ?? '', f.week ?? '', f.colonyStress ?? '',
-      f.darkwingRitual, f.darkwingKnowledge, f.darkwingChange,
-      primaryValue(f.darkwingValues), secondaryValue(f.darkwingValues), sacrificedValue(f.darkwingValues),
-      f.darkwingValues.truth.toFixed(3), f.darkwingValues.stability.toFixed(3), f.darkwingValues.agency.toFixed(3),
+      f.partyRitual, f.partyKnowledge, f.partyChange,
+      primaryValue(f.partyValues), secondaryValue(f.partyValues), sacrificedValue(f.partyValues),
+      f.partyValues.truth.toFixed(3), f.partyValues.stability.toFixed(3), f.partyValues.agency.toFixed(3),
       f.sessionSummary ?? '', f.dominantFactions ?? '', f.influenceNotes ?? '', f.majorConsequences ?? ''
     ];
     downloadCsv([header, row], 'party.csv');

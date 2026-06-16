@@ -1,13 +1,15 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
 import { AppStore } from '../../store/app.store';
 import { Character, CharacterType, driftScore, effectivePressure, influenceConvictionBonus } from '../../core/models/types';
-import { downloadCsv } from '../../core/utils/csv-export';
+import { downloadCsv, parseCsv, csvHeaderMap } from '../../core/utils/csv-export';
+import { oneOf, clampedInt, sanitizeValueVector } from '../../core/utils/validation';
 
 @Component({
   selector: 'app-characters',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, DecimalPipe],
   templateUrl: './characters.component.html',
   styleUrl: './characters.component.scss'
 })
@@ -84,6 +86,61 @@ export class CharactersComponent {
     if (t === 'PartyMember')   return 'Party';
     if (t === 'FactionLeader') return 'Leader';
     return 'NPC';
+  }
+
+  importCsv(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const rows = parseCsv(reader.result as string);
+      if (rows.length < 2) return;
+      const h = csvHeaderMap(rows[0]);
+      const get = (row: string[], col: string) => row[h.get(col) ?? -1] ?? '';
+
+      for (const row of rows.slice(1)) {
+        const character: Character = {
+          id:            get(row, 'id'),
+          name:          get(row, 'name'),
+          characterType: oneOf(get(row, 'role'), ['NPC', 'PartyMember', 'FactionLeader'] as const) ?? 'NPC',
+          factionId:     get(row, 'factionid')
+                           || this.store.factions().find(f => f.type === 'Faction'     && f.name === get(row, 'faction'))?.id
+                           || undefined,
+          socialClassId: get(row, 'socialclassid')
+                           || this.store.factions().find(f => f.type === 'SocialClass' && f.name === get(row, 'social class'))?.id
+                           || undefined,
+          ancestry:      get(row, 'ancestry')      || undefined,
+          heritage:      get(row, 'heritage')      || undefined,
+          class:         get(row, 'class')          || undefined,
+          background:    get(row, 'background')    || undefined,
+          level:         get(row, 'level')          ? Number(get(row, 'level'))  : undefined,
+          gender:        get(row, 'gender')         || undefined,
+          age:           get(row, 'age')            ? Number(get(row, 'age'))    : undefined,
+          occupation:    get(row, 'occupation')     || undefined,
+          ritual:        oneOf(get(row, 'ritual'),    ['Good', 'Neutral', 'Bad']              as const),
+          knowledge:     oneOf(get(row, 'knowledge'), ['Hidden', 'Controlled', 'Revealed']   as const),
+          change:        oneOf(get(row, 'change'),    ['Yes', 'No']                           as const),
+          doubtDirection:oneOf(get(row, 'doubtdirection'), ['Truth', 'Stability', 'Agency']  as const),
+          conviction:    clampedInt(get(row, 'conviction'),    0, 100, 50),
+          pressure:      clampedInt(get(row, 'pressure'),      0, 100, 0),
+          influence:     clampedInt(get(row, 'influence'),     0, 100, 0),
+          impressionable:clampedInt(get(row, 'impressionable'),0, 100, 50),
+          values: sanitizeValueVector(
+            parseFloat(get(row, 'truth')),
+            parseFloat(get(row, 'stability')),
+            parseFloat(get(row, 'agency')),
+          ),
+          summary: get(row, 'summary') || undefined,
+          goals:   get(row, 'goals')   || undefined,
+          fears:   get(row, 'fears')   || undefined,
+          notes:   get(row, 'notes')   || undefined,
+        };
+        this.store.saveCharacter(character);
+      }
+      // Reset the input so the same file can be re-imported if needed
+      (event.target as HTMLInputElement).value = '';
+    };
+    reader.readAsText(file);
   }
 
   exportCsv(): void {

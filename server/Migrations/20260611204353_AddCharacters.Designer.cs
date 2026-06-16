@@ -108,22 +108,22 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<int>("ColonyStress")
                         .HasColumnType("INTEGER");
 
-                    b.Property<double>("DarkwingAgencyValue")
+                    b.Property<double>("PartyAgencyValue")
                         .HasColumnType("REAL");
 
-                    b.Property<int>("DarkwingChange")
+                    b.Property<int>("PartyChange")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("DarkwingKnowledge")
+                    b.Property<int>("PartyKnowledge")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("DarkwingRitual")
+                    b.Property<int>("PartyRitual")
                         .HasColumnType("INTEGER");
 
-                    b.Property<double>("DarkwingStabilityValue")
+                    b.Property<double>("PartyStabilityValue")
                         .HasColumnType("REAL");
 
-                    b.Property<double>("DarkwingTruthValue")
+                    b.Property<double>("PartyTruthValue")
                         .HasColumnType("REAL");
 
                     b.Property<string>("DominantFactions")
@@ -305,7 +305,7 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<int>("ColonyStressChange")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("DarkwingActions")
+                    b.Property<string>("PartyActions")
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Date")

@@ -90,19 +90,19 @@
   margin-top: 0.5rem;
 }
 
-.darkwing-grid {
+.party-grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 0.75rem;
 }
 
-.dw-item {
+.party-item {
   background: var(--bg-base);
   border-radius: 6px;
   padding: 0.6rem 0.75rem;
 }
 
-.dw-label {
+.party-label {
   display: block;
   font-size: 0.7rem;
   color: var(--text-muted);
@@ -111,14 +111,20 @@
   margin-bottom: 0.2rem;
 }
 
-.dw-value {
+.party-value {
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--text-primary);
 
-  &.desires    { color: var(--color-truth); }
-  &.maintains  { color: var(--color-stability); }
-  &.sacrifices { color: var(--color-agency); }
+  &.change-no            { color: var(--color-change-no); }
+  &.change-yes           { color: var(--color-change-yes); }
+  &.knowledge-hidden     { color: var(--color-knowledge-hidden); }
+  &.knowledge-revealed   { color: var(--color-knowledge-revealed); }
+  &.ritual-good          { color: var(--color-ritual-good); }
+  &.ritual-bad           { color: var(--color-ritual-bad); }
+  &.truth                { color: var(--color-truth); }
+  &.stability            { color: var(--color-stability); }
+  &.agency               { color: var(--color-agency); }
 }
 
 .score {

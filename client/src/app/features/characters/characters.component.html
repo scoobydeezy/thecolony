@@ -2,6 +2,10 @@
   <h2>Characters</h2>
   <div class="toolbar-actions">
     <button class="btn btn-secondary" (click)="exportCsv()">Export CSV</button>
+    <label class="btn btn-secondary">
+      Import CSV
+      <input type="file" accept=".csv" style="display:none" (change)="importCsv($event)">
+    </label>
     <a routerLink="/characters/new" class="btn btn-primary">+ New Character</a>
   </div>
 </div>
@@ -70,7 +74,7 @@
           <td>{{ factionName(c.socialClassId) }}</td>
           <td><span [class]="convictionClass(c.conviction)">{{ formatPct(c.conviction) }}</span></td>
           <td><span [class]="pressureClass(effectivePressure(c, colonyStress()))">{{ formatPct(effectivePressure(c, colonyStress())) }}</span></td>
-          <td><span [class]="driftClass(effectiveDriftScore(c))">{{ effectiveDriftScore(c) > 0 ? '+' : '' }}{{ effectiveDriftScore(c) }}</span></td>
+          <td><span [class]="driftClass(effectiveDriftScore(c))">{{ effectiveDriftScore(c) > 0 ? '+' : '' }}{{ effectiveDriftScore(c) | number:'1.0-1' }}</span></td>
           <td class="actions">
             <a [routerLink]="['/characters', c.id]" class="btn btn-secondary btn-xs">View</a>
             <button class="btn btn-danger btn-xs" (click)="delete(c)">Delete</button>

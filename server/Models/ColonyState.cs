@@ -3,18 +3,18 @@ namespace ColonyTracker.Api.Models;
 public class ColonyState
 {
     public string Id { get; set; } = "singleton";
-    public string PartyName { get; set; } = "Darkwing";
+    public string PartyName { get; set; } = "The Party";
     public int Act { get; set; } = 1;
     public int Week { get; set; } = 1;
     public int ColonyStress { get; set; } = 0;
 
-    // Darkwing / Party State
-    public RitualPosition DarkwingRitual { get; set; } = RitualPosition.Neutral;
-    public KnowledgePosition DarkwingKnowledge { get; set; } = KnowledgePosition.Controlled;
-    public ChangePosition DarkwingChange { get; set; } = ChangePosition.Yes;
-    public double DarkwingTruthValue { get; set; } = 0.6;
-    public double DarkwingStabilityValue { get; set; } = 0.25;
-    public double DarkwingAgencyValue { get; set; } = 0.15;
+    // Party / Party State
+    public RitualPosition PartyRitual { get; set; } = RitualPosition.Neutral;
+    public KnowledgePosition PartyKnowledge { get; set; } = KnowledgePosition.Controlled;
+    public ChangePosition PartyChange { get; set; } = ChangePosition.Yes;
+    public double PartyTruthValue { get; set; } = 0.6;
+    public double PartyStabilityValue { get; set; } = 0.25;
+    public double PartyAgencyValue { get; set; } = 0.15;
 
     public string? SessionSummary { get; set; }
     public string? DominantFactions { get; set; }

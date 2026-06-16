@@ -14,6 +14,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         ?? "Data Source=colony.db"));
 
 builder.Services.AddScoped<IScoringEngine, ScoringEngine>();
+builder.Services.AddScoped<IFactionInfluenceService, FactionInfluenceService>();
 
 builder.Services.AddCors(options =>
 {

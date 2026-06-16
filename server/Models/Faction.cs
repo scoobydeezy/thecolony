@@ -21,4 +21,7 @@ public class Faction
     public bool Active { get; set; } = true;
     public string? Notes { get; set; }
     public int SortOrder { get; set; } = 0;
+    public int BaseInfluence { get; set; } = 50;
+    public int Momentum { get; set; } = 0;
+    public int Legitimacy { get; set; } = 50;
 }

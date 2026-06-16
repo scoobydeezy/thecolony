@@ -19,6 +19,106 @@
     </div>
   </div>
 
+}
+
+<!-- ── Matrix ──────────────────────────────────────────────────────────────── -->
+<div class="card matrix-card" style="margin-top:1.5rem">
+  <div class="matrix-wrap">
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th class="corner-cell">From ↓ / To →</th>
+          @for (target of factions(); track target.id) {
+            <th class="col-header">
+              <div class="col-label">{{ target.name }}</div>
+            </th>
+          }
+          <th class="col-header party-col">party</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (source of factions(); track source.id) {
+          <tr>
+            <td class="row-header">{{ source.name }}</td>
+            @for (target of factions(); track target.id) {
+              @if (source.id === target.id) {
+                <td class="cell cell-self">—</td>
+              } @else {
+                @let r = getRelationship(source.id, target.id);
+                <td [class]="'cell ' + cellStyle(r)"
+                    (click)="openBreakdown(r)"
+                    title="{{ r ? r.label + ' (' + r.finalScore + ')' : '' }}">
+                  @if (r) {
+                    <div class="cell-score">{{ r.finalScore }}</div>
+                    <div class="cell-label">{{ r.label }}</div>
+                  }
+                </td>
+              }
+            }
+            @let dw = getRelationship(source.id, 'party');
+            <td [class]="'cell party-cell ' + cellStyle(dw)"
+                (click)="openBreakdown(dw)"
+                title="{{ dw ? dw.label + ' (' + dw.finalScore + ')' : '' }}">
+              @if (dw) {
+                <div class="cell-score">{{ dw.finalScore }}</div>
+                <div class="cell-label">{{ dw.label }}</div>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ── Legend + Thresholds ────────────────────────────────────────────────── -->
+<div class="legend card" style="margin-top:1rem">
+  <span class="legend-title">Legend:</span>
+  <span class="badge badge-aligned">Aligned</span>
+  <span class="badge badge-cooperative">Cooperative</span>
+  <span class="badge badge-friendly">Friendly</span>
+  <span class="badge badge-tolerated">Tolerated</span>
+  <span class="badge badge-strained">Strained</span>
+  <span class="badge badge-opposed">Opposed</span>
+  <span class="badge badge-hostile">Hostile</span>
+  <button class="btn btn-secondary btn-sm legend-edit-btn" (click)="openThresholds()">Edit Thresholds</button>
+</div>
+
+<!-- ── Manual Overrides ───────────────────────────────────────────────────── -->
+<div class="card" style="margin-top:1.5rem; margin-bottom:1.5rem;">
+  <div class="section-header">
+    <h3 class="section-title">Manual Score Bumps</h3>
+    <button class="btn btn-primary btn-sm" (click)="openAddOverride()">+ Add Override</button>
+  </div>
+  @if (store.overrides().length > 0) {
+    <table>
+      <thead>
+        <tr>
+          <th>From</th><th>To</th><th>Score Bump</th><th>Notes</th><th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (o of store.overrides(); track o.id) {
+          <tr>
+            <td>{{ sourceName(o.sourceId) }}</td>
+            <td>{{ sourceName(o.targetId) }}</td>
+            <td [class]="o.scoreBump >= 0 ? 'pos' : 'neg'">{{ o.scoreBump > 0 ? '+' : '' }}{{ o.scoreBump }}</td>
+            <td>{{ o.notes ?? '—' }}</td>
+            <td>
+              <button class="btn btn-secondary btn-sm" (click)="openEditOverride(o.id)">Edit</button>
+              <button class="btn btn-danger btn-sm" (click)="deleteOverride(o.id)" style="margin-left:0.5rem">Delete</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else {
+    <p class="empty-msg">No manual overrides.</p>
+  }
+</div>
+
+@if (rules(); as r) {
+
   <!-- ── Tuners ─────────────────────────────────────────────────────────── -->
   <div class="tuner-row" style="margin-bottom:1rem">
 
@@ -111,104 +211,8 @@
   <div class="tuner-reset-row">
     <button class="btn btn-secondary btn-sm" (click)="resetRules()">Reset to defaults</button>
   </div>
-
+  
 }
-
-<!-- ── Matrix ──────────────────────────────────────────────────────────────── -->
-<div class="card matrix-card" style="margin-top:1.5rem">
-  <div class="matrix-wrap">
-    <table class="matrix-table">
-      <thead>
-        <tr>
-          <th class="corner-cell">From ↓ / To →</th>
-          @for (target of factions(); track target.id) {
-            <th class="col-header">
-              <div class="col-label">{{ target.name }}</div>
-            </th>
-          }
-          <th class="col-header darkwing-col">Darkwing</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (source of factions(); track source.id) {
-          <tr>
-            <td class="row-header">{{ source.name }}</td>
-            @for (target of factions(); track target.id) {
-              @if (source.id === target.id) {
-                <td class="cell cell-self">—</td>
-              } @else {
-                @let r = getRelationship(source.id, target.id);
-                <td [class]="'cell ' + cellStyle(r)"
-                    (click)="openBreakdown(r)"
-                    title="{{ r ? r.label + ' (' + r.finalScore + ')' : '' }}">
-                  @if (r) {
-                    <div class="cell-score">{{ r.finalScore }}</div>
-                    <div class="cell-label">{{ r.label }}</div>
-                  }
-                </td>
-              }
-            }
-            @let dw = getRelationship(source.id, 'darkwing');
-            <td [class]="'cell darkwing-cell ' + cellStyle(dw)"
-                (click)="openBreakdown(dw)"
-                title="{{ dw ? dw.label + ' (' + dw.finalScore + ')' : '' }}">
-              @if (dw) {
-                <div class="cell-score">{{ dw.finalScore }}</div>
-                <div class="cell-label">{{ dw.label }}</div>
-              }
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
-</div>
-
-<!-- ── Legend + Thresholds ────────────────────────────────────────────────── -->
-<div class="legend card" style="margin-top:1rem">
-  <span class="legend-title">Legend:</span>
-  <span class="badge badge-aligned">Aligned</span>
-  <span class="badge badge-cooperative">Cooperative</span>
-  <span class="badge badge-friendly">Friendly</span>
-  <span class="badge badge-tolerated">Tolerated</span>
-  <span class="badge badge-strained">Strained</span>
-  <span class="badge badge-opposed">Opposed</span>
-  <span class="badge badge-hostile">Hostile</span>
-  <button class="btn btn-secondary btn-sm legend-edit-btn" (click)="openThresholds()">Edit Thresholds</button>
-</div>
-
-<!-- ── Manual Overrides ───────────────────────────────────────────────────── -->
-<div class="card" style="margin-top:1.5rem">
-  <div class="section-header">
-    <h3 class="section-title">Manual Score Bumps</h3>
-    <button class="btn btn-primary btn-sm" (click)="openAddOverride()">+ Add Override</button>
-  </div>
-  @if (store.overrides().length > 0) {
-    <table>
-      <thead>
-        <tr>
-          <th>From</th><th>To</th><th>Score Bump</th><th>Notes</th><th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (o of store.overrides(); track o.id) {
-          <tr>
-            <td>{{ sourceName(o.sourceId) }}</td>
-            <td>{{ sourceName(o.targetId) }}</td>
-            <td [class]="o.scoreBump >= 0 ? 'pos' : 'neg'">{{ o.scoreBump > 0 ? '+' : '' }}{{ o.scoreBump }}</td>
-            <td>{{ o.notes ?? '—' }}</td>
-            <td>
-              <button class="btn btn-secondary btn-sm" (click)="openEditOverride(o.id)">Edit</button>
-              <button class="btn btn-danger btn-sm" (click)="deleteOverride(o.id)" style="margin-left:0.5rem">Delete</button>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  } @else {
-    <p class="empty-msg">No manual overrides.</p>
-  }
-</div>
 
 <!-- ── Score Breakdown Modal ─────────────────────────────────────────────── -->
 @if (selectedBreakdown(); as r) {
@@ -310,7 +314,7 @@
           @for (f of store.allActiveFactions(); track f.id) {
             <option [value]="f.id">{{ f.name }}</option>
           }
-          <option value="darkwing">Darkwing</option>
+          <option value="party">party</option>
         </select>
       </div>
       <div class="form-group">

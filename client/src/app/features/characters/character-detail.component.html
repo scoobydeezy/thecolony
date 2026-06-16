@@ -1,7 +1,16 @@
 <div class="page-header">
   <div class="header-left">
     <a routerLink="/characters" class="back-link">← Characters</a>
-    <h2>{{ editMode() ? (editForm().name || 'New Character') : character().name }}</h2>
+    <h2>
+      {{ editMode() ? (editForm().name || 'New Character') : character().name }}
+      @if (!editMode()) {
+        <span class="type-badge"
+          [class.party]="character().characterType === 'PartyMember'"
+          [class.leader]="character().characterType === 'FactionLeader'">
+          {{ character().characterType === 'PartyMember' ? 'Party Member' : character().characterType === 'FactionLeader' ? 'Faction Leader' : 'NPC' }}
+        </span>
+      }
+    </h2>
   </div>
   <div class="header-actions">
     @if (!editMode()) {
@@ -233,13 +242,6 @@
       <h3 class="section-title">Identity</h3>
       <div class="detail-grid">
         <div class="detail-item"><span class="detail-label">Name</span><span>{{ character().name }}</span></div>
-        <div class="detail-item"><span class="detail-label">Type</span>
-          <span class="type-badge"
-            [class.party]="character().characterType === 'PartyMember'"
-            [class.leader]="character().characterType === 'FactionLeader'">
-            {{ character().characterType === 'PartyMember' ? 'Party Member' : character().characterType === 'FactionLeader' ? 'Faction Leader' : 'NPC' }}
-          </span>
-        </div>
         @if (character().gender || character().ancestry) {
           <div class="detail-item"><span class="detail-label">Race & Gender</span><span>{{ character().ancestry }} {{ character().gender }}</span></div>
         }
@@ -298,7 +300,7 @@
       <h3 class="section-title">Doubt &amp; Pressure</h3>
       <div class="detail-grid">
         <div class="detail-item">
-          <span class="detail-label">Doubted Value</span>
+          <span class="detail-label">Doubt Vector</span>
           <span class="doubt-value">{{ character().doubtDirection ?? '—' }}</span>
         </div>
         <div class="detail-item">
@@ -340,23 +342,16 @@
     <div class="card alignment-card">
       <h3 class="section-title">Alignment Analysis</h3>
 
-      <div class="beliefs-pills-row">
-        <div class="belief-item">
-          <span class="belief-label">Ritual</span>
-          <span class="belief-val ritual-{{ derivedBeliefs().ritual.toLowerCase() }}">{{ derivedBeliefs().ritual }}</span>
-          @if (character().ritual) { <span class="override-badge">override</span> }
+      @if (character().doubtDirection) {
+        @let eds = effectivePressureValue() - effectiveConvictionValue();
+        <div class="doubt-analysis">
+          <span class="detail-label">Doubts</span>
+          <span class="doubt-direction">{{ character().doubtDirection }}</span>
+          @if (eds > 0) {
+            <span class="drift-note">Drift Score +{{ eds | number:'1.0-1' }} — under pressure toward {{ character().doubtDirection === 'Truth' ? 'hidden knowledge' : character().doubtDirection === 'Stability' ? 'embracing change' : 'collective ritual' }}.</span>
+          }
         </div>
-        <div class="belief-item">
-          <span class="belief-label">Knowledge</span>
-          <span class="belief-val">{{ derivedBeliefs().knowledge }}</span>
-          @if (character().knowledge) { <span class="override-badge">override</span> }
-        </div>
-        <div class="belief-item">
-          <span class="belief-label">Change</span>
-          <span class="belief-val change-{{ derivedBeliefs().change.toLowerCase() }}">{{ derivedBeliefs().change }}</span>
-          @if (character().change) { <span class="override-badge">override</span> }
-        </div>
-      </div>
+      }
 
       <div class="alignment-columns">
 
@@ -364,15 +359,23 @@
         <div class="alignment-col current-col">
           <h4 class="alignment-col-title">Current</h4>
 
-          @if (character().factionId) {
-            <div class="compat-row">
-              <span class="compat-label">Member Of</span>
-              <span class="compat-faction">{{ factionName(character().factionId) }}</span>
-              @if (currentFactionCompatibility(); as cfc) {
-                <span [class]="valueScoreClass(cfc.score)">{{ cfc.score > 0 ? '+' : '' }}{{ cfc.score }}</span>
-              }
+          <div class="beliefs-pills-row">
+            <div class="belief-item">
+              <span class="belief-label">Ritual</span>
+              <span class="belief-val ritual-{{ derivedBeliefs().ritual.toLowerCase() }}">{{ derivedBeliefs().ritual }}</span>
+              @if (character().ritual) { <span class="override-badge">override</span> }
             </div>
-          }
+            <div class="belief-item">
+              <span class="belief-label">Knowledge</span>
+              <span class="belief-val knowledge-{{ derivedBeliefs().knowledge.toLowerCase() }}">{{ derivedBeliefs().knowledge }}</span>
+              @if (character().knowledge) { <span class="override-badge">override</span> }
+            </div>
+            <div class="belief-item">
+              <span class="belief-label">Change</span>
+              <span class="belief-val change-{{ derivedBeliefs().change.toLowerCase() }}">{{ derivedBeliefs().change }}</span>
+              @if (character().change) { <span class="override-badge">override</span> }
+            </div>
+          </div>
 
           @if (mostCompatibleFaction(); as best) {
             <div class="compat-row highlight" [class.defection-risk]="isPotentialDefection()">
@@ -408,6 +411,36 @@
               <span class="col-title-hint">(conviction {{ character().conviction }}%)</span>
             </h4>
 
+            <div class="beliefs-pills-row">
+              <div class="belief-item"
+                [class.changed-belief]="driftedBeliefChanges().ritual"
+              >
+                <span class="belief-label">Ritual</span>
+                <span class="belief-val ritual-{{ driftedBeliefs().ritual.toLowerCase() }}">
+                  {{ driftedBeliefs().ritual }}
+                </span>
+                @if (character().ritual) { <span class="override-badge">override</span> }
+              </div>
+              <div class="belief-item"
+                [class.changed-belief]="driftedBeliefChanges().knowledge"
+              >
+                <span class="belief-label">Knowledge</span>
+                <span class="belief-val knowledge-{{ driftedBeliefs().knowledge.toLowerCase() }}">
+                  {{ driftedBeliefs().knowledge }}
+                </span>
+                @if (character().knowledge) { <span class="override-badge">override</span> }
+              </div>
+              <div class="belief-item"
+                [class.changed-belief]="driftedBeliefChanges().change"
+              >
+                <span class="belief-label">Change</span>
+                <span class="belief-val change-{{ driftedBeliefs().change.toLowerCase() }}">
+                  {{ driftedBeliefs().change }}
+                </span>
+                @if (character().change) { <span class="override-badge">override</span> }
+              </div>
+            </div>
+
             @if (driftedTopFaction(); as driftBest) {
               <div class="compat-row highlight" [class.defection-risk]="isDriftRiskFactionDifferent()">
                 <span class="compat-label">Best Fit</span>
@@ -441,17 +474,6 @@
         }
 
       </div>
-
-      @if (character().doubtDirection) {
-        @let eds = effectivePressureValue() - effectiveConvictionValue();
-        <div class="doubt-analysis">
-          <span class="detail-label">Doubts</span>
-          <span class="doubt-direction">{{ character().doubtDirection }}</span>
-          @if (eds > 0) {
-            <span class="drift-note">Drift Score +{{ eds | number:'1.0-1' }} — under pressure toward {{ character().doubtDirection === 'Truth' ? 'hidden knowledge' : character().doubtDirection === 'Stability' ? 'embracing change' : 'collective ritual' }}.</span>
-          }
-        </div>
-      }
     </div>
 
     <!-- Narrative -->

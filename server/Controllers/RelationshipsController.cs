@@ -33,11 +33,11 @@ public class RelationshipsController(AppDbContext db, IScoringEngine scoring) : 
             }
         }
 
-        // Darkwing relationships
+        // party relationships
         foreach (var faction in activeFactions)
         {
-            var bump = overrides.FirstOrDefault(o => o.SourceId == faction.Id && o.TargetId == "darkwing")?.ScoreBump ?? 0;
-            var breakdown = scoring.ScoreRelationshipToDarkwing(faction, colonyState, bump, rules);
+            var bump = overrides.FirstOrDefault(o => o.SourceId == faction.Id && o.TargetId == "party")?.ScoreBump ?? 0;
+            var breakdown = scoring.ScoreRelationshipToParty(faction, colonyState, bump, rules);
             results.Add(breakdown);
         }
 
@@ -54,11 +54,11 @@ public class RelationshipsController(AppDbContext db, IScoringEngine scoring) : 
 
         if (colonyState is null || rules is null) return StatusCode(500);
 
-        if (targetId == "darkwing")
+        if (targetId == "party")
         {
             var source = await db.Factions.FindAsync(sourceId);
             if (source is null) return NotFound();
-            return Ok(scoring.ScoreRelationshipToDarkwing(source, colonyState, bump, rules));
+            return Ok(scoring.ScoreRelationshipToParty(source, colonyState, bump, rules));
         }
         else
         {

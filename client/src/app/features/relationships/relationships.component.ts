@@ -165,7 +165,7 @@ export class RelationshipsComponent {
   }
 
   sourceName(id: string): string {
-    if (id === 'darkwing') return 'Darkwing';
+    if (id === 'party') return 'party';
     return this.store.factions().find(f => f.id === id)?.name ?? id;
   }
 
@@ -218,7 +218,7 @@ export class RelationshipsComponent {
   // ── CSV export ────────────────────────────────────────────────────────────
   exportCsv(): void {
     const factions = this.factions();
-    const colHeaders = [...factions.map(f => f.name), 'Darkwing'];
+    const colHeaders = [...factions.map(f => f.name), 'party'];
     const header = ['From \\ To', ...colHeaders];
     const rows = factions.map(source => {
       const cells = factions.map(target => {
@@ -226,7 +226,7 @@ export class RelationshipsComponent {
         const r = this.getRelationship(source.id, target.id);
         return r ? `${r.finalScore} (${r.label})` : '';
       });
-      const dw = this.getRelationship(source.id, 'darkwing');
+      const dw = this.getRelationship(source.id, 'party');
       cells.push(dw ? `${dw.finalScore} (${dw.label})` : '');
       return [source.name, ...cells];
     });

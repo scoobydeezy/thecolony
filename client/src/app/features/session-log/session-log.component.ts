@@ -9,7 +9,7 @@ const emptyEntry = (): SessionLogEntry => ({
   act: 1,
   week: 1,
   summary: '',
-  darkwingActions: '',
+  partyActions: '',
   factionChanges: '',
   colonyStressChange: 0,
   relationshipBumps: '',

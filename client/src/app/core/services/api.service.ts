@@ -29,13 +29,13 @@ function characterToApi(c: Character): any {
 }
 
 function colonyStateFromApi(cs: any): ColonyState {
-  const { darkwingTruthValue, darkwingStabilityValue, darkwingAgencyValue, ...rest } = cs;
-  return { ...rest, partyName: rest.partyName ?? 'Darkwing', darkwingValues: { truth: darkwingTruthValue ?? 0.6, stability: darkwingStabilityValue ?? 0.25, agency: darkwingAgencyValue ?? 0.15 } };
+  const { partyTruthValue, partyStabilityValue, partyAgencyValue, ...rest } = cs;
+  return { ...rest, partyName: rest.partyName ?? 'party', partyValues: { truth: partyTruthValue ?? 0.6, stability: partyStabilityValue ?? 0.25, agency: partyAgencyValue ?? 0.15 } };
 }
 
 function colonyStateToApi(cs: ColonyState): any {
-  const { darkwingValues, ...rest } = cs;
-  return { ...rest, darkwingTruthValue: darkwingValues.truth, darkwingStabilityValue: darkwingValues.stability, darkwingAgencyValue: darkwingValues.agency };
+  const { partyValues, ...rest } = cs;
+  return { ...rest, partyTruthValue: partyValues.truth, partyStabilityValue: partyValues.stability, partyAgencyValue: partyValues.agency };
 }
 
 @Injectable({ providedIn: 'root' })

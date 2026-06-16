@@ -36,10 +36,10 @@
         }
 
         <div class="session-details">
-          @if (entry.darkwingActions) {
+          @if (entry.partyActions) {
             <div class="detail-section">
-              <span class="detail-label">Darkwing Actions</span>
-              <p>{{ entry.darkwingActions }}</p>
+              <span class="detail-label">Party Actions</span>
+              <p>{{ entry.partyActions }}</p>
             </div>
           }
           @if (entry.factionChanges) {
@@ -96,9 +96,9 @@
       </div>
 
       <div class="form-group">
-        <label>Darkwing Actions</label>
-        <textarea rows="2" [value]="editingEntry().darkwingActions ?? ''"
-          (input)="editingEntry.update(e => ({...e, darkwingActions: $any($event.target).value}))"></textarea>
+        <label>Party Actions</label>
+        <textarea rows="2" [value]="editingEntry().partyActions ?? ''"
+          (input)="editingEntry.update(e => ({...e, partyActions: $any($event.target).value}))"></textarea>
       </div>
 
       <div class="form-group">

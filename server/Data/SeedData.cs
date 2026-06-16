@@ -345,11 +345,11 @@ public static class SeedData
             Act = 1,
             Week = 1,
             ColonyStress = 3,
-            DarkwingRitual = RitualPosition.Neutral,
-            DarkwingKnowledge = KnowledgePosition.Controlled,
-            DarkwingChange = ChangePosition.Yes,
+            PartyRitual = RitualPosition.Neutral,
+            PartyKnowledge = KnowledgePosition.Controlled,
+            PartyChange = ChangePosition.Yes,
             // Desires Truth, Maintains Stability, Sacrifices Agency
-            DarkwingTruthValue = D, DarkwingStabilityValue = M, DarkwingAgencyValue = S
+            PartyTruthValue = D, PartyStabilityValue = M, PartyAgencyValue = S
         });
 
         db.RulesConfigs.Add(new RulesConfig { Id = "singleton" });

@@ -95,6 +95,9 @@ export interface Faction {
   active: boolean;
   notes?: string;
   sortOrder: number;
+  baseInfluence: number;
+  momentum: number;
+  legitimacy: number;
 }
 
 export interface ColonyState {
@@ -103,10 +106,10 @@ export interface ColonyState {
   act: number;
   week: number;
   colonyStress: number;
-  darkwingRitual: RitualPosition;
-  darkwingKnowledge: KnowledgePosition;
-  darkwingChange: ChangePosition;
-  darkwingValues: ValueVector;
+  partyRitual: RitualPosition;
+  partyKnowledge: KnowledgePosition;
+  partyChange: ChangePosition;
+  partyValues: ValueVector;
   sessionSummary?: string;
   dominantFactions?: string;
   influenceNotes?: string;
@@ -160,7 +163,7 @@ export interface SessionLogEntry {
   act: number;
   week: number;
   summary?: string;
-  darkwingActions?: string;
+  partyActions?: string;
   factionChanges?: string;
   colonyStressChange: number;
   relationshipBumps?: string;

@@ -289,17 +289,38 @@ export class CharacterDetailComponent implements OnInit {
     return top && c.factionId && top.factionId !== c.factionId;
   });
 
-  // Drifted compatibility: character at max-pressure position given current conviction
-  // t = 1 - conviction/100  (conviction 100 → no drift, conviction 0 → full drift to target)
-  readonly driftedCompatibilityList = computed(() => {
+  readonly driftedCharacter = computed(() => {
     const c = this.character();
     const target = this.driftTarget();
+
     if (!target) return null;
-    const t = 1 - Math.min(100, Math.max(0, this.effectiveConvictionValue())) / 100;
+
+    const conviction = Math.min(100, Math.max(0, c.conviction));
+    const t = 1 - conviction / 100;
+
     if (t <= 0) return null;
-    const driftedValues = lerpValueVector(c.values, target, t);
-    const driftedChar = { ...c, values: driftedValues };
-    return topCompatibleFactions(driftedChar, this.activeFactions());
+
+    return {
+      ...c,
+      values: lerpValueVector(c.values, target, t),
+    };
+  });
+
+  readonly driftedCompatibilityList = computed(() => {
+    const drifted = this.driftedCharacter();
+
+    if (!drifted) return null;
+
+    return topCompatibleFactions(drifted, this.activeFactions());
+  });
+
+  readonly driftedBeliefs = computed(() => {
+    const target = this.driftTarget();
+
+    return effectiveBeliefs({
+      ...this.character(),
+      values: target ?? this.character().values
+    });
   });
 
   readonly driftedTop3 = computed(() =>
@@ -319,6 +340,17 @@ export class CharacterDetailComponent implements OnInit {
   });
 
   readonly derivedBeliefs = computed(() => effectiveBeliefs(this.character()));
+
+  readonly driftedBeliefChanges = computed(() => {
+  const current = this.derivedBeliefs();
+  const drifted = this.driftedBeliefs();
+
+  return {
+    ritual: current.ritual !== drifted.ritual,
+    knowledge: current.knowledge !== drifted.knowledge,
+    change: current.change !== drifted.change,
+  };
+});
 
   readonly factionOptions = computed(() =>
     this.store.factions().filter(f => f.type === 'Faction' && f.active)

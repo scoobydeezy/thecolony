@@ -23,7 +23,7 @@
   </div>
 </div>
 
-<!-- Colony Stress + Darkwing State -->
+<!-- Colony Stress + Party State -->
 <div class="two-col">
   @if (store.colonyState(); as cs) {
     <div class="card">
@@ -42,14 +42,32 @@
     </div>
 
     <div class="card">
-      <h3 class="section-title">Darkwing Position</h3>
-      <div class="darkwing-grid">
-        <div class="dw-item"><span class="dw-label">Ritual</span><span class="dw-value">{{ cs.darkwingRitual }}</span></div>
-        <div class="dw-item"><span class="dw-label">Knowledge</span><span class="dw-value">{{ cs.darkwingKnowledge }}</span></div>
-        <div class="dw-item"><span class="dw-label">Change</span><span class="dw-value">{{ cs.darkwingChange }}</span></div>
-        <div class="dw-item"><span class="dw-label">Desires</span><span class="dw-value desires">{{ primaryValue(cs.darkwingValues) }}</span></div>
-        <div class="dw-item"><span class="dw-label">Maintains</span><span class="dw-value maintains">{{ secondaryValue(cs.darkwingValues) }}</span></div>
-        <div class="dw-item"><span class="dw-label">Sacrifices</span><span class="dw-value sacrifices">{{ sacrificedValue(cs.darkwingValues) }}</span></div>
+      <h3 class="section-title">Party Position</h3>
+      <div class="party-grid">
+        <div class="party-item">
+          <span class="party-label">Ritual</span>
+          <span class="party-value ritual-{{ cs.partyRitual.toLowerCase() }}">{{ cs.partyRitual }}</span>
+        </div>
+        <div class="party-item">
+          <span class="party-label">Knowledge</span>
+          <span class="party-value knowledge-{{ cs.partyKnowledge.toLowerCase() }}">{{ cs.partyKnowledge }}</span>
+        </div>
+        <div class="party-item">
+          <span class="party-label">Change</span>
+          <span class="party-value change-{{ cs.partyChange.toLowerCase() }}">{{ cs.partyChange }}</span>
+        </div>
+        <div class="party-item">
+          <span class="party-label">Desires</span>
+          <span class="party-value {{ primaryValue(cs.partyValues).toLowerCase() }}">{{ primaryValue(cs.partyValues) }}</span>
+        </div>
+        <div class="party-item">
+          <span class="party-label">Maintains</span>
+          <span class="party-value {{ secondaryValue(cs.partyValues).toLowerCase() }}">{{ secondaryValue(cs.partyValues) }}</span>
+        </div>
+        <div class="party-item">
+          <span class="party-label">Sacrifices</span>
+          <span class="party-value {{ sacrificedValue(cs.partyValues).toLowerCase() }}">{{ sacrificedValue(cs.partyValues) }}</span>
+        </div>
       </div>
     </div>
   }
@@ -130,7 +148,7 @@
               <td>{{ factionName(c.factionId) }}</td>
               <td>
                 <span [class]="driftScore(c) >= 30 ? 'score neg-high' : driftScore(c) >= 10 ? 'score neg-mid' : 'score neutral'">
-                  {{ driftScore(c) > 0 ? '+' : '' }}{{ driftScore(c) }}
+                  {{ driftScore(c) > 0 ? '+' : '' }}{{ driftScore(c) | number:'1.0-1' }}
                 </span>
               </td>
             </tr>
@@ -167,9 +185,9 @@
   </div>
 }
 
-<!-- Darkwing Relationships -->
+<!-- Party Relationships -->
 <div class="card" style="margin-top: 1.5rem;">
-  <h3 class="section-title">Faction → Darkwing Relationships</h3>
+  <h3 class="section-title">Faction → Party Relationships</h3>
   <table>
     <thead>
       <tr>
@@ -182,7 +200,7 @@
       </tr>
     </thead>
     <tbody>
-      @for (r of store.darkwingRelationships(); track r.sourceId) {
+      @for (r of store.partyRelationships(); track r.sourceId) {
         <tr>
           <td>{{ factionName(r.sourceId) }}</td>
           <td><span [class]="labelClass(r.label)">{{ r.label }}</span></td>

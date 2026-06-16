@@ -1,12 +1,13 @@
 import { Component, inject, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { DecimalPipe } from '@angular/common';
 import { AppStore } from '../../store/app.store';
 import { primaryValue, secondaryValue, sacrificedValue, driftScore, topCompatibleFactions } from '../../core/models/types';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, DecimalPipe],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
@@ -20,7 +21,7 @@ export class DashboardComponent {
 
   factionName(id: string | undefined): string {
     if (!id) return '—';
-    if (id === 'darkwing') return 'Darkwing';
+    if (id === 'party') return 'party';
     return this.store.factions().find(f => f.id === id)?.name ?? id;
   }
 

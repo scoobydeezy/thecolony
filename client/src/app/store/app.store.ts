@@ -48,21 +48,21 @@ export const AppStore = signalStore(
     ),
     mostHostile: computed(() =>
       [...store.relationships()]
-        .filter(r => r.targetId !== 'darkwing')
+        .filter(r => r.targetId !== 'party')
         .sort((a, b) => a.finalScore - b.finalScore)
         .slice(0, 5)
     ),
     strongestAlliances: computed(() =>
       [...store.relationships()]
-        .filter(r => r.targetId !== 'darkwing')
+        .filter(r => r.targetId !== 'party')
         .sort((a, b) => b.finalScore - a.finalScore)
         .slice(0, 5)
     ),
-    darkwingRelationships: computed(() =>
-      store.relationships().filter(r => r.targetId === 'darkwing')
+    partyRelationships: computed(() =>
+      store.relationships().filter(r => r.targetId === 'party')
     ),
     factionRelationships: computed(() =>
-      store.relationships().filter(r => r.targetId !== 'darkwing')
+      store.relationships().filter(r => r.targetId !== 'party')
     ),
 
     // Characters sorted by effective drift score descending (most at-risk first)

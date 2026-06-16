@@ -1,6 +1,8 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { DecimalPipe, NgClass } from '@angular/common';
 import { FormField, form, required } from '@angular/forms/signals';
 import { AppStore } from '../../store/app.store';
+import { FactionInfluenceService } from '../../core/services/faction-influence.service';
 import {
   Faction, Character, GroupType, RitualPosition, KnowledgePosition, ChangePosition,
   ValueVector, primaryValue, secondaryValue, sacrificedValue,
@@ -8,7 +10,8 @@ import {
   mostAlignedFactions, mostOpposedFactions, effectivePressure, topCompatibleFactions
 } from '../../core/models/types';
 import { TernaryPlotComponent, TernaryOverlayPoint } from '../../shared/ternary-plot/ternary-plot.component';
-import { downloadCsv } from '../../core/utils/csv-export';
+import { downloadCsv, parseCsv, csvHeaderMap } from '../../core/utils/csv-export';
+import { oneOf, clampedInt, sanitizeValueVector } from '../../core/utils/validation';
 
 
 interface FactionFormModel {
@@ -28,6 +31,9 @@ interface FactionFormModel {
   active: string;
   notes: string;
   sortOrder: number;
+  baseInfluence: string;
+  momentum: string;
+  legitimacy: string;
 }
 
 const DEFAULT_VALUES: ValueVector = { truth: 1/3, stability: 1/3, agency: 1/3 };
@@ -37,7 +43,8 @@ const emptyForm = (): FactionFormModel => ({
   coreTenet: '', certainOf: '', rightAbout: '', afraidOf: '',
   wrongAbout: '', singleSentence: '',
   ritual: '', knowledge: '', change: '',
-  active: 'true', notes: '', sortOrder: 0
+  active: 'true', notes: '', sortOrder: 0,
+  baseInfluence: '50', momentum: '0', legitimacy: '50'
 });
 
 const toFormModel = (f: Faction): FactionFormModel => ({
@@ -56,7 +63,10 @@ const toFormModel = (f: Faction): FactionFormModel => ({
   change: f.change ?? '',
   active: f.active ? 'true' : 'false',
   notes: f.notes ?? '',
-  sortOrder: f.sortOrder
+  sortOrder: f.sortOrder,
+  baseInfluence: f.baseInfluence.toString(),
+  momentum: f.momentum.toString(),
+  legitimacy: f.legitimacy.toString()
 });
 
 const fromFormModel = (fm: FactionFormModel, values: ValueVector): Faction => ({
@@ -76,18 +86,22 @@ const fromFormModel = (fm: FactionFormModel, values: ValueVector): Faction => ({
   values,
   active: fm.active === 'true',
   notes: fm.notes || undefined,
-  sortOrder: fm.sortOrder
+  sortOrder: fm.sortOrder,
+  baseInfluence: fm.baseInfluence !== '' ? +fm.baseInfluence : 50,
+  momentum: fm.momentum !== '' ? +fm.momentum : 0,
+  legitimacy: fm.legitimacy !== '' ? +fm.legitimacy : 50
 });
 
 @Component({
   selector: 'app-factions',
   standalone: true,
-  imports: [FormField, TernaryPlotComponent],
+  imports: [FormField, TernaryPlotComponent, DecimalPipe, NgClass],
   templateUrl: './factions.component.html',
   styleUrl: './factions.component.scss'
 })
 export class FactionsComponent {
-  store = inject(AppStore);
+  store    = inject(AppStore);
+  influence = inject(FactionInfluenceService);
 
   showModal = signal(false);
   detailFaction = signal<Faction | null>(null);
@@ -125,12 +139,58 @@ export class FactionsComponent {
   });
 
   readonly detailLeaders = computed<Character[]>(() =>
-    this.detailCharacters().filter(c => c.characterType === 'FactionLeader')
+    this.detailCharacters()
+      .filter(c => c.characterType === 'FactionLeader')
+      .sort((a, b) => b.influence - a.influence)
   );
 
   readonly detailMembers = computed<Character[]>(() =>
-    this.detailCharacters().filter(c => c.characterType !== 'FactionLeader')
+    this.detailCharacters()
+      .filter(c => c.characterType !== 'FactionLeader')
+      .sort((a, b) => b.influence - a.influence)
   );
+
+  readonly detailCharInfluence = computed(() =>
+    this.influence.calculateCharacterInfluence(this.detailCharacters())
+  );
+
+  readonly detailNormalizedMomentum = computed(() => {
+    const f = this.detailFaction();
+    return f ? this.influence.calculateNormalizedMomentum(f.momentum) : 50;
+  });
+
+  readonly detailTotalInfluence = computed(() => {
+    const f = this.detailFaction();
+    return f ? this.influence.calculateTotalInfluence(f, this.detailCharacters()) : 0;
+  });
+
+  readonly detailEffectivePower = computed(() => {
+    const f = this.detailFaction();
+    return f ? this.influence.calculateEffectivePower(f, this.detailCharacters()) : 0;
+  });
+
+  formatMomentum(m: number): string {
+    return m > 0 ? `+${m}` : `${m}`;
+  }
+
+  momentumIcon(m: number): string {
+    const abs = Math.abs(m);
+    if (abs >= 50) return 'fa-arrow-trend-up';
+    if (abs >= 20) return 'fa-arrow-trend-up';
+    return 'fa-arrow-right-long';
+  }
+
+  momentumClass(m: number): string {
+    const abs = Math.abs(m);
+    const dir = m > 0 ? 'pos' : m < 0 ? 'neg' : 'neutral';
+    if (dir === 'neutral') return 'momentum-neutral';
+    const level = abs >= 50 ? 'high' : abs >= 20 ? 'mid' : 'low';
+    return `momentum-${dir}-${level}`;
+  }
+
+  momentumFlip(m: number): boolean {
+    return m < 0;
+  }
 
   readonly colonyStress = computed(() => this.store.colonyState()?.colonyStress ?? 0);
 
@@ -278,6 +338,64 @@ export class FactionsComponent {
     return t === 'Faction' ? 'Faction' : 'Social Class';
   }
 
+  factionMemberCount(f: Faction): number {
+    return this.store.characters().filter(c => c.factionId === f.id || c.socialClassId === f.id).length;
+  }
+
+  factionTotalInfluence(f: Faction): number {
+    const members = this.store.characters().filter(c => c.factionId === f.id || c.socialClassId === f.id);
+    return this.influence.calculateTotalInfluence(f, members);
+  }
+
+  factionEffectivePower(f: Faction): number {
+    const members = this.store.characters().filter(c => c.factionId === f.id || c.socialClassId === f.id);
+    return this.influence.calculateEffectivePower(f, members);
+  }
+
+  importCsv(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const rows = parseCsv(reader.result as string);
+      if (rows.length < 2) return;
+      const h = csvHeaderMap(rows[0]);
+      const get = (row: string[], col: string) => row[h.get(col) ?? -1] ?? '';
+
+      for (const row of rows.slice(1)) {
+        const faction: Faction = {
+          id:             get(row, 'id'),
+          name:           get(row, 'name'),
+          type:           oneOf(get(row, 'type'), ['Faction', 'SocialClass'] as const) ?? 'Faction',
+          active:         get(row, 'active') !== 'false',
+          sortOrder:      clampedInt(get(row, 'sortorder'), 0, 99999, 0),
+          represents:     get(row, 'represents'),
+          coreTenet:      get(row, 'coretenet'),
+          certainOf:      get(row, 'certainof'),
+          rightAbout:     get(row, 'rightabout'),
+          afraidOf:       get(row, 'afraidof'),
+          wrongAbout:     get(row, 'wrongabout'),
+          singleSentence: get(row, 'singlesentence'),
+          ritual:         oneOf(get(row, 'ritual'),    ['Good', 'Neutral', 'Bad']            as const),
+          knowledge:      oneOf(get(row, 'knowledge'), ['Hidden', 'Controlled', 'Revealed'] as const),
+          change:         oneOf(get(row, 'change'),    ['Yes', 'No']                         as const),
+          values: sanitizeValueVector(
+            parseFloat(get(row, 'truth')),
+            parseFloat(get(row, 'stability')),
+            parseFloat(get(row, 'agency')),
+          ),
+          notes: get(row, 'notes') || undefined,
+          baseInfluence: parseInt(get(row, 'baseinfluence')) || 50,
+          momentum: parseInt(get(row, 'momentum')) || 0,
+          legitimacy: parseInt(get(row, 'legitimacy')) || 50,
+        };
+        this.store.saveFaction(faction);
+      }
+      (event.target as HTMLInputElement).value = '';
+    };
+    reader.readAsText(file);
+  }
+
   exportCsv(): void {
     const header = [
       'Id', 'Name', 'Type', 'Active', 'SortOrder',
@@ -285,14 +403,16 @@ export class FactionsComponent {
       'AfraidOf', 'WrongAbout', 'SingleSentence',
       'Ritual', 'Knowledge', 'Change',
       'Truth', 'Stability', 'Agency',
+      'BaseInfluence', 'Momentum', 'Legitimacy',
       'Notes'
     ];
     const rows = this.store.factions().map(f => [
       f.id, f.name, f.type, f.active ? 'true' : 'false', f.sortOrder,
       f.represents, f.coreTenet, f.certainOf, f.rightAbout,
-      f.wrongAbout, f.afraidOf, f.singleSentence,
+      f.afraidOf, f.wrongAbout, f.singleSentence,
       f.ritual ?? '', f.knowledge ?? '', f.change ?? '',
       f.values.truth.toFixed(4), f.values.stability.toFixed(4), f.values.agency.toFixed(4),
+      f.baseInfluence, f.momentum, f.legitimacy,
       f.notes ?? ''
     ]);
     downloadCsv([header, ...rows], 'factions.csv');

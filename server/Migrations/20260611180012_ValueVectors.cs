@@ -67,15 +67,15 @@ namespace ColonyTracker.Api.Migrations
                 table: "Factions");
 
             migrationBuilder.DropColumn(
-                name: "DarkwingDesires",
+                name: "PartyDesires",
                 table: "ColonyStates");
 
             migrationBuilder.DropColumn(
-                name: "DarkwingMaintains",
+                name: "PartyMaintains",
                 table: "ColonyStates");
 
             migrationBuilder.DropColumn(
-                name: "DarkwingSacrifices",
+                name: "PartySacrifices",
                 table: "ColonyStates");
 
             migrationBuilder.RenameColumn(
@@ -110,21 +110,21 @@ namespace ColonyTracker.Api.Migrations
                 defaultValue: 0.0);
 
             migrationBuilder.AddColumn<double>(
-                name: "DarkwingAgencyValue",
+                name: "PartyAgencyValue",
                 table: "ColonyStates",
                 type: "REAL",
                 nullable: false,
                 defaultValue: 0.0);
 
             migrationBuilder.AddColumn<double>(
-                name: "DarkwingStabilityValue",
+                name: "PartyStabilityValue",
                 table: "ColonyStates",
                 type: "REAL",
                 nullable: false,
                 defaultValue: 0.0);
 
             migrationBuilder.AddColumn<double>(
-                name: "DarkwingTruthValue",
+                name: "PartyTruthValue",
                 table: "ColonyStates",
                 type: "REAL",
                 nullable: false,
@@ -147,15 +147,15 @@ namespace ColonyTracker.Api.Migrations
                 table: "Factions");
 
             migrationBuilder.DropColumn(
-                name: "DarkwingAgencyValue",
+                name: "PartyAgencyValue",
                 table: "ColonyStates");
 
             migrationBuilder.DropColumn(
-                name: "DarkwingStabilityValue",
+                name: "PartyStabilityValue",
                 table: "ColonyStates");
 
             migrationBuilder.DropColumn(
-                name: "DarkwingTruthValue",
+                name: "PartyTruthValue",
                 table: "ColonyStates");
 
             migrationBuilder.RenameColumn(
@@ -264,21 +264,21 @@ namespace ColonyTracker.Api.Migrations
                 nullable: true);
 
             migrationBuilder.AddColumn<int>(
-                name: "DarkwingDesires",
+                name: "PartyDesires",
                 table: "ColonyStates",
                 type: "INTEGER",
                 nullable: false,
                 defaultValue: 0);
 
             migrationBuilder.AddColumn<int>(
-                name: "DarkwingMaintains",
+                name: "PartyMaintains",
                 table: "ColonyStates",
                 type: "INTEGER",
                 nullable: false,
                 defaultValue: 0);
 
             migrationBuilder.AddColumn<int>(
-                name: "DarkwingSacrifices",
+                name: "PartySacrifices",
                 table: "ColonyStates",
                 type: "INTEGER",
                 nullable: false,

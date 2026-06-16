@@ -1,43 +1,49 @@
-# Colony Campaign Tracker
+# Colony Tracker
 
-A local web application for tracking faction relationships in *The Colony* TTRPG campaign. Replaces the Excel workbook with a live, interactive tool that calculates directional relationship scores, applies colony stress, supports manual overrides, and lets you configure the scoring rules yourself.
+A local web application for tracking faction relationships, character motivations, social dynamics, and ideological pressure within *The Colony* TTRPG campaign.
 
-## Stack
+The application models how factions and individuals respond to uncertainty, stress, and competing values over time. It replaces the original Excel workbook with a live, interactive tool capable of simulating ideological compatibility, tracking faction influence, modeling character drift, and visualizing the evolving state of the colony.
+
+---
+
+# Stack
 
 | Layer | Technology |
 |---|---|
 | Frontend | Angular 22, NgRx Signal Store, SCSS |
 | Backend | ASP.NET Core 10 Web API |
 | Database | SQLite via EF Core 10 |
-| Tests | Vitest (frontend scoring engine) |
-| Dev environment | Docker Compose |
+| Tests | Vitest |
+| Dev Environment | Docker Compose |
 
-## Project Structure
+---
 
-```
+# Project Structure
+
+```text
 colony-tracker/
-├── client/                  # Angular 22 frontend
-├── server/                  # ASP.NET Core 10 Web API
-├── docker-compose.yml       # Dev mode: API in Docker, run Angular locally
-├── docker-compose.full.yml  # Full stack: both API and Angular in containers
+├── client/
+├── server/
+├── docker-compose.yml
+├── docker-compose.full.yml
 └── README.md
 ```
 
 ---
 
-## Running the Application
+# Running the Application
 
-### Dev mode (default)
+## Dev Mode (Recommended)
 
-Runs the API in Docker. Run the Angular dev server locally for hot reload.
+Runs the API in Docker while Angular runs locally with hot reload.
 
-**Terminal 1 — start the API:**
+### Start API
 
 ```bash
 docker compose up -d
 ```
 
-**Terminal 2 — start the Angular dev server:**
+### Start Angular
 
 ```bash
 cd client
@@ -45,31 +51,32 @@ npm install
 npm start
 ```
 
-- Frontend (hot reload): <http://localhost:4200>
-- API: <http://localhost:5000>
-- Angular proxies `/api/*` to the backend automatically.
+Available at:
 
-### Full stack via Docker
+- Frontend: http://localhost:4200
+- API: http://localhost:5000
 
-Runs both the API and the Angular app in containers.
+---
+
+## Full Docker Mode
 
 ```bash
 docker compose -f docker-compose.full.yml up --build
 ```
 
-- Frontend: <http://localhost:4200>
-- API: <http://localhost:5000>
+---
 
-### Fully local (no Docker)
+## Fully Local
 
-**Start the API:**
+### API
+
 ```bash
 cd server
 dotnet run
 ```
-The API starts on `http://localhost:5000`, creates `colony.db`, and seeds faction data on first run.
 
-**Start the frontend:**
+### Angular
+
 ```bash
 cd client
 npm install
@@ -78,185 +85,414 @@ npm start
 
 ---
 
-## Running Tests
-
-Unit tests cover the scoring engine: belief matching, value weights, buffer positions (Neutral ritual, Controlled knowledge), stress scaling, directional asymmetry, and relationship labels.
+# Running Tests
 
 ```bash
 cd client
-npm run test:unit          # run once
-npm run test:unit:watch    # watch mode
+
+npm run test:unit
+npm run test:unit:watch
+```
+
+Unit tests validate:
+
+- Relationship scoring
+- Value weighting
+- Ternary normalization
+- Character drift calculations
+- Stress scaling
+- Compatibility calculations
+- Relationship labels
+
+---
+
+# Core Concepts
+
+## Values
+
+The Colony is modeled around three competing societal values:
+
+| Value | Meaning |
+|---------|---------|
+| Truth | Knowledge, remembrance, transparency |
+| Stability | Continuity, survival, order |
+| Agency | Choice, consent, self-determination |
+
+These values are represented as a ternary graph.
+
+Every faction, social class, character, and special actor occupies a position within this value space.
+
+Values always normalize to:
+
+```text
+Truth + Stability + Agency = 1.0
 ```
 
 ---
 
-## Key Concepts
+## Emergent Values
 
-### Relationship Scoring
+Certain concepts emerge naturally from combinations of primary values:
 
-Relationships are **directional** — Faction A's score toward B may differ from B's score toward A. The source faction's `desires` value determines which belief axis is weighted most heavily.
+| Combination | Emergent Value |
+|-------------|----------------|
+| Truth + Agency | Justice |
+| Truth + Stability | Accountability |
+| Stability + Agency | Prosperity |
 
-| Source Desires | Weighted Axis |
-|---|---|
-| Stability | Change (×2) |
-| Truth | Knowledge (×2) |
-| Agency | Ritual (×2) |
+These are not stored directly.
 
-### Buffer Positions
-
-- **Neutral ritual** — does not score a match or conflict with any other ritual stance.
-- **Controlled knowledge** — does not score a match or conflict with any other knowledge stance.
-
-These positions moderate the faction's relationship to that axis without committing to either side.
-
-### Colony Stress
-
-Stress (0–10) intensifies all relationships. Negative scores grow faster than positive ones under stress, modelling how pressure accelerates conflict more than it strengthens alliances.
-
-### Darkwing
-
-The party is modelled as a special actor (Darkwing) with their own belief positions and values. All active factions calculate a directional score toward Darkwing using the same rules.
+They emerge from a position within the ternary graph.
 
 ---
 
-## Application Screens
+## Beliefs
 
-| Screen | Purpose |
-|---|---|
-| **Dashboard** | Colony stress, Darkwing position, most hostile relationships, strongest alliances |
-| **Factions** | CRUD for all factions and social classes |
-| **Relationships** | Color-coded directional matrix; click any cell for score breakdown |
-| **Colony State** | Edit stress, act/week, session summary, Darkwing position |
-| **Session Log** | Record what happened each session |
-| **Rules Config** | Edit all scoring rules, weights, stress multipliers, and label thresholds |
+While values represent what a faction or character ultimately prioritizes, beliefs represent the practical conclusions that emerge from those values.
 
----
+Values answer:
 
-# Design Philosophy
+> What matters?
 
-This application is not intended to model objective morality, faction power, or political alignment.
+Beliefs answer:
 
-It models **perceived ideological compatibility under pressure**.
+> What should we do about it?
 
-The scoring system is designed to support the themes of *The Colony* campaign:
+The application models three belief axes that derive directly from Values:
 
-* certainty
-* responsibility
-* compromise
-* unintended consequences
-* societal stress
+| Value | Belief | Question |
+|----------|----------|----------|
+| Truth | Knowledge | Should the truth be concealed or revealed? |
+| Stability | Change | Should the current system be preserved or altered? |
+| Agency | Ritual | Is the ritual justified? |
 
-The goal is not to determine which faction is "correct."
+This means:
 
-The goal is to model how factions react to one another as circumstances change.
+- Truth-focused actors care most about disclosure versus concealment.
+- Stability-focused actors care most about preserving or changing systems.
+- Agency-focused actors care most about whether participation is voluntary or imposed.
 
 ---
 
-# Core Modeling Assumptions
+### Emergent Beliefs
 
-The application is built around several assumptions.
+Unless explicitly overridden, a faction amd character's beliefs should naturally emerge from its values.
 
-These assumptions are intentionally opinionated and should be preserved unless there is a strong reason to change them.
+Examples:
 
-## Factions Are Defined By Values
+#### High Truth
 
-A faction's most important properties are:
+```text
+Truth      0.70
+Stability  0.20
+Agency     0.10
+```
 
-* desires
-* maintains
-* sacrifices
+Tends toward:
 
-These values represent what the faction ultimately prioritizes.
+```text
+Knowledge = Revealed
+```
 
-Actionable beliefs emerge from values.
+---
 
-Values are therefore weighted more heavily than policy positions.
+#### High Stability
+
+```text
+Truth      0.15
+Stability  0.75
+Agency     0.10
+```
+
+Tends toward:
+
+```text
+Change = No
+```
+
+---
+
+#### High Agency
+
+```text
+Truth      0.15
+Stability  0.25
+Agency     0.60
+```
+
+Tends toward:
+
+```text
+Ritual = Bad
+```
+
+because participation imposed by the ritual conflicts with self-determination.
+
+---
+
+### Overrides
+
+Values should remain the primary source of truth.
+
+However, beliefs may be manually overridden.
+
+This allows for exceptions such as:
+
+- hypocrites
+- extremists
+- reformers
+- pragmatists
+- conflicted individuals
+
+Examples:
+
+A Truth-focused character may still support secrecy.
+
+A Stability-focused faction may advocate dramatic change.
+
+A highly Agency-focused individual may support the ritual for personal reasons.
+
+These exceptions are often narratively interesting and should remain possible.
+
+---
+
+### Values Matter More Than Beliefs
+
+Beliefs are downstream from values.
+
+Two factions may hold identical beliefs for entirely different reasons.
 
 Example:
 
-Two factions may agree that the ritual should continue.
+Both the Keepers and Witnesses may believe the ritual should continue.
 
-If one believes this because stability matters and another believes it because truth matters, they may still strongly disagree.
+However:
+
+- Keepers support it because Stability is paramount.
+- Witnesses support it because Truth requires remembering its cost.
+
+Because the underlying values differ, the factions may still strongly disagree despite reaching similar conclusions.
+
+For this reason, relationship calculations place greater emphasis on value alignment than belief alignment.
 
 ---
 
-## Social Classes Are Not Ideologies
+## Factions
 
-Social classes represent lived experience rather than political belief.
-
-Classes answer:
-
-> What happened to you?
+Factions represent ideological responses to the colony's central compromise.
 
 Factions answer:
 
 > What do you believe?
 
-Because of this distinction, members of a social class may be attracted toward multiple factions.
+Examples:
 
-The application may eventually support faction affinity or recruitment tendencies for social classes.
+- Keepers
+- Witnesses
+- Seekers
+- Shattered
+- Cult of the Unknown
+- EGRESS Institute
+- Aspis
+
+Every faction occupies a unique ideological position within value space and maintains directional relationships toward every other faction.
 
 ---
 
-## Relationships Are Directional
+## Social Classes
 
-Faction relationships are intentionally asymmetric.
+Social Classes represent lived experience rather than ideology.
 
-Faction A's opinion of Faction B may differ from Faction B's opinion of Faction A.
+Social Classes answer:
 
-This reflects the fact that different factions care about different disagreements.
+> What happened to you?
+
+Examples:
+
+- Civilians
+- Burdened
+- Heirs
+- Fractured
+- Forgotten
+
+Members of a social class may belong to any faction. Social classes have default values, but it is not a strong ideological position, so they do not have derived beliefs.
+
+---
+
+## Characters
+
+Characters represent individuals within the colony.
+
+A character may be:
+
+- NPC
+- Party Member
+- Faction Leader
+
+Characters have:
+
+- Identity
+- Occupation
+- Faction
+- Social Class
+- Personal Values
+- Influence
+- Pressure
+- Conviction
+- Doubt Direction
+
+Unlike factions, characters are not defined solely by ideology.
+
+The tension between a character's faction, class, and personal values is often the most important narrative information.
+
+---
+
+## Influence
+
+Influence represents a character's ability to shape events.
+
+Range:
+
+```text
+0 - 100
+```
+
+High influence characters:
+
+- sway factions
+- create events
+- affect colony stability
 
 Example:
 
-A stability-focused faction may view revolutionaries as an existential threat.
-
-The revolutionaries may view that same faction as merely one obstacle among many.
-
-These relationships should not automatically be forced into symmetry.
+- Faction leaders
 
 ---
 
-## Values Determine What Matters
+## Pressure
 
-The same disagreement does not matter equally to every faction.
+Pressure represents external strain placed upon a character.
 
-Each faction weights one belief axis more heavily based on its primary desired value.
+Sources may include:
 
-| Desired Value | Weighted Belief Axis |
-| ------------- | -------------------- |
-| Stability     | Change               |
-| Truth         | Knowledge            |
-| Agency        | Ritual               |
+- Colony stress
+- Faction setbacks
+- Narrative events
 
-Meaning:
+Range:
 
-* Stability-focused factions care most about preserving or changing systems.
-* Truth-focused factions care most about concealment versus disclosure.
-* Agency-focused factions care most about whether participation is voluntary or imposed.
+```text
+0 - 100
+```
 
-These mappings intentionally connect values to actionable beliefs.
+Pressure increases the likelihood of ideological drift.
 
 ---
 
-## Stress Reveals Priorities
+## Conviction
 
-Colony Stress is one of the most important variables in the application.
+Conviction measures resistance to change.
 
-Stress is intended to model what happens when ideological disagreements acquire real consequences.
+Range:
 
-At low stress levels:
+```text
+0 - 100
+```
 
-* factions tolerate disagreement
-* nuance survives
-* compromise is easier
+High conviction:
 
-At high stress levels:
+- difficult to influence
 
-* differences become sharper
-* alliances become more rigid
-* hostility escalates
+Low conviction:
 
-Negative reactions increase faster than positive reactions.
+- easily swayed
+
+---
+
+## Doubt
+
+Every character possesses a Doubt Direction.
+
+A character's doubt represents the value they gravitate toward when their existing worldview begins to fail.
+
+Possible directions:
+
+- Truth
+- Stability
+- Agency
+
+Examples:
+
+A Keeper may privately doubt Stability and drift toward Truth.
+
+A Witness may doubt Truth and drift toward Stability.
+
+---
+
+## Drift
+
+Characters do not automatically change factions.
+
+Instead, pressure causes gradual value drift.
+
+The application tracks:
+
+```text
+Drift Score = Pressure - Conviction
+```
+
+This provides a visible measure of ideological instability.
+
+Drift reveals:
+
+- likely defections
+- future alliances
+- personal crises
+
+---
+
+## Relationship Scoring
+
+Relationships are directional.
+
+Faction A's opinion of Faction B may differ from B's opinion of A.
+
+The scoring engine compares:
+
+- value alignment
+- belief alignment
+- weighted priorities
+- colony stress
+- manual modifiers
+
+Directional asymmetry is intentional.
+
+Different factions care about different disagreements.
+
+---
+
+## Colony Stress
+
+Colony Stress represents overall societal strain. It is likely to increase over the course of a campaign.
+
+Range:
+
+```text
+0 - 10
+```
+
+Low Stress:
+
+- compromise is easier
+- factions tolerate disagreement
+
+High Stress:
+
+- hostility increases
+- alliances harden
+- ideological differences become magnified
+
+Negative relationships escalate faster than positive ones.
 
 This is intentional.
 
@@ -264,56 +500,151 @@ Pressure tends to accelerate conflict more readily than cooperation.
 
 ---
 
+## The Party
+
+The Party is modeled as a special actor within the colony.
+
+The Party has:
+
+- values
+- beliefs
+- faction relationships
+
+All factions calculate directional relationships toward The Party using the same scoring rules used elsewhere in the application.
+
+---
+
+# Application Screens
+
+| Screen | Purpose |
+|---|---|
+| Dashboard | Colony overview, stress, major alliances, major conflicts |
+| Factions | Manage factions and social classes |
+| Characters | Create and manage NPCs and party members |
+| Character Detail | Values graph, pressure, conviction, drift analysis |
+| Relationships | Directional relationship matrix |
+| Colony State | Stress, timeline, Party positions |
+| Session Log | Campaign history and notes |
+
+---
+
+# Design Philosophy
+
+This application is not intended to determine who is morally correct.
+
+It models:
+
+> Perceived ideological compatibility under pressure.
+
+The application supports the themes of *The Colony*:
+
+- certainty
+- doubt
+- responsibility
+- compromise
+- consequence
+- societal stress
+
+The goal is not to identify a "right" answer.
+
+The goal is to explore how individuals and systems react when multiple good things come into conflict.
+
+---
+
+# Core Modeling Assumptions
+
+## Values Generate Beliefs
+
+The Colony is built on emergent conflict arising from a character or group's Values.
+
+Values -> Beliefs -> Actions -> Consequences
+
+
+## Factions Are Defined By Values
+
+Factions are ideological entities.
+
+Their positions emerge from how they prioritize:
+
+- Truth
+- Stability
+- Agency
+
+---
+
+## Social Classes Are Defined By Circumstance
+
+Social Classes describe lived experience.
+
+They are not ideologies.
+
+---
+
+## Characters Exist Between Systems
+
+Characters are influenced by:
+
+- faction
+- class
+- personal values
+
+The most interesting characters exist in tension with at least one of those forces.
+
+---
+
+## Relationships Are Directional
+
+No relationship is assumed to be symmetrical.
+
+Perception matters.
+
+---
+
+## Stress Reveals Priorities
+
+Stress does not create values.
+
+Stress reveals them.
+
+---
+
 ## The Colony Is A Living System
 
-The application assumes that faction relationships are not static.
+Relationships, influence, pressure, and ideological alignment should evolve continuously.
 
-Relationships should evolve over time as:
-
-* colony stress changes
-* Darkwing intervenes
-* factions gain or lose influence
-* compromises become harder to maintain
-
-The goal is not to create a fixed political map.
-
-The goal is to simulate an evolving society.
+The application is intended to model a society in motion.
 
 ---
 
 # Campaign Truths
 
-The application is built to support the narrative themes of *Results Pending*.
+Several assumptions should be treated as foundational:
 
-Several campaign truths should be considered foundational:
-
-* Every faction is correct about something.
-* Every faction is blind to something.
-* No faction possesses the complete answer.
-* The campaign has no predetermined solution.
-* The colony itself functions as the primary antagonist.
-* Monsters and supernatural phenomena are symptoms, not root causes.
-* The central question is not whether the compromise is wrong.
-* The central question is what should replace it.
-
-Whenever new features are added, preference should be given to mechanics that reinforce uncertainty, consequence, and difficult tradeoffs rather than mechanics that identify a single "correct" faction or solution.
+- Every faction is correct about something.
+- Every faction is blind to something.
+- No faction possesses the complete answer.
+- The campaign has no predetermined solution.
+- The colony itself functions as the primary antagonist.
+- Monsters are symptoms, not root causes.
+- The central question is not whether the compromise is wrong.
+- The central question is what should replace it.
 
 ---
 
 # Future Design Direction
 
-Potential future features:
+Potential future systems:
 
-* faction influence tracking
-* faction recruitment tendencies
-* district-level politics
-* settlement resources
-* event simulation
-* consequence chains
-* historical timeline tracking
-* observer notebook integration
-* automated colony-state forecasting
+- Districts
+- Resources
+- Event Engine
+- Consequence Chains
+- Observer Notebook
+- Faction Recruitment
+- Character Relationships
+- Succession & Leadership
+- Automated Colony Forecasting
 
-All future systems should build upon the same core principle:
+All future systems should build upon the same principle:
 
 > The application models how people respond to pressure, not whether they are objectively right.

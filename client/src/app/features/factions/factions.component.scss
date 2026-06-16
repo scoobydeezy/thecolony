@@ -87,6 +87,10 @@
 }
 
 .faction-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
   margin-bottom: 0.75rem;
 
   h3 {
@@ -100,6 +104,19 @@
     color: var(--text-muted);
     margin-top: 0.2rem;
   }
+}
+
+.faction-header-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.faction-header-stats {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-shrink: 0;
+  padding-top: 0.1rem;
 }
 
 .faction-name-row {
@@ -168,14 +185,15 @@
   font-weight: 600;
   color: var(--text-primary);
 
-  &.ritual-good    { color: #4ade80; }
-  &.ritual-neutral { color: #94a3b8; }
-  &.ritual-bad     { color: #f87171; }
-  &.change-yes     { color: #60a5fa; }
-  &.change-no      { color: #fbbf24; }
-  &.truth          { color: var(--color-truth); }
-  &.stability      { color: var(--color-stability); }
-  &.agency         { color: var(--color-agency); }
+  &.change-no            { color: var(--color-change-no); }
+  &.change-yes           { color: var(--color-change-yes); }
+  &.knowledge-hidden     { color: var(--color-knowledge-hidden); }
+  &.knowledge-revealed   { color: var(--color-knowledge-revealed); }
+  &.ritual-good          { color: var(--color-ritual-good); }
+  &.ritual-bad           { color: var(--color-ritual-bad); }
+  &.truth                { color: var(--color-truth); }
+  &.stability            { color: var(--color-stability); }
+  &.agency               { color: var(--color-agency); }
 }
 
 .core-tenet {
@@ -222,18 +240,60 @@
   border-radius: 4px;
 }
 
+
+.card-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.card-stat-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+}
+
+.card-stat-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+
+  &.card-stat-power { color: var(--accent); }
+}
+
+.card-stat-divider {
+  width: 1px;
+  height: 1rem;
+  background: var(--border);
+}
+
 .faction-actions {
   display: flex;
+  align-items: center;
   gap: 0.5rem;
   margin-top: 0.75rem;
   padding-top: 0.75rem;
   border-top: 1px solid var(--border);
 }
 
+.faction-actions-right {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
 .field-error {
   font-size: 0.75rem;
   color: #f87171;
   margin-top: 0.25rem;
+}
+
+.range-hint {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-left: 0.25rem;
 }
 
 .separator {
@@ -268,6 +328,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.1rem;
+  margin-top: .5rem;
 }
 
 .ternary-edit-row {
@@ -282,6 +343,100 @@
   font-size: 0.75rem;
   color: var(--text-muted);
   text-align: center;
+}
+
+// ── Influence block in detail modal ──────────────────────────────────────────
+
+.detail-influence-block {
+  width: 100%;
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  margin-top: .4rem;
+  margin-bottom: 0.75rem;
+}
+
+.detail-influence-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: 0.5rem;
+  padding: 0 0.5rem;
+}
+
+.detail-influence-total {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.detail-influence-hero-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+}
+
+.detail-influence-power {
+  color: var(--accent);
+}
+
+.detail-influence-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin: 0.2rem 0 0.75rem;
+}
+
+.detail-influence-factors {
+  display: flex;
+  justify-content: space-around;
+  gap: 0.5rem;
+  border-top: 1px solid var(--border);
+  padding-top: 0.6rem;
+}
+
+.detail-influence-factor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+}
+
+.detail-influence-factor-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.detail-influence-factor-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.momentum-pos { color: #4ade80; }
+.momentum-neg { color: #f87171; }
+
+.momentum-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+  transition: color 0.15s;
+
+  &.momentum-flip { transform: scaleX(-1); }
+
+  &.momentum-pos-high  { color: #4ade80; }
+  &.momentum-pos-mid   { color: #16a34a; }
+  &.momentum-pos-low   { color: #15803d; }
+  &.momentum-neutral   { color: #64748b; }
+  &.momentum-neg-low   { color: #b91c1c; }
+  &.momentum-neg-mid   { color: #dc2626; }
+  &.momentum-neg-high  { color: #f87171; }
 }
 
 // ── Faction Detail Modal ──────────────────────────────────────────────────────
@@ -347,6 +502,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.6rem;
+  margin-bottom: 1rem;
 }
 
 .detail-beliefs {
@@ -362,10 +518,15 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
+  margin-bottom: 1rem;
 }
 
 .detail-section {
   margin-bottom: 1rem;
+}
+
+.detail-notes {
+  margin-bottom: 1.5rem;
 }
 
 .detail-text {
@@ -373,13 +534,6 @@
   color: var(--text-secondary);
   margin: 0 0 0.25rem;
   line-height: 1.5;
-}
-
-.detail-notes {
-  background: var(--bg-base);
-  padding: 0.5rem 0.75rem;
-  border-radius: 4px;
-  white-space: pre-wrap;
 }
 
 .detail-field {
@@ -464,8 +618,9 @@
   background: #374151;
   color: #9ca3af;
 
-  &.party  { background: #1d4ed8; color: #bfdbfe; }
-  &.leader { background: #3b1e5f; color: #c4b5fd; border: 1px solid #8b5cf6; }
+  &.party        { background: #1d4ed8; color: #bfdbfe; }
+  &.leader       { background: #1d4ed8; color: #bfdbfe; }
+  &.faction-label { background: #1e3a5f; color: #93c5fd; border: 1px solid #3b82f6; }
 }
 
 .char-meta {
