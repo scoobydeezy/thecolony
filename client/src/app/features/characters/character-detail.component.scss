@@ -4,23 +4,26 @@
 
 .page-header {
   display: flex;
+  flex-direction: column;
   align-items: flex-start;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.25rem;
   margin-bottom: 1.5rem;
 }
 
-.header-left {
+.header-row {
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  width: 100%;
 
   h2 {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     flex-wrap: wrap;
+    margin: 0;
   }
 }
 
@@ -29,6 +32,13 @@
   color: var(--color-text-muted, #94a3b8);
   text-decoration: none;
   &:hover { color: #60a5fa; text-decoration: underline; }
+}
+
+.header-right {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .header-actions { display: flex; gap: 0.5rem; }
@@ -181,6 +191,20 @@
   &.leader { background: #1e3a5f; color: #93c5fd; border-color: #3b82f6; }
 }
 
+.state-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+
+  &--dead      { color: #ef4444; }
+  &--missing   { color: #f59e0b; }
+  &--forgotten { color: #6366f1; }
+}
+
 .narrative-block {
   margin-bottom: 0.75rem;
   p { margin: 0.15rem 0 0; line-height: 1.6; font-size: 0.9rem; color: var(--color-text, #e2e8f0); }
@@ -258,15 +282,12 @@
   font-weight: 600;
   color: var(--color-text, #e2e8f0);
 
-  &.change-no            { color: var(--color-change-no); }
-  &.change-yes           { color: var(--color-change-yes); }
-  &.knowledge-hidden     { color: var(--color-knowledge-hidden); }
-  &.knowledge-revealed   { color: var(--color-knowledge-revealed); }
-  &.ritual-good          { color: var(--color-ritual-good); }
-  &.ritual-bad           { color: var(--color-ritual-bad); }
-  &.truth                { color: var(--color-truth); }
-  &.stability            { color: var(--color-stability); }
-  &.agency               { color: var(--color-agency); }
+  &.belief-statusquo { color: var(--color-belief-statusquo); }
+  &.belief-dissent   { color: var(--color-belief-dissent); }
+  &.belief-neutral   { color: var(--color-belief-neutral); }
+  &.valuea           { color: var(--color-valuea); }
+  &.valueb           { color: var(--color-valueb); }
+  &.valuec           { color: var(--color-valuec); }
 }
 
 .belief-item.changed-belief {
@@ -309,7 +330,8 @@
 }
 
 .current-col,
-.drifted-col { border-top: 1px solid var(--border-color, #334155); padding-top: 1rem; }
+.drifted-col,
+.doubt-analysis { border-top: 1px solid var(--border-color, #334155); padding-top: 1rem; }
 
 .no-drift-note {
   font-size: 0.78rem;
@@ -401,6 +423,60 @@
 }
 
 .current-faction td { color: #60a5fa; }
+
+.narrative-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 2rem;
+  align-items: start;
+
+  @media (max-width: 700px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.narrative-text-col {
+  min-width: 0;
+  grid-column: span 2;
+}
+
+.narrative-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem 1.5rem;
+  align-items: start;
+}
+
+.narrative-party-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-left: 1px solid var(--border-color, #334155);
+  padding-left: 1.5rem;
+  min-width: 180px;
+}
+
+.party-rel-row {
+  display: flex;
+  flex-direction: row;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.party-rel-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.party-rel-icon {
+  font-size: 0.85rem;
+  color: var(--color-text-muted, #64748b);
+  width: 1rem;
+  text-align: center;
+}
+
+
 
 .doubt-analysis {
   margin-top: 1rem;

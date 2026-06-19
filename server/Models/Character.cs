@@ -34,9 +34,9 @@ public class Character
     public double AgencyValue { get; set; } = 1.0 / 3;
 
     // Belief overrides (null = derive from values)
-    public RitualPosition? Ritual { get; set; }
-    public KnowledgePosition? Knowledge { get; set; }
-    public ChangePosition? Change { get; set; }
+    public BeliefPosition? BeliefC { get; set; }
+    public BeliefPosition? BeliefA { get; set; }
+    public BeliefPosition? BeliefB { get; set; }
 
     // Doubt system
     public DoubtDirection? DoubtDirection { get; set; }
@@ -46,4 +46,7 @@ public class Character
     // Influence system
     public int Influence { get; set; } = 0;       // 0–100: how much this character stabilizes faction-mates
     public int Impressionable { get; set; } = 50;  // 0–100: how strongly this character is affected by others' influence
+
+    // Narrative state
+    public CharacterState State { get; set; } = CharacterState.Alive;
 }

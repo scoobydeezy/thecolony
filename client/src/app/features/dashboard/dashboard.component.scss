@@ -1,7 +1,14 @@
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
+  grid-template-columns: repeat(12, 1fr);
+
+  .stat-card:nth-child(1),
+  .stat-card:nth-child(2) { grid-column: span 3; }
+
+  .stat-card:nth-child(3),
+  .stat-card:nth-child(4),
+  .stat-card:nth-child(5) { grid-column: span 2; }
+  gap: 1.5rem;
   margin-bottom: 1.5rem;
 }
 
@@ -116,15 +123,12 @@
   font-weight: 600;
   color: var(--text-primary);
 
-  &.change-no            { color: var(--color-change-no); }
-  &.change-yes           { color: var(--color-change-yes); }
-  &.knowledge-hidden     { color: var(--color-knowledge-hidden); }
-  &.knowledge-revealed   { color: var(--color-knowledge-revealed); }
-  &.ritual-good          { color: var(--color-ritual-good); }
-  &.ritual-bad           { color: var(--color-ritual-bad); }
-  &.truth                { color: var(--color-truth); }
-  &.stability            { color: var(--color-stability); }
-  &.agency               { color: var(--color-agency); }
+  &.belief-statusquo { color: var(--color-belief-statusquo); }
+  &.belief-dissent   { color: var(--color-belief-dissent); }
+  &.belief-neutral   { color: var(--color-belief-neutral); }
+  &.valuea           { color: var(--color-valuea); }
+  &.valueb           { color: var(--color-valueb); }
+  &.valuec           { color: var(--color-valuec); }
 }
 
 .score {
@@ -149,3 +153,140 @@
 }
 
 .defect-target { color: #f97316; font-weight: 600; }
+
+// Campaign Timeline
+.timeline-card { overflow: hidden; }
+
+.timeline-chart-wrap {
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.timeline-svg {
+  display: block;
+  width: 100%;
+  max-width: 560px;
+  height: auto;
+}
+
+.timeline-sessions {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-top: 1px solid var(--border);
+  margin-top: 0.5rem;
+}
+
+.timeline-session-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--border);
+  text-decoration: none;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  transition: background 0.15s;
+
+  &:hover { background: var(--surface-2); padding-left: 0.4rem; }
+  &:last-child { border-bottom: none; }
+}
+
+.tl-num {
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 1.5rem;
+  font-size: 0.82rem;
+}
+
+.tl-title {
+  font-weight: 600;
+  flex: 1;
+}
+
+.tl-meta {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tl-events {
+  font-size: 0.72rem;
+  color: var(--accent);
+  background: rgba(99,102,241,0.1);
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+}
+
+// Colony Alerts
+.alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.alert-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  background: var(--bg-base);
+  border-left: 3px solid var(--border);
+
+  &.rising { border-left-color: var(--color-success); }
+  &.danger  { border-left-color: var(--color-danger); }
+}
+
+.alert-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  min-width: 9rem;
+}
+
+.alert-value {
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.alert-meta {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.alerts-empty {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-style: italic;
+}
+
+// Faction Rankings
+.stress-note {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+}
+
+.top-faction { background: rgba(99,102,241,0.06); }
+
+.rank {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  min-width: 1.5rem;
+}
+
+.faction-name { font-weight: 600; }
+
+.momentum {
+  font-weight: 700;
+  font-size: 0.9rem;
+
+  &.pos     { color: var(--color-success); }
+  &.neg     { color: var(--color-danger); }
+  &.neutral { color: var(--text-secondary); }
+}

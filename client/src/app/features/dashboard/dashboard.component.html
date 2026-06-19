@@ -1,6 +1,6 @@
 <div class="page-header">
   <h2>Dashboard</h2>
-  <p>The Colony — Act {{ store.colonyState()?.act }}, Week {{ store.colonyState()?.week }}</p>
+  <p>The Colony — {{ isViewingBaseline ? 'Overview' : 'Act ' + viewActWeek().act + ', Week ' + viewActWeek().week }}</p>
 </div>
 
 <!-- Stats Row -->
@@ -11,7 +11,11 @@
   </div>
   <div class="stat-card">
     <div class="stat-value">{{ totalRelationshipCount }}</div>
-    <div class="stat-label">Relationships Tracked</div>
+    <div class="stat-label">Relationships</div>
+  </div>
+  <div class="stat-card success">
+    <div class="stat-value">{{ friendlyCount }}</div>
+    <div class="stat-label">Friendly</div>
   </div>
   <div class="stat-card danger">
     <div class="stat-value">{{ hostileCount }}</div>
@@ -19,7 +23,7 @@
   </div>
   <div class="stat-card success">
     <div class="stat-value">{{ alignedCount }}</div>
-    <div class="stat-label">Friendly / Aligned</div>
+    <div class="stat-label">Cooperative / Aligned</div>
   </div>
 </div>
 
@@ -29,52 +33,171 @@
     <div class="card">
       <h3 class="section-title">Colony Stress</h3>
       <div class="stress-row">
-        <div [class]="stressClass()">{{ cs.colonyStress }}</div>
+        <div [class]="stressClass()">{{ store.viewColonyStress() }}</div>
         <div class="stress-bar-wrap">
           <div class="stress-bar" [style.width]="stressBarWidth()"></div>
         </div>
         <div class="stress-max">/ 10</div>
       </div>
-      @if (cs.sessionSummary) {
-        <p class="session-summary">{{ cs.sessionSummary }}</p>
-      }
-      <a routerLink="/colony-state" class="btn btn-secondary btn-sm" style="margin-top:1rem">Edit Colony State</a>
     </div>
 
     <div class="card">
-      <h3 class="section-title">Party Position</h3>
+      <h3 class="section-title">{{ partyName() }} Position</h3>
       <div class="party-grid">
         <div class="party-item">
-          <span class="party-label">Ritual</span>
-          <span class="party-value ritual-{{ cs.partyRitual.toLowerCase() }}">{{ cs.partyRitual }}</span>
+          <span class="party-label">{{ store.beliefAxisLabels().c.axisName }}</span>
+          <span class="party-value {{ beliefClass('c', cs.partyBeliefc) }}">{{ beliefLabel('c', cs.partyBeliefc) }}</span>
         </div>
         <div class="party-item">
-          <span class="party-label">Knowledge</span>
-          <span class="party-value knowledge-{{ cs.partyKnowledge.toLowerCase() }}">{{ cs.partyKnowledge }}</span>
+          <span class="party-label">{{ store.beliefAxisLabels().a.axisName }}</span>
+          <span class="party-value {{ beliefClass('a', cs.partyBeliefa) }}">{{ beliefLabel('a', cs.partyBeliefa) }}</span>
         </div>
         <div class="party-item">
-          <span class="party-label">Change</span>
-          <span class="party-value change-{{ cs.partyChange.toLowerCase() }}">{{ cs.partyChange }}</span>
+          <span class="party-label">{{ store.beliefAxisLabels().b.axisName }}</span>
+          <span class="party-value {{ beliefClass('b', cs.partyBeliefb) }}">{{ beliefLabel('b', cs.partyBeliefb) }}</span>
         </div>
         <div class="party-item">
           <span class="party-label">Desires</span>
-          <span class="party-value {{ primaryValue(cs.partyValues).toLowerCase() }}">{{ primaryValue(cs.partyValues) }}</span>
+          <span class="party-value value{{ primaryValue(cs.partyValues).toLowerCase() }}">{{ valueLabel(primaryValue(cs.partyValues)) }}</span>
         </div>
         <div class="party-item">
           <span class="party-label">Maintains</span>
-          <span class="party-value {{ secondaryValue(cs.partyValues).toLowerCase() }}">{{ secondaryValue(cs.partyValues) }}</span>
+          <span class="party-value value{{ secondaryValue(cs.partyValues).toLowerCase() }}">{{ valueLabel(secondaryValue(cs.partyValues)) }}</span>
         </div>
         <div class="party-item">
           <span class="party-label">Sacrifices</span>
-          <span class="party-value {{ sacrificedValue(cs.partyValues).toLowerCase() }}">{{ sacrificedValue(cs.partyValues) }}</span>
+          <span class="party-value value{{ sacrificedValue(cs.partyValues).toLowerCase() }}">{{ valueLabel(sacrificedValue(cs.partyValues)) }}</span>
         </div>
       </div>
     </div>
   }
 </div>
 
+<!-- Campaign Timeline — Baseline only -->
+@if (isViewingBaseline && store.sortedSessions().length > 0) {
+  <div class="card timeline-card" style="margin-top: 1.5rem;">
+    <h3 class="section-title">Timeline</h3>
+
+    <div class="timeline-chart-wrap">
+      <svg [attr.viewBox]="'0 0 ' + timelineWidth + ' ' + timelineHeight"
+           [attr.width]="timelineWidth" [attr.height]="timelineHeight"
+           class="timeline-svg">
+        @for (tick of [0, 2, 4, 6, 8, 10]; track tick) {
+          <line
+            [attr.x1]="timelinePadX"
+            [attr.x2]="timelineWidth - timelinePadX"
+            [attr.y1]="timelinePadY + (timelineHeight - timelinePadY*2) - (tick/10)*(timelineHeight - timelinePadY*2)"
+            [attr.y2]="timelinePadY + (timelineHeight - timelinePadY*2) - (tick/10)*(timelineHeight - timelinePadY*2)"
+            stroke="var(--border)" stroke-width="1" stroke-dasharray="3 3" />
+          <text
+            [attr.x]="timelinePadX - 4"
+            [attr.y]="timelinePadY + (timelineHeight - timelinePadY*2) - (tick/10)*(timelineHeight - timelinePadY*2) + 3"
+            text-anchor="end" font-size="8" fill="var(--text-muted)">{{ tick }}</text>
+        }
+
+        @if (stressPoints()) {
+          <polyline
+            [attr.points]="stressPoints()"
+            fill="none"
+            stroke="var(--accent)"
+            stroke-width="2"
+            stroke-linejoin="round"
+            stroke-linecap="round" />
+        }
+
+        @if (stressMarkers().length > 0) {
+          <polygon
+            [attr.points]="stressPoints() + ' ' + (timelineWidth - timelinePadX) + ',' + (timelineHeight - timelinePadY) + ' ' + timelinePadX + ',' + (timelineHeight - timelinePadY)"
+            fill="rgba(99,102,241,0.08)" />
+        }
+
+        @for (m of stressMarkers(); track m.label) {
+          <circle [attr.cx]="m.x" [attr.cy]="m.y" r="3"
+            fill="var(--accent)" stroke="var(--bg-surface)" stroke-width="1.5">
+            <title>{{ m.label }}: {{ m.title }} — Stress {{ m.stress }}</title>
+          </circle>
+          <text [attr.x]="m.x" [attr.y]="timelineHeight - 1"
+            text-anchor="middle" font-size="7" fill="var(--text-muted)">{{ m.label }}</text>
+        }
+      </svg>
+    </div>
+  </div>
+}
+
+<!-- Colony Alerts + Faction Rankings - Snapshots Only -->
+@if (!isViewingBaseline && store.sortedSessions().length > 0) {
+  <div class="two-col" style="margin-top: 1.5rem;">
+    <div class="card">
+      <h3 class="section-title">Colony Alerts</h3>
+      <div class="alerts-list">
+        @if (mostInfluential) {
+          <div class="alert-row">
+            <span class="alert-label">Most Influential</span>
+            <span class="alert-value">{{ mostInfluential.faction.name }}</span>
+            <span class="alert-meta">momentum {{ mostInfluential.momentum }}</span>
+          </div>
+        }
+        @if (fastestRising) {
+          <div class="alert-row rising">
+            <span class="alert-label">Fastest Rising</span>
+            <span class="alert-value">{{ fastestRising.faction.name }}</span>
+            <span class="alert-meta">↑ this session</span>
+          </div>
+        }
+        @if (lowestLegitimacy) {
+          <div class="alert-row danger">
+            <span class="alert-label">Lowest Legitimacy</span>
+            <span class="alert-value">{{ lowestLegitimacy.faction.name }}</span>
+            <span class="alert-meta">{{ lowestLegitimacy.legitimacy }}</span>
+          </div>
+        }
+        @if (highestDefectionRisk) {
+          <div class="alert-row danger">
+            <span class="alert-label">Highest Defection Risk</span>
+            <span class="alert-value">{{ highestDefectionRisk.name }}</span>
+            <span class="alert-meta">drift {{ highestDefectionRisk.driftScore > 0 ? '+' : '' }}{{ highestDefectionRisk.driftScore }}</span>
+          </div>
+        }
+        @if (!mostInfluential && !lowestLegitimacy && !highestDefectionRisk) {
+          <p class="alerts-empty">No data yet. Add factions and characters.</p>
+        }
+      </div>
+    </div>
+
+    @if (factionRankings().length > 0) {
+      <div class="card">
+        <h3 class="section-title">Faction Rankings</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Faction</th>
+              <th>Momentum</th>
+              <th>Legitimacy</th>
+              <th>Influence</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of factionRankings(); track row.faction.id; let i = $index) {
+              <tr [class.top-faction]="i === 0">
+                <td class="rank">{{ i + 1 }}</td>
+                <td class="faction-name">{{ row.faction.name }}</td>
+                <td><span [class]="'momentum ' + (row.momentum > 0 ? 'pos' : row.momentum < 0 ? 'neg' : 'neutral')">
+                  {{ row.momentum > 0 ? '+' : '' }}{{ row.momentum }}
+                </span></td>
+                <td>{{ row.legitimacy }}</td>
+                <td>{{ row.influence }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+}
+
 <!-- Most Hostile + Strongest Alliances -->
-<div class="two-col">
+<div class="two-col" style="margin-top: 1.5rem;">
   <div class="card">
     <h3 class="section-title">Most Hostile Relationships</h3>
     <table>
@@ -142,7 +265,7 @@
           <tr><th>Name</th><th>Faction</th><th>Drift</th></tr>
         </thead>
         <tbody>
-          @for (c of store.mostAtRisk(); track c.id) {
+          @for (c of store.viewMostAtRisk(); track c.id) {
             <tr>
               <td><a [routerLink]="['/characters', c.id]" class="char-link">{{ c.name }}</a></td>
               <td>{{ factionName(c.factionId) }}</td>
@@ -168,7 +291,7 @@
           <tr><th>Name</th><th>Current</th><th>Most Compatible</th></tr>
         </thead>
         <tbody>
-          @for (c of store.potentialDefections(); track c.id) {
+          @for (c of store.viewPotentialDefections(); track c.id) {
             <tr>
               <td><a [routerLink]="['/characters', c.id]" class="char-link">{{ c.name }}</a></td>
               <td>{{ factionName(c.factionId) }}</td>
@@ -185,18 +308,18 @@
   </div>
 }
 
-<!-- Party Relationships -->
+<!-- Faction → Party Relationships -->
 <div class="card" style="margin-top: 1.5rem;">
-  <h3 class="section-title">Faction → Party Relationships</h3>
+  <h3 class="section-title">Faction → {{ partyName() }} Relationships</h3>
   <table>
     <thead>
       <tr>
         <th>Faction</th>
         <th>Label</th>
         <th>Score</th>
-        <th>Ritual</th>
-        <th>Knowledge</th>
-        <th>Change</th>
+        <th>{{ store.beliefAxisLabels().c.axisName }}</th>
+        <th>{{ store.beliefAxisLabels().a.axisName }}</th>
+        <th>{{ store.beliefAxisLabels().b.axisName }}</th>
       </tr>
     </thead>
     <tbody>
@@ -205,9 +328,9 @@
           <td>{{ factionName(r.sourceId) }}</td>
           <td><span [class]="labelClass(r.label)">{{ r.label }}</span></td>
           <td><span [class]="scoreClass(r.finalScore)">{{ r.finalScore }}</span></td>
-          <td [class]="r.contributions.ritual >= 0 ? 'pos' : 'neg'">{{ r.contributions.ritual > 0 ? '+' : '' }}{{ r.contributions.ritual }}</td>
-          <td [class]="r.contributions.knowledge >= 0 ? 'pos' : 'neg'">{{ r.contributions.knowledge > 0 ? '+' : '' }}{{ r.contributions.knowledge }}</td>
-          <td [class]="r.contributions.change >= 0 ? 'pos' : 'neg'">{{ r.contributions.change > 0 ? '+' : '' }}{{ r.contributions.change }}</td>
+          <td [class]="r.contributions.beliefc >= 0 ? 'pos' : 'neg'">{{ r.contributions.beliefc > 0 ? '+' : '' }}{{ r.contributions.beliefc }}</td>
+          <td [class]="r.contributions.beliefa >= 0 ? 'pos' : 'neg'">{{ r.contributions.beliefa > 0 ? '+' : '' }}{{ r.contributions.beliefa }}</td>
+          <td [class]="r.contributions.beliefb >= 0 ? 'pos' : 'neg'">{{ r.contributions.beliefb > 0 ? '+' : '' }}{{ r.contributions.beliefb }}</td>
         </tr>
       }
       @empty {

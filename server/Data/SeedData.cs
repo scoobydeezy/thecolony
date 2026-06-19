@@ -27,9 +27,9 @@ public static class SeedData
                 AfraidOf = "Collapse",
                 WrongAbout = "The current system is the only possible solution",
                 SingleSentence = "\"The ritual works.\" or \"Don't gamble with lives\" or \"Good intentions don't stop disasters.\"",
-                Ritual = RitualPosition.Good,
-                Knowledge = KnowledgePosition.Hidden,
-                Change = ChangePosition.No,
+                BeliefC = BeliefPosition.Positive,
+                BeliefA = BeliefPosition.Negative,
+                BeliefB = BeliefPosition.Negative,
                 // Desires Stability, Maintains Truth, Sacrifices Agency
                 StabilityValue = D, TruthValue = M, AgencyValue = S,
                 Active = true
@@ -46,9 +46,9 @@ public static class SeedData
                 AfraidOf = "Comfort built on amnesia.",
                 WrongAbout = "Remembrance itself creates change.",
                 SingleSentence = "\"If we must pay the price, we cannot forget it.\"",
-                Ritual = RitualPosition.Good,
-                Knowledge = KnowledgePosition.Revealed,
-                Change = ChangePosition.No,
+                BeliefC = BeliefPosition.Positive,
+                BeliefA = BeliefPosition.Positive,
+                BeliefB = BeliefPosition.Negative,
                 // Desires Truth, Maintains Stability, Sacrifices Agency
                 TruthValue = D, StabilityValue = M, AgencyValue = S,
                 Active = true
@@ -65,9 +65,9 @@ public static class SeedData
                 AfraidOf = "Complacency",
                 WrongAbout = "Every problem has a solution",
                 SingleSentence = "Just because it works doesn't mean it's right.",
-                Ritual = RitualPosition.Bad,
-                Knowledge = KnowledgePosition.Hidden,
-                Change = ChangePosition.Yes,
+                BeliefC = BeliefPosition.Negative,
+                BeliefA = BeliefPosition.Negative,
+                BeliefB = BeliefPosition.Positive,
                 // Desires Agency, Maintains Stability, Sacrifices Truth
                 AgencyValue = D, StabilityValue = M, TruthValue = S,
                 Active = true
@@ -84,9 +84,9 @@ public static class SeedData
                 AfraidOf = "Becoming complicit",
                 WrongAbout = "Destruction produces solutions",
                 SingleSentence = "\"If survival demands this, perhaps it shouldn't survive.\"",
-                Ritual = RitualPosition.Bad,
-                Knowledge = KnowledgePosition.Revealed,
-                Change = ChangePosition.Yes,
+                BeliefC = BeliefPosition.Negative,
+                BeliefA = BeliefPosition.Positive,
+                BeliefB = BeliefPosition.Positive,
                 // Desires Agency, Maintains Truth, Sacrifices Stability
                 AgencyValue = D, TruthValue = M, StabilityValue = S,
                 Active = true
@@ -103,9 +103,9 @@ public static class SeedData
                 AfraidOf = "Intellectual stagnation",
                 WrongAbout = "Knowledge alone solves human problems",
                 SingleSentence = "Every cage is just a puzzle waiting to be solved.",
-                Ritual = RitualPosition.Neutral,
-                Knowledge = KnowledgePosition.Controlled,
-                Change = ChangePosition.Yes,
+                BeliefC = BeliefPosition.Neutral,
+                BeliefA = BeliefPosition.Neutral,
+                BeliefB = BeliefPosition.Positive,
                 // Desires Truth, Maintains Stability, Sacrifices Agency
                 TruthValue = D, StabilityValue = M, AgencyValue = S,
                 Active = true
@@ -122,9 +122,9 @@ public static class SeedData
                 AfraidOf = "Ignorance",
                 WrongAbout = "The entity is benevolent",
                 SingleSentence = "The ritual misunderstands the relationship.",
-                Ritual = RitualPosition.Bad,
-                Knowledge = KnowledgePosition.Controlled,
-                Change = ChangePosition.Yes,
+                BeliefC = BeliefPosition.Negative,
+                BeliefA = BeliefPosition.Neutral,
+                BeliefB = BeliefPosition.Positive,
                 // Desires Truth, Maintains Agency, Sacrifices Stability
                 TruthValue = D, AgencyValue = M, StabilityValue = S,
                 Active = true
@@ -141,9 +141,9 @@ public static class SeedData
                 AfraidOf = "Idealists disrupting stability",
                 WrongAbout = "Everything can be commodified",
                 SingleSentence = "The system exists. Use it.",
-                Ritual = RitualPosition.Neutral,
-                Knowledge = KnowledgePosition.Hidden,
-                Change = ChangePosition.No,
+                BeliefC = BeliefPosition.Neutral,
+                BeliefA = BeliefPosition.Negative,
+                BeliefB = BeliefPosition.Negative,
                 // Desires Stability, Maintains Agency, Sacrifices Truth
                 StabilityValue = D, AgencyValue = M, TruthValue = S,
                 Active = true
@@ -255,7 +255,7 @@ public static class SeedData
                 FactionId = "institute",
                 SocialClassId = "burdened",
                 TruthValue = 0.55, StabilityValue = 0.30, AgencyValue = 0.15,
-                DoubtDirection = DoubtDirection.Stability,
+                DoubtDirection = DoubtDirection.B,
                 Conviction = 65,
                 Pressure = 30
             },
@@ -274,7 +274,7 @@ public static class SeedData
                 FactionId = "keepers",
                 SocialClassId = "burdened",
                 TruthValue = 0.20, StabilityValue = 0.65, AgencyValue = 0.15,
-                DoubtDirection = DoubtDirection.Truth,
+                DoubtDirection = DoubtDirection.A,
                 Conviction = 40,
                 Pressure = 55
             },
@@ -293,7 +293,7 @@ public static class SeedData
                 FactionId = "cult",
                 SocialClassId = "fractured",
                 TruthValue = 0.50, StabilityValue = 0.15, AgencyValue = 0.35,
-                DoubtDirection = DoubtDirection.Agency,
+                DoubtDirection = DoubtDirection.C,
                 Conviction = 35,
                 Pressure = 70
             },
@@ -312,7 +312,7 @@ public static class SeedData
                 FactionId = "aspis",
                 SocialClassId = "civilians",
                 TruthValue = 0.10, StabilityValue = 0.70, AgencyValue = 0.20,
-                DoubtDirection = DoubtDirection.Stability,
+                DoubtDirection = DoubtDirection.B,
                 Conviction = 80,
                 Pressure = 15
             },
@@ -331,7 +331,7 @@ public static class SeedData
                 FactionId = "shattered",
                 SocialClassId = "heirs",
                 TruthValue = 0.25, StabilityValue = 0.10, AgencyValue = 0.65,
-                DoubtDirection = DoubtDirection.Agency,
+                DoubtDirection = DoubtDirection.C,
                 Conviction = 25,
                 Pressure = 80
             }
@@ -345,9 +345,9 @@ public static class SeedData
             Act = 1,
             Week = 1,
             ColonyStress = 3,
-            PartyRitual = RitualPosition.Neutral,
-            PartyKnowledge = KnowledgePosition.Controlled,
-            PartyChange = ChangePosition.Yes,
+            PartyBeliefC = BeliefPosition.Neutral,
+            PartyBeliefA = BeliefPosition.Neutral,
+            PartyBeliefB = BeliefPosition.Positive,
             // Desires Truth, Maintains Stability, Sacrifices Agency
             PartyTruthValue = D, PartyStabilityValue = M, PartyAgencyValue = S
         });

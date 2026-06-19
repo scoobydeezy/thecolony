@@ -1,0 +1,387 @@
+.toolbar {
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
+.import-error {
+  color: var(--color-danger, #c0392b);
+  font-size: 0.85rem;
+}
+
+.import-warn {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.empty-state {
+  color: var(--text-muted);
+  text-align: center;
+  padding: 3rem;
+}
+
+.session-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+// ── Session card ──────────────────────────────────────────────────────────
+
+.session-card {
+  padding: 0;
+  overflow: hidden;
+}
+
+.session-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding: 1rem 1.25rem 0.75rem;
+}
+
+.session-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 2.5rem;
+  text-align: center;
+  padding-top: 0.3rem;
+  flex-shrink: 0;
+}
+
+.session-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.session-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.session-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.meta-chip {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  background: var(--surface-2);
+  border-radius: 3px;
+  padding: 0.2rem 0;
+}
+
+.session-summary {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.session-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+// ── Event rows ────────────────────────────────────────────────────────────
+
+.event-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.event-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.75rem;
+  padding: 0.6rem 1rem 0.6rem 1.25rem;
+  border-top: 1px solid var(--border);
+  cursor: default;
+  transition: background 0.1s;
+
+  &:hover { background: var(--surface-2); }
+  &.dragging { opacity: 0.4; }
+
+  &[draggable="true"] { cursor: grab; &:active { cursor: grabbing; } }
+}
+
+.drag-handle {
+  font-size: 1rem;
+  color: var(--text-muted);
+  cursor: grab;
+  flex-shrink: 0;
+  margin-left: 1rem;
+  padding-top: 0.1rem;
+  user-select: none;
+  &:active { cursor: grabbing; }
+}
+
+.event-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.event-title-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: .6rem;
+}
+
+.event-title {
+  font-weight: 600;
+  font-size: .9rem;
+  color: var(--text-primary);
+}
+
+.event-desc {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+// ── Effects inline display ────────────────────────────────────────────────
+
+.effects-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.35rem;
+}
+
+.effect-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.8rem;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.3rem 0.5rem;
+
+  &--derived {
+    border: 1px dashed #6366f1;
+    background: rgba(99, 102, 241, 0.06);
+  }
+}
+
+.effect-repeat-icon {
+  font-size: 0.55rem;
+  color: #f59e0b;
+}
+
+// ── Derived effects bar ───────────────────────────────────────────────────
+
+.derived-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.75rem;
+  padding: 0.5rem 1rem 0.5rem 1.25rem;
+  border-top: 1px solid var(--border);
+  background: rgba(99, 102, 241, 0.04);
+}
+
+.derived-bar-icon {
+  font-size: 0.65rem;
+  color: #6366f1;
+  flex-shrink: 0;
+  margin-left: .9rem;
+  padding-top: 0.5rem;
+  min-width: .8rem;
+  text-align: center;
+}
+
+.derived-bar-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.derived-reason {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-style: italic;
+  border-left: 2px solid var(--border);
+  padding-left: .4rem;
+}
+
+.effect-target { font-weight: 600; color: var(--text-primary); }
+.effect-prop   { color: var(--text-muted); text-transform: lowercase; }
+
+.effect-del {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  padding: 0;
+  line-height: 1;
+  &:hover { color: var(--color-danger); }
+}
+
+// ── Effect draft rows ─────────────────────────────────────────────────────
+
+.effect-drafts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+}
+
+.effect-draft-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+
+  select, input {
+    font-size: 0.82rem;
+    padding: 0.25rem 0.4rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    height: 28px;
+  }
+
+  select { flex: 1; min-width: 90px; }
+}
+
+.delta-stepper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex: none;
+}
+
+.delta-input {
+  width: 56px; 
+  flex: none !important; 
+}
+
+.stepper-btn {
+  height: 28px;
+  width: 24px;
+  border: transparent;
+  background: var(--surface-1);
+  color: var(--text-primary);
+  cursor: pointer;
+  font-size: 1.5rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.1s, color 0.1s;
+
+  &:hover { background: var(--surface-2); }
+}
+
+.stepper-minus {
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+  color: var(--color-danger);
+  &:hover { color: var(--color-danger); }
+}
+
+.stepper-plus {
+  border-left: none;
+  border-radius: 0 4px 4px 0;
+  color: var(--color-success);
+  &:hover { color: var(--color-success); }
+}
+
+.delta-stepper .delta-input {
+  border-radius: 4px;
+}
+
+// ── Event action buttons ──────────────────────────────────────────────────
+
+.event-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.3rem;
+  flex-shrink: 0;
+  padding-top: 0.05rem;
+}
+
+.add-event-row {
+  padding: 1rem 1.25rem;
+}
+
+.add-effect-row {
+  padding: 0.5rem 0 0;
+}
+
+// ── Delta colors ──────────────────────────────────────────────────────────
+
+.delta {
+  font-weight: 700;
+  font-size: 0.82rem;
+  &.pos     { color: var(--color-success); }
+  &.neg     { color: var(--color-danger);  }
+  &.neutral { color: var(--text-muted);    }
+}
+
+// ── Modal ─────────────────────────────────────────────────────────────────
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.optional {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+// ── Modal delete button ───────────────────────────────────────────────────
+
+.modal-delete { margin-right: auto; }
+
+// ── Extra button size ─────────────────────────────────────────────────────
+
+.btn-xs {
+  font-size: 0.72rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 3px;
+}
+
+.btn-full {
+  background: var(--bg-base);
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 4px;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, border-color 0.15s;
+
+  &:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+}

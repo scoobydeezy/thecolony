@@ -1,64 +1,102 @@
-import { Component, inject, signal, effect } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, inject, signal, effect, computed } from '@angular/core';
 import { AppStore } from '../../store/app.store';
-import { ColonyState, RitualPosition, KnowledgePosition, ChangePosition, ValueVector, primaryValue, secondaryValue, sacrificedValue } from '../../core/models/types';
+import { ColonyState, BeliefPosition, ValueVector, primaryValue, secondaryValue, sacrificedValue, beliefAxisOptions, beliefPositionLabel } from '../../core/models/types';
+import { FormField, form } from '@angular/forms/signals';
 import { downloadCsv } from '../../core/utils/csv-export';
 import { TernaryPlotComponent } from '../../shared/ternary-plot/ternary-plot.component';
+
+interface PartyFormModel {
+  partyName: string;
+  partyBeliefc: string;
+  partyBeliefa: string;
+  partyBeliefb: string;
+}
+
+const toFormModel = (cs: ColonyState): PartyFormModel => ({
+  partyName:    cs.partyName,
+  partyBeliefc: cs.partyBeliefc,
+  partyBeliefa: cs.partyBeliefa,
+  partyBeliefb: cs.partyBeliefb,
+});
 
 @Component({
   selector: 'app-party',
   standalone: true,
-  imports: [FormsModule, TernaryPlotComponent],
+  imports: [FormField, TernaryPlotComponent],
   templateUrl: './party.component.html',
   styleUrl: './party.component.scss'
 })
 export class PartyComponent {
   store = inject(AppStore);
 
-  form = signal<ColonyState | null>(null);
+  readonly editForm = signal<PartyFormModel>({
+    partyName: '', partyBeliefc: '', partyBeliefa: '', partyBeliefb: ''
+  });
+  readonly editValues = signal<ValueVector>({ a: 1/3, b: 1/3, c: 1/3 });
+  readonly f = form(this.editForm);
+
   saved = signal(false);
 
-  readonly ritualOptions: RitualPosition[] = ['Good', 'Neutral', 'Bad'];
-  readonly knowledgeOptions: KnowledgePosition[] = ['Hidden', 'Controlled', 'Revealed'];
-  readonly changeOptions: ChangePosition[] = ['Yes', 'No'];
+  readonly beliefcOptions = computed(() => beliefAxisOptions(this.store.beliefAxisLabels().c));
+  readonly beliefaOptions = computed(() => beliefAxisOptions(this.store.beliefAxisLabels().a));
+  readonly beliefbOptions = computed(() => beliefAxisOptions(this.store.beliefAxisLabels().b));
+
+  beliefLabel(axis: 'a' | 'b' | 'c', pos: BeliefPosition): string {
+    return beliefPositionLabel(pos, this.store.beliefAxisLabels()[axis]);
+  }
+
+  axisName(axis: 'a' | 'b' | 'c'): string {
+    return this.store.beliefAxisLabels()[axis].axisName;
+  }
 
   constructor() {
     effect(() => {
       const cs = this.store.colonyState();
-      if (cs && !this.form()) {
-        this.form.set({ ...cs });
+      if (cs) {
+        this.editForm.set(toFormModel(cs));
+        this.editValues.set({ ...cs.partyValues });
       }
     });
   }
 
   updateValues(v: ValueVector): void {
-    this.form.update(s => s ? { ...s, partyValues: v } : s);
+    this.editValues.set(v);
   }
 
   exportCsv(): void {
-    const f = this.form();
-    if (!f) return;
+    const cs = this.store.colonyState();
+    if (!cs) return;
+    const f = this.editForm();
+    const v = this.editValues();
     const header = [
       'Party Name', 'Act', 'Week', 'Colony Stress',
-      'Ritual', 'Knowledge', 'Change',
+      'BeliefC', 'BeliefA', 'BeliefB',
       'Primary Value', 'Secondary Value', 'Sacrificed Value',
-      'Truth', 'Stability', 'Agency',
+      'ValueA', 'ValueB', 'ValueC',
       'Session Summary', 'Dominant Factions', 'Influence Notes', 'Major Consequences'
     ];
     const row = [
-      f.partyName, f.act ?? '', f.week ?? '', f.colonyStress ?? '',
-      f.partyRitual, f.partyKnowledge, f.partyChange,
-      primaryValue(f.partyValues), secondaryValue(f.partyValues), sacrificedValue(f.partyValues),
-      f.partyValues.truth.toFixed(3), f.partyValues.stability.toFixed(3), f.partyValues.agency.toFixed(3),
-      f.sessionSummary ?? '', f.dominantFactions ?? '', f.influenceNotes ?? '', f.majorConsequences ?? ''
+      f.partyName, cs.act ?? '', cs.week ?? '', cs.colonyStress ?? '',
+      f.partyBeliefc, f.partyBeliefa, f.partyBeliefb,
+      primaryValue(v), secondaryValue(v), sacrificedValue(v),
+      v.a.toFixed(3), v.b.toFixed(3), v.c.toFixed(3),
+      cs.sessionSummary ?? '', cs.dominantFactions ?? '', cs.influenceNotes ?? '', cs.majorConsequences ?? ''
     ];
     downloadCsv([header, row], 'party.csv');
   }
 
   save(): void {
-    const f = this.form();
-    if (!f) return;
-    this.store.saveColonyState(f);
+    const cs = this.store.colonyState();
+    if (!cs) return;
+    const f = this.editForm();
+    this.store.saveColonyState({
+      ...cs,
+      partyName:    f.partyName,
+      partyBeliefc: f.partyBeliefc as BeliefPosition,
+      partyBeliefa: f.partyBeliefa as BeliefPosition,
+      partyBeliefb: f.partyBeliefb as BeliefPosition,
+      partyValues:  this.editValues(),
+    });
     this.saved.set(true);
     setTimeout(() => {
       this.saved.set(false);

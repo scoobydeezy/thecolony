@@ -11,25 +11,89 @@
 
       <li class="nav-section-label">World</li>
       <li><a routerLink="/factions" routerLinkActive="active">Factions</a></li>
+      <li><a routerLink="/characters" routerLinkActive="active">Characters</a></li>
       <li><a routerLink="/relationships" routerLinkActive="active">Relationships</a></li>
-      <li><a routerLink="/colony-state" routerLinkActive="active">Colony State</a></li>
 
       <li class="nav-section-label">Campaign</li>
+      <li><a routerLink="/sessions" routerLinkActive="active">Sessions</a></li>
       <li><a routerLink="/party" routerLinkActive="active">{{ partyName() }}</a></li>
-      <li><a routerLink="/characters" routerLinkActive="active">Characters</a></li>
-      <li><a routerLink="/session-log" routerLinkActive="active">Session Log</a></li>
 
     </ul>
 
     @if (store.colonyState()) {
       <div class="stress-badge">
         <span class="stress-label">Colony Stress</span>
-        <span [class]="stressClass()">{{ store.colonyState()!.colonyStress }}/10</span>
+        <span [class]="stressClass()">{{ store.viewColonyStress() }}/10</span>
       </div>
     }
   </nav>
 
-  <main class="main-content">
-    <router-outlet />
-  </main>
+  <div class="content-column">
+    <header class="top-bar">
+      <p class="top-bar-title">Viewing</p>
+      <div class="view-selector" [class.is-snapshot]="store.isViewingSnapshot()">
+        <button class="view-btn" (click)="toggleViewMenu()" type="button">
+          <span class="view-label">{{ store.viewingLabel() }}</span>
+          <span class="view-caret">▾</span>
+        </button>
+        @if (viewMenuOpen()) {
+          <ul class="view-menu" (mouseleave)="closeViewMenu()">
+            <li>
+              <button type="button" [class.active]="store.viewingContext() === 'baseline'"
+                (click)="setViewing('baseline')">Baseline</button>
+            </li>
+            <li>
+              <button type="button" [class.active]="store.viewingContext() === 'current'"
+                (click)="setViewing('current')">Current State</button>
+            </li>
+            @if (store.sortedSessions().length > 0) {
+              <li class="menu-divider"></li>
+              @for (session of store.sortedSessions(); track session.id) {
+                <li>
+                  <button type="button" [class.active]="store.viewingContext() === session.id"
+                    (click)="setViewing(session.id)">
+                    Session {{ session.number }}: {{ session.title }}
+                  </button>
+                </li>
+              }
+            }
+          </ul>
+        }
+      </div>
+      <div class="playback-controls">
+        <button class="playback-btn" type="button" [disabled]="!canStepBack()"
+          (click)="jumpToBaseline()" title="Jump to Baseline" aria-label="Jump to Baseline">
+          <i class="fa-solid fa-backward-fast"></i>
+        </button>
+        <button class="playback-btn" type="button" [disabled]="!canStepBack()"
+          (click)="stepBack()" title="Step Back" aria-label="Step Back">
+          <i class="fa-solid fa-backward-step"></i>
+        </button>
+        <button class="playback-btn" type="button" [disabled]="!canStepForward()"
+          (click)="stepForward()" title="Step Forward" aria-label="Step Forward">
+          <i class="fa-solid fa-forward-step"></i>
+        </button>
+        <button class="playback-btn" type="button" [disabled]="!canStepForward()"
+          (click)="jumpToCurrent()" title="Jump to Current State" aria-label="Jump to Current State">
+          <i class="fa-solid fa-forward-fast"></i>
+        </button>
+      </div>
+      @if (store.isViewingSnapshot()) {
+        <span class="snapshot">Read-only Session Snapshot</span>
+      }
+      <div class="top-bar-spacer"></div>
+      <button class="settings-btn" (click)="openSettings()" type="button" aria-label="Open settings" title="Settings">
+        <svg class="settings-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+      </button>
+    </header>
+
+    <main class="main-content">
+      <router-outlet />
+    </main>
+  </div>
 </div>
+
+<app-settings-drawer [open]="settingsOpen()" (closed)="closeSettings()" />

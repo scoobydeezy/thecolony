@@ -1,3 +1,7 @@
+.card {
+  margin-bottom: 1.25rem;
+}
+
 .section-title {
   font-size: 0.875rem;
   font-weight: 600;
@@ -27,8 +31,13 @@
     color: var(--text-muted);
     margin-bottom: 0.75rem;
   }
+}
 
-  &.conflict h4 { color: #f87171; }
+.rule-help {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
 }
 
 .rule-row {
@@ -58,49 +67,34 @@
   }
 }
 
-.weights-table {
+.grid-2 {
   display: grid;
-  grid-template-columns: 120px repeat(3, 1fr);
-  gap: 0.5rem;
-  align-items: center;
-  max-width: 500px;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  max-width: 480px;
 }
 
-.weights-header {
-  display: contents;
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
 
-  span {
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    color: var(--text-muted);
-    padding: 0 0.25rem;
-    text-align: center;
+  label {
+    font-size: 0.825rem;
+    color: var(--text-secondary);
   }
-}
-
-.weights-row {
-  display: contents;
 
   input[type=number] {
     background: var(--bg-base);
     border: 1px solid var(--border);
     border-radius: 6px;
-    padding: 0.35rem;
+    padding: 0.4rem 0.6rem;
     color: var(--text-primary);
     font-size: 0.9rem;
-    text-align: center;
     outline: none;
     &:focus { border-color: var(--accent); }
   }
-}
 
-.value-name {
-  font-size: 0.85rem;
-  font-weight: 600;
-  &.truth     { color: var(--color-truth); }
-  &.stability { color: var(--color-stability); }
-  &.agency    { color: var(--color-agency); }
 }
 
 small {
@@ -110,17 +104,35 @@ small {
   margin-top: 0.25rem;
 }
 
-.threshold-legend {
+.threshold-rows {
   display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-top: 0.75rem;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-width: 380px;
+}
+
+.threshold-row {
+  .badge {
+    min-width: 100px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .threshold-input-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+    .rule-label {
+      font-size: 0.78rem;
+    }
+  }
 }
 
 .save-bar {
   display: flex;
   align-items: center;
   gap: 1rem;
+  padding-top: 0.5rem;
 }
 
 .saved-msg {

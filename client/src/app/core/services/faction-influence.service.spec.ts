@@ -7,7 +7,7 @@ const svc = new FactionInfluenceService();
 function makeChar(influence: number): Character {
   return {
     id: crypto.randomUUID(), name: 'Test', characterType: 'NPC',
-    values: { truth: 1/3, stability: 1/3, agency: 1/3 },
+    values: { a: 1/3, b: 1/3, c: 1/3 },
     conviction: 50, pressure: 0, influence, impressionable: 50
   };
 }
@@ -16,7 +16,7 @@ function makeFaction(baseInfluence: number, momentum: number): Faction {
   return {
     id: 'f1', name: 'Test Faction', represents: '', type: 'Faction',
     coreTenet: '', certainOf: '', rightAbout: '', afraidOf: '', wrongAbout: '',
-    singleSentence: '', values: { truth: 1/3, stability: 1/3, agency: 1/3 },
+    singleSentence: '', values: { a: 1/3, b: 1/3, c: 1/3 },
     active: true, sortOrder: 0, baseInfluence, momentum
   };
 }

@@ -36,4 +36,14 @@ public class RulesConfig
           {"label":"Hostile","minScore":-999}
         ]
         """;
+
+    // Display label overrides (stored as JSON; empty string = use client defaults)
+    public string ValueLabelsJson { get; set; } = "";
+    public string BeliefAxisLabelsJson { get; set; } = "";
+
+    // Cascade rules (stored as JSON; empty string = use client defaults)
+    public string CascadeRulesJson { get; set; } = "";
+
+    // Formula weights (stored as JSON; empty string = use client defaults)
+    public string FormulasJson { get; set; } = "";
 }

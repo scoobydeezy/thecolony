@@ -2,7 +2,7 @@ import {
   RulesConfig, RelationshipBreakdown,
   RelationshipLabel, RelationshipThreshold,
   ValueVector, dot, inverseVector,
-  RitualPosition, KnowledgePosition, ChangePosition
+  BeliefPosition
 } from '../models/types';
 
 export const DEFAULT_RULES: RulesConfig = {
@@ -24,7 +24,11 @@ export const DEFAULT_RULES: RulesConfig = {
     { label: 'Strained',  minScore: -4  },
     { label: 'Opposed',   minScore: -10 },
     { label: 'Hostile',   minScore: -999 }
-  ])
+  ]),
+  valueLabelsJson: '',
+  beliefAxisLabelsJson: '',
+  cascadeRulesJson: '',
+  formulasJson: '',
 };
 
 function scoreBelief<T>(a: T | undefined, b: T | undefined, isBuffer: (v: T) => boolean, rules: RulesConfig): number {
@@ -52,9 +56,9 @@ function getLabel(score: number, rules: RulesConfig): RelationshipLabel {
 export interface ScoringActor {
   id: string;
   values: ValueVector;
-  ritual?: RitualPosition;
-  knowledge?: KnowledgePosition;
-  change?: ChangePosition;
+  beliefc?: BeliefPosition;
+  beliefa?: BeliefPosition;
+  beliefb?: BeliefPosition;
 }
 
 export function scoreRelationship(
@@ -66,15 +70,15 @@ export function scoreRelationship(
 ): RelationshipBreakdown {
   const sv = source.values;
 
-  const ritualContrib    = scoreBelief(source.ritual,    target.ritual,    r => r === 'Neutral',    rules) * sv.agency;
-  const knowledgeContrib = scoreBelief(source.knowledge, target.knowledge, k => k === 'Controlled', rules) * sv.truth;
-  const changeContrib    = scoreBelief(source.change,    target.change,    () => false,             rules) * sv.stability;
+  const beliefcContrib = scoreBelief(source.beliefc, target.beliefc, r => r === 'neutral', rules) * sv.c;
+  const beliefaContrib = scoreBelief(source.beliefa, target.beliefa, k => k === 'neutral', rules) * sv.a;
+  const beliefbContrib = scoreBelief(source.beliefb, target.beliefb, () => false,          rules) * sv.b;
 
   const alignmentContrib = dot(sv, target.values)            * rules.valueAlignmentScale;
   const conflictContrib  = dot(sv, inverseVector(target.values)) * rules.valueConflictScale;
 
   const baseScore = round1(
-    ritualContrib + knowledgeContrib + changeContrib + alignmentContrib - conflictContrib
+    beliefcContrib + beliefaContrib + beliefbContrib + alignmentContrib - conflictContrib
   );
 
   const stressedScore = round1(applyStress(baseScore, colonyStress, rules));
@@ -89,9 +93,9 @@ export function scoreRelationship(
     finalScore,
     label: getLabel(finalScore, rules),
     contributions: {
-      ritual:         round1(ritualContrib),
-      knowledge:      round1(knowledgeContrib),
-      change:         round1(changeContrib),
+      beliefc:        round1(beliefcContrib),
+      beliefa:        round1(beliefaContrib),
+      beliefb:        round1(beliefbContrib),
       valueAlignment: round1(alignmentContrib),
       valueConflict:  round1(-conflictContrib),
     }

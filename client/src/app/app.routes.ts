@@ -19,12 +19,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/party/party.component').then(m => m.PartyComponent)
   },
   {
-    path: 'colony-state',
-    loadComponent: () => import('./features/colony-state/colony-state.component').then(m => m.ColonyStateComponent)
-  },
-  {
     path: 'session-log',
     loadComponent: () => import('./features/session-log/session-log.component').then(m => m.SessionLogComponent)
+  },
+  {
+    path: 'sessions',
+    loadComponent: () => import('./features/sessions/sessions.component').then(m => m.SessionsComponent)
   },
   {
     path: 'characters',

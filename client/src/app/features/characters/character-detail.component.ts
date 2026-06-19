@@ -4,19 +4,21 @@ import { DecimalPipe } from '@angular/common';
 import { FormField, form, required } from '@angular/forms/signals';
 import { AppStore } from '../../store/app.store';
 import {
-  Character, CharacterType, DoubtDirection, ValueVector,
-  RitualPosition, KnowledgePosition, ChangePosition,
+  Character, CharacterType, CharacterState, DoubtDirection, ValueVector,
+  BeliefPosition,
   effectivePressure, computeDriftTarget, lerpValueVector,
   topCompatibleFactions, effectiveBeliefs,
   primaryValue, secondaryValue, sacrificedValue,
-  influenceConvictionBonus
+  influenceConvictionBonus, beliefAxisOptions, beliefPositionLabel
 } from '../../core/models/types';
 import { TernaryPlotComponent, TernaryOverlayPoint } from '../../shared/ternary-plot/ternary-plot.component';
+import { scoreRelationship, ScoringActor, DEFAULT_RULES } from '../../core/services/scoring.service';
 
 interface CharacterFormModel {
   id: string;
   name: string;
   characterType: string;
+  state: CharacterState;
   ancestry: string;
   heritage: string;
   class: string;
@@ -31,9 +33,9 @@ interface CharacterFormModel {
   notes: string;
   factionId: string;
   socialClassId: string;
-  ritual: string;
-  knowledge: string;
-  change: string;
+  beliefc: string;
+  beliefa: string;
+  beliefb: string;
   doubtDirection: string;
   conviction: string;
   pressure: string;
@@ -41,15 +43,15 @@ interface CharacterFormModel {
   impressionable: string;
 }
 
-const DEFAULT_VALUES: ValueVector = { truth: 1/3, stability: 1/3, agency: 1/3 };
+const DEFAULT_VALUES: ValueVector = { a: 1/3, b: 1/3, c: 1/3 };
 
 const emptyFormModel = (): CharacterFormModel => ({
-  id: '', name: '', characterType: 'NPC',
+  id: '', name: '', characterType: 'NPC', state: 'Alive',
   ancestry: '', heritage: '', class: '', background: '', level: '',
   gender: '', age: '', occupation: '',
   summary: '', goals: '', fears: '', notes: '',
   factionId: '', socialClassId: '',
-  ritual: '', knowledge: '', change: '',
+  beliefc: '', beliefa: '', beliefb: '',
   doubtDirection: '', conviction: '50', pressure: '0',
   influence: '0', impressionable: '50'
 });
@@ -58,6 +60,7 @@ const toFormModel = (c: Character): CharacterFormModel => ({
   id: c.id,
   name: c.name,
   characterType: c.characterType,
+  state: c.state,
   ancestry: c.ancestry ?? '',
   heritage: c.heritage ?? '',
   class: c.class ?? '',
@@ -72,9 +75,9 @@ const toFormModel = (c: Character): CharacterFormModel => ({
   notes: c.notes ?? '',
   factionId: c.factionId ?? '',
   socialClassId: c.socialClassId ?? '',
-  ritual: c.ritual ?? '',
-  knowledge: c.knowledge ?? '',
-  change: c.change ?? '',
+  beliefc: c.beliefc ?? '',
+  beliefa: c.beliefa ?? '',
+  beliefb: c.beliefb ?? '',
   doubtDirection: c.doubtDirection ?? '',
   conviction: c.conviction.toString(),
   pressure: c.pressure.toString(),
@@ -86,6 +89,7 @@ const fromFormModel = (fm: CharacterFormModel, values: ValueVector): Character =
   id: fm.id,
   name: fm.name,
   characterType: fm.characterType as CharacterType,
+  state: fm.state,
   ancestry: fm.ancestry || undefined,
   heritage: fm.heritage || undefined,
   class: fm.class || undefined,
@@ -100,9 +104,9 @@ const fromFormModel = (fm: CharacterFormModel, values: ValueVector): Character =
   notes: fm.notes || undefined,
   factionId: fm.factionId || undefined,
   socialClassId: fm.socialClassId || undefined,
-  ritual: (fm.ritual as RitualPosition) || undefined,
-  knowledge: (fm.knowledge as KnowledgePosition) || undefined,
-  change: (fm.change as ChangePosition) || undefined,
+  beliefc: (fm.beliefc as BeliefPosition) || undefined,
+  beliefa: (fm.beliefa as BeliefPosition) || undefined,
+  beliefb: (fm.beliefb as BeliefPosition) || undefined,
   values,
   doubtDirection: (fm.doubtDirection as DoubtDirection) || undefined,
   conviction: fm.conviction !== '' ? +fm.conviction : 0,
@@ -128,7 +132,7 @@ export class CharacterDetailComponent implements OnInit {
 
   // Read-mode: the saved character
   character = signal<Character>({
-    id: '', name: '', characterType: 'NPC',
+    id: '', name: '', characterType: 'NPC', state: 'Alive',
     values: { ...DEFAULT_VALUES }, conviction: 50, pressure: 0,
     influence: 0, impressionable: 50
   });
@@ -140,10 +144,11 @@ export class CharacterDetailComponent implements OnInit {
     required(schema.name, { message: 'Name is required' });
   });
 
-  readonly doubtDirections: DoubtDirection[] = ['Truth', 'Stability', 'Agency'];
-  readonly ritualOptions:    RitualPosition[]    = ['Good', 'Neutral', 'Bad'];
-  readonly knowledgeOptions: KnowledgePosition[] = ['Hidden', 'Controlled', 'Revealed'];
-  readonly changeOptions:    ChangePosition[]    = ['Yes', 'No'];
+  readonly stateOptions: CharacterState[] = ['Alive', 'Dead', 'Missing', 'Forgotten'];
+  readonly doubtDirections: DoubtDirection[] = ['a', 'b', 'c'];
+  readonly beliefcOptions = computed(() => beliefAxisOptions(this.store.beliefAxisLabels().c));
+  readonly beliefaOptions = computed(() => beliefAxisOptions(this.store.beliefAxisLabels().a));
+  readonly beliefbOptions = computed(() => beliefAxisOptions(this.store.beliefAxisLabels().b));
 
   readonly genderOptions = ['Male', 'Female', 'Unknown', 'Unspecified'];
 
@@ -177,7 +182,33 @@ export class CharacterDetailComponent implements OnInit {
   secondaryValue  = secondaryValue;
   sacrificedValue = sacrificedValue;
 
-  readonly colonyStress = computed(() => this.store.colonyState()?.colonyStress ?? 0);
+  valueLabel(v: string): string {
+    const vl = this.store.valueLabels();
+    const k = v.toLowerCase() as 'a' | 'b' | 'c';
+    return (k === 'a' || k === 'b' || k === 'c') ? vl[k] : v;
+  }
+
+  beliefLabel(axis: 'a' | 'b' | 'c', pos: BeliefPosition): string {
+    return beliefPositionLabel(pos, this.store.beliefAxisLabels()[axis]);
+  }
+
+  beliefClass(axis: 'a' | 'b' | 'c', pos: BeliefPosition): string {
+    const cfg = this.store.beliefAxisLabels()[axis];
+    if (pos === 'positive') return cfg.positiveAligns ? 'belief-statusquo' : 'belief-dissent';
+    if (pos === 'negative') return cfg.positiveAligns ? 'belief-dissent' : 'belief-statusquo';
+    return 'belief-neutral';
+  }
+
+  axisName(axis: 'a' | 'b' | 'c'): string {
+    return this.store.beliefAxisLabels()[axis].axisName;
+  }
+
+  doubtLabel(direction: DoubtDirection | undefined): string {
+    if (!direction) return '—';
+    return this.store.valueLabels()[direction];
+  }
+
+  readonly colonyStress = computed(() => this.store.viewColonyStress());
 
   readonly effectivePressureValue = computed(() =>
     effectivePressure(this.character(), this.colonyStress())
@@ -186,7 +217,7 @@ export class CharacterDetailComponent implements OnInit {
   readonly factionPeers = computed(() => {
     const c = this.character();
     if (!c.factionId) return [];
-    return this.store.characters().filter(p => p.factionId === c.factionId && p.id !== c.id);
+    return this.store.viewCharacters().filter(p => p.state === 'Alive' && p.factionId === c.factionId && p.id !== c.id);
   });
 
   readonly influenceScale = computed(() =>
@@ -220,7 +251,7 @@ export class CharacterDetailComponent implements OnInit {
     const base = Math.min(100, Math.max(0, Number(fm.conviction) || 0));
     const impressionable = Math.min(100, Math.max(0, Number(fm.impressionable) || 0));
     if (!fm.factionId) return base;
-    const peers = this.store.characters().filter(p => p.factionId === fm.factionId && p.id !== fm.id);
+    const peers = this.store.viewCharacters().filter(p => p.state === 'Alive' && p.factionId === fm.factionId && p.id !== fm.id);
     const scale = this.store.rules()?.influenceConvictionScale ?? 0.5;
     const bonus = peers.length === 0 ? 0
       : (peers.reduce((s, p) => s + p.influence, 0) / peers.length) * (impressionable / 100) * scale;
@@ -260,11 +291,11 @@ export class CharacterDetailComponent implements OnInit {
 
   // Faction compatibility (read mode)
   readonly activeFactions = computed(() =>
-    this.store.factions().filter(f => f.active && f.type === 'Faction')
+    this.store.viewFactions().filter(f => f.active && f.type === 'Faction')
   );
 
   readonly compatibilityList = computed(() =>
-    topCompatibleFactions(this.character(), this.activeFactions())
+    topCompatibleFactions(this.character(), this.activeFactions(), this.store.formulas().beliefDerivationThreshold)
   );
 
   readonly top3Compatible = computed(() =>
@@ -311,7 +342,7 @@ export class CharacterDetailComponent implements OnInit {
 
     if (!drifted) return null;
 
-    return topCompatibleFactions(drifted, this.activeFactions());
+    return topCompatibleFactions(drifted, this.activeFactions(), this.store.formulas().beliefDerivationThreshold);
   });
 
   readonly driftedBeliefs = computed(() => {
@@ -339,6 +370,24 @@ export class CharacterDetailComponent implements OnInit {
     return drifted && current && drifted.id !== current.id;
   });
 
+  readonly factionToPartyRelationship = computed(() => {
+    const c = this.character();
+    if (!c.factionId) return null;
+    return this.store.partyRelationships().find(r => r.sourceId === c.factionId) ?? null;
+  });
+
+  readonly characterToPartyRelationship = computed(() => {
+    const cs = this.store.colonyState();
+    if (!cs) return null;
+    const c = this.character();
+    const beliefs = effectiveBeliefs(c);
+    const source: ScoringActor = { id: c.id, values: c.values, beliefc: beliefs.beliefc, beliefa: beliefs.beliefa, beliefb: beliefs.beliefb };
+    const party: ScoringActor  = { id: 'party', values: cs.partyValues, beliefc: cs.partyBeliefc, beliefa: cs.partyBeliefa, beliefb: cs.partyBeliefb };
+    return scoreRelationship(source, party, this.colonyStress(), 0, this.store.rules() ?? DEFAULT_RULES);
+  });
+
+  readonly partyName = computed(() => this.store.colonyState()?.partyName ?? 'Party');
+
   readonly derivedBeliefs = computed(() => effectiveBeliefs(this.character()));
 
   readonly driftedBeliefChanges = computed(() => {
@@ -346,9 +395,9 @@ export class CharacterDetailComponent implements OnInit {
   const drifted = this.driftedBeliefs();
 
   return {
-    ritual: current.ritual !== drifted.ritual,
-    knowledge: current.knowledge !== drifted.knowledge,
-    change: current.change !== drifted.change,
+    beliefc: current.beliefc !== drifted.beliefc,
+    beliefa: current.beliefa !== drifted.beliefa,
+    beliefb: current.beliefb !== drifted.beliefb,
   };
 });
 
@@ -367,7 +416,7 @@ export class CharacterDetailComponent implements OnInit {
       this.editForm.set(emptyFormModel());
       this.editValues.set({ ...DEFAULT_VALUES });
     } else {
-      const found = this.store.characters().find(c => c.id === id);
+      const found = this.store.viewCharacters().find(c => c.id === id);
       if (found) {
         this.character.set({ ...found, values: { ...found.values } });
       }
@@ -383,6 +432,21 @@ export class CharacterDetailComponent implements OnInit {
   factionName(id?: string): string {
     if (!id) return '—';
     return this.store.factions().find(f => f.id === id)?.name ?? id;
+  }
+
+  private readonly stateIconMap: Record<CharacterState, string> = {
+    Alive:     '',
+    Dead:      'fa-solid fa-skull',
+    Missing:   'fa-solid fa-circle-question',
+    Forgotten: 'fa-solid fa-hourglass-start',
+  };
+
+  stateIconClass(state: CharacterState): string {
+    return this.stateIconMap[state];
+  }
+
+  stateHeadingClass(state: CharacterState): string {
+    return `state-heading state-heading--${state.toLowerCase()}`;
   }
 
   driftClass(score: number): string {

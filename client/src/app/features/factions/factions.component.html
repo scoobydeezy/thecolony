@@ -11,11 +11,13 @@
   </div>
   <div class="toolbar-actions">
     <button class="btn btn-secondary" (click)="exportCsv()">Export CSV</button>
-    <label class="btn btn-secondary">
-      Import CSV
-      <input type="file" accept=".csv" style="display:none" (change)="importCsv($event)">
-    </label>
-    <button class="btn btn-primary" (click)="openAdd()">+ Add Faction</button>
+    @if (!store.isViewingSnapshot()) {
+      <label class="btn btn-secondary">
+        Import CSV
+        <input type="file" accept=".csv" style="display:none" (change)="importCsv($event)">
+      </label>
+      <button class="btn btn-primary" (click)="openAdd()">+ Add Faction</button>
+    }
   </div>
 </div>
 
@@ -29,7 +31,7 @@
   <div class="card global-view-card">
     <h3 class="section-title">Value Landscape</h3>
     <app-ternary-plot
-      [values]="{ truth: 1/3, stability: 1/3, agency: 1/3 }"
+      [values]="{ a: 1/3, b: 1/3, c: 1/3 }"
       [editable]="false"
       [size]="480"
       [showValueLabels]="false"
@@ -37,6 +39,7 @@
       [showOverlayLabels]="true"
       [hidePrimaryPoint]="true"
       [legendItems]="[{ label: 'Faction', color: '#1d4ed8' }, { label: 'Social Class', color: '#7c3aed' }]"
+      [valueLabels]="store.valueLabels()"
     />
   </div>
 }
@@ -80,7 +83,7 @@
       </div>
 
       <div class="card-body">
-        <app-ternary-plot [values]="f.values" [editable]="false" [size]="160" [showValueLabels]="false" />
+        <app-ternary-plot [values]="f.values" [editable]="false" [size]="160" [showValueLabels]="false" [valueLabels]="store.valueLabels()" />
 
         <div class="beliefs-col">
           @if (f.coreTenet) {
@@ -96,40 +99,40 @@
             <div class="fact-group-items">
               <div class="belief-item">
                 <span class="belief-label">Desires</span>
-                <span class="belief-val" [class]="'value-name ' + primaryValue(f.values).toLowerCase()">{{ primaryValue(f.values) }}</span>
+                <span class="belief-val value{{ primaryValue(f.values).toLowerCase() }}">{{ valueLabel(primaryValue(f.values)) }}</span>
               </div>
               <div class="belief-item">
                 <span class="belief-label">Maintains</span>
-                <span class="belief-val" [class]="'value-name ' + secondaryValue(f.values).toLowerCase()">{{ secondaryValue(f.values) }}</span>
+                <span class="belief-val value{{ secondaryValue(f.values).toLowerCase() }}">{{ valueLabel(secondaryValue(f.values)) }}</span>
               </div>
               <div class="belief-item">
                 <span class="belief-label">Sacrifices</span>
-                <span class="belief-val" [class]="'value-name ' + sacrificedValue(f.values).toLowerCase()">{{ sacrificedValue(f.values) }}</span>
+                <span class="belief-val value{{ sacrificedValue(f.values).toLowerCase() }}">{{ valueLabel(sacrificedValue(f.values)) }}</span>
               </div>
             </div>
           </div>
 
-          @if (f.ritual || f.knowledge || f.change) {
-            @let conflicts = beliefConflicts(f.values, f.ritual, f.knowledge, f.change);
+          @if (f.beliefc || f.beliefa || f.beliefb) {
+            @let conflicts = beliefConflictsComputed(f.values, f.beliefc, f.beliefa, f.beliefb);
             <div class="fact-group">
               <span class="fact-group-label">Beliefs</span>
               <div class="fact-group-items">
-                @if (f.ritual) {
-                  <div class="belief-item" [class.belief-conflict]="conflicts.ritual">
-                    <span class="belief-label">Ritual</span>
-                    <span class="belief-val ritual-{{ f.ritual.toLowerCase() }}">{{ f.ritual }}</span>
+                @if (f.beliefc) {
+                  <div class="belief-item" [class.belief-conflict]="conflicts.beliefc">
+                    <span class="belief-label">{{ axisName('c') }}</span>
+                    <span class="belief-val {{ beliefClass('c', f.beliefc) }}">{{ beliefLabel('c', f.beliefc) }}</span>
                   </div>
                 }
-                @if (f.knowledge) {
-                  <div class="belief-item" [class.belief-conflict]="conflicts.knowledge">
-                    <span class="belief-label">Knowledge</span>
-                    <span class="belief-val">{{ f.knowledge }}</span>
+                @if (f.beliefa) {
+                  <div class="belief-item" [class.belief-conflict]="conflicts.beliefa">
+                    <span class="belief-label">{{ axisName('a') }}</span>
+                    <span class="belief-val {{ beliefClass('a', f.beliefa) }}">{{ beliefLabel('a', f.beliefa) }}</span>
                   </div>
                 }
-                @if (f.change) {
-                  <div class="belief-item" [class.belief-conflict]="conflicts.change">
-                    <span class="belief-label">Change</span>
-                    <span class="belief-val change-{{ f.change.toLowerCase() }}">{{ f.change }}</span>
+                @if (f.beliefb) {
+                  <div class="belief-item" [class.belief-conflict]="conflicts.beliefb">
+                    <span class="belief-label">{{ axisName('b') }}</span>
+                    <span class="belief-val {{ beliefClass('b', f.beliefb) }}">{{ beliefLabel('b', f.beliefb) }}</span>
                   </div>
                 }
               </div>
@@ -138,22 +141,24 @@
         </div>
       </div>
 
-      <div class="faction-actions" (click)="$event.stopPropagation()">
-        <button class="btn btn-secondary btn-sm" (click)="openEdit(f)">Edit</button>
-        <div class="faction-actions-right">
-          <button class="btn btn-secondary btn-sm" (click)="toggleActive(f)">
-            {{ f.active ? 'Deactivate' : 'Activate' }}
-          </button>
-          <button class="btn btn-danger btn-sm" (click)="delete(f.id)">Delete</button>
+      @if (!store.isViewingSnapshot()) {
+        <div class="faction-actions" (click)="$event.stopPropagation()">
+          <button class="btn btn-secondary btn-sm" (click)="openEdit(f)">Edit</button>
+          <div class="faction-actions-right">
+            <button class="btn btn-secondary btn-sm" (click)="toggleActive(f)">
+              {{ f.active ? 'Deactivate' : 'Activate' }}
+            </button>
+            <button class="btn btn-danger btn-sm" (click)="delete(f.id)">Delete</button>
+          </div>
         </div>
-      </div>
+      }
     </div>
   }
 </div>
 
 <!-- Faction Detail Modal -->
 @if (detailFaction(); as faction) {
-  @let conflicts = beliefConflicts(faction.values, faction.ritual, faction.knowledge, faction.change);
+  @let conflicts = beliefConflictsComputed(faction.values, faction.beliefc, faction.beliefa, faction.beliefb);
   <div class="modal-backdrop" (click)="closeDetail()">
     <div class="modal modal-detail" (click)="$event.stopPropagation()">
       <div class="detail-header">
@@ -207,7 +212,7 @@
               </div>
             </div>
           </div>
-          <app-ternary-plot [values]="faction.values" [editable]="false" [size]="280" [showValueLabels]="true" />
+          <app-ternary-plot [values]="faction.values" [editable]="false" [size]="280" [showValueLabels]="true" [valueLabels]="store.valueLabels()" />
         </div>
 
         <div class="detail-right">
@@ -248,26 +253,26 @@
             </div>
           }
 
-          @if (faction.ritual || faction.knowledge || faction.change) {
+          @if (faction.beliefc || faction.beliefa || faction.beliefb) {
             <div class="detail-section">
               <div class="separator">Beliefs</div>
               <div class="detail-beliefs-row">
-                @if (faction.ritual) {
-                  <div class="belief-item" [class.belief-conflict]="conflicts.ritual">
-                    <span class="belief-label">Ritual</span>
-                    <span class="belief-val ritual-{{ faction.ritual.toLowerCase() }}">{{ faction.ritual }}</span>
+                @if (faction.beliefc) {
+                  <div class="belief-item" [class.belief-conflict]="conflicts.beliefc">
+                    <span class="belief-label">{{ axisName('c') }}</span>
+                    <span class="belief-val {{ beliefClass('c', faction.beliefc) }}">{{ beliefLabel('c', faction.beliefc) }}</span>
                   </div>
                 }
-                @if (faction.knowledge) {
-                  <div class="belief-item" [class.belief-conflict]="conflicts.knowledge">
-                    <span class="belief-label">Knowledge</span>
-                    <span class="belief-val">{{ faction.knowledge }}</span>
+                @if (faction.beliefa) {
+                  <div class="belief-item" [class.belief-conflict]="conflicts.beliefa">
+                    <span class="belief-label">{{ axisName('a') }}</span>
+                    <span class="belief-val {{ beliefClass('a', faction.beliefa) }}">{{ beliefLabel('a', faction.beliefa) }}</span>
                   </div>
                 }
-                @if (faction.change) {
-                  <div class="belief-item" [class.belief-conflict]="conflicts.change">
-                    <span class="belief-label">Change</span>
-                    <span class="belief-val change-{{ faction.change.toLowerCase() }}">{{ faction.change }}</span>
+                @if (faction.beliefb) {
+                  <div class="belief-item" [class.belief-conflict]="conflicts.beliefb">
+                    <span class="belief-label">{{ axisName('b') }}</span>
+                    <span class="belief-val {{ beliefClass('b', faction.beliefb) }}">{{ beliefLabel('b', faction.beliefb) }}</span>
                   </div>
                 }
               </div>
@@ -311,6 +316,8 @@
       <div class="detail-characters">
         @if (detailCharacters().length === 0) {
           <p class="no-members">No characters belong to this faction.</p>
+        } @else if (detailActiveCharacters().length === 0 && detailInactiveCharacters().length > 0) {
+          <p class="no-members">All members are deceased, missing, or forgotten.</p>
         } @else {
 
           @if (detailLeaders().length > 0) {
@@ -367,11 +374,35 @@
           }
 
         }
+
+        @if (detailInactiveCharacters().length > 0) {
+          <p class="members-subsection-label former-members-label">Former Members</p>
+          @for (char of detailInactiveCharacters(); track char.id) {
+            <div class="character-row former-member">
+              <div class="character-row-main">
+                @if (stateIconClass(char.state)) {
+                  <i [class]="stateIconClass(char.state)" [title]="char.state"></i>
+                }
+                <span class="char-name">{{ char.name }}</span>
+                <span class="char-type-chip"
+                  [class.party]="char.characterType === 'PartyMember'"
+                  [class.leader]="char.characterType === 'FactionLeader'">
+                  {{ char.characterType === 'FactionLeader' ? 'Leader' : char.characterType === 'PartyMember' ? 'Party' : 'NPC' }}
+                </span>
+                @if (char.occupation) { <span class="char-meta">{{ char.occupation }}</span> }
+              </div>
+              @if (char.summary) { <p class="char-summary">{{ char.summary }}</p> }
+            </div>
+          }
+        }
+
       </div>
 
       <div class="modal-actions">
         <button class="btn btn-secondary" (click)="closeDetail()">Close</button>
-        <button class="btn btn-primary" (click)="closeDetail(); openEdit(faction)">Edit</button>
+        @if (!store.isViewingSnapshot()) {
+          <button class="btn btn-primary" (click)="closeDetail(); openEdit(faction)">Edit</button>
+        }
       </div>
     </div>
   </div>
@@ -454,6 +485,7 @@
         <app-ternary-plot
           [values]="editValues()"
           [editable]="true"
+          [valueLabels]="store.valueLabels()"
           (valuesChange)="editValues.set($event)"
         />
         <p class="ternary-hint">Drag the point to adjust values. The derived labels update live.</p>
@@ -466,30 +498,30 @@
       }
 
       <div class="grid-3">
-        <div class="form-group" [class.belief-conflict-group]="editConflicts().ritual">
-          <label [class.label-conflict]="editConflicts().ritual">Ritual</label>
-          <select [formField]="f.ritual">
+        <div class="form-group" [class.belief-conflict-group]="editConflicts().beliefc">
+          <label [class.label-conflict]="editConflicts().beliefc">{{ axisName('c') }}</label>
+          <select [formField]="f.beliefc">
             <option value="">— None —</option>
-            @for (opt of ritualOptions; track opt) {
-              <option [value]="opt">{{ opt }}</option>
+            @for (opt of beliefcOptions(); track opt) {
+              <option [value]="opt">{{ beliefLabel('c', opt) }}</option>
             }
           </select>
         </div>
-        <div class="form-group" [class.belief-conflict-group]="editConflicts().knowledge">
-          <label [class.label-conflict]="editConflicts().knowledge">Knowledge</label>
-          <select [formField]="f.knowledge">
+        <div class="form-group" [class.belief-conflict-group]="editConflicts().beliefa">
+          <label [class.label-conflict]="editConflicts().beliefa">{{ axisName('a') }}</label>
+          <select [formField]="f.beliefa">
             <option value="">— None —</option>
-            @for (opt of knowledgeOptions; track opt) {
-              <option [value]="opt">{{ opt }}</option>
+            @for (opt of beliefaOptions(); track opt) {
+              <option [value]="opt">{{ beliefLabel('a', opt) }}</option>
             }
           </select>
         </div>
-        <div class="form-group" [class.belief-conflict-group]="editConflicts().change">
-          <label [class.label-conflict]="editConflicts().change">Change</label>
-          <select [formField]="f.change">
+        <div class="form-group" [class.belief-conflict-group]="editConflicts().beliefb">
+          <label [class.label-conflict]="editConflicts().beliefb">{{ axisName('b') }}</label>
+          <select [formField]="f.beliefb">
             <option value="">— None —</option>
-            @for (opt of changeOptions; track opt) {
-              <option [value]="opt">{{ opt }}</option>
+            @for (opt of beliefbOptions(); track opt) {
+              <option [value]="opt">{{ beliefLabel('b', opt) }}</option>
             }
           </select>
         </div>

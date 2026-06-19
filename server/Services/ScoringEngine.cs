@@ -31,9 +31,9 @@ public class ScoringEngine : IScoringEngine
         return Score(
             source.Id, target.Id,
             source.TruthValue, source.StabilityValue, source.AgencyValue,
-            source.Ritual, source.Knowledge, source.Change,
+            source.BeliefC, source.BeliefA, source.BeliefB,
             target.TruthValue, target.StabilityValue, target.AgencyValue,
-            target.Ritual, target.Knowledge, target.Change,
+            target.BeliefC, target.BeliefA, target.BeliefB,
             colonyStress, manualBump, rules);
     }
 
@@ -46,36 +46,36 @@ public class ScoringEngine : IScoringEngine
         return Score(
             source.Id, "party",
             source.TruthValue, source.StabilityValue, source.AgencyValue,
-            source.Ritual, source.Knowledge, source.Change,
+            source.BeliefC, source.BeliefA, source.BeliefB,
             cs.PartyTruthValue, cs.PartyStabilityValue, cs.PartyAgencyValue,
-            cs.PartyRitual, cs.PartyKnowledge, cs.PartyChange,
+            cs.PartyBeliefC, cs.PartyBeliefA, cs.PartyBeliefB,
             cs.ColonyStress, manualBump, rules);
     }
 
     private static RelationshipBreakdownDto Score(
         string sourceId, string targetId,
         double sTruth, double sStability, double sAgency,
-        RitualPosition? sourceRitual, KnowledgePosition? sourceKnowledge, ChangePosition? sourceChange,
+        BeliefPosition? sourceBeliefc, BeliefPosition? sourceBeliefa, BeliefPosition? sourceBeliefb,
         double tTruth, double tStability, double tAgency,
-        RitualPosition? targetRitual, KnowledgePosition? targetKnowledge, ChangePosition? targetChange,
+        BeliefPosition? targetBeliefc, BeliefPosition? targetBeliefa, BeliefPosition? targetBeliefb,
         int colonyStress, int manualBump, RulesConfig rules)
     {
-        // Ritual weighted by source's Agency value; Neutral on either side = buffer (0)
-        double ritualRaw = ScoreBelief(sourceRitual, targetRitual,
-            a => a == RitualPosition.Neutral, rules) * sAgency;
+        // BeliefC weighted by source's Agency value; Neutral on either side = buffer (0)
+        double beliefcRaw = ScoreBelief(sourceBeliefc, targetBeliefc,
+            a => a == BeliefPosition.Neutral, rules) * sAgency;
 
-        // Knowledge weighted by source's Truth value; Controlled on either side = buffer (0)
-        double knowledgeRaw = ScoreBelief(sourceKnowledge, targetKnowledge,
-            a => a == KnowledgePosition.Controlled, rules) * sTruth;
+        // BeliefA weighted by source's Truth value; Neutral on either side = buffer (0)
+        double beliefaRaw = ScoreBelief(sourceBeliefa, targetBeliefa,
+            a => a == BeliefPosition.Neutral, rules) * sTruth;
 
-        // Change weighted by source's Stability value; no buffer position
-        double changeRaw = ScoreBelief(sourceChange, targetChange,
+        // BeliefB weighted by source's Stability value; no buffer position
+        double beliefbRaw = ScoreBelief(sourceBeliefb, targetBeliefb,
             _ => false, rules) * sStability;
 
         // Apply enabled flags: clamp each contribution so only the allowed sign passes through
-        double ritualContrib    = ClampByEnabled(ritualRaw,    rules);
-        double knowledgeContrib = ClampByEnabled(knowledgeRaw, rules);
-        double changeContrib    = ClampByEnabled(changeRaw,    rules);
+        double beliefcContrib = ClampByEnabled(beliefcRaw, rules);
+        double beliefaContrib = ClampByEnabled(beliefaRaw, rules);
+        double beliefbContrib = ClampByEnabled(beliefbRaw, rules);
 
         double alignmentRaw = Dot(sTruth, sStability, sAgency, tTruth, tStability, tAgency)
                               * rules.ValueAlignmentScale;
@@ -85,7 +85,7 @@ public class ScoringEngine : IScoringEngine
         double alignment = rules.PositiveEnabled ? alignmentRaw : 0;
         double conflict  = rules.NegativeEnabled ? conflictRaw  : 0;
 
-        double baseScore     = Math.Round(ritualContrib + knowledgeContrib + changeContrib + alignment - conflict, 1);
+        double baseScore     = Math.Round(beliefcContrib + beliefaContrib + beliefbContrib + alignment - conflict, 1);
         double stressedScore = Math.Round(ApplyStress(baseScore, colonyStress, rules), 1);
         double finalScore    = Math.Round(stressedScore + manualBump, 1);
 
@@ -100,9 +100,9 @@ public class ScoringEngine : IScoringEngine
             Label = GetLabel(finalScore, rules).ToString(),
             Contributions = new RelationshipContributionsDto
             {
-                Ritual         = Math.Round(ritualContrib, 1),
-                Knowledge      = Math.Round(knowledgeContrib, 1),
-                Change         = Math.Round(changeContrib, 1),
+                BeliefC = Math.Round(beliefcContrib, 1),
+                BeliefA = Math.Round(beliefaContrib, 1),
+                BeliefB = Math.Round(beliefbContrib, 1),
                 ValueAlignment = Math.Round(alignment, 1),
                 ValueConflict  = Math.Round(-conflict, 1)
             }

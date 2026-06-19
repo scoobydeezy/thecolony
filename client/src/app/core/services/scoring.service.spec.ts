@@ -6,62 +6,62 @@ const D = 0.60, M = 0.25, S = 0.15;
 
 const keepers: ScoringActor = {
   id: 'keepers',
-  values: { stability: D, truth: M, agency: S },
-  ritual: 'Good', knowledge: 'Hidden', change: 'No'
+  values: { b: D, a: M, c: S },
+  beliefc: 'positive', beliefa: 'negative', beliefb: 'negative'
 };
 
 const witnesses: ScoringActor = {
   id: 'witnesses',
-  values: { truth: D, stability: M, agency: S },
-  ritual: 'Good', knowledge: 'Revealed', change: 'No'
+  values: { a: D, b: M, c: S },
+  beliefc: 'positive', beliefa: 'positive', beliefb: 'negative'
 };
 
 const seekers: ScoringActor = {
   id: 'seekers',
-  values: { agency: D, stability: M, truth: S },
-  ritual: 'Bad', knowledge: 'Hidden', change: 'Yes'
+  values: { c: D, b: M, a: S },
+  beliefc: 'negative', beliefa: 'negative', beliefb: 'positive'
 };
 
 const shattered: ScoringActor = {
   id: 'shattered',
-  values: { agency: D, truth: M, stability: S },
-  ritual: 'Bad', knowledge: 'Revealed', change: 'Yes'
+  values: { c: D, a: M, b: S },
+  beliefc: 'negative', beliefa: 'positive', beliefb: 'positive'
 };
 
 const institute: ScoringActor = {
   id: 'institute',
-  values: { truth: D, stability: M, agency: S },
-  ritual: 'Neutral', knowledge: 'Controlled', change: 'Yes'
+  values: { a: D, b: M, c: S },
+  beliefc: 'neutral', beliefa: 'neutral', beliefb: 'positive'
 };
 
 const aspis: ScoringActor = {
   id: 'aspis',
-  values: { stability: D, agency: M, truth: S },
-  ritual: 'Neutral', knowledge: 'Hidden', change: 'No'
+  values: { b: D, c: M, a: S },
+  beliefc: 'neutral', beliefa: 'negative', beliefb: 'negative'
 };
 
 describe('scoreRelationship', () => {
   describe('buffer positions', () => {
     it('Neutral ritual produces 0 ritual contribution regardless of other side', () => {
       const r = scoreRelationship(institute, keepers, 0, 0);
-      expect(r.contributions.ritual).toBe(0);
+      expect(r.contributions.beliefc).toBe(0);
     });
 
     it('Controlled knowledge produces 0 knowledge contribution regardless of other side', () => {
       const r = scoreRelationship(institute, keepers, 0, 0);
-      expect(r.contributions.knowledge).toBe(0);
+      expect(r.contributions.beliefa).toBe(0);
     });
 
     it('Neutral ritual buffers even when target is Good', () => {
       const r = scoreRelationship(aspis, keepers, 0, 0);
-      expect(r.contributions.ritual).toBe(0);
+      expect(r.contributions.beliefc).toBe(0);
     });
 
     it('non-buffer beliefs score normally when both sides are opinionated', () => {
       // keepers(Good) vs witnesses(Good) — ritual match, weighted by source agency (S=0.15).
       // Contributions are rounded to 1 decimal, so we check within 0.05.
       const r = scoreRelationship(keepers, witnesses, 0, 0);
-      expect(r.contributions.ritual).toBeCloseTo(0.8 * S, 1);
+      expect(r.contributions.beliefc).toBeCloseTo(0.8 * S, 1);
     });
   });
 
@@ -69,37 +69,37 @@ describe('scoreRelationship', () => {
     it('matching ritual gives ritualMatch * source.agency', () => {
       // keepers: agency=S=0.15, both Good. Rounded to 1dp: round(0.8*0.15, 1) = 0.1
       const r = scoreRelationship(keepers, witnesses, 0, 0);
-      expect(r.contributions.ritual).toBeCloseTo(DEFAULT_RULES.ritualMatch * S, 1);
+      expect(r.contributions.beliefc).toBeCloseTo(DEFAULT_RULES.beliefMatch * S, 1);
     });
 
     it('conflicting ritual gives ritualConflict * source.agency', () => {
       // keepers(Good) vs seekers(Bad); keepers agency=S=0.15. round(-0.5*0.15, 1) = -0.1
       const r = scoreRelationship(keepers, seekers, 0, 0);
-      expect(r.contributions.ritual).toBeCloseTo(DEFAULT_RULES.ritualConflict * S, 1);
+      expect(r.contributions.beliefc).toBeCloseTo(DEFAULT_RULES.beliefConflict * S, 1);
     });
 
     it('matching knowledge gives knowledgeMatch * source.truth', () => {
       // seekers: truth=S=0.15, both Hidden. round(0.8*0.15, 1) = 0.1
       const r = scoreRelationship(seekers, keepers, 0, 0);
-      expect(r.contributions.knowledge).toBeCloseTo(DEFAULT_RULES.knowledgeMatch * S, 1);
+      expect(r.contributions.beliefa).toBeCloseTo(DEFAULT_RULES.beliefMatch * S, 1);
     });
 
     it('conflicting knowledge gives knowledgeConflict * source.truth', () => {
       // witnesses(Revealed) vs keepers(Hidden); witnesses truth=D=0.60. round(-0.5*0.60, 1) = -0.3
       const r = scoreRelationship(witnesses, keepers, 0, 0);
-      expect(r.contributions.knowledge).toBeCloseTo(DEFAULT_RULES.knowledgeConflict * D, 1);
+      expect(r.contributions.beliefa).toBeCloseTo(DEFAULT_RULES.beliefConflict * D, 1);
     });
 
     it('matching change gives changeMatch * source.stability', () => {
       // keepers(No) vs witnesses(No); keepers stability=D=0.60. round(0.8*0.60, 1) = 0.5
       const r = scoreRelationship(keepers, witnesses, 0, 0);
-      expect(r.contributions.change).toBeCloseTo(DEFAULT_RULES.changeMatch * D, 1);
+      expect(r.contributions.beliefb).toBeCloseTo(DEFAULT_RULES.beliefMatch * D, 1);
     });
 
     it('conflicting change gives changeConflict * source.stability', () => {
       // keepers(No) vs seekers(Yes); keepers stability=D=0.60. round(-0.5*0.60, 1) = -0.3
       const r = scoreRelationship(keepers, seekers, 0, 0);
-      expect(r.contributions.change).toBeCloseTo(DEFAULT_RULES.changeConflict * D, 1);
+      expect(r.contributions.beliefb).toBeCloseTo(DEFAULT_RULES.beliefConflict * D, 1);
     });
   });
 
@@ -108,13 +108,13 @@ describe('scoreRelationship', () => {
       // seekers agency=D=0.60 vs keepers agency=S=0.15 → different weights
       const ab = scoreRelationship(seekers, keepers, 0, 0);
       const ba = scoreRelationship(keepers, seekers, 0, 0);
-      expect(ab.contributions.ritual).not.toBeCloseTo(ba.contributions.ritual, 5);
+      expect(ab.contributions.beliefc).not.toBeCloseTo(ba.contributions.beliefc, 5);
     });
 
     it('knowledge contribution differs when source and target swap', () => {
       const ab = scoreRelationship(keepers, witnesses, 0, 0);
       const ba = scoreRelationship(witnesses, keepers, 0, 0);
-      expect(ab.contributions.knowledge).not.toBeCloseTo(ba.contributions.knowledge, 5);
+      expect(ab.contributions.beliefa).not.toBeCloseTo(ba.contributions.beliefa, 5);
     });
 
     it('sourceId and targetId are set correctly', () => {
@@ -129,7 +129,7 @@ describe('scoreRelationship', () => {
       // Contribution is rounded to 1dp before storage, so we match to 1dp.
       const sv = keepers.values, tv = witnesses.values;
       const exact =
-        (sv.truth * tv.truth + sv.stability * tv.stability + sv.agency * tv.agency) *
+        (sv.a * tv.a + sv.b * tv.b + sv.c * tv.c) *
         DEFAULT_RULES.valueAlignmentScale;
       const r = scoreRelationship(keepers, witnesses, 0, 0);
       expect(r.contributions.valueAlignment).toBeCloseTo(exact, 1);
@@ -165,8 +165,8 @@ describe('scoreRelationship', () => {
 
     it('institute → keepers: both buffer contributions are 0', () => {
       const r = scoreRelationship(institute, keepers, 0, 0);
-      expect(r.contributions.ritual).toBe(0);
-      expect(r.contributions.knowledge).toBe(0);
+      expect(r.contributions.beliefc).toBe(0);
+      expect(r.contributions.beliefa).toBe(0);
     });
   });
 
@@ -175,8 +175,8 @@ describe('scoreRelationship', () => {
       // Construct a minimal actor whose base score is positive (identical vectors, same beliefs)
       const a: ScoringActor = {
         id: 'a',
-        values: { truth: 0.8, stability: 0.1, agency: 0.1 },
-        ritual: 'Good', knowledge: 'Revealed', change: 'No'
+        values: { a: 0.8, b: 0.1, c: 0.1 },
+        beliefc: 'positive', beliefa: 'positive', beliefb: 'negative'
       };
       const r0 = scoreRelationship(a, a, 0, 0);
       const r5 = scoreRelationship(a, a, 5, 0);
@@ -201,8 +201,8 @@ describe('scoreRelationship', () => {
       // Use a manually constructed positive-base actor to avoid the value-conflict dominance.
       const pos: ScoringActor = {
         id: 'p',
-        values: { truth: 0.8, stability: 0.1, agency: 0.1 },
-        ritual: 'Good', knowledge: 'Revealed', change: 'No'
+        values: { a: 0.8, b: 0.1, c: 0.1 },
+        beliefc: 'positive', beliefa: 'positive', beliefb: 'negative'
       };
       const posBase  = scoreRelationship(pos, pos, 0, 0).baseScore;
       const posHigh  = scoreRelationship(pos, pos, 10, 0).stressedScore;
@@ -221,7 +221,7 @@ describe('scoreRelationship', () => {
     });
 
     it('zero base score remains 0 under any stress', () => {
-      const neutral: ScoringActor = { id: 'a', values: { truth: 1/3, stability: 1/3, agency: 1/3 } };
+      const neutral: ScoringActor = { id: 'a', values: { a: 1/3, b: 1/3, c: 1/3 } };
       const r = scoreRelationship(neutral, neutral, 10, 0);
       // Identical vectors → alignment = conflict, so contributions partially cancel.
       // The zero-base test is about 0 → stays 0 under stress.

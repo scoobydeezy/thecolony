@@ -185,15 +185,12 @@
   font-weight: 600;
   color: var(--text-primary);
 
-  &.change-no            { color: var(--color-change-no); }
-  &.change-yes           { color: var(--color-change-yes); }
-  &.knowledge-hidden     { color: var(--color-knowledge-hidden); }
-  &.knowledge-revealed   { color: var(--color-knowledge-revealed); }
-  &.ritual-good          { color: var(--color-ritual-good); }
-  &.ritual-bad           { color: var(--color-ritual-bad); }
-  &.truth                { color: var(--color-truth); }
-  &.stability            { color: var(--color-stability); }
-  &.agency               { color: var(--color-agency); }
+  &.belief-statusquo { color: var(--color-belief-statusquo); }
+  &.belief-dissent   { color: var(--color-belief-dissent); }
+  &.belief-neutral   { color: var(--color-belief-neutral); }
+  &.valuea           { color: var(--color-valuea); }
+  &.valueb           { color: var(--color-valueb); }
+  &.valuec           { color: var(--color-valuec); }
 }
 
 .core-tenet {
@@ -669,4 +666,23 @@
   font-size: 0.68rem;
   color: #f87171;
   white-space: nowrap;
+}
+
+.state-icon {
+  font-size: 0.85rem;
+  margin-right: 0.35rem;
+  &--dead      { color: #ef4444; }
+  &--missing   { color: #f59e0b; }
+  &--forgotten { color: #6366f1; }
+}
+
+.former-members-label {
+  margin-top: 0.75rem;
+  color: #475569;
+}
+
+.character-row.former-member {
+  opacity: 0.6;
+  background: transparent;
+  border-color: #1e293b;
 }

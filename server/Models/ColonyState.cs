@@ -9,9 +9,9 @@ public class ColonyState
     public int ColonyStress { get; set; } = 0;
 
     // Party / Party State
-    public RitualPosition PartyRitual { get; set; } = RitualPosition.Neutral;
-    public KnowledgePosition PartyKnowledge { get; set; } = KnowledgePosition.Controlled;
-    public ChangePosition PartyChange { get; set; } = ChangePosition.Yes;
+    public BeliefPosition PartyBeliefC { get; set; } = BeliefPosition.Neutral;
+    public BeliefPosition PartyBeliefA { get; set; } = BeliefPosition.Neutral;
+    public BeliefPosition PartyBeliefB { get; set; } = BeliefPosition.Positive;
     public double PartyTruthValue { get; set; } = 0.6;
     public double PartyStabilityValue { get; set; } = 0.25;
     public double PartyAgencyValue { get; set; } = 0.15;

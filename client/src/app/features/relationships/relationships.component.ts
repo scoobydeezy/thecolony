@@ -23,7 +23,7 @@ export class RelationshipsComponent {
 
   // ── Matrix ────────────────────────────────────────────────────────────────
   selectedBreakdown = signal<RelationshipBreakdown | null>(null);
-  factions = computed(() => this.store.activeFactions());
+  factions = computed(() => this.store.viewFactions().filter(f => f.active && f.type === 'Faction'));
 
   // ── Rules editing ─────────────────────────────────────────────────────────
   rules = signal<RulesConfig | null>(null);
@@ -61,8 +61,12 @@ export class RelationshipsComponent {
     });
   }
 
-  // ── Stress (lives in colonyState, edited here) ────────────────────────────
+  // ── Stress ────────────────────────────────────────────────────────────────
   get stress(): number {
+    return this.store.viewColonyStress();
+  }
+
+  get baselineStress(): number {
     return this.store.colonyState()?.colonyStress ?? 0;
   }
 
@@ -133,8 +137,9 @@ export class RelationshipsComponent {
   }
 
   // ── Matrix helpers ────────────────────────────────────────────────────────
+
   getRelationship(sourceId: string, targetId: string): RelationshipBreakdown | undefined {
-    return this.store.relationships().find(
+    return this.store.viewRelationships().find(
       r => r.sourceId === sourceId && r.targetId === targetId
     );
   }
@@ -165,17 +170,18 @@ export class RelationshipsComponent {
   }
 
   sourceName(id: string): string {
-    if (id === 'party') return 'party';
+    if (id === 'party') return this.store.colonyState()?.partyName ?? 'Party';
     return this.store.factions().find(f => f.id === id)?.name ?? id;
   }
 
   breakdownContribs(r: RelationshipBreakdown): Array<{ label: string; value: number }> {
+    const bl = this.store.beliefAxisLabels();
     return [
       { label: 'Value Alignment',   value: r.contributions.valueAlignment },
       { label: 'Value Conflict',    value: r.contributions.valueConflict },
-      { label: 'Ritual ' + (r.contributions.ritual >= 0 ? 'Alignment' : 'Conflict'),    value: r.contributions.ritual },
-      { label: 'Knowledge ' + (r.contributions.knowledge >= 0 ? 'Alignment' : 'Conflict'), value: r.contributions.knowledge },
-      { label: 'Change ' + (r.contributions.change >= 0 ? 'Alignment' : 'Conflict'),    value: r.contributions.change },
+      { label: bl.c.axisName + ' ' + (r.contributions.beliefc >= 0 ? 'Alignment' : 'Conflict'), value: r.contributions.beliefc },
+      { label: bl.a.axisName + ' ' + (r.contributions.beliefa >= 0 ? 'Alignment' : 'Conflict'), value: r.contributions.beliefa },
+      { label: bl.b.axisName + ' ' + (r.contributions.beliefb >= 0 ? 'Alignment' : 'Conflict'), value: r.contributions.beliefb },
     ].filter(c => c.value !== 0);
   }
 
@@ -218,7 +224,8 @@ export class RelationshipsComponent {
   // ── CSV export ────────────────────────────────────────────────────────────
   exportCsv(): void {
     const factions = this.factions();
-    const colHeaders = [...factions.map(f => f.name), 'party'];
+    const partyName = this.store.colonyState()?.partyName ?? 'Party';
+    const colHeaders = [...factions.map(f => f.name), partyName];
     const header = ['From \\ To', ...colHeaders];
     const rows = factions.map(source => {
       const cells = factions.map(target => {

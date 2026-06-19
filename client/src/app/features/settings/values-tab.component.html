@@ -1,0 +1,163 @@
+@let vl = valueLabels();
+@let bl = beliefAxisLabels();
+
+<!-- Core Values -->
+<div class="label-section">
+  <h3 class="label-section-title">Core Values</h3>
+  <p class="label-section-desc">The three axes of the core ideology system.</p>
+
+  <div class="label-grid">
+    <div class="label-row">
+      <span class="label-key value-a">Value A</span>
+      <input type="text" [value]="vl.a" (input)="setValueLabel('a', $any($event.target).value)" />
+    </div>
+    <div class="label-row">
+      <span class="label-key value-b">Value B</span>
+      <input type="text" [value]="vl.b" (input)="setValueLabel('b', $any($event.target).value)" />
+    </div>
+    <div class="label-row">
+      <span class="label-key value-c">Value C</span>
+      <input type="text" [value]="vl.c" (input)="setValueLabel('c', $any($event.target).value)" />
+    </div>
+  </div>
+</div>
+
+<!-- Ternary Edge Labels -->
+<div class="label-section">
+  <h3 class="label-section-title">Secondary Values</h3>
+  <p class="label-section-desc">Represents the midpoint blend between two core values.</p>
+
+  <div class="label-grid">
+    <div class="label-row">
+      <span class="label-key edge">{{ vl.a }} / {{ vl.c }}</span>
+      <input type="text" [value]="vl.edgeAC" (input)="setValueLabel('edgeAC', $any($event.target).value)" />
+    </div>
+    <div class="label-row">
+      <span class="label-key edge">{{ vl.a }} / {{ vl.b }}</span>
+      <input type="text" [value]="vl.edgeAB" (input)="setValueLabel('edgeAB', $any($event.target).value)" />
+    </div>
+    <div class="label-row">
+      <span class="label-key edge">{{ vl.b }} / {{ vl.c }}</span>
+      <input type="text" [value]="vl.edgeBC" (input)="setValueLabel('edgeBC', $any($event.target).value)" />
+    </div>
+  </div>
+</div>
+
+<!-- Value A Axis -->
+<div class="label-section">
+  <div class="axis-header">
+    <h3 class="label-section-title">Value A Axis <span class="axis-note">(Belief derived from {{ vl.a }})</span></h3>
+    <div class="axis-controls">
+      <div class="type-tabs">
+        <button [class.active]="bl.a.type === 'opinion'" (click)="setAxisLabel('a', 'type', 'opinion')">Opinion</button>
+        <button [class.active]="bl.a.type === 'boolean'" (click)="setAxisLabel('a', 'type', 'boolean')">Boolean</button>
+      </div>
+      <button class="btn-flip" (click)="togglePositiveAligns('a')" title="Flip which position aligns with this value">
+        <i class="fa-solid fa-retweet"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="label-grid">
+    <div class="label-row">
+      <span class="label-key muted">Belief name</span>
+      <input type="text" [value]="bl.a.axisName" (input)="setAxisLabel('a', 'axisName', $any($event.target).value)" />
+    </div>
+    <div class="label-row">
+      <span class="label-key" [class.conflict-pos]="bl.a.positiveAligns" [class.conflict-neg]="!bl.a.positiveAligns">Positive</span>
+      <input type="text" [value]="bl.a.positive" (input)="setAxisLabel('a', 'positive', $any($event.target).value)" />
+    </div>
+    @if (bl.a.type === 'opinion') {
+      <div class="label-row">
+        <span class="label-key muted">Neutral</span>
+        <input type="text" [value]="bl.a.neutral" (input)="setAxisLabel('a', 'neutral', $any($event.target).value)" />
+      </div>
+    }
+    <div class="label-row">
+      <span class="label-key" [class.conflict-neg]="bl.a.positiveAligns" [class.conflict-pos]="!bl.a.positiveAligns">Negative</span>
+      <input type="text" [value]="bl.a.negative" (input)="setAxisLabel('a', 'negative', $any($event.target).value)" />
+    </div>
+  </div>
+</div>
+
+<!-- Value B Axis -->
+<div class="label-section">
+  <div class="axis-header">
+    <h3 class="label-section-title">Value B Axis <span class="axis-note">(Belief derived from {{ vl.b }})</span></h3>
+    <div class="axis-controls">
+      <div class="type-tabs">
+        <button [class.active]="bl.b.type === 'opinion'" (click)="setAxisLabel('b', 'type', 'opinion')">Opinion</button>
+        <button [class.active]="bl.b.type === 'boolean'" (click)="setAxisLabel('b', 'type', 'boolean')">Boolean</button>
+      </div>
+      <button class="btn-flip" (click)="togglePositiveAligns('b')" title="Flip which position aligns with this value">
+        <i class="fa-solid fa-retweet"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="label-grid">
+    <div class="label-row">
+      <span class="label-key muted">Belief name</span>
+      <input type="text" [value]="bl.b.axisName" (input)="setAxisLabel('b', 'axisName', $any($event.target).value)" />
+    </div>
+    <div class="label-row">
+      <span class="label-key" [class.conflict-pos]="bl.b.positiveAligns" [class.conflict-neg]="!bl.b.positiveAligns">Positive</span>
+      <input type="text" [value]="bl.b.positive" (input)="setAxisLabel('b', 'positive', $any($event.target).value)" />
+    </div>
+    @if (bl.b.type === 'opinion') {
+      <div class="label-row">
+        <span class="label-key muted">Neutral</span>
+        <input type="text" [value]="bl.b.neutral" (input)="setAxisLabel('b', 'neutral', $any($event.target).value)" />
+      </div>
+    }
+    <div class="label-row">
+      <span class="label-key" [class.conflict-neg]="bl.b.positiveAligns" [class.conflict-pos]="!bl.b.positiveAligns">Negative</span>
+      <input type="text" [value]="bl.b.negative" (input)="setAxisLabel('b', 'negative', $any($event.target).value)" />
+    </div>
+  </div>
+</div>
+
+<!-- Value C Axis -->
+<div class="label-section">
+  <div class="axis-header">
+    <h3 class="label-section-title">Value C Axis <span class="axis-note">(Belief derived from {{ vl.c }})</span></h3>
+    <div class="axis-controls">
+      <div class="type-tabs">
+        <button [class.active]="bl.c.type === 'opinion'" (click)="setAxisLabel('c', 'type', 'opinion')">Opinion</button>
+        <button [class.active]="bl.c.type === 'boolean'" (click)="setAxisLabel('c', 'type', 'boolean')">Boolean</button>
+      </div>
+      <button class="btn-flip" (click)="togglePositiveAligns('c')" title="Flip which position aligns with this value">
+        <i class="fa-solid fa-retweet"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="label-grid">
+    <div class="label-row">
+      <span class="label-key muted">Belief name</span>
+      <input type="text" [value]="bl.c.axisName" (input)="setAxisLabel('c', 'axisName', $any($event.target).value)" />
+    </div>
+    <div class="label-row">
+      <span class="label-key" [class.conflict-pos]="bl.c.positiveAligns" [class.conflict-neg]="!bl.c.positiveAligns">Positive</span>
+      <input type="text" [value]="bl.c.positive" (input)="setAxisLabel('c', 'positive', $any($event.target).value)" />
+    </div>
+    @if (bl.c.type === 'opinion') {
+      <div class="label-row">
+        <span class="label-key muted">Neutral</span>
+        <input type="text" [value]="bl.c.neutral" (input)="setAxisLabel('c', 'neutral', $any($event.target).value)" />
+      </div>
+    }
+    <div class="label-row">
+      <span class="label-key" [class.conflict-neg]="bl.c.positiveAligns" [class.conflict-pos]="!bl.c.positiveAligns">Negative</span>
+      <input type="text" [value]="bl.c.negative" (input)="setAxisLabel('c', 'negative', $any($event.target).value)" />
+    </div>
+  </div>
+</div>
+
+<div class="save-bar">
+  <button class="btn btn-primary" (click)="save()">Save Labels</button>
+  <button class="btn btn-secondary" (click)="resetToDefaults()">Reset to Defaults</button>
+  @if (saved()) {
+    <span class="saved-msg">Saved!</span>
+  }
+</div>

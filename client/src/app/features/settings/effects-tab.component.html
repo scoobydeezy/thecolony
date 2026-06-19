@@ -1,0 +1,185 @@
+<div class="card">
+  <h3 class="section-title">Cascade Rules</h3>
+  <p class="help-text">
+    Rules fire each session when their trigger condition is met, applying an effect to a target property.
+    Streak rules fire only the highest-threshold matching rule per source/direction per entity.
+  </p>
+
+  <div class="rules-list">
+    @for (rule of rules(); track rule.id) {
+      <div class="rule-card"
+        [class.neg]="rule.direction === 'negative'"
+        [class.pos]="rule.direction === 'positive'"
+        [class.either]="rule.direction === 'either' || rule.triggerType === 'threshold'"
+        [class.event]="rule.triggerType === 'event'">
+
+        <div class="rule-header">
+          <input
+            class="rule-label-input"
+            type="text"
+            placeholder="Rule label"
+            [value]="rule.label"
+            (input)="updateRule(rule.id, { label: $any($event.target).value })" />
+          <button class="remove-btn" type="button" (click)="removeRule(rule.id)" title="Remove rule">✕</button>
+        </div>
+
+        <!-- Trigger section -->
+        <div class="section-label">Trigger</div>
+        <div class="rule-fields">
+          <div class="field-group">
+            <label>Type</label>
+            <select [value]="rule.triggerType" (change)="updateRule(rule.id, { triggerType: $any($event.target).value })">
+              <option value="streak">Streak</option>
+              <option value="threshold">Threshold</option>
+              <option value="event">Event</option>
+            </select>
+          </div>
+
+          @if (rule.triggerType === 'streak') {
+            <div class="field-group">
+              <label>Min Consecutive Sessions</label>
+              <input type="number" min="1" step="1"
+                [value]="rule.minConsecutiveWeeks ?? 2"
+                (input)="updateRule(rule.id, { minConsecutiveWeeks: +$any($event.target).value })" />
+            </div>
+          } @else if (rule.triggerType === 'threshold') {
+            <div class="field-group">
+              <label>Threshold Value</label>
+              <input type="number" step="1"
+                [value]="rule.thresholdValue ?? 0"
+                (input)="updateRule(rule.id, { thresholdValue: +$any($event.target).value })" />
+            </div>
+          }
+
+          <div class="field-group">
+            <label>Source Entity</label>
+            <select [value]="rule.sourceEntityType" (change)="updateRule(rule.id, { sourceEntityType: $any($event.target).value })">
+              <option value="faction">Faction</option>
+              <option value="character">Character</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label>Source Property</label>
+            <select [value]="rule.sourceProperty" (change)="updateRule(rule.id, { sourceProperty: $any($event.target).value })">
+              @for (d of sourceDescriptors(rule); track d.property) {
+                <option [value]="d.property">{{ d.label }}</option>
+              }
+            </select>
+          </div>
+
+          @if (rule.triggerType === 'streak') {
+            <div class="field-group">
+              <label>Direction</label>
+              <select [value]="rule.direction ?? 'negative'" (change)="updateRule(rule.id, { direction: $any($event.target).value })">
+                <option value="negative">Negative</option>
+                <option value="positive">Positive</option>
+                <option value="either">Either</option>
+              </select>
+            </div>
+          } @else if (rule.triggerType === 'threshold') {
+            <div class="field-group">
+              <label>Operator</label>
+              <select [value]="rule.thresholdOperator ?? 'gt'" (change)="updateRule(rule.id, { thresholdOperator: $any($event.target).value })">
+                <option value="gt">Greater than (&gt;)</option>
+                <option value="lt">Less than (&lt;)</option>
+              </select>
+            </div>
+          } @else if (rule.triggerType === 'event') {
+            <div class="field-group">
+              <label>Subtype</label>
+              <select [value]="rule.sourceEntitySubtype ?? ''" (change)="updateRule(rule.id, { sourceEntitySubtype: $any($event.target).value })">
+                @for (t of subtypeOptions(rule); track t.value) {
+                  <option [value]="t.value">{{ t.label }}</option>
+                }
+              </select>
+            </div>
+            @if (sourceDescriptor(rule)?.inputType === 'select') {
+              <div class="field-group field-group--values">
+                <label>Value</label>
+                <div class="value-rows">
+                  @for (val of (rule.sourcePropertyValue ?? []); track $index) {
+                    <div class="value-row">
+                      @if ($index > 0) { <span class="or-label">OR</span> }
+                      <select [value]="val" (change)="setPropertyValue(rule.id, $index, $any($event.target).value)">
+                        @for (opt of sourceDescriptor(rule)?.selectOptions ?? []; track opt.value) {
+                          <option [value]="opt.value">{{ opt.label }}</option>
+                        }
+                      </select>
+                      <button class="remove-val-btn" type="button" (click)="removePropertyValue(rule.id, $index)" title="Remove">✕</button>
+                    </div>
+                  }
+                  @if (!(rule.sourcePropertyValue?.length)) {
+                    <span class="any-label">Any</span>
+                  }
+                  <button class="btn-or" type="button" (click)="addPropertyValue(rule.id)">+ OR</button>
+                </div>
+              </div>
+            }
+          }
+        </div>
+
+        <!-- Effect section -->
+        <div class="section-label">Effect</div>
+        <div class="rule-fields">
+          <div class="field-group">
+            <label>Effect Type</label>
+            <select [value]="rule.effectType" (change)="updateRule(rule.id, { effectType: $any($event.target).value })">
+              <option value="multiplier">Multiplier</option>
+              <option value="flat">Flat Delta</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label>Target Entity</label>
+            <select [value]="rule.targetEntityType" (change)="updateRule(rule.id, { targetEntityType: $any($event.target).value })">
+              <option value="faction">Faction</option>
+              <option value="character">Character</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label>Target Property</label>
+            <select [value]="rule.targetProperty" (change)="updateRule(rule.id, { targetProperty: $any($event.target).value })">
+              @for (p of targetProps(rule); track p.value) {
+                <option [value]="p.value">{{ p.label }}</option>
+              }
+            </select>
+          </div>
+
+          @if (rule.effectType === 'multiplier') {
+            <div class="field-group">
+              <label>Multiplier</label>
+              <input type="number" min="0" step="0.5"
+                [value]="rule.multiplier ?? 2"
+                (input)="updateRule(rule.id, { multiplier: +$any($event.target).value })" />
+            </div>
+          } @else {
+            <div class="field-group">
+              <label>Flat Delta</label>
+              <input type="number" step="1"
+                [value]="rule.flatDelta ?? 0"
+                (input)="updateRule(rule.id, { flatDelta: +$any($event.target).value })" />
+            </div>
+          }
+        </div>
+
+        <p class="rule-preview">{{ rulePreview(rule) }}</p>
+      </div>
+    }
+
+    @empty {
+      <p class="empty-msg">No cascade rules configured.</p>
+    }
+  </div>
+
+  <button class="btn btn-secondary add-btn" type="button" (click)="addRule()">+ Add Rule</button>
+</div>
+
+<div class="save-bar">
+  <button class="btn btn-primary" (click)="save()">Save Rules</button>
+  <button class="btn btn-secondary" (click)="resetToDefaults()">Reset to Defaults</button>
+  @if (saved()) {
+    <span class="saved-msg">Saved!</span>
+  }
+</div>

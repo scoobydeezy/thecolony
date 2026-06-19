@@ -4,38 +4,73 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
   Faction, ColonyState, RelationshipOverride, RulesConfig,
-  RelationshipBreakdown, SessionLogEntry, Character
+  RelationshipBreakdown, SessionLogEntry, Character,
+  Session, CampaignEvent
 } from '../models/types';
 
-// The C# model stores value floats as flat properties; map them to/from the nested ValueVector.
+// The C# model stores value floats as truthValue/stabilityValue/agencyValue; map to/from ValueVector a/b/c.
+// BeliefPosition enums arrive as Pascal-case strings ("Positive"/"Neutral"/"Negative"); lowercase them.
+// Server sends beliefC/beliefA/beliefB (camelCase from C# BeliefC/BeliefA/BeliefB).
+// Client models use beliefc/beliefa/beliefb (all lowercase). Remap and lowercase.
+function lowerBeliefPositions(obj: any): void {
+  const remap: Record<string, string> = {
+    beliefC: 'beliefc', beliefA: 'beliefa', beliefB: 'beliefb',
+    partyBeliefC: 'partyBeliefc', partyBeliefA: 'partyBeliefa', partyBeliefB: 'partyBeliefb',
+  };
+  for (const [from, to] of Object.entries(remap)) {
+    if (obj[from] != null) { obj[to] = obj[from].toLowerCase(); delete obj[from]; }
+  }
+}
+
 function factionFromApi(f: any): Faction {
   const { truthValue, stabilityValue, agencyValue, ...rest } = f;
-  return { ...rest, sortOrder: rest.sortOrder ?? 0, values: { truth: truthValue ?? 1/3, stability: stabilityValue ?? 1/3, agency: agencyValue ?? 1/3 } };
+  lowerBeliefPositions(rest);
+  return { ...rest, sortOrder: rest.sortOrder ?? 0, values: { a: truthValue ?? 1/3, b: stabilityValue ?? 1/3, c: agencyValue ?? 1/3 } };
+}
+
+function upperBeliefPositions(obj: any): void {
+  const remap: Record<string, string> = {
+    beliefc: 'beliefC', beliefa: 'beliefA', beliefb: 'beliefB',
+    partyBeliefc: 'partyBeliefC', partyBeliefa: 'partyBeliefA', partyBeliefb: 'partyBeliefB',
+  };
+  for (const [from, to] of Object.entries(remap)) {
+    if (obj[from] != null) { obj[to] = obj[from]; delete obj[from]; }
+    else if (obj[from] === undefined) delete obj[from];
+  }
 }
 
 function factionToApi(f: Faction): any {
   const { values, ...rest } = f;
-  return { ...rest, truthValue: values.truth, stabilityValue: values.stability, agencyValue: values.agency };
+  const out: any = { ...rest, truthValue: values.a, stabilityValue: values.b, agencyValue: values.c };
+  upperBeliefPositions(out);
+  return out;
 }
 
 function characterFromApi(c: any): Character {
   const { truthValue, stabilityValue, agencyValue, ...rest } = c;
-  return { ...rest, values: { truth: truthValue ?? 1/3, stability: stabilityValue ?? 1/3, agency: agencyValue ?? 1/3 } };
+  if (rest.doubtDirection) rest.doubtDirection = rest.doubtDirection.toLowerCase();
+  lowerBeliefPositions(rest);
+  return { ...rest, values: { a: truthValue ?? 1/3, b: stabilityValue ?? 1/3, c: agencyValue ?? 1/3 } };
 }
 
 function characterToApi(c: Character): any {
   const { values, ...rest } = c;
-  return { ...rest, truthValue: values.truth, stabilityValue: values.stability, agencyValue: values.agency };
+  const out: any = { ...rest, truthValue: values.a, stabilityValue: values.b, agencyValue: values.c };
+  upperBeliefPositions(out);
+  return out;
 }
 
 function colonyStateFromApi(cs: any): ColonyState {
   const { partyTruthValue, partyStabilityValue, partyAgencyValue, ...rest } = cs;
-  return { ...rest, partyName: rest.partyName ?? 'party', partyValues: { truth: partyTruthValue ?? 0.6, stability: partyStabilityValue ?? 0.25, agency: partyAgencyValue ?? 0.15 } };
+  lowerBeliefPositions(rest);
+  return { ...rest, partyName: rest.partyName ?? 'party', partyValues: { a: partyTruthValue ?? 0.6, b: partyStabilityValue ?? 0.25, c: partyAgencyValue ?? 0.15 } };
 }
 
 function colonyStateToApi(cs: ColonyState): any {
   const { partyValues, ...rest } = cs;
-  return { ...rest, partyTruthValue: partyValues.truth, partyStabilityValue: partyValues.stability, partyAgencyValue: partyValues.agency };
+  const out: any = { ...rest, partyTruthValue: partyValues.a, partyStabilityValue: partyValues.b, partyAgencyValue: partyValues.c };
+  upperBeliefPositions(out);
+  return out;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -124,5 +159,44 @@ export class ApiService {
   }
   deleteSessionEntry(id: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/session-log/${id}`);
+  }
+
+  // Sessions
+  getSessions(): Observable<Session[]> {
+    return this.http.get<Session[]>(`${this.base}/sessions`);
+  }
+  getSession(id: string): Observable<Session> {
+    return this.http.get<Session>(`${this.base}/sessions/${id}`);
+  }
+  createSession(session: Omit<Session, 'id' | 'events'>): Observable<Session> {
+    return this.http.post<Session>(`${this.base}/sessions`, { ...session, events: [] });
+  }
+  updateSession(session: Session): Observable<Session> {
+    return this.http.put<Session>(`${this.base}/sessions/${session.id}`, session);
+  }
+  deleteSession(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/sessions/${id}`);
+  }
+
+  // Events
+  getEventsBySession(sessionId: string): Observable<CampaignEvent[]> {
+    return this.http.get<CampaignEvent[]>(`${this.base}/events/by-session/${sessionId}`);
+  }
+  createEvent(ev: Omit<CampaignEvent, 'id'>): Observable<CampaignEvent> {
+    return this.http.post<CampaignEvent>(`${this.base}/events`, ev);
+  }
+  updateEvent(ev: CampaignEvent): Observable<CampaignEvent> {
+    return this.http.put<CampaignEvent>(`${this.base}/events/${ev.id}`, ev);
+  }
+  deleteEvent(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/events/${id}`);
+  }
+
+  reorderEvents(orderedIds: string[]): Observable<void> {
+    return this.http.put<void>(`${this.base}/events/reorder`, orderedIds);
+  }
+
+  importSessions(sessions: Session[]): Observable<{ imported: number; skipped: number }> {
+    return this.http.post<{ imported: number; skipped: number }>(`${this.base}/sessions/import`, sessions);
   }
 }

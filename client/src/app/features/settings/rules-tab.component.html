@@ -1,0 +1,105 @@
+@if (form(); as f) {
+  <!-- Relationship Rule Scores -->
+  <div class="card">
+    <h3 class="section-title">Relationship Multipliers</h3>
+    <p class="help-text">
+      Belief multipliers are weighted by the importance of its corresponding value to the faction or character.
+    </p>
+
+    <div class="rules-grid">
+      <div class="rule-group">
+        <h4>Values</h4>
+        <div class="rule-row">
+          <span class="rule-label">Alignment</span>
+          <input type="number" step="0.5" [value]="f.valueAlignmentScale"
+            (input)="numField('valueAlignmentScale', $any($event.target).value)" />
+        </div>
+        <div class="rule-row">
+          <span class="rule-label">Conflict</span>
+          <input type="number" step="0.5" [value]="f.valueConflictScale"
+            (input)="numField('valueConflictScale', $any($event.target).value)" />
+        </div>
+      </div>
+
+      <div class="rule-group">
+        <h4>Beliefs</h4>
+        <div class="rule-row">
+          <span class="rule-label">Matching</span>
+          <input type="number" step="0.1" [value]="f.beliefMatch"
+            (input)="numField('beliefMatch', $any($event.target).value)" />
+        </div>
+        <div class="rule-row">
+          <span class="rule-label">Conflicting</span>
+          <input type="number" step="0.1" [value]="f.beliefConflict"
+            (input)="numField('beliefConflict', $any($event.target).value)" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stress Multipliers -->
+  <div class="card">
+    <h3 class="section-title">Stress Multipliers</h3>
+    <p class="help-text">
+      Multipliers tilt with stress level. At low stress, positive relationships are boosted more strongly.
+      At high stress, negative relationships worsen more dramatically.
+    </p>
+    <div class="grid-2">
+      <div class="form-group">
+        <label>Positive Multiplier / Point</label>
+        <input type="number" step="0.01" [value]="f.stressPositiveMultiplierPerPoint"
+          (input)="floatField('stressPositiveMultiplierPerPoint', $any($event.target).value)" />
+        <small>Default: 0.25 — fades out as stress rises</small>
+      </div>
+      <div class="form-group">
+        <label>Negative Multiplier / Point</label>
+        <input type="number" step="0.01" [value]="f.stressNegativeMultiplierPerPoint"
+          (input)="floatField('stressNegativeMultiplierPerPoint', $any($event.target).value)" />
+        <small>Default: 0.35 — fades in as stress rises</small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Influence -->
+  <div class="card">
+    <h3 class="section-title">Influence</h3>
+    <p class="help-text">
+      Controls how strongly faction peers can shift a character's conviction via the influence system.
+    </p>
+    <div class="rule-row" style="max-width: 320px">
+      <span class="rule-label">Conviction Scale</span>
+      <input type="number" step="0.05" [value]="f.influenceConvictionScale"
+        (input)="floatField('influenceConvictionScale', $any($event.target).value)" />
+    </div>
+    <small style="margin-top: 0.5rem; display: block">
+      Default: 0.5 — bonus = factionInfluenceAvg × (impressionable / 100) × scale
+    </small>
+  </div>
+
+  <!-- Relationship Thresholds -->
+  <div class="card">
+    <h3 class="section-title">Relationship Thresholds</h3>
+    <p class="help-text">Minimum score required to reach each relationship level. Labels are applied top-down; the highest matching threshold wins.</p>
+    <div class="threshold-rows">
+      @for (label of thresholdLabels; track label) {
+        <div class="rule-row threshold-row">
+          <span class="badge badge-{{ label.toLowerCase() }}">{{ label }}</span>
+          <div class="threshold-input-group">
+            <span class="rule-label">Min score</span>
+            <input type="number" step="1"
+              [value]="thresholdMinScore(label)"
+              (input)="setThreshold(label, $any($event.target).value)" />
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+  <div class="save-bar">
+    <button class="btn btn-primary" (click)="save()">Save Rules</button>
+    <button class="btn btn-secondary" (click)="reset()">Reset to Defaults</button>
+    @if (saved()) {
+      <span class="saved-msg">Saved! Relationships recalculated.</span>
+    }
+  </div>
+}

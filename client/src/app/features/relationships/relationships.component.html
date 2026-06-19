@@ -4,22 +4,6 @@
   <p>Tune scoring rules and view faction relationships. Changes apply automatically.</p>
 </div>
 
-@if (rules(); as r) {
-
-  <!-- ── Stress ─────────────────────────────────────────────────────────── -->
-  <div class="card tuner-card" style="margin-bottom:1rem">
-    <div class="stress-row">
-      <span class="tuner-label">Colony Stress</span>
-      <input type="range" min="0" max="10" step="1"
-        [value]="stress"
-        (input)="setStress(+$any($event.target).value)" />
-      <span class="stress-value" [class]="stress >= 7 ? 'danger' : stress >= 4 ? 'warn' : 'ok'">
-        {{ stress }} / 10
-      </span>
-    </div>
-  </div>
-
-}
 
 <!-- ── Matrix ──────────────────────────────────────────────────────────────── -->
 <div class="card matrix-card" style="margin-top:1.5rem">
@@ -33,7 +17,9 @@
               <div class="col-label">{{ target.name }}</div>
             </th>
           }
-          <th class="col-header party-col">party</th>
+          <th class="col-header party-col">
+            <div class="col-label">{{ store.colonyState()?.partyName ?? 'Party' }}</div>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -81,20 +67,24 @@
   <span class="badge badge-strained">Strained</span>
   <span class="badge badge-opposed">Opposed</span>
   <span class="badge badge-hostile">Hostile</span>
-  <button class="btn btn-secondary btn-sm legend-edit-btn" (click)="openThresholds()">Edit Thresholds</button>
+  @if (!store.isViewingSnapshot()) {
+    <button class="btn btn-secondary btn-sm legend-edit-btn" (click)="openThresholds()">Edit Thresholds</button>
+  }
 </div>
 
 <!-- ── Manual Overrides ───────────────────────────────────────────────────── -->
 <div class="card" style="margin-top:1.5rem; margin-bottom:1.5rem;">
   <div class="section-header">
     <h3 class="section-title">Manual Score Bumps</h3>
-    <button class="btn btn-primary btn-sm" (click)="openAddOverride()">+ Add Override</button>
+    @if (!store.isViewingSnapshot()) {
+      <button class="btn btn-primary btn-sm" (click)="openAddOverride()">+ Add Override</button>
+    }
   </div>
   @if (store.overrides().length > 0) {
     <table>
       <thead>
         <tr>
-          <th>From</th><th>To</th><th>Score Bump</th><th>Notes</th><th>Actions</th>
+          <th>From</th><th>To</th><th>Score Bump</th><th>Notes</th><th class="col-actions">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -104,9 +94,11 @@
             <td>{{ sourceName(o.targetId) }}</td>
             <td [class]="o.scoreBump >= 0 ? 'pos' : 'neg'">{{ o.scoreBump > 0 ? '+' : '' }}{{ o.scoreBump }}</td>
             <td>{{ o.notes ?? '—' }}</td>
-            <td>
-              <button class="btn btn-secondary btn-sm" (click)="openEditOverride(o.id)">Edit</button>
-              <button class="btn btn-danger btn-sm" (click)="deleteOverride(o.id)" style="margin-left:0.5rem">Delete</button>
+            <td class="col-actions">
+              @if (!store.isViewingSnapshot()) {
+                <button class="btn btn-secondary btn-sm" (click)="openEditOverride(o.id)">Edit</button>
+                <button class="btn btn-danger btn-sm" (click)="deleteOverride(o.id)">Delete</button>
+              }
             </td>
           </tr>
         }
@@ -120,7 +112,7 @@
 @if (rules(); as r) {
 
   <!-- ── Tuners ─────────────────────────────────────────────────────────── -->
-  <div class="tuner-row" style="margin-bottom:1rem">
+  <div class="tuner-row" style="margin-bottom:1rem" [class.tuner-readonly]="store.isViewingSnapshot()">
 
     <div class="card tuner-card" [class.tuner-disabled]="!r.positiveEnabled">
       <div class="tuner-header positive">
@@ -128,6 +120,7 @@
         <label class="tuner-toggle" title="Enable positive relationship scoring">
           <input type="checkbox"
             [checked]="r.positiveEnabled"
+            [disabled]="store.isViewingSnapshot()"
             (change)="setRuleBool('positiveEnabled', $any($event.target).checked)" />
           <span class="toggle-track"></span>
         </label>
@@ -137,7 +130,7 @@
         <div class="tuner-control">
           <input type="range" min="0" max="10" step="0.5"
             [value]="r.valueAlignmentScale"
-            [disabled]="!r.positiveEnabled"
+            [disabled]="!r.positiveEnabled || store.isViewingSnapshot()"
             (input)="setRule('valueAlignmentScale', $any($event.target).value)" />
           <span class="tuner-val">{{ r.valueAlignmentScale | number:'1.1-1' }}</span>
         </div>
@@ -147,7 +140,7 @@
         <div class="tuner-control">
           <input type="range" min="0" max="3" step="0.1"
             [value]="r.beliefMatch"
-            [disabled]="!r.positiveEnabled"
+            [disabled]="!r.positiveEnabled || store.isViewingSnapshot()"
             (input)="setRule('beliefMatch', $any($event.target).value)" />
           <span class="tuner-val">{{ r.beliefMatch | number:'1.2-2' }}</span>
         </div>
@@ -157,7 +150,7 @@
         <div class="tuner-control">
           <input type="range" min="0" max="0.5" step="0.05"
             [value]="r.stressPositiveMultiplierPerPoint"
-            [disabled]="!r.positiveEnabled"
+            [disabled]="!r.positiveEnabled || store.isViewingSnapshot()"
             (input)="setRule('stressPositiveMultiplierPerPoint', $any($event.target).value)" />
           <span class="tuner-val">{{ r.stressPositiveMultiplierPerPoint | number:'1.2-2' }}</span>
         </div>
@@ -170,6 +163,7 @@
         <label class="tuner-toggle" title="Enable negative relationship scoring">
           <input type="checkbox"
             [checked]="r.negativeEnabled"
+            [disabled]="store.isViewingSnapshot()"
             (change)="setRuleBool('negativeEnabled', $any($event.target).checked)" />
           <span class="toggle-track"></span>
         </label>
@@ -179,7 +173,7 @@
         <div class="tuner-control">
           <input type="range" min="0" max="10" step="0.5"
             [value]="r.valueConflictScale"
-            [disabled]="!r.negativeEnabled"
+            [disabled]="!r.negativeEnabled || store.isViewingSnapshot()"
             (input)="setRule('valueConflictScale', $any($event.target).value)" />
           <span class="tuner-val">{{ r.valueConflictScale | number:'1.1-1' }}</span>
         </div>
@@ -189,7 +183,7 @@
         <div class="tuner-control">
           <input type="range" min="-3" max="0" step="0.1"
             [value]="r.beliefConflict"
-            [disabled]="!r.negativeEnabled"
+            [disabled]="!r.negativeEnabled || store.isViewingSnapshot()"
             (input)="setRule('beliefConflict', $any($event.target).value)" />
           <span class="tuner-val">{{ r.beliefConflict | number:'1.2-2' }}</span>
         </div>
@@ -199,7 +193,7 @@
         <div class="tuner-control">
           <input type="range" min="0" max="0.5" step="0.05"
             [value]="r.stressNegativeMultiplierPerPoint"
-            [disabled]="!r.negativeEnabled"
+            [disabled]="!r.negativeEnabled || store.isViewingSnapshot()"
             (input)="setRule('stressNegativeMultiplierPerPoint', $any($event.target).value)" />
           <span class="tuner-val">{{ r.stressNegativeMultiplierPerPoint | number:'1.2-2' }}</span>
         </div>
@@ -208,9 +202,30 @@
 
   </div>
 
-  <div class="tuner-reset-row">
-    <button class="btn btn-secondary btn-sm" (click)="resetRules()">Reset to defaults</button>
+  <!-- ── Stress ─────────────────────────────────────────────────────────── -->
+  <div class="card tuner-card tuner-card-stress">
+    <div class="tuner-header stress-header">Colony Stress</div>
+    <div class="tuner-group">
+      <div class="tuner-control">
+        <input type="range" min="0" max="10" step="1"
+          [value]="stress"
+          [disabled]="store.isViewingSnapshot()"
+          (input)="setStress(+$any($event.target).value)" />
+        <span class="stress-value" [class]="stress >= 7 ? 'danger' : stress >= 4 ? 'warn' : 'ok'">
+          {{ stress }} / 10
+        </span>
+      </div>
+      @if (store.isViewingSnapshot()) {
+        <p class="tuner-snapshot-note">Showing snapshot stress. Edit baseline to change.</p>
+      }
+    </div>
   </div>
+
+  @if (!store.isViewingSnapshot()) {
+    <div class="tuner-reset-row">
+      <button class="btn btn-secondary btn-sm" (click)="resetRules()">Reset to defaults</button>
+    </div>
+  }
   
 }
 
@@ -239,7 +254,7 @@
           <span>Base Score</span><strong>{{ r.baseScore }}</strong>
         </div>
         <div class="total-row">
-          <span>After Stress ({{ store.colonyState()?.colonyStress ?? 0 }})</span>
+          <span>After Stress ({{ stress }})</span>
           <strong>{{ r.stressedScore }}</strong>
         </div>
         @if (r.manualBump !== 0) {
@@ -314,7 +329,7 @@
           @for (f of store.allActiveFactions(); track f.id) {
             <option [value]="f.id">{{ f.name }}</option>
           }
-          <option value="party">party</option>
+          <option value="party">{{ store.colonyState()?.partyName ?? 'Party' }}</option>
         </select>
       </div>
       <div class="form-group">

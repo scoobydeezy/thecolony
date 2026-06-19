@@ -14,9 +14,9 @@ public class RelationshipBreakdownDto
 
 public class RelationshipContributionsDto
 {
-    public double Ritual { get; set; }
-    public double Knowledge { get; set; }
-    public double Change { get; set; }
+    public double BeliefC { get; set; }
+    public double BeliefA { get; set; }
+    public double BeliefB { get; set; }
     public double ValueAlignment { get; set; }
     public double ValueConflict { get; set; }
 }

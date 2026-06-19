@@ -1,0 +1,146 @@
+.label-section {
+  margin-bottom: 1.75rem;
+
+  &:last-of-type { margin-bottom: 0; }
+}
+
+.axis-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.axis-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+// Pill-tab pair matching the factions page filter tabs
+.type-tabs {
+  display: flex;
+  gap: 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+
+  button {
+    background: none;
+    border: none;
+    padding: 0.2rem 0.65rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    border-right: 1px solid var(--border);
+
+    &:last-child { border-right: none; }
+    &:hover { background: var(--bg-hover); color: var(--text-primary); }
+    &.active { background: var(--bg-active); color: var(--accent); font-weight: 600; }
+  }
+}
+
+.btn-flip {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.2rem 0.5rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.8rem;
+  line-height: 1;
+  transition: color 0.15s, border-color 0.15s;
+
+  &:hover { color: var(--text-primary); border-color: var(--accent); }
+}
+
+.label-section-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-secondary);
+  margin-bottom: 0.25rem;
+  margin-top: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .axis-header & { margin-bottom: 0; }
+
+  .axis-note {
+    font-size: 0.72rem;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--text-muted);
+  }
+}
+
+.label-section-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+}
+
+.label-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.label-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  input[type=text] {
+    flex: 1;
+    background: var(--bg-base);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.35rem 0.6rem;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    outline: none;
+
+    &:focus { border-color: var(--accent); }
+  }
+}
+
+.label-key {
+  width: 180px;
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-align: right;
+  padding-right: 0.25rem;
+
+  &.value-a { color: var(--color-valuea); }
+  &.value-b { color: var(--color-valueb); }
+  &.value-c { color: var(--color-valuec); }
+  &.edge      { color: var(--text-secondary); font-weight: 400; font-style: italic; }
+  &.muted     { color: var(--text-muted); font-weight: 400; }
+  &.conflict-pos { color: var(--color-belief-statusquo); }
+  &.conflict-neg { color: var(--color-belief-dissent); }
+}
+
+.save-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  margin-top: 0.5rem;
+}
+
+.saved-msg {
+  color: var(--color-success);
+  font-size: 0.875rem;
+  font-weight: 600;
+}

@@ -1,0 +1,317 @@
+<div class="page-header">
+  <h2>Sessions</h2>
+  <p>Campaign history and events.</p>
+</div>
+
+<div class="toolbar">
+  <button class="btn btn-primary" (click)="openAddSession()">+ New Session</button>
+  <div class="toolbar-right">
+    <button class="btn btn-secondary" (click)="exportSessions()" title="Download all sessions as JSON backup">Export JSON</button>
+    <label class="btn btn-secondary" title="Restore sessions from a JSON backup">
+      Import JSON
+      <input type="file" accept=".json" (change)="onImportFile($event)" style="display:none" />
+    </label>
+    @if (importError()) {
+      <span class="import-error">{{ importError() }}</span>
+    }
+  </div>
+</div>
+
+@if (store.sortedSessions().length === 0) {
+  <div class="card empty-state">
+    <p>No sessions yet. Start by adding your first session.</p>
+  </div>
+} @else {
+  <div class="session-list">
+    @for (session of store.sortedSessions(); track session.id) {
+      <div class="session-card card">
+
+        <!-- Session header -->
+        <div class="session-head">
+          <div class="session-number">{{ session.number }}</div>
+          <div class="session-body">
+            <div class="session-title">{{ session.title }}</div>
+            <div class="session-meta-row">
+              <span class="meta-chip">Act {{ session.act }}</span>
+              <span class="meta-chip">Week {{ session.week }}</span>
+              @if (session.date) { <span class="meta-chip">{{ session.date }}</span> }
+            </div>
+            @if (session.summary) {
+              <p class="session-summary">{{ session.summary }}</p>
+            }
+          </div>
+          <div class="session-actions">
+            <button class="btn btn-secondary btn-sm" (click)="openEditSession(session)">Edit</button>
+          </div>
+        </div>
+
+
+        <!-- Derived effects bar -->
+        @let derived = sessionDerivedEffects(session);
+        @if (derived.length > 0) {
+          <div class="derived-bar">
+            <span class="derived-bar-icon" title="Derived effects"><i class="fa-solid fa-diamond"></i></span>
+            <div class="derived-bar-chips">
+            @for (de of derived; track de.ruleId + '_' + de.targetEntityId + '_' + $index) {
+              <span class="effect-chip effect-chip--derived">
+                <span class="effect-target">{{ de.targetEntityType === 'faction' ? factionName(de.targetEntityId) : characterName(de.targetEntityId) }}</span>
+                <span class="effect-prop">{{ de.targetProperty }}</span>
+                <span [class]="deltaClass(de.delta)">{{ de.delta > 0 ? '+' : '' }}{{ de.delta }}</span>
+                <span class="derived-reason"
+                  [title]="de.triggerType === 'streak' && de.consecutiveWeeks ? de.consecutiveWeeks + '× ' + (de.direction === 'positive' ? 'pos' : 'neg') + ' ' + de.sourceProperty : ''">{{ de.ruleLabel }}</span>
+              </span>
+            }
+            </div>
+          </div>
+        }
+
+        <!-- Event rows -->
+        <div class="event-rows">
+          @for (ev of sortedEvents(session); track ev.id) {
+            <div class="event-row"
+              draggable="true"
+              (dragstart)="onDragStart(session.id, ev.id, $event)"
+              (dragover)="onDragOver($event)"
+              (drop)="onDrop(session.id, ev.id, $event)"
+              (dragend)="onDragEnd($event)">
+
+              <span class="drag-handle" title="Drag to reorder">⠿</span>
+
+              <div class="event-main">
+                <div class="event-title-row">
+                  <span class="event-title">{{ ev.title }}</span>
+                  @if (ev.description) {
+                    <span class="event-desc">{{ ev.description }}</span>
+                  }
+                </div>
+
+                <!-- Existing effects -->
+                @if (ev.effects.length > 0) {
+                  <div class="effects-inline">
+                    @for (ef of ev.effects; track ef.id || $index) {
+                      <span class="effect-chip">
+                        @if (isRepeatedEffect(session, ef)) {
+                          <i class="fa-solid fa-diamond effect-repeat-icon" title="Same effect applied last session"></i>
+                        }
+                        <span class="effect-target">{{ targetName(ef) }}</span>
+                        <span class="effect-prop">{{ ef.property }}</span>
+                        <span [class]="ef.property === 'state' || ef.property === 'factionChange' ? 'delta neutral' : deltaClass(ef.delta)">{{ effectLabel(ef) }}</span>
+                        <button class="effect-del" (click)="deleteEffect(ev, ef.id)" title="Remove effect">✕</button>
+                      </span>
+                    }
+                  </div>
+                }
+
+                <!-- Inline effect drafts -->
+                @if ((inlineEffects()[ev.id] ?? []).length > 0) {
+                  <div class="effect-drafts">
+                    @for (draft of inlineEffects()[ev.id]; track $index) {
+                      <div class="effect-draft-row">
+                        <!-- Target type -->
+                        <select [value]="draft.targetType ?? 'faction'"
+                          (change)="updateInlineEffect(ev.id, $index, 'targetType', $any($event.target).value)">
+                          <option value="colony">Colony</option>
+                          <option value="faction">Faction</option>
+                          <option value="character">Character</option>
+                        </select>
+
+                        <!-- Primary target -->
+                        @if (draft.targetType !== 'colony') {
+                          @if (draft.targetType === 'character') {
+                            <select [value]="draft.targetId ?? ''"
+                              (change)="updateInlineEffect(ev.id, $index, 'targetId', $any($event.target).value)">
+                              <option value="">— character —</option>
+                              @for (c of allCharacters; track c.id) {
+                                <option [value]="c.id">{{ c.name }}</option>
+                              }
+                            </select>
+                          } @else {
+                            <select [value]="draft.targetId ?? ''"
+                              (change)="updateInlineEffect(ev.id, $index, 'targetId', $any($event.target).value)">
+                              <option value="">— faction —</option>
+                              @for (f of activeFactions; track f.id) {
+                                <option [value]="f.id">{{ f.name }}</option>
+                              }
+                            </select>
+                          }
+                        }
+
+                        <!-- Property -->
+                        <select [value]="draft.property ?? 'momentum'"
+                          (change)="updateInlineEffect(ev.id, $index, 'property', $any($event.target).value)">
+                          @for (d of descriptorsFor(draft.targetType ?? 'faction'); track d.property) {
+                            <option [value]="d.property">{{ d.label }}</option>
+                          }
+                        </select>
+
+                        <!-- Secondary faction target (for relationshipBump) -->
+                        @if (needsSecondaryTarget(draft.property)) {
+                          <select [value]="draft.secondaryTargetId ?? ''"
+                            (change)="updateInlineEffect(ev.id, $index, 'secondaryTargetId', $any($event.target).value)">
+                            <option value="">— with faction —</option>
+                            @for (f of activeFactions; track f.id) {
+                              @if (f.id !== draft.targetId) {
+                                <option [value]="f.id">{{ f.name }}</option>
+                              }
+                            }
+                          </select>
+                        }
+
+                        <!-- Value input: driven by descriptor inputType -->
+                        @if (descriptor(draft.targetType ?? 'faction', draft.property); as d) {
+                          @if (d.inputType === 'select') {
+                            <select [value]="draft.value ?? d.selectOptions?.[0]?.value ?? ''"
+                              (change)="updateInlineEffect(ev.id, $index, 'value', $any($event.target).value)">
+                              @for (opt of d.selectOptions ?? []; track opt.value) {
+                                <option [value]="opt.value">{{ opt.label }}</option>
+                              }
+                            </select>
+                          } @else if (d.inputType === 'none') {
+                            <!-- factionChange: faction target select -->
+                            <select [value]="draft.value ?? ''"
+                              (change)="updateInlineEffect(ev.id, $index, 'value', $any($event.target).value)">
+                              <option value="">— None —</option>
+                              @for (f of activeFactions; track f.id) {
+                                <option [value]="f.id">{{ f.name }}</option>
+                              }
+                            </select>
+                          } @else {
+                            <!-- Numeric delta -->
+                            <div class="delta-stepper">
+                              <button class="stepper-btn stepper-minus" (click)="updateInlineEffect(ev.id, $index, 'delta', (draft.delta ?? 0) - deltaStep(draft))">−</button>
+                              <input type="number" class="delta-input" placeholder="Δ" [value]="draft.delta ?? 0"
+                                (input)="updateInlineEffect(ev.id, $index, 'delta', +$any($event.target).value)" />
+                              <button class="stepper-btn stepper-plus" (click)="updateInlineEffect(ev.id, $index, 'delta', (draft.delta ?? 0) + deltaStep(draft))">+</button>
+                            </div>
+                          }
+                        }
+
+                        <button class="btn btn-primary" (click)="saveInlineEffect(ev.id, $index)">Add</button>
+                        <button class="btn btn-secondary" (click)="removeInlineEffect(ev.id, $index)">✕</button>
+                      </div>
+                    }
+                  </div>
+                }
+
+                <!-- Add Effect row -->
+                <div class="add-effect-row">
+                  <button class="btn btn-secondary" (click)="addInlineEffect(ev.id)">+ Add Effect</button>
+                </div>
+              </div>
+
+              <div class="event-actions">
+                <button class="btn btn-secondary" (click)="openEditEvent(ev)">Edit</button>
+              </div>
+            </div>
+          }
+
+          <!-- Add Event row -->
+          <div class="add-event-row">
+            <button class="btn btn-full" (click)="openAddEvent(session.id)">+ Add Event</button>
+          </div>
+        </div>
+
+      </div>
+    }
+  </div>
+}
+
+<!-- ── Session Modal ────────────────────────────────────────────────────── -->
+@if (showSessionModal()) {
+  <div class="modal-backdrop" (click)="closeSessionModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>{{ editingSession().id ? 'Edit Session' : 'New Session' }}</h3>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Session #</label>
+          <input type="number" min="1" [value]="editingSession().number"
+            (input)="editingSession.update(s => ({...s, number: +$any($event.target).value}))" />
+        </div>
+        <div class="form-group">
+          <label>Date <span class="optional">(optional)</span></label>
+          <input type="date" [value]="editingSession().date ?? ''"
+            (input)="editingSession.update(s => ({...s, date: $any($event.target).value || undefined}))" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" placeholder="e.g. The Secret" [value]="editingSession().title ?? ''"
+          (input)="editingSession.update(s => ({...s, title: $any($event.target).value}))" />
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Act</label>
+          <input type="number" min="1" [value]="editingSession().act"
+            (input)="editingSession.update(s => ({...s, act: +$any($event.target).value}))" />
+        </div>
+        <div class="form-group">
+          <label>Week</label>
+          <input type="number" min="1" [value]="editingSession().week"
+            (input)="editingSession.update(s => ({...s, week: +$any($event.target).value}))" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Summary <span class="optional">(optional)</span></label>
+        <textarea rows="3" [value]="editingSession().summary ?? ''"
+          (input)="editingSession.update(s => ({...s, summary: $any($event.target).value}))"></textarea>
+      </div>
+
+      <div class="modal-actions">
+        @if (editingSession().id) {
+          <button class="btn btn-danger modal-delete" (click)="deleteSession(editingSession().id!); closeSessionModal()">Delete</button>
+        }
+        <button class="btn btn-secondary" (click)="closeSessionModal()">Cancel</button>
+        <button class="btn btn-primary" (click)="saveSession()" [disabled]="!editingSession().title?.trim()">Save</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Import Confirm Modal ──────────────────────────────────────────────── -->
+@if (showImportConfirm()) {
+  <div class="modal-backdrop" (click)="cancelImport()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>Import Sessions</h3>
+      <p>Found <strong>{{ pendingImport()?.length }}</strong> session(s) in the file. Sessions whose IDs already exist in the database will be skipped.</p>
+      <p class="import-warn">This will add new sessions alongside existing ones. It will not overwrite or delete anything.</p>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" (click)="cancelImport()">Cancel</button>
+        <button class="btn btn-primary" (click)="confirmImport()">Import</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Event Modal (title + description only) ────────────────────────────── -->
+@if (showEventModal()) {
+  <div class="modal-backdrop" (click)="closeEventModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>{{ editingEvent().id ? 'Edit Event' : 'New Event' }}</h3>
+
+      <div class="form-group">
+        <label>Title</label>
+        <input type="text" placeholder="e.g. The Party exposes Keeper records"
+          [value]="editingEvent().title ?? ''"
+          (input)="editingEvent.update(e => ({...e, title: $any($event.target).value}))" />
+      </div>
+
+      <div class="form-group">
+        <label>Description <span class="optional">(optional)</span></label>
+        <textarea rows="3" [value]="editingEvent().description ?? ''"
+          (input)="editingEvent.update(e => ({...e, description: $any($event.target).value}))"></textarea>
+      </div>
+
+      <div class="modal-actions">
+        @if (editingEvent().id) {
+          <button class="btn btn-danger modal-delete" (click)="deleteEvent(editingEvent().sessionId!, editingEvent().id!); closeEventModal()">Delete</button>
+        }
+        <button class="btn btn-secondary" (click)="closeEventModal()">Cancel</button>
+        <button class="btn btn-primary" (click)="saveEvent()" [disabled]="!editingEvent().title?.trim()">Save</button>
+      </div>
+    </div>
+  </div>
+}

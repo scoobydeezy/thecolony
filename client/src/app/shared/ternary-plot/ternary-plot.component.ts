@@ -2,7 +2,7 @@ import {
   Component, Input, Output, EventEmitter,
   ElementRef, ViewChild, OnChanges, OnInit, SimpleChanges, ChangeDetectionStrategy
 } from '@angular/core';
-import { ValueVector, primaryValue, secondaryValue, sacrificedValue } from '../../core/models/types';
+import { ValueVector, primaryValue, secondaryValue, sacrificedValue, ValueLabels, DEFAULT_VALUE_LABELS } from '../../core/models/types';
 
 export interface TernaryOverlayPoint {
   values: ValueVector;
@@ -31,53 +31,53 @@ const _rMid: [number, number] = [(Vt[0]+Va[0])/2, (Vt[1]+Va[1])/2]; // Truth/Age
 const _lMid: [number, number] = [(Vt[0]+Vs[0])/2, (Vt[1]+Vs[1])/2]; // Truth/Stability midpoint
 const _bMid: [number, number] = [(Vs[0]+Va[0])/2, (Vs[1]+Va[1])/2]; // Stability/Agency midpoint
 
-const EDGE_LABELS: Array<{ label: string; x: number; y: number; rotate: number }> = [
-  { label: 'Justice',        x: _rMid[0] + 0.866*OFFSET, y: _rMid[1] - 0.5*OFFSET, rotate:  60 },
-  { label: 'Accountability', x: _lMid[0] - 0.866*OFFSET, y: _lMid[1] - 0.5*OFFSET, rotate: -60 },
-  { label: 'Prosperity',        x: _bMid[0],                 y: _bMid[1] + OFFSET,      rotate:   0 },
+const EDGE_POSITIONS: Array<{ x: number; y: number; rotate: number; labelKey: keyof ValueLabels }> = [
+  { x: _rMid[0] + 0.866*OFFSET, y: _rMid[1] - 0.5*OFFSET, rotate:  60, labelKey: 'edgeAC' },
+  { x: _lMid[0] - 0.866*OFFSET, y: _lMid[1] - 0.5*OFFSET, rotate: -60, labelKey: 'edgeAB' },
+  { x: _bMid[0],                 y: _bMid[1] + OFFSET,      rotate:   0, labelKey: 'edgeBC' },
 ];
 
 function toCartesian(v: ValueVector): [number, number] {
-  const x = v.truth * Vt[0] + v.stability * Vs[0] + v.agency * Va[0];
-  const y = v.truth * Vt[1] + v.stability * Vs[1] + v.agency * Va[1];
+  const x = v.a * Vt[0] + v.b * Vs[0] + v.c * Va[0];
+  const y = v.a * Vt[1] + v.b * Vs[1] + v.c * Va[1];
   return [x, y];
 }
 
 function toBarycentric(px: number, py: number): ValueVector {
-  // Solve the linear system: p = t*Vt + s*Vs + a*Va, t+s+a=1
+  // Solve the linear system: p = a*Vt + b*Vs + c*Va, a+b+c=1
   const [x1, y1] = Vt;
   const [x2, y2] = Vs;
   const [x3, y3] = Va;
 
   const denom = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3);
-  let t = ((y2 - y3) * (px - x3) + (x3 - x2) * (py - y3)) / denom;
-  let s = ((y3 - y1) * (px - x3) + (x1 - x3) * (py - y3)) / denom;
-  let a = 1 - t - s;
+  let va = ((y2 - y3) * (px - x3) + (x3 - x2) * (py - y3)) / denom;
+  let vb = ((y3 - y1) * (px - x3) + (x1 - x3) * (py - y3)) / denom;
+  let vc = 1 - va - vb;
 
   // Clamp negatives to 0 then renormalize to keep point inside triangle
-  t = Math.max(0, t);
-  s = Math.max(0, s);
-  a = Math.max(0, a);
-  const sum = t + s + a || 1;
-  return { truth: t / sum, stability: s / sum, agency: a / sum };
+  va = Math.max(0, va);
+  vb = Math.max(0, vb);
+  vc = Math.max(0, vc);
+  const sum = va + vb + vc || 1;
+  return { a: va / sum, b: vb / sum, c: vc / sum };
 }
 
 function gridLines(): Array<[number, number, number, number]> {
   const lines: Array<[number, number, number, number]> = [];
   for (const frac of [0.25, 0.5, 0.75]) {
-    // Lines of constant truth (parallel to Vs-Va edge)
-    const p1 = toCartesian({ truth: frac, stability: 1 - frac, agency: 0 });
-    const p2 = toCartesian({ truth: frac, stability: 0, agency: 1 - frac });
+    // Lines of constant a (parallel to Vs-Va edge)
+    const p1 = toCartesian({ a: frac, b: 1 - frac, c: 0 });
+    const p2 = toCartesian({ a: frac, b: 0, c: 1 - frac });
     lines.push([p1[0], p1[1], p2[0], p2[1]]);
 
-    // Lines of constant stability (parallel to Vt-Va edge)
-    const p3 = toCartesian({ truth: 1 - frac, stability: frac, agency: 0 });
-    const p4 = toCartesian({ truth: 0, stability: frac, agency: 1 - frac });
+    // Lines of constant b (parallel to Vt-Va edge)
+    const p3 = toCartesian({ a: 1 - frac, b: frac, c: 0 });
+    const p4 = toCartesian({ a: 0, b: frac, c: 1 - frac });
     lines.push([p3[0], p3[1], p4[0], p4[1]]);
 
-    // Lines of constant agency (parallel to Vt-Vs edge)
-    const p5 = toCartesian({ truth: 1 - frac, stability: 0, agency: frac });
-    const p6 = toCartesian({ truth: 0, stability: 1 - frac, agency: frac });
+    // Lines of constant c (parallel to Vt-Vs edge)
+    const p5 = toCartesian({ a: 1 - frac, b: 0, c: frac });
+    const p6 = toCartesian({ a: 0, b: 1 - frac, c: frac });
     lines.push([p5[0], p5[1], p6[0], p6[1]]);
   }
   return lines;
@@ -122,12 +122,12 @@ function gridLines(): Array<[number, number, number, number]> {
         }
 
         <!-- Vertex labels -->
-        <text [attr.x]="vtx[0]" [attr.y]="vtx[1] - 8" text-anchor="middle" class="vertex-label truth">Truth</text>
-        <text [attr.x]="vsx[0]" [attr.y]="vsx[1] + 16" text-anchor="middle" class="vertex-label stability">Stability</text>
-        <text [attr.x]="vax[0]" [attr.y]="vax[1] + 16" text-anchor="middle" class="vertex-label agency">Agency</text>
+        <text [attr.x]="vtx[0]" [attr.y]="vtx[1] - 8" text-anchor="middle" class="vertex-label va">{{ valueLabels.a }}</text>
+        <text [attr.x]="vsx[0]" [attr.y]="vsx[1] + 16" text-anchor="middle" class="vertex-label vb">{{ valueLabels.b }}</text>
+        <text [attr.x]="vax[0]" [attr.y]="vax[1] + 16" text-anchor="middle" class="vertex-label vc">{{ valueLabels.c }}</text>
 
         <!-- Edge midpoint labels -->
-        @for (el of edgeLabels; track el.label) {
+        @for (el of edgePositions; track el.labelKey) {
           <text
             [attr.x]="el.x"
             [attr.y]="el.y"
@@ -135,7 +135,7 @@ function gridLines(): Array<[number, number, number, number]> {
             dominant-baseline="middle"
             [attr.transform]="'rotate(' + el.rotate + ',' + el.x + ',' + el.y + ')'"
             class="edge-label"
-          >{{ el.label }}</text>
+          >{{ valueLabels[el.labelKey] }}</text>
         }
 
         <!-- Overlay points (faction, social class, etc.) -->
@@ -217,9 +217,9 @@ function gridLines(): Array<[number, number, number, number]> {
 
       @if (showValueLabels) {
         <div class="value-labels">
-          <span class="vl desires">Desires <span class="vl-value" [class]="primary.toLowerCase()">{{ primary }}</span></span>
-          <span class="vl maintains">Maintains <span class="vl-value" [class]="secondary.toLowerCase()">{{ secondary }}</span></span>
-          <span class="vl sacrifices">Sacrifices <span class="vl-value" [class]="sacrificed.toLowerCase()">{{ sacrificed }}</span></span>
+          <span class="vl desires">Desires <span class="vl-value" [class]="primary.toLowerCase()">{{ valueLabel(primary) }}</span></span>
+          <span class="vl maintains">Maintains <span class="vl-value" [class]="secondary.toLowerCase()">{{ valueLabel(secondary) }}</span></span>
+          <span class="vl sacrifices">Sacrifices <span class="vl-value" [class]="sacrificed.toLowerCase()">{{ valueLabel(sacrificed) }}</span></span>
         </div>
       }
     </div>
@@ -235,9 +235,9 @@ function gridLines(): Array<[number, number, number, number]> {
       font-weight: 600;
       fill: var(--color-text-muted, #94a3b8);
     }
-    .vertex-label.truth     { fill: var(--color-truth,    #f59e0b); }
-    .vertex-label.stability { fill: var(--color-stability, #14b8a6); }
-    .vertex-label.agency    { fill: var(--color-agency,   #8b5cf6); }
+    .vertex-label.va { fill: var(--color-valuea, #f59e0b); }
+    .vertex-label.vb { fill: var(--color-valueb, #14b8a6); }
+    .vertex-label.vc { fill: var(--color-valuec, #8b5cf6); }
 
     .edge-label {
       font-size: 9px;
@@ -272,9 +272,9 @@ function gridLines(): Array<[number, number, number, number]> {
 
     .vl-value {
       font-weight: 700;
-      &.truth     { color: var(--color-truth,    #f59e0b); }
-      &.stability { color: var(--color-stability, #14b8a6); }
-      &.agency    { color: var(--color-agency,   #8b5cf6); }
+      &.a { color: var(--color-valuea, #f59e0b); }
+      &.b { color: var(--color-valueb, #14b8a6); }
+      &.c { color: var(--color-valuec, #8b5cf6); }
     }
 
     .overlay-legend {
@@ -300,7 +300,7 @@ function gridLines(): Array<[number, number, number, number]> {
   `]
 })
 export class TernaryPlotComponent implements OnInit, OnChanges {
-  @Input() values: ValueVector = { truth: 1/3, stability: 1/3, agency: 1/3 };
+  @Input() values: ValueVector = { a: 1/3, b: 1/3, c: 1/3 };
   @Input() editable = false;
   @Input() size = SVG_W;           // rendered pixel width; height scales proportionally
   @Input() showValueLabels = true; // show Desires/Maintains/Sacrifices pills below SVG
@@ -322,6 +322,8 @@ export class TernaryPlotComponent implements OnInit, OnChanges {
 
   @ViewChild('svgEl') svgEl!: ElementRef<SVGSVGElement>;
 
+  @Input() valueLabels: ValueLabels = DEFAULT_VALUE_LABELS;
+
   readonly svgW = SVG_W;
   readonly svgH = SVG_H;
   readonly trianglePoints = `${Vt[0]},${Vt[1]} ${Vs[0]},${Vs[1]} ${Va[0]},${Va[1]}`;
@@ -329,7 +331,7 @@ export class TernaryPlotComponent implements OnInit, OnChanges {
   readonly vtx = Vt;
   readonly vsx = Vs;
   readonly vax = Va;
-  readonly edgeLabels = EDGE_LABELS;
+  readonly edgePositions = EDGE_POSITIONS;
 
   get renderedWidth(): number  { return this.size; }
   get renderedHeight(): number { return Math.round(this.size * SVG_H / SVG_W); }
@@ -344,6 +346,11 @@ export class TernaryPlotComponent implements OnInit, OnChanges {
   // Stored fields — recomputed in ngOnChanges to avoid OnPush getter staleness
   driftGhostBar: { x1: number; y1: number; x2: number; y2: number } | null = null;
   driftMarker: { x: number; y: number } | null = null;
+
+  valueLabel(coreValue: string): string {
+    const k = coreValue.toLowerCase() as 'a' | 'b' | 'c';
+    return (k === 'a' || k === 'b' || k === 'c') ? this.valueLabels[k] : coreValue;
+  }
 
   overlayPoint(v: ValueVector): [number, number] {
     return toCartesian(v);

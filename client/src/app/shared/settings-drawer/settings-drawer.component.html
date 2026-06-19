@@ -1,0 +1,39 @@
+@if (open()) {
+  <div class="drawer-backdrop" (click)="close()"></div>
+}
+
+<div class="drawer" [class.drawer-open]="open()">
+  <div class="drawer-header">
+    <h2 class="drawer-title">Settings</h2>
+    <button class="drawer-close" (click)="close()" type="button" aria-label="Close settings">✕</button>
+  </div>
+
+  <div class="drawer-tabs">
+    @for (tab of tabs; track tab.id) {
+      <button
+        class="tab-btn"
+        [class.active]="activeTab() === tab.id"
+        (click)="selectTab(tab.id)"
+        type="button">
+        {{ tab.label }}
+      </button>
+    }
+  </div>
+
+  <div class="drawer-body">
+    @switch (activeTab()) {
+      @case ('labels') {
+        <app-values-tab />
+      }
+      @case ('rules') {
+        <app-rules-tab />
+      }
+      @case ('effects') {
+        <app-effects-tab />
+      }
+      @case ('formulas') {
+        <app-formulas-tab />
+      }
+    }
+  </div>
+</div>

@@ -1,79 +1,124 @@
-export type RitualPosition = 'Good' | 'Neutral' | 'Bad';
-export type KnowledgePosition = 'Hidden' | 'Controlled' | 'Revealed';
-export type ChangePosition = 'Yes' | 'No';
-export type CoreValue = 'Stability' | 'Agency' | 'Truth';
+export type BeliefPosition = 'positive' | 'neutral' | 'negative';
+export type CoreValue = 'A' | 'B' | 'C';
+
+// ── Display Labels ─────────────────────────────────────────────────────────
+
+export interface ValueLabels {
+  a: string;       // Value A (was: truth)
+  b: string;       // Value B (was: stability)
+  c: string;       // Value C (was: agency)
+  edgeAC: string;  // ternary edge between Value A and Value C vertices
+  edgeAB: string;  // ternary edge between Value A and Value B vertices
+  edgeBC: string;  // ternary edge between Value B and Value C vertices
+}
+
+// A single unified shape for every belief axis.
+// type='opinion' uses all three BeliefPosition slots; type='boolean' uses positive/negative only.
+export interface BeliefAxisConfig {
+  axisName: string;
+  type: 'opinion' | 'boolean';
+  positiveAligns: boolean;  // true → 'positive' aligns with this value (e.g. Revealed=Truth); false → 'negative' aligns (e.g. No Change=Stability)
+  positive: string;
+  neutral: string;               // only shown when type='opinion'
+  negative: string;
+}
+
+export interface BeliefAxisLabels {
+  a: BeliefAxisConfig;  // knowledge axis — aligns with Value A
+  b: BeliefAxisConfig;  // change axis    — aligns with Value B
+  c: BeliefAxisConfig;  // ritual axis    — aligns with Value C
+}
+
+export const DEFAULT_VALUE_LABELS: ValueLabels = {
+  a: 'Truth',
+  b: 'Stability',
+  c: 'Agency',
+  edgeAC: 'Justice',
+  edgeAB: 'Accountability',
+  edgeBC: 'Prosperity',
+};
+
+export const DEFAULT_BELIEF_AXIS_LABELS: BeliefAxisLabels = {
+  a: { axisName: 'Knowledge', type: 'opinion', positiveAligns: true,  positive: 'Revealed', neutral: 'Controlled', negative: 'Hidden' },
+  b: { axisName: 'Change',    type: 'boolean', positiveAligns: false, positive: 'Yes',      neutral: 'Neutral',    negative: 'No'     },
+  c: { axisName: 'Ritual',    type: 'opinion', positiveAligns: false, positive: 'Good',     neutral: 'Neutral',    negative: 'Bad'    },
+};
+
+// Returns the engine positions available for an axis. For 'boolean' type, neutral is omitted.
+export function beliefAxisOptions(cfg: BeliefAxisConfig): BeliefPosition[] {
+  return cfg.type === 'opinion' ? ['positive', 'neutral', 'negative'] : ['positive', 'negative'];
+}
+
+// Returns the display label for a BeliefPosition on an axis.
+export function beliefPositionLabel(position: BeliefPosition, cfg: BeliefAxisConfig): string {
+  return cfg[position] || position;
+}
 export type RelationshipLabel = 'Aligned' | 'Cooperative' | 'Friendly' | 'Tolerated' | 'Strained' | 'Opposed' | 'Hostile';
 export type GroupType = 'Faction' | 'SocialClass';
 
 export interface ValueVector {
-  truth: number;     // 0–1, sum with stability + agency = 1
-  stability: number;
-  agency: number;
+  a: number;  // 0–1, was: truth
+  b: number;  // 0–1, was: stability
+  c: number;  // 0–1; a + b + c = 1
 }
 
 export function dot(a: ValueVector, b: ValueVector): number {
-  return a.truth * b.truth + a.stability * b.stability + a.agency * b.agency;
+  return a.a * b.a + a.b * b.b + a.c * b.c;
 }
 
 export function inverseVector(v: ValueVector): ValueVector {
-  return { truth: 1 - v.truth, stability: 1 - v.stability, agency: 1 - v.agency };
+  return { a: 1 - v.a, b: 1 - v.b, c: 1 - v.c };
 }
 
 export function primaryValue(v: ValueVector): CoreValue {
-  if (v.truth >= v.stability && v.truth >= v.agency) return 'Truth';
-  if (v.stability >= v.agency) return 'Stability';
-  return 'Agency';
+  if (v.a >= v.b && v.a >= v.c) return 'A';
+  if (v.b >= v.c) return 'B';
+  return 'C';
 }
 
 export function secondaryValue(v: ValueVector): CoreValue {
-  const sorted = (['truth', 'stability', 'agency'] as const)
+  const sorted = (['a', 'b', 'c'] as const)
     .map(k => ({ key: k, val: v[k] }))
     .sort((a, b) => b.val - a.val);
-  const key = sorted[1].key;
-  if (key === 'truth') return 'Truth';
-  if (key === 'stability') return 'Stability';
-  return 'Agency';
+  return sorted[1].key.toUpperCase() as CoreValue;
 }
 
 export function sacrificedValue(v: ValueVector): CoreValue {
-  if (v.truth <= v.stability && v.truth <= v.agency) return 'Truth';
-  if (v.stability <= v.agency) return 'Stability';
-  return 'Agency';
+  if (v.a <= v.b && v.a <= v.c) return 'A';
+  if (v.b <= v.c) return 'B';
+  return 'C';
 }
 
-// Each value's "aligned" belief and the position that represents alignment vs conflict.
-// Truth cares about Knowledge (Revealed = aligned, Hidden = conflict).
-// Stability cares about Change (No = aligned, Yes = conflict).
-// Agency cares about Ritual (Bad = aligned, Good = conflict).
-export const BELIEF_VALUE_ALIGNMENT = {
-  truth:     { axis: 'knowledge' as const, aligned: 'Revealed' as KnowledgePosition, conflicting: 'Hidden' as KnowledgePosition },
-  stability: { axis: 'change'    as const, aligned: 'No'       as ChangePosition,    conflicting: 'Yes'    as ChangePosition    },
-  agency:    { axis: 'ritual'    as const, aligned: 'Bad'      as RitualPosition,    conflicting: 'Good'   as RitualPosition    },
-};
-
 export interface BeliefConflicts {
-  ritual:    boolean;
-  knowledge: boolean;
-  change:    boolean;
+  beliefc:   boolean;
+  beliefa:   boolean;
+  beliefb:   boolean;
   any:       boolean;
+}
+
+// Which BeliefPosition is aligned with a high score on the corresponding value axis?
+// positiveAligns=true  → 'positive' is aligned (e.g. Knowledge: Revealed=high Truth)
+// positiveAligns=false → 'negative' is aligned (e.g. Change: No=high Stability; Ritual: Bad=high Agency)
+function alignedPosition(cfg: BeliefAxisConfig): BeliefPosition {
+  return cfg.positiveAligns ? 'positive' : 'negative';
 }
 
 export function beliefConflicts(
   values: ValueVector,
-  ritual: RitualPosition | undefined,
-  knowledge: KnowledgePosition | undefined,
-  change: ChangePosition | undefined
+  beliefc: BeliefPosition | undefined,
+  beliefa: BeliefPosition | undefined,
+  beliefb: BeliefPosition | undefined,
+  axisLabels: BeliefAxisLabels
 ): BeliefConflicts {
   const primary = primaryValue(values);
-  const map = BELIEF_VALUE_ALIGNMENT[primary.toLowerCase() as keyof typeof BELIEF_VALUE_ALIGNMENT];
-  const knowledgeConflict = primary === 'Truth'     && knowledge === map.conflicting;
-  const changeConflict    = primary === 'Stability' && change    === map.conflicting;
-  const ritualConflict    = primary === 'Agency'    && ritual    === map.conflicting;
+  const beliefaConflict = primary === 'A' && beliefa != null && beliefa !== 'neutral' && beliefa !== alignedPosition(axisLabels.a);
+  const beliefbConflict = primary === 'B' && beliefb != null && beliefb !== 'neutral' && beliefb !== alignedPosition(axisLabels.b);
+  const beliefcConflict = primary === 'C' && beliefc != null && beliefc !== 'neutral' && beliefc !== alignedPosition(axisLabels.c);
   return {
-    ritual:    ritualConflict,
-    knowledge: knowledgeConflict,
-    change:    changeConflict,
-    any:       ritualConflict || knowledgeConflict || changeConflict,
+    beliefc:   beliefcConflict,
+    beliefa:   beliefaConflict,
+    beliefb:   beliefbConflict,
+    any:       beliefcConflict || beliefaConflict || beliefbConflict,
   };
 }
 
@@ -88,9 +133,9 @@ export interface Faction {
   afraidOf: string;
   wrongAbout: string;
   singleSentence: string;
-  ritual?: RitualPosition;
-  knowledge?: KnowledgePosition;
-  change?: ChangePosition;
+  beliefc?: BeliefPosition;
+  beliefa?: BeliefPosition;
+  beliefb?: BeliefPosition;
   values: ValueVector;
   active: boolean;
   notes?: string;
@@ -106,9 +151,9 @@ export interface ColonyState {
   act: number;
   week: number;
   colonyStress: number;
-  partyRitual: RitualPosition;
-  partyKnowledge: KnowledgePosition;
-  partyChange: ChangePosition;
+  partyBeliefc: BeliefPosition;
+  partyBeliefa: BeliefPosition;
+  partyBeliefb: BeliefPosition;
   partyValues: ValueVector;
   sessionSummary?: string;
   dominantFactions?: string;
@@ -124,6 +169,143 @@ export interface RelationshipOverride {
   notes?: string;
 }
 
+// ── Formulas Config ────────────────────────────────────────────────────────
+// Magic-number weights used in the influence and belief derivation engines.
+
+export interface FormulasConfig {
+  // Faction influence blend: characterInfluence = avg * memberAvgWeight + max * memberMaxWeight
+  memberAvgWeight: number;           // default 0.6
+  memberMaxWeight: number;           // default 0.4
+  // Total influence blend: base * baseWeight + charInfluence * charWeight + momentum * momentumWeight
+  baseInfluenceWeight: number;       // default 0.45
+  charInfluenceWeight: number;       // default 0.35
+  momentumInfluenceWeight: number;   // default 0.20
+  // Effective power: totalInfluence × (legitimacyBase + legitimacy / legitimacyScale)
+  legitimacyBase: number;            // default 0.5
+  legitimacyScale: number;           // default 100
+  // Leaderless penalty: if no alive FactionLeader exists, multiply effective power by this
+  leaderlessPowerMultiplier: number; // default 0.75
+  // Belief derivation: value axis must exceed this to assign a non-neutral position
+  beliefDerivationThreshold: number; // default 0.4
+}
+
+export const DEFAULT_FORMULAS: FormulasConfig = {
+  memberAvgWeight:            0.6,
+  memberMaxWeight:            0.4,
+  baseInfluenceWeight:        0.45,
+  charInfluenceWeight:        0.35,
+  momentumInfluenceWeight:    0.20,
+  legitimacyBase:             0.5,
+  legitimacyScale:            100,
+  leaderlessPowerMultiplier:  0.75,
+  beliefDerivationThreshold:  0.4,
+};
+
+// ── Session Effect Descriptors (single source of truth) ───────────────────
+// Used by both the session event editor and the cascade event rule trigger.
+// inputType 'delta'  → numeric stepper (delta field)
+// inputType 'select' → string value dropdown (value field, options provided)
+// inputType 'none'   → no value input (e.g. factionChange uses a separate target select)
+
+export interface EffectPropDescriptor {
+  property: string;
+  label: string;
+  inputType: 'delta' | 'select' | 'none';
+  selectOptions?: { value: string; label: string }[];
+  needsSecondaryTarget?: boolean;  // true for relationshipBump
+}
+
+export const CHARACTER_STATE_OPTIONS: { value: CharacterState; label: string }[] = [
+  { value: 'Alive',    label: 'Alive' },
+  { value: 'Dead',     label: 'Dead' },
+  { value: 'Missing',  label: 'Missing' },
+  { value: 'Forgotten', label: 'Forgotten' },
+];
+
+export const FACTION_SUBTYPE_OPTIONS: { value: string; label: string }[] = [
+  { value: '',           label: 'Any' },
+  { value: 'Faction',    label: 'Faction' },
+  { value: 'SocialClass', label: 'Social Class' },
+];
+
+export const CHARACTER_SUBTYPE_OPTIONS: { value: string; label: string }[] = [
+  { value: '',             label: 'Any' },
+  { value: 'FactionLeader', label: 'Faction Leader' },
+  { value: 'NPC',           label: 'NPC' },
+  { value: 'PartyMember',   label: 'Party Member' },
+];
+
+export const FACTION_EFFECT_PROPS: EffectPropDescriptor[] = [
+  { property: 'momentum',              label: 'Momentum',              inputType: 'delta' },
+  { property: 'legitimacy',            label: 'Legitimacy',            inputType: 'delta' },
+  { property: 'relationshipBump',      label: 'Relationship Bump',     inputType: 'delta', needsSecondaryTarget: true },
+  { property: 'partyRelationshipBump', label: 'Party Rel. Bump',       inputType: 'delta' },
+];
+
+export const CHARACTER_EFFECT_PROPS: EffectPropDescriptor[] = [
+  { property: 'pressure',    label: 'Pressure',    inputType: 'delta' },
+  { property: 'influence',   label: 'Influence',   inputType: 'delta' },
+  { property: 'state',       label: 'State',       inputType: 'select', selectOptions: CHARACTER_STATE_OPTIONS },
+  { property: 'factionChange', label: 'Faction Change', inputType: 'none' },
+];
+
+export const COLONY_EFFECT_PROPS: EffectPropDescriptor[] = [
+  { property: 'stress', label: 'Stress', inputType: 'delta' },
+];
+
+// ── Cascade Rules ──────────────────────────────────────────────────────────
+// Rules fire each session when their trigger condition is met.
+// triggerType 'streak': source property moved in the same direction for
+//   minConsecutiveWeeks sessions.
+// triggerType 'threshold': source property's current value is above/below
+//   a fixed value.
+// triggerType 'event': fires when an entity matching sourceEntitySubtype has
+//   its sourceProperty set/changed during this session. For select-type
+//   properties (e.g. state), sourcePropertyValue narrows to a specific value.
+// effectType 'multiplier': multiplies the change that already happened to
+//   the source property by `multiplier` and applies the result to the target.
+// effectType 'flat': adds `flatDelta` directly to the target property.
+
+export type FactionSourceProp = 'momentum' | 'legitimacy';
+export type CharacterSourceProp = 'pressure' | 'conviction' | 'influence' | 'impressionable';
+export type FactionTargetProp = 'momentum' | 'legitimacy';
+export type CharacterTargetProp = 'pressure' | 'conviction' | 'influence' | 'impressionable';
+
+export interface CascadeRule {
+  id: string;
+  label: string;
+
+  // ── Trigger ──
+  triggerType: 'streak' | 'threshold' | 'event';
+  sourceEntityType: 'faction' | 'character';
+  sourceProperty: string;
+  // streak trigger
+  direction?: 'positive' | 'negative' | 'either';
+  minConsecutiveWeeks?: number;
+  // threshold trigger
+  thresholdOperator?: 'gt' | 'lt';
+  thresholdValue?: number;
+  // event trigger
+  sourceEntitySubtype?: string;     // e.g. 'FactionLeader', 'Faction', 'SocialClass', '' = any
+  sourcePropertyValue?: string[];   // for select-type properties; any listed value matches (OR logic)
+
+  // ── Effect ──
+  effectType: 'multiplier' | 'flat';
+  targetEntityType: 'faction' | 'character';
+  targetProperty: FactionTargetProp | CharacterTargetProp;
+  // multiplier effect
+  multiplier?: number;
+  // flat effect
+  flatDelta?: number;
+}
+
+export const DEFAULT_CASCADE_RULES: CascadeRule[] = [
+  { id: 'neg-2', label: '2+ negative weeks',  triggerType: 'streak', sourceEntityType: 'faction', sourceProperty: 'momentum', direction: 'negative', minConsecutiveWeeks: 2, effectType: 'multiplier', targetEntityType: 'faction', targetProperty: 'legitimacy', multiplier: 2 },
+  { id: 'neg-3', label: '3+ negative weeks',  triggerType: 'streak', sourceEntityType: 'faction', sourceProperty: 'momentum', direction: 'negative', minConsecutiveWeeks: 3, effectType: 'multiplier', targetEntityType: 'faction', targetProperty: 'legitimacy', multiplier: 3 },
+  { id: 'pos-2', label: '2+ positive weeks',  triggerType: 'streak', sourceEntityType: 'faction', sourceProperty: 'momentum', direction: 'positive', minConsecutiveWeeks: 2, effectType: 'multiplier', targetEntityType: 'faction', targetProperty: 'legitimacy', multiplier: 2 },
+  { id: 'pos-3', label: '3+ positive weeks',  triggerType: 'streak', sourceEntityType: 'faction', sourceProperty: 'momentum', direction: 'positive', minConsecutiveWeeks: 3, effectType: 'multiplier', targetEntityType: 'faction', targetProperty: 'legitimacy', multiplier: 3 },
+];
+
 export interface RulesConfig {
   id: string;
   beliefMatch: number;
@@ -136,12 +318,22 @@ export interface RulesConfig {
   negativeEnabled: boolean;
   thresholdsJson: string;
   influenceConvictionScale: number; // caps max conviction bonus from faction peers (default 0.5)
+
+  // Display labels — stored as JSON strings in the DB, decoded by the store
+  valueLabelsJson: string;
+  beliefAxisLabelsJson: string;
+
+  // Cascade rules — stored as JSON; empty string = use client defaults
+  cascadeRulesJson: string;
+
+  // Formula weights — stored as JSON; empty string = use client defaults
+  formulasJson: string;
 }
 
 export interface RelationshipContributions {
-  ritual: number;
-  knowledge: number;
-  change: number;
+  beliefc: number;
+  beliefa: number;
+  beliefb: number;
   valueAlignment: number;
   valueConflict: number;
 }
@@ -170,6 +362,95 @@ export interface SessionLogEntry {
   futureConsequences?: string;
 }
 
+// ── Sessions & Events ──────────────────────────────────────────────────────
+
+export interface Session {
+  id: string;
+  number: number;
+  title: string;
+  act: number;
+  week: number;
+  date?: string;
+  summary?: string;
+  events: CampaignEvent[];
+}
+
+export interface EventEffect {
+  id: string;
+  eventId: string;
+  targetType: string;   // "colony" | "faction" | "character"
+  targetId: string;
+  // colony: "stress"
+  // faction: "momentum" | "legitimacy" | "relationshipBump" | "partyRelationshipBump"
+  // character: "pressure" | "influence" | "state" | "factionChange"
+  property: string;
+  delta: number;                  // numeric effects
+  value?: string;                 // non-numeric effects: CharacterState or factionId
+  secondaryTargetId?: string;     // relationship bumps: the other faction id
+}
+
+export interface CampaignEvent {
+  id: string;
+  sessionId: string;
+  title: string;
+  description?: string;
+  sortOrder: number;
+  effects: EventEffect[];
+}
+
+export interface DerivedEffect {
+  ruleId: string;
+  ruleLabel: string;
+  // source
+  sourceEntityType: 'faction' | 'character';
+  sourceEntityId: string;
+  sourceProperty: string;
+  // trigger context
+  triggerType: 'streak' | 'threshold' | 'event';
+  consecutiveWeeks?: number;       // streak trigger
+  direction?: 'positive' | 'negative'; // streak trigger
+  thresholdValue?: number;         // threshold trigger
+  eventCharacterType?: string;     // event trigger: which character type fired it
+  eventStateValue?: string;        // event trigger: which state value was matched
+  // effect
+  targetEntityType: 'faction' | 'character';
+  targetEntityId: string;
+  targetProperty: string;
+  delta: number;                   // change applied (positive = gain, negative = drain)
+  // convenience aliases kept for backward compat with sessions display
+  /** @deprecated use sourceEntityId */ factionId?: string;
+  /** @deprecated use delta */ legitimacyChange?: number;
+}
+
+// Computed from session events against baseline world state
+export interface ColonySnapshot {
+  sessionId: string;
+  sessionNumber: number;
+  colonyStress: number;
+  factionMomentum: Record<string, number>;     // factionId → momentum
+  factionLegitimacy: Record<string, number>;   // factionId → legitimacy
+  characterPressure: Record<string, number>;   // characterId → pressure
+  characterInfluence: Record<string, number>;  // characterId → influence
+  characterStates: Record<string, CharacterState>;   // characterId → state at this point
+  characterFactions: Record<string, string | undefined>; // characterId → factionId at this point
+  // cumulative relationship bumps added via session effects (compound per session pair)
+  factionRelationshipBumps: Record<string, Record<string, number>>; // sourceId → targetId → bump
+  factionPartyBumps: Record<string, number>;   // factionId → cumulative party bump
+  derivedEffects: DerivedEffect[];             // computed momentum cascade effects this session
+}
+
+export interface ColonyImpact {
+  stressDelta: number;
+  momentumChanges: { factionId: string; delta: number }[];
+  legitimacyChanges: { factionId: string; delta: number }[];
+  characterDeaths: string[];
+  defections: { characterId: string; fromFactionId: string; toFactionId: string }[];
+  factionRelationshipChanges: { sourceId: string; targetId: string; delta: number }[];
+  partyRelationshipChanges: { factionId: string; delta: number }[];
+  characterStateChanges: { characterId: string; state: CharacterState }[];
+  characterFactionChanges: { characterId: string; newFactionId: string }[];
+}
+
 export interface RelationshipThreshold {
   label: RelationshipLabel;
   minScore: number;
@@ -178,7 +459,8 @@ export interface RelationshipThreshold {
 // ── Character System ───────────────────────────────────────────────────────
 
 export type CharacterType = 'NPC' | 'PartyMember' | 'FactionLeader';
-export type DoubtDirection = 'Truth' | 'Stability' | 'Agency';
+export type DoubtDirection = 'a' | 'b' | 'c';
+export type CharacterState = 'Alive' | 'Dead' | 'Missing' | 'Forgotten';
 
 export interface Character {
   id: string;
@@ -211,9 +493,9 @@ export interface Character {
   values: ValueVector;
 
   // Belief overrides — when set, these take precedence over derived beliefs
-  ritual?: RitualPosition;
-  knowledge?: KnowledgePosition;
-  change?: ChangePosition;
+  beliefc?: BeliefPosition;
+  beliefa?: BeliefPosition;
+  beliefb?: BeliefPosition;
 
   // Doubt system
   doubtDirection?: DoubtDirection;
@@ -223,49 +505,60 @@ export interface Character {
   // Influence system
   influence: number;      // 0–100: stabilizing effect this character exerts on faction-mates
   impressionable: number; // 0–100: how strongly this character is affected by faction peers' influence
+
+  // Narrative state
+  state: CharacterState;
 }
 
 /**
  * Derives belief positions from a value vector using per-axis thresholds.
- * Each belief axis maps to the value that most strongly "cares" about it:
- *   knowledge ← truth (Revealed if truth dominant, Hidden if agency dominant, else Controlled)
- *   change    ← stability (No if stability dominant, Yes if agency dominant — no neutral)
- *   ritual    ← agency (Bad if agency dominant, Good if truth dominant, else Neutral)
- * Characters near the center (no axis > 0.4) get all neutral/buffer positions,
- * falling back to pure value alignment in scoring.
+ *   knowledge ← A axis: A dominant → positive, C dominant → negative, else neutral
+ *   change    ← B axis: B dominant → negative, C dominant → positive, else neutral/positive
+ *   ritual    ← C axis: C dominant → negative, A dominant → positive, else neutral
  */
-export function deriveBeliefs(values: ValueVector): { ritual: RitualPosition; knowledge: KnowledgePosition; change: ChangePosition } {
-  const THRESHOLD = 0.4;
-  const knowledge: KnowledgePosition =
-    values.truth   >= THRESHOLD ? 'Revealed'   :
-    values.agency  >= THRESHOLD ? 'Hidden'      : 'Controlled';
-  const ritual: RitualPosition =
-    values.agency  >= THRESHOLD ? 'Bad'         :
-    values.truth   >= THRESHOLD ? 'Good'        : 'Neutral';
-  const change: ChangePosition =
-    values.stability >= THRESHOLD ? 'No' : 'Yes';
-  return { ritual, knowledge, change };
+export function deriveBeliefs(
+  values: ValueVector,
+  threshold = 0.4,
+  axisLabels: BeliefAxisLabels = DEFAULT_BELIEF_AXIS_LABELS
+): { beliefc: BeliefPosition; beliefa: BeliefPosition; beliefb: BeliefPosition } {
+  // beliefa ← A axis: A dominant → positive, C dominant → negative, else neutral
+  const beliefa: BeliefPosition =
+    values.a >= threshold ? 'positive' :
+    values.c >= threshold ? 'negative' : 'neutral';
+
+  // beliefc ← C axis: C dominant → negative, A dominant → positive, else neutral
+  const beliefc: BeliefPosition =
+    values.c >= threshold ? 'negative' :
+    values.a >= threshold ? 'positive' : 'neutral';
+
+  // beliefb ← B axis: B dominant → negative (status quo); C dominant → positive (change); else neutral/positive
+  const bIsOpinion = axisLabels.b.type === 'opinion';
+  const beliefb: BeliefPosition = bIsOpinion
+    ? (values.b >= threshold ? 'negative' : values.c >= threshold ? 'positive' : 'neutral')
+    : (values.b >= threshold ? 'negative' : 'positive');
+
+  return { beliefc, beliefa, beliefb };
 }
 
 /** Returns the character's effective beliefs: overrides where set, derived elsewhere. */
-export function effectiveBeliefs(character: Character): { ritual: RitualPosition; knowledge: KnowledgePosition; change: ChangePosition } {
+export function effectiveBeliefs(character: Character): { beliefc: BeliefPosition; beliefa: BeliefPosition; beliefb: BeliefPosition } {
   const derived = deriveBeliefs(character.values);
   return {
-    ritual:    character.ritual    ?? derived.ritual,
-    knowledge: character.knowledge ?? derived.knowledge,
-    change:    character.change    ?? derived.change,
+    beliefc:   character.beliefc ?? derived.beliefc,
+    beliefa:   character.beliefa ?? derived.beliefa,
+    beliefb:   character.beliefb ?? derived.beliefb,
   };
 }
 
 /** Linearly interpolates between two normalized ValueVectors and renormalizes. */
 export function lerpValueVector(a: ValueVector, b: ValueVector, t: number): ValueVector {
   const raw = {
-    truth:     a.truth     + (b.truth     - a.truth)     * t,
-    stability: a.stability + (b.stability - a.stability) * t,
-    agency:    a.agency    + (b.agency    - a.agency)    * t,
+    a: a.a + (b.a - a.a) * t,
+    b: a.b + (b.b - a.b) * t,
+    c: a.c + (b.c - a.c) * t,
   };
-  const sum = raw.truth + raw.stability + raw.agency || 1;
-  return { truth: raw.truth / sum, stability: raw.stability / sum, agency: raw.agency / sum };
+  const sum = raw.a + raw.b + raw.c || 1;
+  return { a: raw.a / sum, b: raw.b / sum, c: raw.c / sum };
 }
 
 /** Base pressure stored on the character, adjusted manually by the user (0–100). */
@@ -341,8 +634,8 @@ export function effectiveDriftScoreWithInfluence(
 export function computeDriftTarget(values: ValueVector, doubtDirection: DoubtDirection): ValueVector {
   const key = doubtDirection.toLowerCase() as keyof ValueVector;
   const zeroed: ValueVector = { ...values, [key]: 0 };
-  const sum = zeroed.truth + zeroed.stability + zeroed.agency || 1;
-  return { truth: zeroed.truth / sum, stability: zeroed.stability / sum, agency: zeroed.agency / sum };
+  const sum = zeroed.a + zeroed.b + zeroed.c || 1;
+  return { a: zeroed.a / sum, b: zeroed.b / sum, c: zeroed.c / sum };
 }
 
 export interface FactionCompatibility {
@@ -352,24 +645,23 @@ export interface FactionCompatibility {
 
 /**
  * Scores character-to-faction compatibility using the same relationship formula
- * as faction-to-faction scoring (scales 5/3). Belief contributions are derived
- * from the character's value vector unless overrides are set on the character.
+ * as faction-to-faction scoring (scales 5/3). BeliefPosition 'neutral' always counts as buffer (score 0).
  */
 export function scoreFactionCompatibility(
   characterValues: ValueVector,
-  characterBeliefs: { ritual: RitualPosition; knowledge: KnowledgePosition; change: ChangePosition },
+  characterBeliefs: { beliefc: BeliefPosition; beliefa: BeliefPosition; beliefb: BeliefPosition },
   faction: Faction
 ): number {
   const sv = characterValues;
 
-  const ritualScore    = scoreBelief(characterBeliefs.ritual,    faction.ritual,    r => r === 'Neutral',    2.5, -1.0) * sv.agency;
-  const knowledgeScore = scoreBelief(characterBeliefs.knowledge, faction.knowledge, k => k === 'Controlled', 2.5, -1.0) * sv.truth;
-  const changeScore    = scoreBelief(characterBeliefs.change,    faction.change,    () => false,             2.5, -1.0) * sv.stability;
+  const beliefcScore = scoreBelief(characterBeliefs.beliefc, faction.beliefc, r => r === 'neutral', 2.5, -1.0) * sv.c;
+  const beliefaScore = scoreBelief(characterBeliefs.beliefa, faction.beliefa, k => k === 'neutral', 2.5, -1.0) * sv.a;
+  const beliefbScore = scoreBelief(characterBeliefs.beliefb, faction.beliefb, c => c === 'neutral', 2.5, -1.0) * sv.b;
 
   const alignment = dot(sv, faction.values)             * 5;
   const conflict  = dot(sv, inverseVector(faction.values)) * 3;
 
-  return Math.round((ritualScore + knowledgeScore + changeScore + alignment - conflict) * 10) / 10;
+  return Math.round((beliefcScore + beliefaScore + beliefbScore + alignment - conflict) * 10) / 10;
 }
 
 function scoreBelief<T>(
@@ -383,13 +675,16 @@ function scoreBelief<T>(
 }
 
 export function topCompatibleFactions(
-  character: { values: ValueVector; ritual?: RitualPosition; knowledge?: KnowledgePosition; change?: ChangePosition },
-  factions: Faction[]
+  character: { values: ValueVector; beliefc?: BeliefPosition; beliefa?: BeliefPosition; beliefb?: BeliefPosition },
+  factions: Faction[],
+  beliefThreshold = 0.4,
+  axisLabels: BeliefAxisLabels = DEFAULT_BELIEF_AXIS_LABELS
 ): FactionCompatibility[] {
+  const derived = deriveBeliefs(character.values, beliefThreshold, axisLabels);  // axisLabels drives beliefb-axis type only
   const beliefs = {
-    ritual:    character.ritual    ?? deriveBeliefs(character.values).ritual,
-    knowledge: character.knowledge ?? deriveBeliefs(character.values).knowledge,
-    change:    character.change    ?? deriveBeliefs(character.values).change,
+    beliefc:   character.beliefc ?? derived.beliefc,
+    beliefa:   character.beliefa ?? derived.beliefa,
+    beliefb:   character.beliefb ?? derived.beliefb,
   };
   return factions
     .map(f => ({ factionId: f.id, score: scoreFactionCompatibility(character.values, beliefs, f) }))

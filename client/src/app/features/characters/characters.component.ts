@@ -2,7 +2,7 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { AppStore } from '../../store/app.store';
-import { Character, CharacterType, driftScore, effectivePressure, influenceConvictionBonus } from '../../core/models/types';
+import { Character, CharacterType, CharacterState, driftScore, effectivePressure, influenceConvictionBonus } from '../../core/models/types';
 import { downloadCsv, parseCsv, csvHeaderMap } from '../../core/utils/csv-export';
 import { oneOf, clampedInt, sanitizeValueVector } from '../../core/utils/validation';
 
@@ -23,10 +23,10 @@ export class CharactersComponent {
   driftScore = driftScore;
   effectivePressure = effectivePressure;
 
-  readonly colonyStress = computed(() => this.store.colonyState()?.colonyStress ?? 0);
+  readonly colonyStress = computed(() => this.store.viewColonyStress());
 
   readonly displayCharacters = computed(() => {
-    let chars = this.store.characters();
+    let chars = this.store.viewCharacters();
     const type    = this.filterType();
     const faction = this.filterFaction();
     const cls     = this.filterClass();
@@ -39,11 +39,11 @@ export class CharactersComponent {
   });
 
   readonly factionOptions = computed(() =>
-    this.store.factions().filter(f => f.type === 'Faction' && f.active)
+    this.store.viewFactions().filter(f => f.type === 'Faction' && f.active)
   );
 
   readonly socialClassOptions = computed(() =>
-    this.store.factions().filter(f => f.type === 'SocialClass' && f.active)
+    this.store.viewFactions().filter(f => f.type === 'SocialClass' && f.active)
   );
 
   factionName(id?: string): string {
@@ -76,10 +76,22 @@ export class CharactersComponent {
   }
 
   effectiveDriftScore(c: Character): number {
-    const peers = this.store.characters().filter(p => p.factionId && p.factionId === c.factionId && p.id !== c.id);
+    const peers = this.store.viewCharacters().filter(p => p.state === 'Alive' && p.factionId && p.factionId === c.factionId && p.id !== c.id);
     const scale = this.store.rules()?.influenceConvictionScale ?? 0.5;
     const effConv = c.conviction + influenceConvictionBonus(c, peers, scale);
     return effectivePressure(c, this.colonyStress()) - effConv;
+  }
+
+  private readonly stateIconMap: Record<CharacterState, string> = {
+    Alive:     '',
+    Dead:      'fa-solid fa-skull',
+    Missing:   'fa-solid fa-circle-question',
+    Forgotten: 'fa-solid fa-hourglass-start',
+  };
+
+  stateIconClass(state: CharacterState): string {
+    const icon = this.stateIconMap[state];
+    return icon ? `state-icon ${icon} state-icon--${state.toLowerCase()}` : '';
   }
 
   typeLabel(t: CharacterType): string {
@@ -117,18 +129,19 @@ export class CharactersComponent {
           gender:        get(row, 'gender')         || undefined,
           age:           get(row, 'age')            ? Number(get(row, 'age'))    : undefined,
           occupation:    get(row, 'occupation')     || undefined,
-          ritual:        oneOf(get(row, 'ritual'),    ['Good', 'Neutral', 'Bad']              as const),
-          knowledge:     oneOf(get(row, 'knowledge'), ['Hidden', 'Controlled', 'Revealed']   as const),
-          change:        oneOf(get(row, 'change'),    ['Yes', 'No']                           as const),
-          doubtDirection:oneOf(get(row, 'doubtdirection'), ['Truth', 'Stability', 'Agency']  as const),
+          beliefc: oneOf(get(row, 'beliefc'), ['positive', 'neutral', 'negative'] as const),
+          beliefa: oneOf(get(row, 'beliefa'), ['positive', 'neutral', 'negative'] as const),
+          beliefb: oneOf(get(row, 'beliefb'), ['positive', 'negative']             as const),
+          doubtDirection:oneOf(get(row, 'doubtdirection'), ['a', 'b', 'c']  as const),
+          state:         oneOf(get(row, 'state'), ['Alive', 'Dead', 'Missing', 'Forgotten'] as const) ?? 'Alive' as CharacterState,
           conviction:    clampedInt(get(row, 'conviction'),    0, 100, 50),
           pressure:      clampedInt(get(row, 'pressure'),      0, 100, 0),
           influence:     clampedInt(get(row, 'influence'),     0, 100, 0),
           impressionable:clampedInt(get(row, 'impressionable'),0, 100, 50),
           values: sanitizeValueVector(
-            parseFloat(get(row, 'truth')),
-            parseFloat(get(row, 'stability')),
-            parseFloat(get(row, 'agency')),
+            parseFloat(get(row, 'valuea')),
+            parseFloat(get(row, 'valueb')),
+            parseFloat(get(row, 'valuec')),
           ),
           summary: get(row, 'summary') || undefined,
           goals:   get(row, 'goals')   || undefined,
@@ -145,24 +158,24 @@ export class CharactersComponent {
 
   exportCsv(): void {
     const header = [
-      'Id', 'Name', 'Role',
+      'Id', 'Name', 'Role', 'State',
       'FactionId', 'Faction', 'SocialClassId', 'Social Class',
       'Ancestry', 'Heritage', 'Class', 'Background', 'Level',
       'Gender', 'Age', 'Occupation',
-      'Ritual', 'Knowledge', 'Change',
+      'BeliefC', 'BeliefA', 'BeliefB',
       'DoubtDirection', 'Conviction', 'Pressure', 'Influence', 'Impressionable',
-      'Truth', 'Stability', 'Agency',
+      'ValueA', 'ValueB', 'ValueC',
       'Summary', 'Goals', 'Fears', 'Notes'
     ];
     const rows = this.store.characters().map(c => [
-      c.id, c.name, c.characterType,
+      c.id, c.name, c.characterType, c.state,
       c.factionId ?? '', this.factionName(c.factionId),
       c.socialClassId ?? '', this.factionName(c.socialClassId),
       c.ancestry ?? '', c.heritage ?? '', c.class ?? '', c.background ?? '', c.level ?? '',
       c.gender ?? '', c.age ?? '', c.occupation ?? '',
-      c.ritual ?? '', c.knowledge ?? '', c.change ?? '',
+      c.beliefc ?? '', c.beliefa ?? '', c.beliefb ?? '',
       c.doubtDirection ?? '', c.conviction, c.pressure, c.influence, c.impressionable,
-      c.values.truth.toFixed(4), c.values.stability.toFixed(4), c.values.agency.toFixed(4),
+      c.values.a.toFixed(4), c.values.b.toFixed(4), c.values.c.toFixed(4),
       c.summary ?? '', c.goals ?? '', c.fears ?? '', c.notes ?? ''
     ]);
     downloadCsv([header, ...rows], 'characters.csv');

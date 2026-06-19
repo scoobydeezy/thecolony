@@ -27,21 +27,20 @@ export function clampedInt(raw: string, min: number, max: number, fallback: numb
  * weights [0.5, 0.3, 0.2] in that order so the result at least respects the original
  * value priority. NaN / out-of-range inputs are treated as 0 for ranking purposes.
  */
-export function sanitizeValueVector(t: number, s: number, a: number): ValueVector {
+export function sanitizeValueVector(va: number, vb: number, vc: number): ValueVector {
   const inRange = (v: number) => isFinite(v) && v >= 0 && v <= 1;
-  if (inRange(t) && inRange(s) && inRange(a) && Math.abs(t + s + a - 1) < 0.001) {
-    return { truth: t, stability: s, agency: a };
+  if (inRange(va) && inRange(vb) && inRange(vc) && Math.abs(va + vb + vc - 1) < 0.001) {
+    return { a: va, b: vb, c: vc };
   }
 
-  // Rank by original value (treat NaN / out-of-range as 0) to preserve priority intent.
   const entries: Array<[keyof ValueVector, number]> = [
-    ['truth',     inRange(t) ? t : 0],
-    ['stability', inRange(s) ? s : 0],
-    ['agency',    inRange(a) ? a : 0],
+    ['a', inRange(va) ? va : 0],
+    ['b', inRange(vb) ? vb : 0],
+    ['c', inRange(vc) ? vc : 0],
   ];
   entries.sort((x, y) => y[1] - x[1]);
 
-  const result: ValueVector = { truth: 0, stability: 0, agency: 0 };
+  const result: ValueVector = { a: 0, b: 0, c: 0 };
   entries.forEach(([key], i) => { result[key] = PRIORITY_WEIGHTS[i]; });
   return result;
 }

@@ -1,6 +1,6 @@
 <div class="page-header">
-  <div class="header-left">
-    <a routerLink="/characters" class="back-link">← Characters</a>
+  <a routerLink="/characters" class="back-link">← Characters</a>
+  <div class="header-row">
     <h2>
       {{ editMode() ? (editForm().name || 'New Character') : character().name }}
       @if (!editMode()) {
@@ -11,14 +11,24 @@
         </span>
       }
     </h2>
-  </div>
-  <div class="header-actions">
-    @if (!editMode()) {
-      <button class="btn btn-primary" (click)="enterEditMode()">Edit</button>
-    } @else {
-      <button class="btn btn-primary" (click)="save()">Save</button>
-      <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
-    }
+    <div class="header-right">
+      @if (!editMode() && character().state !== 'Alive') {
+        <h2 [class]="stateHeadingClass(character().state)">
+          <i [class]="stateIconClass(character().state)"></i>
+          {{ character().state }}
+        </h2>
+      }
+      <div class="header-actions">
+        @if (!editMode()) {
+          @if (!store.isViewingSnapshot()) {
+            <button class="btn btn-primary" (click)="enterEditMode()">Edit</button>
+          }
+        } @else {
+          <button class="btn btn-primary" (click)="save()">Save</button>
+          <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+        }
+      </div>
+    </div>
   </div>
 </div>
 
@@ -42,6 +52,14 @@
           <select [formField]="f.characterType">
             @for (opt of roleOptions; track opt.value) {
               <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label>State</label>
+          <select [formField]="f.state">
+            @for (s of stateOptions; track s) {
+              <option [value]="s">{{ s }}</option>
             }
           </select>
         </div>
@@ -116,6 +134,7 @@
             [driftTarget]="editDriftTarget()"
             [conviction]="editEffectiveConviction()"
             [pressure]="editPressure()"
+            [valueLabels]="store.valueLabels()"
             (valuesChange)="editValues.set($event)"
           />
         </div>
@@ -145,29 +164,29 @@
             <label>Belief Overrides <span class="optional-label">(override derived beliefs)</span></label>
             <div class="belief-override-row">
               <div class="form-group">
-                <label>Ritual</label>
-                <select [formField]="f.ritual">
+                <label>{{ axisName('c') }}</label>
+                <select [formField]="f.beliefc">
                   <option value="">— Derived —</option>
-                  @for (opt of ritualOptions; track opt) {
-                    <option [value]="opt">{{ opt }}</option>
+                  @for (opt of beliefcOptions(); track opt) {
+                    <option [value]="opt">{{ beliefLabel('c',opt) }}</option>
                   }
                 </select>
               </div>
               <div class="form-group">
-                <label>Knowledge</label>
-                <select [formField]="f.knowledge">
+                <label>{{ axisName('a') }}</label>
+                <select [formField]="f.beliefa">
                   <option value="">— Derived —</option>
-                  @for (opt of knowledgeOptions; track opt) {
-                    <option [value]="opt">{{ opt }}</option>
+                  @for (opt of beliefaOptions(); track opt) {
+                    <option [value]="opt">{{ beliefLabel('a',opt) }}</option>
                   }
                 </select>
               </div>
               <div class="form-group">
-                <label>Change</label>
-                <select [formField]="f.change">
+                <label>{{ axisName('b') }}</label>
+                <select [formField]="f.beliefb">
                   <option value="">— Derived —</option>
-                  @for (opt of changeOptions; track opt) {
-                    <option [value]="opt">{{ opt }}</option>
+                  @for (opt of beliefbOptions(); track opt) {
+                    <option [value]="opt">{{ beliefLabel('b',opt) }}</option>
                   }
                 </select>
               </div>
@@ -178,7 +197,7 @@
             <select [formField]="f.doubtDirection">
               <option value="">None</option>
               @for (d of doubtDirections; track d) {
-                <option [value]="d">{{ d }}</option>
+                <option [value]="d">{{ doubtLabel(d) }}</option>
               }
             </select>
           </div>
@@ -195,12 +214,12 @@
           </div>
           <div class="belief-override-row two-col">
             <div class="form-group">
-              <label>Influence (0–100)</label>
-              <input type="number" [formField]="f.influence" />
-            </div>
-            <div class="form-group">
               <label>Impressionable (0–100)</label>
               <input type="number" [formField]="f.impressionable" />
+            </div>
+            <div class="form-group">
+              <label>Influence (0–100)</label>
+              <input type="number" [formField]="f.influence" />
             </div>
             <p class="pressure-hint">Influence stabilizes faction-mates' conviction. Impressionable controls how much others' influence affects this character.</p>
           </div>
@@ -278,6 +297,50 @@
       </div>
     </div>
 
+    <!-- Narrative -->
+    @if (character().summary || character().goals || character().fears || character().notes || factionToPartyRelationship() || characterToPartyRelationship()) {
+      <div class="card narrative-card">
+        <h3 class="section-title">Narrative</h3>
+        <div class="narrative-layout">
+          <div class="narrative-text-col">
+            <div class="narrative-grid">
+              @if (character().summary) {
+                <div class="narrative-block"><span class="narrative-label">Summary</span><p>{{ character().summary }}</p></div>
+              }
+              @if (character().goals) {
+                <div class="narrative-block"><span class="narrative-label">Goals</span><p>{{ character().goals }}</p></div>
+              }
+              @if (character().fears) {
+                <div class="narrative-block"><span class="narrative-label">Fears</span><p>{{ character().fears }}</p></div>
+              }
+              @if (character().notes) {
+                <div class="narrative-block"><span class="narrative-label">Notes</span><p>{{ character().notes }}</p></div>
+              }
+            </div>
+          </div>
+          @if (factionToPartyRelationship() || characterToPartyRelationship()) {
+            <div class="narrative-party-col">
+              <span class="narrative-label">Relationship to {{ partyName() }}</span>
+              <div class="party-rel-row">
+                @if (characterToPartyRelationship(); as cpr) {
+                  <div class="party-rel-group">
+                    <i class="fa-solid fa-user party-rel-icon"></i>
+                    <span class="badge badge-{{ cpr.label.toLowerCase() }}">{{ cpr.label }}</span>
+                  </div>
+                }
+                @if (factionToPartyRelationship(); as fpr) {
+                  <div class="party-rel-group">
+                    <i class="fa-solid fa-people-group party-rel-icon"></i>
+                    <span class="badge badge-{{ fpr.label.toLowerCase() }}">{{ fpr.label }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
     <!-- Values + Doubt stacked in left column -->
     <div class="values-doubt-col">
 
@@ -292,6 +355,7 @@
         [driftTarget]="driftTarget()"
         [conviction]="effectiveConvictionValue()"
         [pressure]="effectivePressureValue()"
+        [valueLabels]="store.valueLabels()"
       />
     </div>
 
@@ -301,7 +365,7 @@
       <div class="detail-grid">
         <div class="detail-item">
           <span class="detail-label">Doubt Vector</span>
-          <span class="doubt-value">{{ character().doubtDirection ?? '—' }}</span>
+          <span class="doubt-value">{{ doubtLabel(character().doubtDirection) }}</span>
         </div>
         <div class="detail-item">
           <span class="detail-label">Drift Score</span>
@@ -346,9 +410,9 @@
         @let eds = effectivePressureValue() - effectiveConvictionValue();
         <div class="doubt-analysis">
           <span class="detail-label">Doubts</span>
-          <span class="doubt-direction">{{ character().doubtDirection }}</span>
+          <span class="doubt-direction">{{ doubtLabel(character().doubtDirection) }}</span>
           @if (eds > 0) {
-            <span class="drift-note">Drift Score +{{ eds | number:'1.0-1' }} — under pressure toward {{ character().doubtDirection === 'Truth' ? 'hidden knowledge' : character().doubtDirection === 'Stability' ? 'embracing change' : 'collective ritual' }}.</span>
+            <span class="drift-note">Drift Score +{{ eds | number:'1.0-1' }} — belief about {{ axisName(character().doubtDirection!) }} under pressure.</span>
           }
         </div>
       }
@@ -361,19 +425,19 @@
 
           <div class="beliefs-pills-row">
             <div class="belief-item">
-              <span class="belief-label">Ritual</span>
-              <span class="belief-val ritual-{{ derivedBeliefs().ritual.toLowerCase() }}">{{ derivedBeliefs().ritual }}</span>
-              @if (character().ritual) { <span class="override-badge">override</span> }
+              <span class="belief-label">{{ axisName('c') }}</span>
+              <span class="belief-val {{ beliefClass('c', derivedBeliefs().beliefc) }}">{{ beliefLabel('c',derivedBeliefs().beliefc) }}</span>
+              @if (character().beliefc) { <span class="override-badge">override</span> }
             </div>
             <div class="belief-item">
-              <span class="belief-label">Knowledge</span>
-              <span class="belief-val knowledge-{{ derivedBeliefs().knowledge.toLowerCase() }}">{{ derivedBeliefs().knowledge }}</span>
-              @if (character().knowledge) { <span class="override-badge">override</span> }
+              <span class="belief-label">{{ axisName('a') }}</span>
+              <span class="belief-val {{ beliefClass('a', derivedBeliefs().beliefa) }}">{{ beliefLabel('a',derivedBeliefs().beliefa) }}</span>
+              @if (character().beliefa) { <span class="override-badge">override</span> }
             </div>
             <div class="belief-item">
-              <span class="belief-label">Change</span>
-              <span class="belief-val change-{{ derivedBeliefs().change.toLowerCase() }}">{{ derivedBeliefs().change }}</span>
-              @if (character().change) { <span class="override-badge">override</span> }
+              <span class="belief-label">{{ axisName('b') }}</span>
+              <span class="belief-val {{ beliefClass('b', derivedBeliefs().beliefb) }}">{{ beliefLabel('b',derivedBeliefs().beliefb) }}</span>
+              @if (character().beliefb) { <span class="override-badge">override</span> }
             </div>
           </div>
 
@@ -413,31 +477,31 @@
 
             <div class="beliefs-pills-row">
               <div class="belief-item"
-                [class.changed-belief]="driftedBeliefChanges().ritual"
+                [class.changed-belief]="driftedBeliefChanges().beliefc"
               >
-                <span class="belief-label">Ritual</span>
-                <span class="belief-val ritual-{{ driftedBeliefs().ritual.toLowerCase() }}">
-                  {{ driftedBeliefs().ritual }}
+                <span class="belief-label">{{ axisName('c') }}</span>
+                <span class="belief-val {{ beliefClass('c', driftedBeliefs().beliefc) }}">
+                  {{ beliefLabel('c', driftedBeliefs().beliefc) }}
                 </span>
-                @if (character().ritual) { <span class="override-badge">override</span> }
+                @if (character().beliefc) { <span class="override-badge">override</span> }
               </div>
               <div class="belief-item"
-                [class.changed-belief]="driftedBeliefChanges().knowledge"
+                [class.changed-belief]="driftedBeliefChanges().beliefa"
               >
-                <span class="belief-label">Knowledge</span>
-                <span class="belief-val knowledge-{{ driftedBeliefs().knowledge.toLowerCase() }}">
-                  {{ driftedBeliefs().knowledge }}
+                <span class="belief-label">{{ axisName('a') }}</span>
+                <span class="belief-val {{ beliefClass('a', driftedBeliefs().beliefa) }}">
+                  {{ beliefLabel('a', driftedBeliefs().beliefa) }}
                 </span>
-                @if (character().knowledge) { <span class="override-badge">override</span> }
+                @if (character().beliefa) { <span class="override-badge">override</span> }
               </div>
               <div class="belief-item"
-                [class.changed-belief]="driftedBeliefChanges().change"
+                [class.changed-belief]="driftedBeliefChanges().beliefb"
               >
-                <span class="belief-label">Change</span>
-                <span class="belief-val change-{{ driftedBeliefs().change.toLowerCase() }}">
-                  {{ driftedBeliefs().change }}
+                <span class="belief-label">{{ axisName('b') }}</span>
+                <span class="belief-val {{ beliefClass('b', driftedBeliefs().beliefb) }}">
+                  {{ beliefLabel('b', driftedBeliefs().beliefb) }}
                 </span>
-                @if (character().change) { <span class="override-badge">override</span> }
+                @if (character().beliefb) { <span class="override-badge">override</span> }
               </div>
             </div>
 
@@ -475,25 +539,6 @@
 
       </div>
     </div>
-
-    <!-- Narrative -->
-    @if (character().summary || character().goals || character().fears || character().notes) {
-      <div class="card narrative-card">
-        <h3 class="section-title">Narrative</h3>
-        @if (character().summary) {
-          <div class="narrative-block"><span class="narrative-label">Summary</span><p>{{ character().summary }}</p></div>
-        }
-        @if (character().goals) {
-          <div class="narrative-block"><span class="narrative-label">Goals</span><p>{{ character().goals }}</p></div>
-        }
-        @if (character().fears) {
-          <div class="narrative-block"><span class="narrative-label">Fears</span><p>{{ character().fears }}</p></div>
-        }
-        @if (character().notes) {
-          <div class="narrative-block"><span class="narrative-label">Notes</span><p>{{ character().notes }}</p></div>
-        }
-      </div>
-    }
 
   </div>
 }

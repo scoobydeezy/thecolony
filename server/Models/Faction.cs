@@ -12,9 +12,9 @@ public class Faction
     public string AfraidOf { get; set; } = string.Empty;
     public string WrongAbout { get; set; } = string.Empty;
     public string SingleSentence { get; set; } = string.Empty;
-    public RitualPosition? Ritual { get; set; }
-    public KnowledgePosition? Knowledge { get; set; }
-    public ChangePosition? Change { get; set; }
+    public BeliefPosition? BeliefC { get; set; }
+    public BeliefPosition? BeliefA { get; set; }
+    public BeliefPosition? BeliefB { get; set; }
     public double TruthValue { get; set; } = 1.0 / 3;
     public double StabilityValue { get; set; } = 1.0 / 3;
     public double AgencyValue { get; set; } = 1.0 / 3;
