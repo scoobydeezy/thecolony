@@ -515,24 +515,6 @@ export const AppStore = signalStore(
       )
     ),
 
-    // Stress-over-time for the timeline chart
-    stressTimeline: computed((): { sessionNumber: number; sessionTitle: string; stress: number }[] => {
-      const sessions = [...store.sessions()].sort((a, b) => a.number - b.number);
-      const baseline = store.colonyState();
-      if (!baseline || sessions.length === 0) return [];
-      let stress = baseline.colonyStress;
-      return sessions.map(session => {
-        for (const ev of [...(session.events ?? [])].sort((a, b) => a.sortOrder - b.sortOrder)) {
-          for (const ef of ev.effects) {
-            if (ef.targetType === 'colony' && ef.property === 'stress') {
-              stress = Math.max(0, Math.min(10, stress + ef.delta));
-            }
-          }
-        }
-        return { sessionNumber: session.number, sessionTitle: session.title, stress };
-      });
-    }),
-
     // ── View-context helpers ───────────────────────────────────────────────
     isViewingSnapshot: computed(() => store.viewingContext() !== 'baseline'),
 

@@ -85,7 +85,25 @@ public class ScoringEngine : IScoringEngine
         double alignment = rules.PositiveEnabled ? alignmentRaw : 0;
         double conflict  = rules.NegativeEnabled ? conflictRaw  : 0;
 
-        double baseScore     = Math.Round(beliefcContrib + beliefaContrib + beliefbContrib + alignment - conflict, 1);
+        double beliefSubScore = beliefcContrib + beliefaContrib + beliefbContrib;
+        double valueSubScore  = alignment - conflict;
+
+        // Stress-weight scaling: shifts composition from belief-driven to value-driven as stress rises.
+        // Both sub-scores remain additive; only their relative weight changes.
+        double beliefScale = 1.0;
+        double valueScale  = 1.0;
+        double stressWeight = 0.0;
+
+        if (rules.StressWeightEnabled)
+        {
+            const double maxStress = 10.0;
+            double t = Math.Clamp(colonyStress / maxStress, 0, 1);
+            stressWeight = ApplyCurve(t, rules.StressWeightCurve) * rules.StressWeightIntensity;
+            beliefScale  = 1.0 - stressWeight;
+            valueScale   = 1.0 + stressWeight;
+        }
+
+        double baseScore     = Math.Round(beliefSubScore * beliefScale + valueSubScore * valueScale, 1);
         double stressedScore = Math.Round(ApplyStress(baseScore, colonyStress, rules), 1);
         double finalScore    = Math.Round(stressedScore + manualBump, 1);
 
@@ -100,11 +118,14 @@ public class ScoringEngine : IScoringEngine
             Label = GetLabel(finalScore, rules).ToString(),
             Contributions = new RelationshipContributionsDto
             {
-                BeliefC = Math.Round(beliefcContrib, 1),
-                BeliefA = Math.Round(beliefaContrib, 1),
-                BeliefB = Math.Round(beliefbContrib, 1),
+                BeliefC        = Math.Round(beliefcContrib, 1),
+                BeliefA        = Math.Round(beliefaContrib, 1),
+                BeliefB        = Math.Round(beliefbContrib, 1),
                 ValueAlignment = Math.Round(alignment, 1),
-                ValueConflict  = Math.Round(-conflict, 1)
+                ValueConflict  = Math.Round(-conflict, 1),
+                BeliefSubScore = Math.Round(beliefSubScore, 1),
+                ValueSubScore  = Math.Round(valueSubScore, 1),
+                StressWeight   = Math.Round(stressWeight, 3)
             }
         };
     }
@@ -129,6 +150,15 @@ public class ScoringEngine : IScoringEngine
 
     private static double Dot(double at, double as_, double aa, double bt, double bs, double ba)
         => at * bt + as_ * bs + aa * ba;
+
+    // t in [0,1] → curve output in [0,1]
+    private static double ApplyCurve(double t, StressWeightCurve curve) => curve switch
+    {
+        StressWeightCurve.Quadratic   => t * t,
+        StressWeightCurve.Cubic       => t * t * t,
+        StressWeightCurve.Exponential => (Math.Exp(t) - 1) / (Math.E - 1),
+        _                             => t   // Linear
+    };
 
     // Positive multiplier fades out as stress rises; negative fades in — tilt across 0–10.
     private static double ApplyStress(double score, int colonyStress, RulesConfig rules)

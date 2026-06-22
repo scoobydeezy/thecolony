@@ -57,7 +57,7 @@
   </div>
 </div>
 
-<!-- ── Legend + Thresholds ────────────────────────────────────────────────── -->
+<!-- ── Legend ──────────────────────────────────────────────────────────────── -->
 <div class="legend card" style="margin-top:1rem">
   <span class="legend-title">Legend:</span>
   <span class="badge badge-aligned">Aligned</span>
@@ -67,9 +67,6 @@
   <span class="badge badge-strained">Strained</span>
   <span class="badge badge-opposed">Opposed</span>
   <span class="badge badge-hostile">Hostile</span>
-  @if (!store.isViewingSnapshot()) {
-    <button class="btn btn-secondary btn-sm legend-edit-btn" (click)="openThresholds()">Edit Thresholds</button>
-  }
 </div>
 
 <!-- ── Manual Overrides ───────────────────────────────────────────────────── -->
@@ -109,125 +106,24 @@
   }
 </div>
 
-@if (rules(); as r) {
-
-  <!-- ── Tuners ─────────────────────────────────────────────────────────── -->
-  <div class="tuner-row" style="margin-bottom:1rem" [class.tuner-readonly]="store.isViewingSnapshot()">
-
-    <div class="card tuner-card" [class.tuner-disabled]="!r.positiveEnabled">
-      <div class="tuner-header positive">
-        Positive Relationships
-        <label class="tuner-toggle" title="Enable positive relationship scoring">
-          <input type="checkbox"
-            [checked]="r.positiveEnabled"
-            [disabled]="store.isViewingSnapshot()"
-            (change)="setRuleBool('positiveEnabled', $any($event.target).checked)" />
-          <span class="toggle-track"></span>
-        </label>
-      </div>
-      <div class="tuner-group">
-        <label class="tuner-label">Value Match Scale</label>
-        <div class="tuner-control">
-          <input type="range" min="0" max="10" step="0.5"
-            [value]="r.valueAlignmentScale"
-            [disabled]="!r.positiveEnabled || store.isViewingSnapshot()"
-            (input)="setRule('valueAlignmentScale', $any($event.target).value)" />
-          <span class="tuner-val">{{ r.valueAlignmentScale | number:'1.1-1' }}</span>
-        </div>
-      </div>
-      <div class="tuner-group">
-        <label class="tuner-label">Belief Match</label>
-        <div class="tuner-control">
-          <input type="range" min="0" max="3" step="0.1"
-            [value]="r.beliefMatch"
-            [disabled]="!r.positiveEnabled || store.isViewingSnapshot()"
-            (input)="setRule('beliefMatch', $any($event.target).value)" />
-          <span class="tuner-val">{{ r.beliefMatch | number:'1.2-2' }}</span>
-        </div>
-      </div>
-      <div class="tuner-group">
-        <label class="tuner-label">Positive Stress Multiplier</label>
-        <div class="tuner-control">
-          <input type="range" min="0" max="0.5" step="0.05"
-            [value]="r.stressPositiveMultiplierPerPoint"
-            [disabled]="!r.positiveEnabled || store.isViewingSnapshot()"
-            (input)="setRule('stressPositiveMultiplierPerPoint', $any($event.target).value)" />
-          <span class="tuner-val">{{ r.stressPositiveMultiplierPerPoint | number:'1.2-2' }}</span>
-        </div>
-      </div>
+<!-- ── Stress ──────────────────────────────────────────────────────────────── -->
+<div class="card tuner-card tuner-card-stress">
+  <div class="tuner-header stress-header">Colony Stress</div>
+  <div class="tuner-group">
+    <div class="tuner-control">
+      <input type="range" min="0" max="10" step="1"
+        [value]="stress"
+        [disabled]="store.isViewingSnapshot()"
+        (input)="setStress(+$any($event.target).value)" />
+      <span class="stress-value" [class]="stress >= 7 ? 'danger' : stress >= 4 ? 'warn' : 'ok'">
+        {{ stress }} / 10
+      </span>
     </div>
-
-    <div class="card tuner-card" [class.tuner-disabled]="!r.negativeEnabled">
-      <div class="tuner-header negative">
-        Negative Relationships
-        <label class="tuner-toggle" title="Enable negative relationship scoring">
-          <input type="checkbox"
-            [checked]="r.negativeEnabled"
-            [disabled]="store.isViewingSnapshot()"
-            (change)="setRuleBool('negativeEnabled', $any($event.target).checked)" />
-          <span class="toggle-track"></span>
-        </label>
-      </div>
-      <div class="tuner-group">
-        <label class="tuner-label">Value Conflict Scale</label>
-        <div class="tuner-control">
-          <input type="range" min="0" max="10" step="0.5"
-            [value]="r.valueConflictScale"
-            [disabled]="!r.negativeEnabled || store.isViewingSnapshot()"
-            (input)="setRule('valueConflictScale', $any($event.target).value)" />
-          <span class="tuner-val">{{ r.valueConflictScale | number:'1.1-1' }}</span>
-        </div>
-      </div>
-      <div class="tuner-group">
-        <label class="tuner-label">Belief Conflict</label>
-        <div class="tuner-control">
-          <input type="range" min="-3" max="0" step="0.1"
-            [value]="r.beliefConflict"
-            [disabled]="!r.negativeEnabled || store.isViewingSnapshot()"
-            (input)="setRule('beliefConflict', $any($event.target).value)" />
-          <span class="tuner-val">{{ r.beliefConflict | number:'1.2-2' }}</span>
-        </div>
-      </div>
-      <div class="tuner-group">
-        <label class="tuner-label">Negative Stress Multiplier</label>
-        <div class="tuner-control">
-          <input type="range" min="0" max="0.5" step="0.05"
-            [value]="r.stressNegativeMultiplierPerPoint"
-            [disabled]="!r.negativeEnabled || store.isViewingSnapshot()"
-            (input)="setRule('stressNegativeMultiplierPerPoint', $any($event.target).value)" />
-          <span class="tuner-val">{{ r.stressNegativeMultiplierPerPoint | number:'1.2-2' }}</span>
-        </div>
-      </div>
-    </div>
-
+    @if (store.isViewingSnapshot()) {
+      <p class="tuner-snapshot-note">Showing snapshot stress. Edit baseline to change.</p>
+    }
   </div>
-
-  <!-- ── Stress ─────────────────────────────────────────────────────────── -->
-  <div class="card tuner-card tuner-card-stress">
-    <div class="tuner-header stress-header">Colony Stress</div>
-    <div class="tuner-group">
-      <div class="tuner-control">
-        <input type="range" min="0" max="10" step="1"
-          [value]="stress"
-          [disabled]="store.isViewingSnapshot()"
-          (input)="setStress(+$any($event.target).value)" />
-        <span class="stress-value" [class]="stress >= 7 ? 'danger' : stress >= 4 ? 'warn' : 'ok'">
-          {{ stress }} / 10
-        </span>
-      </div>
-      @if (store.isViewingSnapshot()) {
-        <p class="tuner-snapshot-note">Showing snapshot stress. Edit baseline to change.</p>
-      }
-    </div>
-  </div>
-
-  @if (!store.isViewingSnapshot()) {
-    <div class="tuner-reset-row">
-      <button class="btn btn-secondary btn-sm" (click)="resetRules()">Reset to defaults</button>
-    </div>
-  }
-  
-}
+</div>
 
 <!-- ── Score Breakdown Modal ─────────────────────────────────────────────── -->
 @if (selectedBreakdown(); as r) {
@@ -269,40 +165,6 @@
       </div>
       <div class="modal-actions">
         <button class="btn btn-secondary" (click)="closeBreakdown()">Close</button>
-      </div>
-    </div>
-  </div>
-}
-
-<!-- ── Threshold Editor Modal ─────────────────────────────────────────────── -->
-@if (editingThresholds()) {
-  <div class="modal-backdrop" (click)="closeThresholds()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <h3>Edit Relationship Thresholds</h3>
-      <p class="help-text" style="margin-bottom:1rem">
-        Each label applies when the final score is at or above its minimum.
-      </p>
-      <table class="threshold-table">
-        <thead>
-          <tr><th>Label</th><th>Min Score</th></tr>
-        </thead>
-        <tbody>
-          @for (t of thresholdEdits(); track t.label; let i = $index) {
-            <tr>
-              <td><span [class]="labelClass(t.label)">{{ t.label }}</span></td>
-              <td>
-                <input type="number" step="1"
-                  [value]="t.minScore"
-                  (input)="setThresholdScore(i, $any($event.target).value)"
-                  class="threshold-input" />
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-      <div class="modal-actions">
-        <button class="btn btn-secondary" (click)="closeThresholds()">Cancel</button>
-        <button class="btn btn-primary" (click)="saveThresholds()">Save</button>
       </div>
     </div>
   </div>

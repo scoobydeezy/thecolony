@@ -81,6 +81,17 @@
   }
 }
 
+.axis-alignment-caption {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.6rem;
+  margin-bottom: 0;
+  font-style: italic;
+  text-align: right;
+
+  strong { font-style: normal; color: var(--text-secondary); }
+}
+
 .label-section-desc {
   font-size: 0.78rem;
   color: var(--text-muted);
@@ -128,6 +139,35 @@
   &.muted     { color: var(--text-muted); font-weight: 400; }
   &.conflict-pos { color: var(--color-belief-statusquo); }
   &.conflict-neg { color: var(--color-belief-dissent); }
+}
+
+.formula-row {
+  margin-bottom: 0.75rem;
+}
+
+.formula {
+  display: block;
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.78rem;
+  color: var(--accent);
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.label-row input[type=number] {
+  width: 80px;
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.35rem 0.5rem;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  text-align: center;
+  outline: none;
+  &:focus { border-color: var(--accent); }
 }
 
 .save-bar {

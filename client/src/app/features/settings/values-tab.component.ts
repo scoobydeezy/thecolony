@@ -1,7 +1,7 @@
 import { Component, inject, signal, effect } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AppStore } from '../../store/app.store';
-import { ValueLabels, BeliefAxisLabels, BeliefAxisConfig, DEFAULT_VALUE_LABELS, DEFAULT_BELIEF_AXIS_LABELS } from '../../core/models/types';
+import { ValueLabels, BeliefAxisLabels, BeliefAxisConfig, DEFAULT_VALUE_LABELS, DEFAULT_BELIEF_AXIS_LABELS, DEFAULT_FORMULAS } from '../../core/models/types';
 
 @Component({
   selector: 'app-values-tab',
@@ -19,8 +19,18 @@ export class ValuesTabComponent {
     b: { ...DEFAULT_BELIEF_AXIS_LABELS.b },
     c: { ...DEFAULT_BELIEF_AXIS_LABELS.c },
   });
+  beliefDerivationThreshold = signal<number>(DEFAULT_FORMULAS.beliefDerivationThreshold);
 
   saved = signal(false);
+
+  get beliefDerivationExample(): string {
+    const axis = this.beliefAxisLabels().a;
+    const vals = this.valueLabels();
+    const posVal = axis.positiveAligns ? vals.a : vals.c;
+    const negVal = axis.positiveAligns ? vals.c : vals.a;
+    const n = axis.axisName.toLowerCase();
+    return `${n} = ${posVal.toLowerCase()} ≥ threshold ? ${axis.positive} : ${negVal.toLowerCase()} ≥ threshold ? ${axis.negative} : ${axis.neutral}`;
+  }
 
   constructor() {
     effect(() => {
@@ -31,6 +41,7 @@ export class ValuesTabComponent {
         b: { ...bal.b },
         c: { ...bal.c },
       });
+      this.beliefDerivationThreshold.set(this.store.formulas().beliefDerivationThreshold);
     });
   }
 
@@ -59,10 +70,12 @@ export class ValuesTabComponent {
   save(): void {
     const rules = this.store.rules();
     if (!rules) return;
+    const formulas = { ...this.store.formulas(), beliefDerivationThreshold: this.beliefDerivationThreshold() };
     this.store.saveRules({
       ...rules,
       valueLabelsJson: JSON.stringify(this.valueLabels()),
       beliefAxisLabelsJson: JSON.stringify(this.beliefAxisLabels()),
+      formulasJson: JSON.stringify(formulas),
     });
     this.saved.set(true);
     setTimeout(() => this.saved.set(false), 1500);
@@ -76,6 +89,7 @@ export class ValuesTabComponent {
       b: { ...DEFAULT_BELIEF_AXIS_LABELS.b },
       c: { ...DEFAULT_BELIEF_AXIS_LABELS.c },
     });
+    this.beliefDerivationThreshold.set(DEFAULT_FORMULAS.beliefDerivationThreshold);
     this.save();
   }
 }

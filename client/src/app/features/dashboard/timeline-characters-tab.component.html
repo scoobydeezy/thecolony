@@ -1,0 +1,39 @@
+<div class="tab-controls">
+  <select [value]="selectorMode()" (change)="selectorMode.set($any($event.target).value)">
+    <option value="allLeaders">All Leaders</option>
+    <option value="single">Single Character</option>
+    @for (f of activeFactions(); track f.id) {
+      <option [value]="f.id">{{ f.name }} Members</option>
+    }
+  </select>
+
+  @if (showCharacterPicker()) {
+    <select [value]="selectedCharacterId()" (change)="selectedCharacterId.set($any($event.target).value)">
+      @for (c of allCharacters(); track c.id) {
+        <option [value]="c.id">{{ c.name }}</option>
+      }
+    </select>
+  }
+
+  <select [value]="selectedMetric()" (change)="selectedMetric.set($any($event.target).value)">
+    @for (m of metrics; track m.value) {
+      <option [value]="m.value">{{ m.label }}</option>
+    }
+  </select>
+
+
+</div>
+<div class="chart-wrap">
+  <canvas baseChart
+    type="line"
+    [data]="chartData()"
+    [options]="chartOptions()">
+  </canvas>
+  @if (markerTooltip(); as tip) {
+    <div class="marker-tooltip" [class.flip]="tip.flip" [style.left.px]="tip.x" [style.top.px]="tip.y">
+      @for (line of tip.lines; track line) {
+        <div>{{ line }}</div>
+      }
+    </div>
+  }
+</div>

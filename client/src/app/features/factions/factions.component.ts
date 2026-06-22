@@ -297,7 +297,7 @@ export class FactionsComponent {
     const alignedLabel = cfg[alignedPos];
     const vl = this.store.valueLabels();
     const valueLabel = vl[axisKey];
-    return `${valueLabel} expects ${alignedLabel} on ${cfg.axisName}`;
+    return `High ${valueLabel} expects ${alignedLabel} on ${cfg.axisName}`;
   }
 
   // Drag state — tracked by faction id.

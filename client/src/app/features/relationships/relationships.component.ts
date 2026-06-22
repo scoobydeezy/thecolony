@@ -1,20 +1,13 @@
-import { Component, inject, signal, computed, effect } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DecimalPipe } from '@angular/common';
-import { Subject } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
 import { AppStore } from '../../store/app.store';
-import {
-  Faction, RelationshipBreakdown, RulesConfig, RelationshipThreshold, RelationshipLabel
-} from '../../core/models/types';
+import { RelationshipBreakdown } from '../../core/models/types';
 import { downloadCsv } from '../../core/utils/csv-export';
-
-const LABELS: RelationshipLabel[] = ['Aligned', 'Cooperative', 'Friendly', 'Tolerated', 'Strained', 'Opposed', 'Hostile'];
 
 @Component({
   selector: 'app-relationships',
   standalone: true,
-  imports: [FormsModule, DecimalPipe],
+  imports: [FormsModule],
   templateUrl: './relationships.component.html',
   styleUrl: './relationships.component.scss'
 })
@@ -25,21 +18,6 @@ export class RelationshipsComponent {
   selectedBreakdown = signal<RelationshipBreakdown | null>(null);
   factions = computed(() => this.store.viewFactions().filter(f => f.active && f.type === 'Faction'));
 
-  // ── Rules editing ─────────────────────────────────────────────────────────
-  rules = signal<RulesConfig | null>(null);
-  private saveRules$ = new Subject<RulesConfig>();
-
-  // ── Threshold editing ─────────────────────────────────────────────────────
-  editingThresholds = signal(false);
-  thresholdEdits = signal<RelationshipThreshold[]>([]);
-
-  parsedThresholds = computed<RelationshipThreshold[]>(() => {
-    try { return JSON.parse(this.rules()?.thresholdsJson ?? '[]'); }
-    catch { return []; }
-  });
-
-  readonly labelOptions = LABELS;
-
   // ── Override modal ────────────────────────────────────────────────────────
   showOverrideModal = signal(false);
   overrideSourceId = signal('');
@@ -48,26 +26,9 @@ export class RelationshipsComponent {
   overrideNotes = signal('');
   overrideEditId = signal<string | null>(null);
 
-  constructor() {
-    // Seed local rules copy from store once loaded
-    effect(() => {
-      const r = this.store.rules();
-      if (r && !this.rules()) this.rules.set({ ...r });
-    });
-
-    // Debounced auto-save — 600ms after last change
-    this.saveRules$.pipe(debounceTime(600)).subscribe(r => {
-      this.store.saveRules(r);
-    });
-  }
-
   // ── Stress ────────────────────────────────────────────────────────────────
   get stress(): number {
     return this.store.viewColonyStress();
-  }
-
-  get baselineStress(): number {
-    return this.store.colonyState()?.colonyStress ?? 0;
   }
 
   setStress(value: number): void {
@@ -76,68 +37,7 @@ export class RelationshipsComponent {
     this.store.saveColonyState({ ...cs, colonyStress: value });
   }
 
-  // ── Rules field helpers ───────────────────────────────────────────────────
-  setRule(key: keyof RulesConfig, raw: string): void {
-    const value = parseFloat(raw);
-    if (isNaN(value)) return;
-    const updated = { ...this.rules()!, [key]: value };
-    this.rules.set(updated);
-    this.saveRules$.next(updated);
-  }
-
-  setRuleBool(key: 'positiveEnabled' | 'negativeEnabled', value: boolean): void {
-    const updated = { ...this.rules()!, [key]: value };
-    this.rules.set(updated);
-    this.saveRules$.next(updated);
-  }
-
-  resetRules(): void {
-    if (!confirm('Reset all rules to defaults?')) return;
-    const defaults: RulesConfig = {
-      ...this.rules()!,
-      beliefMatch: 2.5,
-      beliefConflict: -1.0,
-      valueAlignmentScale: 5,
-      valueConflictScale: 3,
-      stressPositiveMultiplierPerPoint: 0.25,
-      stressNegativeMultiplierPerPoint: 0.35,
-      positiveEnabled: true,
-      negativeEnabled: true,
-    };
-    this.rules.set(defaults);
-    this.saveRules$.next(defaults);
-  }
-
-  // ── Threshold editing ─────────────────────────────────────────────────────
-  openThresholds(): void {
-    this.thresholdEdits.set(
-      [...this.parsedThresholds()].sort((a, b) => b.minScore - a.minScore)
-    );
-    this.editingThresholds.set(true);
-  }
-
-  closeThresholds(): void {
-    this.editingThresholds.set(false);
-  }
-
-  setThresholdScore(index: number, raw: string): void {
-    const value = parseFloat(raw);
-    if (isNaN(value)) return;
-    this.thresholdEdits.update(ts => ts.map((t, i) => i === index ? { ...t, minScore: value } : t));
-  }
-
-  saveThresholds(): void {
-    const updated = {
-      ...this.rules()!,
-      thresholdsJson: JSON.stringify(this.thresholdEdits())
-    };
-    this.rules.set(updated);
-    this.store.saveRules(updated);
-    this.editingThresholds.set(false);
-  }
-
   // ── Matrix helpers ────────────────────────────────────────────────────────
-
   getRelationship(sourceId: string, targetId: string): RelationshipBreakdown | undefined {
     return this.store.viewRelationships().find(
       r => r.sourceId === sourceId && r.targetId === targetId

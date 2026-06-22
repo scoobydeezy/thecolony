@@ -73,53 +73,31 @@
   }
 </div>
 
-<!-- Campaign Timeline — Baseline only -->
-@if (isViewingBaseline && store.sortedSessions().length > 0) {
+<!-- Historical Analysis Timeline -->
+@if (store.colonySnapshots().length > 0) {
   <div class="card timeline-card" style="margin-top: 1.5rem;">
-    <h3 class="section-title">Timeline</h3>
+    <div class="timeline-tabs">
+      @for (tab of timelineTabs; track tab.value) {
+        <button
+          class="tab-btn"
+          [class.active]="activeTab() === tab.value"
+          (click)="activeTab.set(tab.value)">
+          {{ tab.label }}
+        </button>
+      }
+      <button class="tab-btn events-toggle" [class.active]="showEvents()" (click)="showEvents.set(!showEvents())">
+        <i class="fa-solid fa-skull"></i> Show Events
+      </button>
+    </div>
 
-    <div class="timeline-chart-wrap">
-      <svg [attr.viewBox]="'0 0 ' + timelineWidth + ' ' + timelineHeight"
-           [attr.width]="timelineWidth" [attr.height]="timelineHeight"
-           class="timeline-svg">
-        @for (tick of [0, 2, 4, 6, 8, 10]; track tick) {
-          <line
-            [attr.x1]="timelinePadX"
-            [attr.x2]="timelineWidth - timelinePadX"
-            [attr.y1]="timelinePadY + (timelineHeight - timelinePadY*2) - (tick/10)*(timelineHeight - timelinePadY*2)"
-            [attr.y2]="timelinePadY + (timelineHeight - timelinePadY*2) - (tick/10)*(timelineHeight - timelinePadY*2)"
-            stroke="var(--border)" stroke-width="1" stroke-dasharray="3 3" />
-          <text
-            [attr.x]="timelinePadX - 4"
-            [attr.y]="timelinePadY + (timelineHeight - timelinePadY*2) - (tick/10)*(timelineHeight - timelinePadY*2) + 3"
-            text-anchor="end" font-size="8" fill="var(--text-muted)">{{ tick }}</text>
-        }
-
-        @if (stressPoints()) {
-          <polyline
-            [attr.points]="stressPoints()"
-            fill="none"
-            stroke="var(--accent)"
-            stroke-width="2"
-            stroke-linejoin="round"
-            stroke-linecap="round" />
-        }
-
-        @if (stressMarkers().length > 0) {
-          <polygon
-            [attr.points]="stressPoints() + ' ' + (timelineWidth - timelinePadX) + ',' + (timelineHeight - timelinePadY) + ' ' + timelinePadX + ',' + (timelineHeight - timelinePadY)"
-            fill="rgba(99,102,241,0.08)" />
-        }
-
-        @for (m of stressMarkers(); track m.label) {
-          <circle [attr.cx]="m.x" [attr.cy]="m.y" r="3"
-            fill="var(--accent)" stroke="var(--bg-surface)" stroke-width="1.5">
-            <title>{{ m.label }}: {{ m.title }} — Stress {{ m.stress }}</title>
-          </circle>
-          <text [attr.x]="m.x" [attr.y]="timelineHeight - 1"
-            text-anchor="middle" font-size="7" fill="var(--text-muted)">{{ m.label }}</text>
-        }
-      </svg>
+    <div class="timeline-body">
+      @switch (activeTab()) {
+        @case ('stress') { <app-timeline-stress-tab [showEvents]="showEvents()" /> }
+        @case ('factions') { <app-timeline-factions-tab [showEvents]="showEvents()" /> }
+        @case ('relationships') { <app-timeline-relationships-tab [showEvents]="showEvents()" /> }
+        @case ('characters') { <app-timeline-characters-tab [showEvents]="showEvents()" /> }
+        @case ('analysis') { <app-timeline-analysis-tab [showEvents]="showEvents()" /> }
+      }
     </div>
   </div>
 }
@@ -204,22 +182,26 @@
       <thead>
         <tr>
           <th>From</th>
+          <th></th>
           <th>To</th>
           <th>Label</th>
           <th>Score</th>
         </tr>
       </thead>
       <tbody>
-        @for (r of store.mostHostile(); track r.sourceId + r.targetId) {
+        @for (r of mostHostileConsolidated(); track r.sourceId + r.targetId) {
           <tr>
             <td>{{ factionName(r.sourceId) }}</td>
+            <td class="rel-arrow">
+              <i [class]="r.bidirectional ? 'fa-solid fa-arrows-left-right' : 'fa-solid fa-arrow-right-long'"></i>
+            </td>
             <td>{{ factionName(r.targetId) }}</td>
             <td><span [class]="labelClass(r.label)">{{ r.label }}</span></td>
             <td><span [class]="scoreClass(r.finalScore)">{{ r.finalScore }}</span></td>
           </tr>
         }
         @empty {
-          <tr><td colspan="4" style="color: var(--text-muted); text-align:center">No relationships yet</td></tr>
+          <tr><td colspan="5" style="color: var(--text-muted); text-align:center">No relationships yet</td></tr>
         }
       </tbody>
     </table>
@@ -232,22 +214,26 @@
       <thead>
         <tr>
           <th>From</th>
+          <th></th>
           <th>To</th>
           <th>Label</th>
           <th>Score</th>
         </tr>
       </thead>
       <tbody>
-        @for (r of store.strongestAlliances(); track r.sourceId + r.targetId) {
+        @for (r of strongestAlliancesConsolidated(); track r.sourceId + r.targetId) {
           <tr>
             <td>{{ factionName(r.sourceId) }}</td>
+            <td class="rel-arrow">
+              <i [class]="r.bidirectional ? 'fa-solid fa-arrows-left-right' : 'fa-solid fa-arrow-right-long'"></i>
+            </td>
             <td>{{ factionName(r.targetId) }}</td>
             <td><span [class]="labelClass(r.label)">{{ r.label }}</span></td>
             <td><span [class]="scoreClass(r.finalScore)">{{ r.finalScore }}</span></td>
           </tr>
         }
         @empty {
-          <tr><td colspan="4" style="color: var(--text-muted); text-align:center">No relationships yet</td></tr>
+          <tr><td colspan="5" style="color: var(--text-muted); text-align:center">No relationships yet</td></tr>
         }
       </tbody>
     </table>
@@ -307,35 +293,3 @@
     </div>
   </div>
 }
-
-<!-- Faction → Party Relationships -->
-<div class="card" style="margin-top: 1.5rem;">
-  <h3 class="section-title">Faction → {{ partyName() }} Relationships</h3>
-  <table>
-    <thead>
-      <tr>
-        <th>Faction</th>
-        <th>Label</th>
-        <th>Score</th>
-        <th>{{ store.beliefAxisLabels().c.axisName }}</th>
-        <th>{{ store.beliefAxisLabels().a.axisName }}</th>
-        <th>{{ store.beliefAxisLabels().b.axisName }}</th>
-      </tr>
-    </thead>
-    <tbody>
-      @for (r of store.partyRelationships(); track r.sourceId) {
-        <tr>
-          <td>{{ factionName(r.sourceId) }}</td>
-          <td><span [class]="labelClass(r.label)">{{ r.label }}</span></td>
-          <td><span [class]="scoreClass(r.finalScore)">{{ r.finalScore }}</span></td>
-          <td [class]="r.contributions.beliefc >= 0 ? 'pos' : 'neg'">{{ r.contributions.beliefc > 0 ? '+' : '' }}{{ r.contributions.beliefc }}</td>
-          <td [class]="r.contributions.beliefa >= 0 ? 'pos' : 'neg'">{{ r.contributions.beliefa > 0 ? '+' : '' }}{{ r.contributions.beliefa }}</td>
-          <td [class]="r.contributions.beliefb >= 0 ? 'pos' : 'neg'">{{ r.contributions.beliefb > 0 ? '+' : '' }}{{ r.contributions.beliefb }}</td>
-        </tr>
-      }
-      @empty {
-        <tr><td colspan="6" style="color: var(--text-muted); text-align:center">Loading...</td></tr>
-      }
-    </tbody>
-  </table>
-</div>

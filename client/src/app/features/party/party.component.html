@@ -12,48 +12,103 @@
       <label>Party Name</label>
       <input type="text" [formField]="f.partyName" placeholder="e.g. Darkwing" />
     </div>
+
+    @if (partyMembers().length > 0) {
+      <div class="member-list">
+        <h3 class="section-title">Members</h3>
+        @for (char of partyMembers(); track char.id) {
+          <a class="member-link" [routerLink]="['/characters', char.id]">{{ char.name }}</a>
+        }
+      </div>
+    }
   </div>
 
   <div class="card">
     <h3 class="section-title">Ideological Position</h3>
     <p class="help-text">Set the party's perceived ideological stance. This drives all faction → party relationship scores.</p>
 
-    <div class="separator">Actionable Beliefs</div>
-    <div class="grid-3">
-      <div class="form-group">
-        <label>{{ axisName('c') }}</label>
-        <select [formField]="f.partyBeliefc">
-          @for (opt of beliefcOptions(); track opt) {
-            <option [value]="opt">{{ beliefLabel('c', opt) }}</option>
-          }
-        </select>
+    <div class="ideology-layout">
+      <div class="ideology-values">
+        <div class="separator">Core Values</div>
+        <app-ternary-plot
+          [values]="editValues()"
+          [editable]="true"
+          [size]="340"
+          [valueLabels]="store.valueLabels()"
+          (valuesChange)="updateValues($event)"
+        />
       </div>
-      <div class="form-group">
-        <label>{{ axisName('a') }}</label>
-        <select [formField]="f.partyBeliefa">
-          @for (opt of beliefaOptions(); track opt) {
-            <option [value]="opt">{{ beliefLabel('a', opt) }}</option>
-          }
-        </select>
-      </div>
-      <div class="form-group">
-        <label>{{ axisName('b') }}</label>
-        <select [formField]="f.partyBeliefb">
-          @for (opt of beliefbOptions(); track opt) {
-            <option [value]="opt">{{ beliefLabel('b', opt) }}</option>
-          }
-        </select>
+
+      <div class="ideology-beliefs">
+        <div class="separator">Actionable Beliefs</div>
+
+        @if (beliefConflicts().any) {
+          <p class="belief-conflict-hint">{{ conflictHint() }}</p>
+        }
+
+        <div class="beliefs-column">
+          <div class="form-group" [class.belief-conflict-group]="beliefConflicts().beliefc">
+            <label [class.label-conflict]="beliefConflicts().beliefc">{{ axisName('c') }}</label>
+            <select [formField]="f.partyBeliefc">
+              <option value="">— Derived ({{ derivedBeliefLabel('c') }}) —</option>
+              @for (opt of beliefcOptions(); track opt) {
+                <option [value]="opt">{{ beliefLabel('c', opt) }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group" [class.belief-conflict-group]="beliefConflicts().beliefa">
+            <label [class.label-conflict]="beliefConflicts().beliefa">{{ axisName('a') }}</label>
+            <select [formField]="f.partyBeliefa">
+              <option value="">— Derived ({{ derivedBeliefLabel('a') }}) —</option>
+              @for (opt of beliefaOptions(); track opt) {
+                <option [value]="opt">{{ beliefLabel('a', opt) }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group" [class.belief-conflict-group]="beliefConflicts().beliefb">
+            <label [class.label-conflict]="beliefConflicts().beliefb">{{ axisName('b') }}</label>
+            <select [formField]="f.partyBeliefb">
+              <option value="">— Derived ({{ derivedBeliefLabel('b') }}) —</option>
+              @for (opt of beliefbOptions(); track opt) {
+                <option [value]="opt">{{ beliefLabel('b', opt) }}</option>
+              }
+            </select>
+          </div>
+        </div>
       </div>
     </div>
-
-    <div class="separator">Core Values</div>
-    <app-ternary-plot
-      [values]="editValues()"
-      [editable]="true"
-      [valueLabels]="store.valueLabels()"
-      (valuesChange)="updateValues($event)"
-    />
   </div>
+</div>
+
+<div class="card relationships-card">
+  <h3 class="section-title">Faction → {{ editForm().partyName || 'Party' }} Relationships</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Faction</th>
+        <th>Label</th>
+        <th>Score</th>
+        <th>{{ store.beliefAxisLabels().c.axisName }}</th>
+        <th>{{ store.beliefAxisLabels().a.axisName }}</th>
+        <th>{{ store.beliefAxisLabels().b.axisName }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (r of store.partyRelationships(); track r.sourceId) {
+        <tr>
+          <td>{{ factionName(r.sourceId) }}</td>
+          <td><span [class]="labelClass(r.label)">{{ r.label }}</span></td>
+          <td><span [class]="scoreClass(r.finalScore)">{{ r.finalScore }}</span></td>
+          <td [class]="r.contributions.beliefc >= 0 ? 'pos' : 'neg'">{{ r.contributions.beliefc > 0 ? '+' : '' }}{{ r.contributions.beliefc }}</td>
+          <td [class]="r.contributions.beliefa >= 0 ? 'pos' : 'neg'">{{ r.contributions.beliefa > 0 ? '+' : '' }}{{ r.contributions.beliefa }}</td>
+          <td [class]="r.contributions.beliefb >= 0 ? 'pos' : 'neg'">{{ r.contributions.beliefb > 0 ? '+' : '' }}{{ r.contributions.beliefb }}</td>
+        </tr>
+      }
+      @empty {
+        <tr><td colspan="6" style="color: var(--text-muted); text-align:center">Loading...</td></tr>
+      }
+    </tbody>
+  </table>
 </div>
 
 @if (!store.isViewingSnapshot()) {

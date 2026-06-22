@@ -1,0 +1,50 @@
+<div class="series-builder">
+  @for (row of rows(); track $index; let i = $index) {
+    <div class="series-row">
+      <span class="row-num">{{ i + 1 }}</span>
+      <select [value]="row.metric" (change)="updateMetric(i, $any($event.target).value)">
+        <option value="">— Select metric —</option>
+        @for (opt of metricOptions; track opt.value) {
+          <option [value]="opt.value">{{ opt.label }}</option>
+        }
+      </select>
+
+      @if (metricNeedsEntity(row.metric)) {
+        <select [value]="row.entityId" (change)="updateEntityId(i, $any($event.target).value)">
+          <option value="">— Select {{ metricNeedsEntity(row.metric) }} —</option>
+          @for (opt of entityOptionsForRow(row); track opt.id) {
+            <option [value]="opt.id">{{ opt.name }}</option>
+          }
+        </select>
+      }
+
+      <button class="btn-remove" (click)="removeRow(i)" [disabled]="rows().length === 1" title="Remove series">×</button>
+    </div>
+  }
+
+  <div class="builder-actions">
+    <button class="btn btn-secondary btn-sm" (click)="addRow()" [disabled]="rows().length >= 6">
+      + Add Series
+    </button>
+
+  </div>
+</div>
+
+<div class="chart-wrap">
+  @if (chartData().datasets.length > 0) {
+    <canvas baseChart
+      type="line"
+      [data]="chartData()"
+      [options]="chartOptions()">
+    </canvas>
+  } @else {
+    <p class="empty-msg">Configure at least one series above to display a chart.</p>
+  }
+  @if (markerTooltip(); as tip) {
+    <div class="marker-tooltip" [class.flip]="tip.flip" [style.left.px]="tip.x" [style.top.px]="tip.y">
+      @for (line of tip.lines; track line) {
+        <div>{{ line }}</div>
+      }
+    </div>
+  }
+</div>

@@ -1,19 +1,52 @@
-import { Component, inject, computed } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { DecimalPipe } from '@angular/common';
 import { AppStore } from '../../store/app.store';
 import { BeliefPosition, primaryValue, secondaryValue, sacrificedValue, driftScore, topCompatibleFactions, beliefPositionLabel } from '../../core/models/types';
-import type { Faction } from '../../core/models/types';
+import type { Faction, RelationshipBreakdown } from '../../core/models/types';
+import { TimelineStressTabComponent } from './timeline-stress-tab.component';
+import { TimelineFactionsTabComponent } from './timeline-factions-tab.component';
+import { TimelineRelationshipsTabComponent } from './timeline-relationships-tab.component';
+import { TimelineCharactersTabComponent } from './timeline-characters-tab.component';
+import { TimelineAnalysisTabComponent } from './timeline-analysis-tab.component';
+
+interface ConsolidatedRel {
+  sourceId: string;
+  targetId: string;
+  label: string;
+  finalScore: number;
+  bidirectional: boolean;
+}
+
+type TimelineTab = 'stress' | 'factions' | 'relationships' | 'characters' | 'analysis';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterLink, DecimalPipe],
+  imports: [
+    RouterLink, DecimalPipe,
+    TimelineStressTabComponent,
+    TimelineFactionsTabComponent,
+    TimelineRelationshipsTabComponent,
+    TimelineCharactersTabComponent,
+    TimelineAnalysisTabComponent,
+  ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
   store = inject(AppStore);
+
+  activeTab = signal<TimelineTab>('stress');
+  showEvents = signal(true);
+
+  readonly timelineTabs: { value: TimelineTab; label: string }[] = [
+    { value: 'stress', label: 'Colony Stress' },
+    { value: 'factions', label: 'Factions' },
+    { value: 'relationships', label: 'Relationships' },
+    { value: 'characters', label: 'Characters' },
+    { value: 'analysis', label: 'Analysis' },
+  ];
 
   primaryValue   = primaryValue;
   secondaryValue = secondaryValue;
@@ -74,39 +107,6 @@ export class DashboardComponent {
     return `${this.store.viewColonyStress() * 10}%`;
   }
 
-  // Timeline: SVG stress chart data
-  readonly timelineWidth = 560;
-  readonly timelineHeight = 80;
-  readonly timelinePadX = 28;
-  readonly timelinePadY = 10;
-
-  readonly stressPoints = computed(() => {
-    const data = this.store.stressTimeline();
-    if (data.length === 0) return '';
-    const w = this.timelineWidth - this.timelinePadX * 2;
-    const h = this.timelineHeight - this.timelinePadY * 2;
-    const xStep = data.length > 1 ? w / (data.length - 1) : 0;
-    return data.map((d, i) => {
-      const x = this.timelinePadX + (data.length === 1 ? w / 2 : i * xStep);
-      const y = this.timelinePadY + h - (d.stress / 10) * h;
-      return `${x},${y}`;
-    }).join(' ');
-  });
-
-  readonly stressMarkers = computed(() => {
-    const data = this.store.stressTimeline();
-    if (data.length === 0) return [];
-    const w = this.timelineWidth - this.timelinePadX * 2;
-    const h = this.timelineHeight - this.timelinePadY * 2;
-    const xStep = data.length > 1 ? w / (data.length - 1) : 0;
-    return data.map((d, i) => ({
-      x: this.timelinePadX + (data.length === 1 ? w / 2 : i * xStep),
-      y: this.timelinePadY + h - (d.stress / 10) * h,
-      stress: d.stress,
-      label: `S${d.sessionNumber}`,
-      title: d.sessionTitle,
-    }));
-  });
 
 
   readonly partyName = computed(() => this.store.colonyState()?.partyName || 'Party');
@@ -186,4 +186,38 @@ export class DashboardComponent {
   get isViewingBaseline(): boolean {
     return this.store.viewingContext() === 'baseline';
   }
+
+  private consolidate(sorted: RelationshipBreakdown[], limit: number): ConsolidatedRel[] {
+    // Only consider a pair bidirectional if both directions appear in the candidate pool.
+    // Pool is 2× the limit so a merged pair doesn't silently eat a slot without a replacement.
+    const pool = sorted.slice(0, limit * 2);
+    const seen = new Set<string>();
+    const result: ConsolidatedRel[] = [];
+    for (const r of pool) {
+      if (result.length >= limit) break;
+      const key = [r.sourceId, r.targetId].sort().join('|');
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const reverse = pool.find(x => x.sourceId === r.targetId && x.targetId === r.sourceId);
+      const bidirectional = !!reverse;
+      const finalScore = bidirectional && Math.abs(reverse!.finalScore) > Math.abs(r.finalScore)
+        ? reverse!.finalScore
+        : r.finalScore;
+      const source = bidirectional && Math.abs(reverse!.finalScore) > Math.abs(r.finalScore) ? reverse! : r;
+      result.push({ sourceId: source.sourceId, targetId: source.targetId, label: source.label, finalScore, bidirectional });
+    }
+    return result;
+  }
+
+  readonly mostHostileConsolidated = computed((): ConsolidatedRel[] => {
+    const raw = [...this.store.factionRelationships()]
+      .sort((a, b) => a.finalScore - b.finalScore);
+    return this.consolidate(raw, 5);
+  });
+
+  readonly strongestAlliancesConsolidated = computed((): ConsolidatedRel[] => {
+    const raw = [...this.store.factionRelationships()]
+      .sort((a, b) => b.finalScore - a.finalScore);
+    return this.consolidate(raw, 5);
+  });
 }

@@ -1,0 +1,27 @@
+<div class="tab-controls">
+  <select [value]="resolvedFactionId()" (change)="selectedFactionId.set($any($event.target).value)">
+    @for (f of activeFactions(); track f.id) {
+      <option [value]="f.id">{{ f.name }}</option>
+    }
+    <option value="party">{{ partyName() }}</option>
+  </select>
+
+</div>
+<div class="chart-wrap">
+  @if (resolvedFactionId()) {
+    <canvas baseChart
+      type="line"
+      [data]="chartData()"
+      [options]="chartOptions()">
+    </canvas>
+  } @else {
+    <p class="empty-msg">No factions available.</p>
+  }
+  @if (markerTooltip(); as tip) {
+    <div class="marker-tooltip" [class.flip]="tip.flip" [style.left.px]="tip.x" [style.top.px]="tip.y">
+      @for (line of tip.lines; track line) {
+        <div>{{ line }}</div>
+      }
+    </div>
+  }
+</div>

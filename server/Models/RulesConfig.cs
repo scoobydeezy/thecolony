@@ -1,5 +1,7 @@
 namespace ColonyTracker.Api.Models;
 
+public enum StressWeightCurve { Linear, Quadratic, Cubic, Exponential }
+
 public class RulesConfig
 {
     public string Id { get; set; } = "singleton";
@@ -19,6 +21,11 @@ public class RulesConfig
     // Enable/disable entire positive or negative relationship contributions
     public bool PositiveEnabled { get; set; } = true;
     public bool NegativeEnabled { get; set; } = true;
+
+    // Stress-weight composition: shifts belief/value sub-score weighting as stress rises
+    public bool StressWeightEnabled { get; set; } = false;
+    public StressWeightCurve StressWeightCurve { get; set; } = StressWeightCurve.Linear;
+    public double StressWeightIntensity { get; set; } = 0.5;
 
     // Influence system: caps max conviction bonus from faction peers
     // bonus = factionInfluenceAvg × (impressionable/100) × InfluenceConvictionScale

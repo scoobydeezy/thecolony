@@ -328,7 +328,14 @@ export interface RulesConfig {
 
   // Formula weights — stored as JSON; empty string = use client defaults
   formulasJson: string;
+
+  // Stress-weight composition
+  stressWeightEnabled: boolean;
+  stressWeightCurve: StressWeightCurve;
+  stressWeightIntensity: number;
 }
+
+export type StressWeightCurve = 'Linear' | 'Quadratic' | 'Cubic' | 'Exponential';
 
 export interface RelationshipContributions {
   beliefc: number;
@@ -336,6 +343,9 @@ export interface RelationshipContributions {
   beliefb: number;
   valueAlignment: number;
   valueConflict: number;
+  beliefSubScore: number;
+  valueSubScore: number;
+  stressWeight: number;
 }
 
 export interface RelationshipBreakdown {

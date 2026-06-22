@@ -19,4 +19,8 @@ public class RelationshipContributionsDto
     public double BeliefB { get; set; }
     public double ValueAlignment { get; set; }
     public double ValueConflict { get; set; }
+    // Sub-totals and stress-weight applied (populated when StressWeightEnabled)
+    public double BeliefSubScore { get; set; }
+    public double ValueSubScore { get; set; }
+    public double StressWeight { get; set; }
 }

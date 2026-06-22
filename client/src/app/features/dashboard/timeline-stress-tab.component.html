@@ -1,0 +1,14 @@
+<div class="chart-wrap">
+  <canvas baseChart
+    type="line"
+    [data]="chartData()"
+    [options]="chartOptions()">
+  </canvas>
+  @if (markerTooltip(); as tip) {
+    <div class="marker-tooltip" [class.flip]="tip.flip" [style.left.px]="tip.x" [style.top.px]="tip.y">
+      @for (line of tip.lines; track line) {
+        <div>{{ line }}</div>
+      }
+    </div>
+  }
+</div>

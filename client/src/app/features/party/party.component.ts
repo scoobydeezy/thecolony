@@ -1,6 +1,7 @@
 import { Component, inject, signal, effect, computed } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { AppStore } from '../../store/app.store';
-import { ColonyState, BeliefPosition, ValueVector, primaryValue, secondaryValue, sacrificedValue, beliefAxisOptions, beliefPositionLabel } from '../../core/models/types';
+import { ColonyState, BeliefPosition, ValueVector, primaryValue, secondaryValue, sacrificedValue, beliefAxisOptions, beliefPositionLabel, deriveBeliefs, beliefConflicts as computeBeliefConflicts } from '../../core/models/types';
 import { FormField, form } from '@angular/forms/signals';
 import { downloadCsv } from '../../core/utils/csv-export';
 import { TernaryPlotComponent } from '../../shared/ternary-plot/ternary-plot.component';
@@ -12,17 +13,21 @@ interface PartyFormModel {
   partyBeliefb: string;
 }
 
-const toFormModel = (cs: ColonyState): PartyFormModel => ({
-  partyName:    cs.partyName,
-  partyBeliefc: cs.partyBeliefc,
-  partyBeliefa: cs.partyBeliefa,
-  partyBeliefb: cs.partyBeliefb,
-});
+// '' means "use derived" — set to '' when stored belief matches derived to avoid showing spurious overrides
+const toFormModel = (cs: ColonyState): PartyFormModel => {
+  const derived = deriveBeliefs(cs.partyValues);
+  return {
+    partyName:    cs.partyName,
+    partyBeliefc: cs.partyBeliefc === derived.beliefc ? '' : cs.partyBeliefc,
+    partyBeliefa: cs.partyBeliefa === derived.beliefa ? '' : cs.partyBeliefa,
+    partyBeliefb: cs.partyBeliefb === derived.beliefb ? '' : cs.partyBeliefb,
+  };
+};
 
 @Component({
   selector: 'app-party',
   standalone: true,
-  imports: [FormField, TernaryPlotComponent],
+  imports: [FormField, TernaryPlotComponent, RouterLink],
   templateUrl: './party.component.html',
   styleUrl: './party.component.scss'
 })
@@ -37,9 +42,58 @@ export class PartyComponent {
 
   saved = signal(false);
 
+  readonly partyMembers = computed(() =>
+    this.store.viewCharacters().filter(c => c.characterType === 'PartyMember')
+  );
+
   readonly beliefcOptions = computed(() => beliefAxisOptions(this.store.beliefAxisLabels().c));
   readonly beliefaOptions = computed(() => beliefAxisOptions(this.store.beliefAxisLabels().a));
   readonly beliefbOptions = computed(() => beliefAxisOptions(this.store.beliefAxisLabels().b));
+
+  readonly derivedBeliefs = computed(() => deriveBeliefs(this.editValues(), undefined, this.store.beliefAxisLabels()));
+
+  readonly beliefConflicts = computed(() => {
+    const f = this.editForm();
+    return computeBeliefConflicts(
+      this.editValues(),
+      f.partyBeliefc as BeliefPosition || undefined,
+      f.partyBeliefa as BeliefPosition || undefined,
+      f.partyBeliefb as BeliefPosition || undefined,
+      this.store.beliefAxisLabels()
+    );
+  });
+
+  factionName(id: string | undefined): string {
+    if (!id) return '—';
+    return this.store.viewFactions().find(f => f.id === id)?.name ?? id;
+  }
+
+  labelClass(label: string): string {
+    return `badge badge-${label.toLowerCase()}`;
+  }
+
+  scoreClass(score: number): string {
+    if (score >= 4) return 'score pos-high';
+    if (score >= 2) return 'score pos-mid';
+    if (score >= 0) return 'score neutral';
+    if (score >= -3) return 'score neg-mid';
+    return 'score neg-high';
+  }
+
+  conflictHint(): string {
+    const primary = primaryValue(this.editValues());
+    const axisKey = primary.toLowerCase() as 'a' | 'b' | 'c';
+    const cfg = this.store.beliefAxisLabels()[axisKey];
+    const alignedPos: BeliefPosition = cfg.positiveAligns ? 'positive' : 'negative';
+    const valueLabel = this.store.valueLabels()[axisKey];
+    return `High ${valueLabel} expects ${cfg[alignedPos]} on ${cfg.axisName}`;
+  }
+
+  derivedBeliefLabel(axis: 'a' | 'b' | 'c'): string {
+    const derived = this.derivedBeliefs();
+    const beliefKey = axis === 'a' ? 'beliefa' : axis === 'b' ? 'beliefb' : 'beliefc';
+    return beliefPositionLabel(derived[beliefKey], this.store.beliefAxisLabels()[axis]);
+  }
 
   beliefLabel(axis: 'a' | 'b' | 'c', pos: BeliefPosition): string {
     return beliefPositionLabel(pos, this.store.beliefAxisLabels()[axis]);
@@ -89,12 +143,13 @@ export class PartyComponent {
     const cs = this.store.colonyState();
     if (!cs) return;
     const f = this.editForm();
+    const derived = this.derivedBeliefs();
     this.store.saveColonyState({
       ...cs,
       partyName:    f.partyName,
-      partyBeliefc: f.partyBeliefc as BeliefPosition,
-      partyBeliefa: f.partyBeliefa as BeliefPosition,
-      partyBeliefb: f.partyBeliefb as BeliefPosition,
+      partyBeliefc: (f.partyBeliefc as BeliefPosition) || derived.beliefc,
+      partyBeliefa: (f.partyBeliefa as BeliefPosition) || derived.beliefa,
+      partyBeliefb: (f.partyBeliefb as BeliefPosition) || derived.beliefb,
       partyValues:  this.editValues(),
     });
     this.saved.set(true);
