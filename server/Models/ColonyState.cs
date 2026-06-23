@@ -2,7 +2,7 @@ namespace ColonyTracker.Api.Models;
 
 public class ColonyState
 {
-    public string Id { get; set; } = "singleton";
+    public string Id { get; set; } = Guid.NewGuid().ToString();
     public string PartyName { get; set; } = "The Party";
     public int Act { get; set; } = 1;
     public int Week { get; set; } = 1;
@@ -20,4 +20,5 @@ public class ColonyState
     public string? DominantFactions { get; set; }
     public string? InfluenceNotes { get; set; }
     public string? MajorConsequences { get; set; }
+    public string CampaignId { get; set; } = string.Empty;
 }

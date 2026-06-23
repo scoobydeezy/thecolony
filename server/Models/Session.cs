@@ -10,4 +10,5 @@ public class Session
     public DateTime? Date { get; set; }
     public string? Summary { get; set; }
     public ICollection<Event> Events { get; set; } = new List<Event>();
+    public string CampaignId { get; set; } = string.Empty;
 }

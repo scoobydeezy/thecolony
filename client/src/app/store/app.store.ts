@@ -12,6 +12,7 @@ import {
   CascadeRule, DEFAULT_CASCADE_RULES,
   FormulasConfig, DEFAULT_FORMULAS,
   FACTION_EFFECT_PROPS, CHARACTER_EFFECT_PROPS,
+  Campaign, AppSettings,
 } from '../core/models/types';
 import { ApiService } from '../core/services/api.service';
 import { scoreRelationship, ScoringActor } from '../core/services/scoring.service';
@@ -29,6 +30,8 @@ interface AppState {
   error: string | null;
   // 'baseline' | 'current' | sessionId
   viewingContext: string;
+  campaigns: Campaign[];
+  activeCampaign: Campaign | null;
 }
 
 const initialState: AppState = {
@@ -43,6 +46,8 @@ const initialState: AppState = {
   loading: false,
   error: null,
   viewingContext: 'current',
+  campaigns: [],
+  activeCampaign: null,
 };
 
 function parseBeliefAxisLabels(json: string | undefined): BeliefAxisLabels {
@@ -1034,6 +1039,92 @@ export const AppStore = signalStore(
 
     setViewingContext(ctx: string): void {
       patchState(store, { viewingContext: ctx });
+    },
+
+    // ── Campaign management ────────────────────────────────────────────────
+
+    loadSettings: rxMethod<void>(
+      pipe(
+        switchMap(() =>
+          api.getSettings().pipe(
+            tapResponse({
+              next: (settings: AppSettings) =>
+                patchState(store, { activeCampaign: settings.activeCampaign ?? null }),
+              error: (err: Error) => patchState(store, { error: err.message })
+            })
+          )
+        )
+      )
+    ),
+
+    loadCampaigns: rxMethod<void>(
+      pipe(
+        switchMap(() =>
+          api.getCampaigns().pipe(
+            tapResponse({
+              next: (campaigns: Campaign[]) => patchState(store, { campaigns }),
+              error: (err: Error) => patchState(store, { error: err.message })
+            })
+          )
+        )
+      )
+    ),
+
+    switchCampaign(campaignId: string): void {
+      api.setActiveCampaign(campaignId).subscribe({
+        next: (settings: AppSettings) => {
+          patchState(store, {
+            activeCampaign: settings.activeCampaign ?? null,
+            viewingContext: 'current',
+          });
+          // Reload all campaign-scoped data for the new active campaign
+          api.getFactions().subscribe({ next: (factions) => patchState(store, { factions }) });
+          api.getCharacters().subscribe({ next: (characters) => patchState(store, { characters }) });
+          api.getColonyState().subscribe({ next: (colonyState) => patchState(store, { colonyState }) });
+          api.getRules().subscribe({ next: (rules) => patchState(store, { rules }) });
+          api.getSessions().subscribe({ next: (sessions) => patchState(store, { sessions }) });
+          api.getOverrides().subscribe({ next: (overrides) => patchState(store, { overrides }) });
+          api.getRelationships().subscribe({ next: (relationships) => patchState(store, { relationships }) });
+          api.getSessionLog().subscribe({ next: (sessionLog) => patchState(store, { sessionLog }) });
+        },
+        error: (err: Error) => patchState(store, { error: err.message })
+      });
+    },
+
+    createCampaign(name: string, description?: string): void {
+      api.createCampaign({ name, description }).subscribe({
+        next: (campaign: Campaign) =>
+          patchState(store, { campaigns: [...store.campaigns(), campaign] }),
+        error: (err: Error) => patchState(store, { error: err.message })
+      });
+    },
+
+    updateCampaign(campaign: Campaign): void {
+      api.updateCampaign(campaign).subscribe({
+        next: (saved: Campaign) =>
+          patchState(store, { campaigns: store.campaigns().map(c => c.id === saved.id ? saved : c),
+            activeCampaign: store.activeCampaign()?.id === saved.id ? saved : store.activeCampaign() }),
+        error: (err: Error) => patchState(store, { error: err.message })
+      });
+    },
+
+    deleteCampaign(id: string): void {
+      api.deleteCampaign(id).subscribe({
+        next: () =>
+          patchState(store, { campaigns: store.campaigns().filter(c => c.id !== id) }),
+        error: (err: Error) => patchState(store, { error: err.message })
+      });
+    },
+
+    importEntities(sourceCampaignId: string, entityTypes: string[], importAll: boolean): void {
+      api.importEntities(sourceCampaignId, entityTypes, importAll).subscribe({
+        next: () => {
+          // Reload affected entity sets into active campaign context
+          api.getFactions().subscribe({ next: (factions) => patchState(store, { factions }) });
+          api.getCharacters().subscribe({ next: (characters) => patchState(store, { characters }) });
+        },
+        error: (err: Error) => patchState(store, { error: err.message })
+      });
     },
 
     reorderEvents(sessionId: string, orderedIds: string[]): void {

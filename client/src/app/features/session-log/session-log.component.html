@@ -108,7 +108,7 @@
       </div>
 
       <div class="form-group">
-        <label>Colony Stress Change</label>
+        <label>Global Stress Change</label>
         <input type="number" [value]="editingEntry().colonyStressChange"
           (input)="editingEntry.update(e => ({...e, colonyStressChange: +$any($event.target).value}))" />
       </div>

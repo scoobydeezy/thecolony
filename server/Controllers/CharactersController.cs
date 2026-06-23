@@ -1,5 +1,6 @@
 using ColonyTracker.Api.Data;
 using ColonyTracker.Api.Models;
+using ColonyTracker.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,11 +8,17 @@ namespace ColonyTracker.Api.Controllers;
 
 [ApiController]
 [Route("api/characters")]
-public class CharactersController(AppDbContext db) : ControllerBase
+public class CharactersController(AppDbContext db, ICampaignContext campaign) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll()
-        => Ok(await db.Characters.OrderBy(c => c.Name).ToListAsync());
+    {
+        var cid = await campaign.GetActiveIdAsync();
+        return Ok(await db.Characters
+            .Where(c => c.CampaignId == cid)
+            .OrderBy(c => c.Name)
+            .ToListAsync());
+    }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(string id)
@@ -23,7 +30,9 @@ public class CharactersController(AppDbContext db) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] Character character)
     {
+        var cid = await campaign.GetActiveIdAsync();
         character.Id = Guid.NewGuid().ToString();
+        character.CampaignId = cid;
         db.Characters.Add(character);
         await db.SaveChangesAsync();
         return CreatedAtAction(nameof(GetById), new { id = character.Id }, character);

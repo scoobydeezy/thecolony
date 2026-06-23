@@ -1,8 +1,7 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { DecimalPipe } from '@angular/common';
 import { AppStore } from '../../store/app.store';
-import { BeliefPosition, primaryValue, secondaryValue, sacrificedValue, driftScore, topCompatibleFactions, beliefPositionLabel } from '../../core/models/types';
+import { BeliefPosition, primaryValue, secondaryValue, sacrificedValue, topCompatibleFactions, beliefPositionLabel, effectiveDriftScoreWithInfluence } from '../../core/models/types';
 import type { Faction, RelationshipBreakdown } from '../../core/models/types';
 import { TimelineStressTabComponent } from './timeline-stress-tab.component';
 import { TimelineFactionsTabComponent } from './timeline-factions-tab.component';
@@ -24,7 +23,7 @@ type TimelineTab = 'stress' | 'factions' | 'relationships' | 'characters' | 'ana
   selector: 'app-dashboard',
   standalone: true,
   imports: [
-    RouterLink, DecimalPipe,
+    RouterLink,
     TimelineStressTabComponent,
     TimelineFactionsTabComponent,
     TimelineRelationshipsTabComponent,
@@ -41,7 +40,7 @@ export class DashboardComponent {
   showEvents = signal(true);
 
   readonly timelineTabs: { value: TimelineTab; label: string }[] = [
-    { value: 'stress', label: 'Colony Stress' },
+    { value: 'stress', label: 'Global Stress' },
     { value: 'factions', label: 'Factions' },
     { value: 'relationships', label: 'Relationships' },
     { value: 'characters', label: 'Characters' },
@@ -51,7 +50,6 @@ export class DashboardComponent {
   primaryValue   = primaryValue;
   secondaryValue = secondaryValue;
   sacrificedValue = sacrificedValue;
-  driftScore     = driftScore;
 
   valueLabel(v: string): string {
     const vl = this.store.valueLabels();
@@ -175,12 +173,21 @@ export class DashboardComponent {
     return [...ranks].sort((a, b) => a.legitimacy - b.legitimacy)[0];
   }
 
+  viewDriftOf(characterId: string): number {
+    const stress = this.store.viewColonyStress();
+    const scale  = this.store.rules()?.influenceConvictionScale ?? 0.5;
+    const alive  = this.store.viewCharacters().filter(c => c.state === 'Alive');
+    const c = alive.find(x => x.id === characterId);
+    if (!c) return 0;
+    const peers = alive.filter(p => p.factionId && p.factionId === c.factionId && p.id !== c.id);
+    return Math.round(effectiveDriftScoreWithInfluence(c, stress, peers, scale));
+  }
+
   get highestDefectionRisk(): { name: string; driftScore: number } | null {
     const at = this.store.viewMostAtRisk();
     if (at.length === 0) return null;
     const c = at[0];
-    const drift = c.pressure + this.store.viewColonyStress() * 10 - c.conviction;
-    return { name: c.name, driftScore: Math.round(drift) };
+    return { name: c.name, driftScore: this.viewDriftOf(c.id) };
   }
 
   get isViewingBaseline(): boolean {

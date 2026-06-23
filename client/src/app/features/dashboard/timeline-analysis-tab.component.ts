@@ -48,7 +48,7 @@ export class TimelineAnalysisTabComponent {
   readonly allCharacters = computed(() => this.store.characters());
 
   readonly metricOptions: { value: MetricCategory; label: string; group: string }[] = [
-    { value: 'stress', label: 'Colony Stress', group: 'Colony' },
+    { value: 'stress', label: 'Global Stress', group: 'Colony' },
     { value: 'momentum', label: 'Faction Momentum', group: 'Faction' },
     { value: 'legitimacy', label: 'Faction Legitimacy', group: 'Faction' },
     { value: 'effectivePower', label: 'Faction Effective Power', group: 'Faction' },

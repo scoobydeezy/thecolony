@@ -7,4 +7,5 @@ public class RelationshipOverride
     public string TargetId { get; set; } = string.Empty;
     public int ScoreBump { get; set; } = 0;
     public string? Notes { get; set; }
+    public string CampaignId { get; set; } = string.Empty;
 }

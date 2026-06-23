@@ -1,5 +1,6 @@
 using ColonyTracker.Api.Data;
 using ColonyTracker.Api.Models;
+using ColonyTracker.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,16 +8,24 @@ namespace ColonyTracker.Api.Controllers;
 
 [ApiController]
 [Route("api/session-log")]
-public class SessionLogController(AppDbContext db) : ControllerBase
+public class SessionLogController(AppDbContext db, ICampaignContext campaign) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll()
-        => Ok(await db.SessionLog.OrderByDescending(s => s.Date).ToListAsync());
+    {
+        var cid = await campaign.GetActiveIdAsync();
+        return Ok(await db.SessionLog
+            .Where(s => s.CampaignId == cid)
+            .OrderByDescending(s => s.Date)
+            .ToListAsync());
+    }
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] SessionLogEntry entry)
     {
+        var cid = await campaign.GetActiveIdAsync();
         entry.Id = Guid.NewGuid().ToString();
+        entry.CampaignId = cid;
         db.SessionLog.Add(entry);
         await db.SaveChangesAsync();
         return CreatedAtAction(nameof(GetAll), entry);

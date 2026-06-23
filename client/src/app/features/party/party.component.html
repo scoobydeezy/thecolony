@@ -17,7 +17,12 @@
       <div class="member-list">
         <h3 class="section-title">Members</h3>
         @for (char of partyMembers(); track char.id) {
-          <a class="member-link" [routerLink]="['/characters', char.id]">{{ char.name }}</a>
+          <div class="member-row">
+            <a class="member-link" [routerLink]="['/characters', char.id]">{{ char.name }}</a>
+            @if (memberSubtitle(char)) {
+              <span class="member-subtitle">{{ memberSubtitle(char) }}</span>
+            }
+          </div>
         }
       </div>
     }

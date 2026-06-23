@@ -2,11 +2,12 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AppStore } from './store/app.store';
 import { SettingsDrawerComponent } from './shared/settings-drawer/settings-drawer.component';
+import { CampaignManagerComponent, CampaignManagerMode } from './shared/campaign-manager/campaign-manager.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, SettingsDrawerComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, SettingsDrawerComponent, CampaignManagerComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
@@ -16,6 +17,7 @@ export class App implements OnInit {
   readonly partyName = computed(() => this.store.colonyState()?.partyName || 'Party');
   readonly viewMenuOpen = signal(false);
   readonly settingsOpen = signal(false);
+  readonly campaignManagerMode = signal<CampaignManagerMode>(null);
 
   // Ordered list: baseline, ...sessions ascending by number, current
   private readonly viewContexts = computed(() => [
@@ -56,6 +58,8 @@ export class App implements OnInit {
   }
 
   ngOnInit() {
+    this.store.loadSettings(undefined);
+    this.store.loadCampaigns(undefined);
     this.store.loadFactions(undefined);
     this.store.loadColonyState(undefined);
     this.store.loadRelationships(undefined);
@@ -92,5 +96,13 @@ export class App implements OnInit {
 
   closeSettings(): void {
     this.settingsOpen.set(false);
+  }
+
+  openCampaignManager(mode: CampaignManagerMode): void {
+    this.campaignManagerMode.set(mode);
+  }
+
+  closeCampaignManager(): void {
+    this.campaignManagerMode.set(null);
   }
 }

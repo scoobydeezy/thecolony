@@ -63,6 +63,10 @@ export class PartyComponent {
     );
   });
 
+  memberSubtitle(char: { ancestry?: string; class?: string }): string {
+    return [char.ancestry, char.class].filter(Boolean).join(' ');
+  }
+
   factionName(id: string | undefined): string {
     if (!id) return '—';
     return this.store.viewFactions().find(f => f.id === id)?.name ?? id;

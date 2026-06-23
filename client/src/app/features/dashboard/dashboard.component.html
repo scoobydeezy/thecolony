@@ -31,7 +31,7 @@
 <div class="two-col">
   @if (store.colonyState(); as cs) {
     <div class="card">
-      <h3 class="section-title">Colony Stress</h3>
+      <h3 class="section-title">Global Stress</h3>
       <div class="stress-row">
         <div [class]="stressClass()">{{ store.viewColonyStress() }}</div>
         <div class="stress-bar-wrap">
@@ -256,8 +256,8 @@
               <td><a [routerLink]="['/characters', c.id]" class="char-link">{{ c.name }}</a></td>
               <td>{{ factionName(c.factionId) }}</td>
               <td>
-                <span [class]="driftScore(c) >= 30 ? 'score neg-high' : driftScore(c) >= 10 ? 'score neg-mid' : 'score neutral'">
-                  {{ driftScore(c) > 0 ? '+' : '' }}{{ driftScore(c) | number:'1.0-1' }}
+                <span [class]="viewDriftOf(c.id) >= 30 ? 'score neg-high' : viewDriftOf(c.id) >= 10 ? 'score neg-mid' : 'score neutral'">
+                  {{ viewDriftOf(c.id) > 0 ? '+' : '' }}{{ viewDriftOf(c.id) }}
                 </span>
               </td>
             </tr>

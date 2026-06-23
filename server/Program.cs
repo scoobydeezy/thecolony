@@ -15,6 +15,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<IScoringEngine, ScoringEngine>();
 builder.Services.AddScoped<IFactionInfluenceService, FactionInfluenceService>();
+builder.Services.AddScoped<ICampaignContext, CampaignContext>();
 
 builder.Services.AddCors(options =>
 {

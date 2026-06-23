@@ -1,0 +1,198 @@
+@if (open()) {
+  <div class="modal-backdrop" (click)="close()"></div>
+}
+
+<div class="modal" [class.modal-open]="open()">
+  <div class="modal-header">
+    <h2 class="modal-title">{{ title() }}</h2>
+    <button class="modal-close" (click)="close()" type="button" aria-label="Close">✕</button>
+  </div>
+
+  <div class="modal-body">
+
+    @switch (mode()) {
+
+      @case ('new') {
+        <div class="modal-content">
+          <p class="content-desc">Create a new empty campaign. You can copy entities into it from an existing campaign using Import.</p>
+          <div class="field">
+            <label class="field-label" for="create-name">Campaign Name</label>
+            <input id="create-name" class="field-input" type="text" placeholder="My Campaign"
+              [value]="createName()" (input)="createName.set($any($event.target).value)" />
+          </div>
+          <div class="field">
+            <label class="field-label" for="create-desc">Description <span class="optional">(optional)</span></label>
+            <textarea id="create-desc" class="field-input field-textarea" rows="3" placeholder="A brief description…"
+              [value]="createDescription()" (input)="createDescription.set($any($event.target).value)"></textarea>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" type="button" [disabled]="!createName().trim()"
+              (click)="submitCreate()">Create Campaign</button>
+          </div>
+        </div>
+      }
+
+      @case ('manage') {
+        <div class="modal-content">
+          @if (!canDelete()) {
+            <p class="content-desc warning-text">You must have at least one campaign. Create another before deleting.</p>
+          }
+
+          @if (deletingId()) {
+            <div class="delete-confirm-panel">
+              <p class="delete-warning">
+                You are about to permanently delete <strong>{{ campaignToDelete()?.name }}</strong> and all of its data.
+                This cannot be undone.
+              </p>
+              <div class="field">
+                <label class="field-label">Type <strong>{{ campaignToDelete()?.name }}</strong> to confirm</label>
+                <input class="field-input" type="text" [placeholder]="campaignToDelete()?.name ?? ''"
+                  [value]="deleteConfirmText()" (input)="deleteConfirmText.set($any($event.target).value)" />
+              </div>
+              <div class="form-actions form-actions-row">
+                <button class="btn btn-danger btn-sm" type="button"
+                  [disabled]="!deleteEnabled()" (click)="submitDelete()">Delete Campaign</button>
+                <button class="btn btn-ghost btn-sm" type="button" (click)="cancelDelete()">Cancel</button>
+              </div>
+            </div>
+          } @else {
+            @if (store.campaigns().length === 0) {
+              <p class="empty-state">No campaigns yet.</p>
+            } @else {
+              <ul class="campaign-list">
+                @for (campaign of store.campaigns(); track campaign.id) {
+                  <li class="campaign-list-item">
+                    @if (editingId() === campaign.id) {
+                      <div class="edit-form">
+                        <div class="field">
+                          <label class="field-label">Name</label>
+                          <input class="field-input" type="text"
+                            [value]="editName()" (input)="editName.set($any($event.target).value)" />
+                        </div>
+                        <div class="field">
+                          <label class="field-label">Description <span class="optional">(optional)</span></label>
+                          <textarea class="field-input field-textarea" rows="2"
+                            [value]="editDescription()" (input)="editDescription.set($any($event.target).value)"></textarea>
+                        </div>
+                        <div class="form-actions form-actions-row">
+                          <button class="btn btn-primary btn-sm" type="button"
+                            [disabled]="!editName().trim()" (click)="submitEdit()">Save</button>
+                          <button class="btn btn-ghost btn-sm" type="button" (click)="cancelEdit()">Cancel</button>
+                        </div>
+                      </div>
+                    } @else {
+                      <div class="campaign-list-row">
+                        <div class="campaign-list-info">
+                          <span class="campaign-list-name">{{ campaign.name }}</span>
+                          @if (store.activeCampaign()?.id === campaign.id) {
+                            <span class="active-chip">Active</span>
+                          }
+                          @if (campaign.description) {
+                            <span class="campaign-list-desc">{{ campaign.description }}</span>
+                          }
+                        </div>
+                        <div class="campaign-list-actions">
+                          <button class="icon-btn" type="button" title="Load campaign" aria-label="Load campaign"
+                            [class.icon-btn-active]="store.activeCampaign()?.id === campaign.id"
+                            (click)="loadCampaign(campaign.id)">
+                            <i class="fa-solid fa-download"></i>
+                          </button>
+                          <button class="icon-btn" type="button" title="Edit campaign" aria-label="Edit campaign"
+                            (click)="startEdit(campaign)">
+                            <i class="fa-solid fa-pen"></i>
+                          </button>
+                          <button class="icon-btn icon-btn-danger" type="button" title="Delete campaign" aria-label="Delete campaign"
+                            [disabled]="!canDelete()" (click)="startDelete(campaign)">
+                            <i class="fa-solid fa-trash"></i>
+                          </button>
+                        </div>
+                      </div>
+                    }
+                  </li>
+                }
+              </ul>
+            }
+          }
+        </div>
+      }
+
+      @case ('import') {
+        <div class="modal-content">
+          @if (importDone()) {
+            <div class="import-done">
+              <p class="import-done-msg">Import complete. Entities have been copied into the active campaign.</p>
+              <button class="btn btn-ghost btn-sm" type="button" (click)="resetImport()">Import Again</button>
+            </div>
+          } @else {
+            <p class="content-desc">
+              Copy factions, characters, or party members from another campaign into
+              <strong>{{ store.activeCampaign()?.name }}</strong>.
+              Imported entities receive new IDs and belong only to this campaign.
+            </p>
+
+            @if (importSources().length === 0) {
+              <p class="empty-state">No other campaigns to import from.</p>
+            } @else {
+              <div class="field">
+                <label class="field-label" for="import-source">Source Campaign</label>
+                <select id="import-source" class="field-input field-select"
+                  [value]="importSourceId() ?? ''"
+                  (change)="importSourceId.set($any($event.target).value || null)">
+                  <option value="">Select a campaign…</option>
+                  @for (c of importSources(); track c.id) {
+                    <option [value]="c.id">{{ c.name }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="field">
+                <p class="field-label">What to import</p>
+                <div class="checkbox-group">
+                  <label class="checkbox-row">
+                    <input type="checkbox" [checked]="importAll()"
+                      (change)="toggleImportAll($any($event.target).checked)" />
+                    <span class="checkbox-label">Import All</span>
+                    <span class="checkbox-hint">Factions, characters, and party members</span>
+                  </label>
+                  <div class="checkbox-divider"></div>
+                  <label class="checkbox-row" [class.disabled]="importAll()">
+                    <input type="checkbox" [checked]="importFactions()" [disabled]="importAll()"
+                      (change)="importFactions.set($any($event.target).checked)" />
+                    <span class="checkbox-label">Factions</span>
+                  </label>
+                  <label class="checkbox-row" [class.disabled]="importAll()">
+                    <input type="checkbox" [checked]="importCharacters()" [disabled]="importAll()"
+                      (change)="importCharacters.set($any($event.target).checked)" />
+                    <span class="checkbox-label">Characters</span>
+                    <span class="checkbox-hint">All non-party characters</span>
+                  </label>
+                  <label class="checkbox-row" [class.disabled]="importAll()">
+                    <input type="checkbox" [checked]="importPartyMembers()" [disabled]="importAll()"
+                      (change)="importPartyMembers.set($any($event.target).checked)" />
+                    <span class="checkbox-label">Party Members</span>
+                  </label>
+                </div>
+              </div>
+
+              @if (factionWarning()) {
+                <p class="import-warning">
+                  Characters will be imported without faction links — the source factions aren't being imported.
+                  You can reassign factions after importing.
+                </p>
+              }
+
+              <div class="form-actions">
+                <button class="btn btn-primary" type="button"
+                  [disabled]="!importReady() || importing()"
+                  (click)="submitImport()">
+                  {{ importing() ? 'Importing…' : 'Import' }}
+                </button>
+              </div>
+            }
+          }
+        </div>
+      }
+
+    }
+  </div>
+</div>

@@ -120,7 +120,7 @@ export class TimelineService {
     return {
       labels: this.sessionLabels(snapshots),
       series: [{
-        label: 'Colony Stress',
+        label: 'Global Stress',
         data: snapshots.map(s => s.colonyStress),
         color: '#60a5fa',
       }],
@@ -322,7 +322,7 @@ export class TimelineService {
     for (const def of seriesDefs) {
       if (def.metric === 'stress') {
         allSeries.push({
-          label: 'Colony Stress',
+          label: 'Global Stress',
           color: FACTION_PALETTE[colorIndex++ % FACTION_PALETTE.length],
           data: snapshots.map(s => s.colonyStress),
         });

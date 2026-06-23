@@ -1,5 +1,6 @@
 using ColonyTracker.Api.Data;
 using ColonyTracker.Api.Models;
+using ColonyTracker.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,12 +8,14 @@ namespace ColonyTracker.Api.Controllers;
 
 [ApiController]
 [Route("api/sessions")]
-public class SessionsController(AppDbContext db) : ControllerBase
+public class SessionsController(AppDbContext db, ICampaignContext campaign) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
+        var cid = await campaign.GetActiveIdAsync();
         var sessions = await db.Sessions
+            .Where(s => s.CampaignId == cid)
             .Include(s => s.Events)
                 .ThenInclude(e => e.Effects)
             .OrderBy(s => s.Number)
@@ -34,7 +37,9 @@ public class SessionsController(AppDbContext db) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] Session session)
     {
+        var cid = await campaign.GetActiveIdAsync();
         session.Id = Guid.NewGuid().ToString();
+        session.CampaignId = cid;
         foreach (var ev in session.Events)
         {
             ev.Id = Guid.NewGuid().ToString();
@@ -87,7 +92,8 @@ public class SessionsController(AppDbContext db) : ControllerBase
     {
         if (sessions is null || sessions.Count == 0) return BadRequest("No sessions provided.");
 
-        var existingIds = await db.Sessions.Select(s => s.Id).ToHashSetAsync();
+        var cid = await campaign.GetActiveIdAsync();
+        var existingIds = await db.Sessions.Where(s => s.CampaignId == cid).Select(s => s.Id).ToHashSetAsync();
         var imported = new List<Session>();
 
         foreach (var session in sessions)
@@ -96,6 +102,7 @@ public class SessionsController(AppDbContext db) : ControllerBase
                 continue;
 
             session.Id = string.IsNullOrWhiteSpace(session.Id) ? Guid.NewGuid().ToString() : session.Id;
+            session.CampaignId = cid;
             foreach (var ev in session.Events)
             {
                 ev.Id = string.IsNullOrWhiteSpace(ev.Id) ? Guid.NewGuid().ToString() : ev.Id;

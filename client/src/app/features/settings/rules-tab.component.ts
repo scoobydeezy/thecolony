@@ -8,17 +8,16 @@ import { RulesConfig, RelationshipThreshold, RelationshipLabel } from '../../cor
 import { scoreRelationship, ScoringActor } from '../../core/services/scoring.service';
 
 const THRESHOLD_LABELS: RelationshipLabel[] = [
-  'Aligned', 'Cooperative', 'Friendly', 'Tolerated', 'Strained', 'Opposed', 'Hostile'
+  'Aligned', 'Cooperative', 'Friendly', 'Tolerated', 'Strained', 'Opposed'
 ];
 
 const DEFAULT_THRESHOLDS: RelationshipThreshold[] = [
-  { label: 'Aligned',     minScore: 80 },
-  { label: 'Cooperative', minScore: 50 },
-  { label: 'Friendly',    minScore: 20 },
-  { label: 'Tolerated',   minScore: -10 },
-  { label: 'Strained',    minScore: -30 },
-  { label: 'Opposed',     minScore: -60 },
-  { label: 'Hostile',     minScore: -100 },
+  { label: 'Aligned',     minScore: 6  },
+  { label: 'Cooperative', minScore: 4  },
+  { label: 'Friendly',    minScore: 2  },
+  { label: 'Tolerated',   minScore: -1 },
+  { label: 'Strained',    minScore: -3 },
+  { label: 'Opposed',     minScore: -6 },
 ];
 
 // Five canonical faction pairs spanning the full relationship spectrum.
@@ -128,17 +127,17 @@ export class RulesTabComponent {
   reset(): void {
     if (!confirm('Reset all rules to default values?')) return;
     const defaults: Partial<RulesConfig> = {
-      beliefMatch: 2.5,
-      beliefConflict: -1.0,
-      valueAlignmentScale: 5,
+      beliefMatch: 3.0,
+      beliefConflict: -2.0,
+      valueAlignmentScale: 5.5,
       valueConflictScale: 3,
       stressPositiveMultiplierPerPoint: 0.25,
-      stressNegativeMultiplierPerPoint: 0.35,
+      stressNegativeMultiplierPerPoint: 0.2,
       influenceConvictionScale: 0.5,
       thresholdsJson: JSON.stringify(DEFAULT_THRESHOLDS),
-      stressWeightEnabled: false,
-      stressWeightCurve: 'Linear',
-      stressWeightIntensity: 0.5,
+      stressWeightEnabled: true,
+      stressWeightCurve: 'Cubic',
+      stressWeightIntensity: 0.7,
     };
     this.form.update(f => f ? { ...f, ...defaults } : f);
   }
@@ -262,7 +261,7 @@ export class RulesTabComponent {
       },
       scales: {
         x: {
-          title: { display: true, text: 'Colony Stress', color: textMuted, font: { size: 10 } },
+          title: { display: true, text: 'Global Stress', color: textMuted, font: { size: 10 } },
           ticks: { color: textMuted, font: { size: 10 } },
           grid: { color: 'rgba(255,255,255,0.05)' },
         },

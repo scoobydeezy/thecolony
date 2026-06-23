@@ -12,4 +12,5 @@ public class SessionLogEntry
     public int ColonyStressChange { get; set; } = 0;
     public string? RelationshipBumps { get; set; }
     public string? FutureConsequences { get; set; }
+    public string CampaignId { get; set; } = string.Empty;
 }

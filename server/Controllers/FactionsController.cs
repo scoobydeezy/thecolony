@@ -1,5 +1,6 @@
 using ColonyTracker.Api.Data;
 using ColonyTracker.Api.Models;
+using ColonyTracker.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,11 +8,17 @@ namespace ColonyTracker.Api.Controllers;
 
 [ApiController]
 [Route("api/factions")]
-public class FactionsController(AppDbContext db) : ControllerBase
+public class FactionsController(AppDbContext db, ICampaignContext campaign) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll()
-        => Ok(await db.Factions.OrderBy(f => f.SortOrder).ThenBy(f => f.Name).ToListAsync());
+    {
+        var cid = await campaign.GetActiveIdAsync();
+        return Ok(await db.Factions
+            .Where(f => f.CampaignId == cid)
+            .OrderBy(f => f.SortOrder).ThenBy(f => f.Name)
+            .ToListAsync());
+    }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(string id)
@@ -23,9 +30,11 @@ public class FactionsController(AppDbContext db) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] Faction faction)
     {
+        var cid = await campaign.GetActiveIdAsync();
         faction.Id = Guid.NewGuid().ToString();
+        faction.CampaignId = cid;
         if (faction.SortOrder == 0)
-            faction.SortOrder = (await db.Factions.MaxAsync(f => (int?)f.SortOrder) ?? 0) + 1;
+            faction.SortOrder = (await db.Factions.Where(f => f.CampaignId == cid).MaxAsync(f => (int?)f.SortOrder) ?? 0) + 1;
         db.Factions.Add(faction);
         await db.SaveChangesAsync();
         return CreatedAtAction(nameof(GetById), new { id = faction.Id }, faction);
@@ -50,7 +59,6 @@ public class FactionsController(AppDbContext db) : ControllerBase
         return NoContent();
     }
 
-    // Accepts an ordered list of faction IDs; assigns SortOrder by position.
     [HttpPut("reorder")]
     public async Task<IActionResult> Reorder([FromBody] List<string> orderedIds)
     {

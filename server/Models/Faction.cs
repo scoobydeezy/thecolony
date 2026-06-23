@@ -24,4 +24,5 @@ public class Faction
     public int BaseInfluence { get; set; } = 50;
     public int Momentum { get; set; } = 0;
     public int Legitimacy { get; set; } = 50;
+    public string CampaignId { get; set; } = string.Empty;
 }

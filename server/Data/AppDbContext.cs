@@ -5,6 +5,8 @@ namespace ColonyTracker.Api.Data;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
+    public DbSet<Campaign> Campaigns => Set<Campaign>();
+    public DbSet<AppSettings> AppSettings => Set<AppSettings>();
     public DbSet<Faction> Factions => Set<Faction>();
     public DbSet<ColonyState> ColonyStates => Set<ColonyState>();
     public DbSet<RelationshipOverride> RelationshipOverrides => Set<RelationshipOverride>();
@@ -17,6 +19,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<AppSettings>().HasKey(x => x.Id);
+        modelBuilder.Entity<AppSettings>()
+            .HasOne(x => x.ActiveCampaign)
+            .WithMany()
+            .HasForeignKey(x => x.ActiveCampaignId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // ColonyState and RulesConfig are now per-campaign (Guid PK, not "singleton")
         modelBuilder.Entity<ColonyState>().HasKey(x => x.Id);
         modelBuilder.Entity<RulesConfig>().HasKey(x => x.Id);
 
@@ -31,6 +41,5 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .WithOne(ef => ef.Event)
             .HasForeignKey(ef => ef.EventId)
             .OnDelete(DeleteBehavior.Cascade);
-
     }
 }

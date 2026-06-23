@@ -1,7 +1,7 @@
 <div class="app-shell">
   <nav class="sidebar">
     <div class="sidebar-header">
-      <h1 class="app-title">The Colony</h1>
+      <h1 class="app-title">{{ store.activeCampaign()?.name ?? 'The Colony' }}</h1>
       <p class="app-subtitle">Campaign Tracker</p>
     </div>
 
@@ -20,9 +20,27 @@
 
     </ul>
 
+    <div class="campaign-section">
+      <p class="campaign-section-label">Manage Campaigns</p>
+      <div class="campaign-actions">
+        <button class="campaign-action-btn" type="button" title="New Campaign" aria-label="New Campaign"
+          (click)="openCampaignManager('new')">
+          <i class="fa-regular fa-square-plus"></i>
+        </button>
+        <button class="campaign-action-btn" type="button" title="Manage Campaigns" aria-label="Manage Campaigns"
+          (click)="openCampaignManager('manage')">
+          <i class="fa-regular fa-rectangle-list"></i>
+        </button>
+        <button class="campaign-action-btn" type="button" title="Import Campaign" aria-label="Import Campaign"
+          (click)="openCampaignManager('import')">
+          <i class="fa-regular fa-clone"></i>
+        </button>
+      </div>
+    </div>
+
     @if (store.colonyState()) {
       <div class="stress-badge">
-        <span class="stress-label">Colony Stress</span>
+        <span class="stress-label">Global Stress</span>
         <span [class]="stressClass()">{{ store.viewColonyStress() }}/10</span>
       </div>
     }
@@ -94,3 +112,4 @@
 </div>
 
 <app-settings-drawer [open]="settingsOpen()" (closed)="closeSettings()" />
+<app-campaign-manager [mode]="campaignManagerMode()" (closed)="closeCampaignManager()" />

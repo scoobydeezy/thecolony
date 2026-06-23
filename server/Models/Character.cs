@@ -49,4 +49,5 @@ public class Character
 
     // Narrative state
     public CharacterState State { get; set; } = CharacterState.Alive;
+    public string CampaignId { get; set; } = string.Empty;
 }

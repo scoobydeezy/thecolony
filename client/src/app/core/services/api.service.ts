@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators';
 import {
   Faction, ColonyState, RelationshipOverride, RulesConfig,
   RelationshipBreakdown, SessionLogEntry, Character,
-  Session, CampaignEvent
+  Session, CampaignEvent, Campaign, AppSettings
 } from '../models/types';
 
 // The C# model stores value floats as truthValue/stabilityValue/agencyValue; map to/from ValueVector a/b/c.
@@ -198,5 +198,30 @@ export class ApiService {
 
   importSessions(sessions: Session[]): Observable<{ imported: number; skipped: number }> {
     return this.http.post<{ imported: number; skipped: number }>(`${this.base}/sessions/import`, sessions);
+  }
+
+  // Campaigns
+  getCampaigns(): Observable<Campaign[]> {
+    return this.http.get<Campaign[]>(`${this.base}/campaigns`);
+  }
+  createCampaign(campaign: Pick<Campaign, 'name' | 'description'>): Observable<Campaign> {
+    return this.http.post<Campaign>(`${this.base}/campaigns`, campaign);
+  }
+  updateCampaign(campaign: Campaign): Observable<Campaign> {
+    return this.http.put<Campaign>(`${this.base}/campaigns/${campaign.id}`, campaign);
+  }
+  deleteCampaign(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/campaigns/${id}`);
+  }
+  importEntities(sourceCampaignId: string, entityTypes: string[], importAll: boolean): Observable<void> {
+    return this.http.post<void>(`${this.base}/campaigns/import`, { sourceCampaignId, entityTypes, importAll });
+  }
+
+  // App Settings
+  getSettings(): Observable<AppSettings> {
+    return this.http.get<AppSettings>(`${this.base}/settings`);
+  }
+  setActiveCampaign(campaignId: string): Observable<AppSettings> {
+    return this.http.patch<AppSettings>(`${this.base}/settings`, { activeCampaignId: campaignId });
   }
 }

@@ -34,19 +34,33 @@
 .member-list {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
   margin-top: 1.75rem;
+}
+
+.member-row {
+  display: flex;
+  flex-direction: column;
+  padding: 0.15rem 0;
 }
 
 .member-link {
   font-size: 0.875rem;
-  color: var(--color-accent, #60a5fa);
+  color: var(--color-text, #e2e8f0);
+  font-weight: 600;
   text-decoration: none;
-  padding: 0.1rem 0;
 
   &:hover {
     text-decoration: underline;
+    color: #60a5fa;
   }
+}
+
+.member-subtitle {
+  display: block;
+  font-size: 0.7rem;
+  color: var(--color-text-muted, #94a3b8);
+  font-weight: 400;
 }
 
 // Ideology two-column layout

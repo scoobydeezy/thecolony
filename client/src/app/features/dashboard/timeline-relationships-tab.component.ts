@@ -4,6 +4,7 @@ import { Chart, ChartData, ChartOptions } from 'chart.js';
 import type { AnnotationOptions } from 'chartjs-plugin-annotation';
 import { AppStore } from '../../store/app.store';
 import { TimelineService } from '../../core/services/timeline.service';
+import { RelationshipThreshold } from '../../core/models/types';
 
 @Component({
   selector: 'app-timeline-relationships-tab',
@@ -60,8 +61,54 @@ export class TimelineRelationshipsTabComponent {
     })),
   }));
 
+  private readonly thresholdAnnotations = computed((): Record<string, AnnotationOptions> => {
+    const rules = this.store.rules();
+    if (!rules) return {};
+
+    const allScores = this.dataset().series.flatMap(s => s.data).filter((v): v is number => v != null);
+    if (allScores.length === 0) return {};
+    const yMin = Math.min(...allScores) - 1;
+    const yMax = Math.max(...allScores) + 1;
+
+    const THRESHOLD_COLORS: Record<string, string> = {
+      Aligned:     'rgba(52,211,153,0.35)',
+      Cooperative: 'rgba(96,165,250,0.30)',
+      Friendly:    'rgba(147,197,253,0.25)',
+      Tolerated:   'rgba(148,163,184,0.20)',
+      Strained:    'rgba(251,191,36,0.25)',
+      Opposed:     'rgba(251,146,60,0.30)',
+      Hostile:     'rgba(248,113,113,0.35)',
+    };
+
+    const result: Record<string, AnnotationOptions> = {};
+    try {
+      const thresholds: RelationshipThreshold[] = JSON.parse(rules.thresholdsJson);
+      thresholds
+        .filter(t => t.minScore >= yMin && t.minScore <= yMax)
+        .forEach(t => {
+          result[`thresh_${t.label}`] = {
+            type: 'line',
+            yMin: t.minScore, yMax: t.minScore,
+            borderColor: THRESHOLD_COLORS[t.label] ?? 'rgba(255,255,255,0.15)',
+            borderWidth: 1,
+            borderDash: [4, 3],
+            label: {
+              display: true,
+              content: t.label,
+              position: 'end',
+              color: 'rgba(255,255,255,0.4)',
+              font: { size: 9 },
+              backgroundColor: 'transparent',
+              padding: 2,
+            },
+          };
+        });
+    } catch { /* malformed thresholdsJson */ }
+    return result;
+  });
+
   readonly chartOptions = computed((): ChartOptions<'line'> => {
-    const annotations: Record<string, AnnotationOptions> = {};
+    const annotations: Record<string, AnnotationOptions> = { ...this.thresholdAnnotations() };
 
     if (this.showEvents()) {
       this.dataset().eventMarkers.forEach(m => {

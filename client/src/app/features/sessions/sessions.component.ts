@@ -87,8 +87,9 @@ export class SessionsComponent {
     // sortedSessions is newest-first, so the highest-numbered session is at index 0
     const lastSession = sessions.length > 0 ? sessions[0] : null;
     const nextNumber = lastSession ? lastSession.number + 1 : 1;
+    const nextAct    = lastSession ? lastSession.act  : (cs?.act  ?? 1);
     const nextWeek   = lastSession ? lastSession.week + 1 : (cs?.week ?? 1);
-    this.editingSession.set({ number: nextNumber, title: '', act: cs?.act ?? 1, week: nextWeek, date: undefined, summary: '', events: [] });
+    this.editingSession.set({ number: nextNumber, title: '', act: nextAct, week: nextWeek, date: undefined, summary: '', events: [] });
     this.showSessionModal.set(true);
   }
 

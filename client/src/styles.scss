@@ -149,6 +149,7 @@ html, body {
     outline: none;
     transition: border-color 0.15s;
     &:focus { border-color: var(--accent); }
+    &::-webkit-calendar-picker-indicator { filter: invert(1); }
   }
 
   textarea { resize: vertical; min-height: 80px; }

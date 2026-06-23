@@ -1,6 +1,22 @@
 export type BeliefPosition = 'positive' | 'neutral' | 'negative';
 export type CoreValue = 'A' | 'B' | 'C';
 
+// ── Campaign ───────────────────────────────────────────────────────────────
+
+export interface Campaign {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AppSettings {
+  id: string;
+  activeCampaignId: string;
+  activeCampaign?: Campaign;
+}
+
 // ── Display Labels ─────────────────────────────────────────────────────────
 
 export interface ValueLabels {
