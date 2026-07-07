@@ -42,6 +42,7 @@ public class CharactersController(AppDbContext db, ICampaignContext campaign) : 
     public async Task<IActionResult> Update(string id, [FromBody] Character character)
     {
         if (id != character.Id) return BadRequest();
+        character.CampaignId = await campaign.GetActiveIdAsync();
         db.Entry(character).State = EntityState.Modified;
         await db.SaveChangesAsync();
         return Ok(character);

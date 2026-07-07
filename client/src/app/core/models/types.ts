@@ -144,11 +144,24 @@ export interface Faction {
   represents: string;
   type: GroupType;
   coreTenet: string;
+  focus?: string;
   certainOf: string;
   rightAbout: string;
   afraidOf: string;
   wrongAbout: string;
-  singleSentence: string;
+  response?: string;
+  summary?: string;
+  motto?: string;
+  origin?: string;
+  foundedAs?: string;
+  became?: string;
+  publicFace?: string;
+  selfImage?: string;
+  history?: string;
+  glyphPath?: string;
+  iconPath?: string;
+  primaryColor?: string;
+  secondaryColor?: string;
   beliefc?: BeliefPosition;
   beliefa?: BeliefPosition;
   beliefb?: BeliefPosition;
@@ -156,9 +169,9 @@ export interface Faction {
   active: boolean;
   notes?: string;
   sortOrder: number;
-  baseInfluence: number;
   momentum: number;
-  legitimacy: number;
+  baseLegitimacy: number;
+  powerModifier: number;
 }
 
 export interface ColonyState {
@@ -189,28 +202,38 @@ export interface RelationshipOverride {
 // Magic-number weights used in the influence and belief derivation engines.
 
 export interface FormulasConfig {
-  // Faction influence blend: characterInfluence = avg * memberAvgWeight + max * memberMaxWeight
-  memberAvgWeight: number;           // default 0.6
-  memberMaxWeight: number;           // default 0.4
-  // Total influence blend: base * baseWeight + charInfluence * charWeight + momentum * momentumWeight
-  baseInfluenceWeight: number;       // default 0.45
-  charInfluenceWeight: number;       // default 0.35
-  momentumInfluenceWeight: number;   // default 0.20
-  // Effective power: totalInfluence × (legitimacyBase + legitimacy / legitimacyScale)
-  legitimacyBase: number;            // default 0.5
-  legitimacyScale: number;           // default 100
-  // Leaderless penalty: if no alive FactionLeader exists, multiply effective power by this
-  leaderlessPowerMultiplier: number; // default 0.75
+  // CharacterStrength blend: characterStrength = avg * memberAvgWeight + max * memberMaxWeight
+  memberAvgWeight: number;              // default 0.6
+  memberMaxWeight: number;              // default 0.4
+  // Organization blend: charStrength * charWeight + assetInfluenceScore * assetWeight + normalizedMomentum * momentumWeight + powerModifier
+  charInfluenceWeight: number;          // default 0.40
+  assetInfluenceWeight: number;         // default 0.40
+  momentumInfluenceWeight: number;      // default 0.20
+  // Normalization scales for asset raw scores → 0–100
+  assetInfluenceScale: number;          // default 25 (raw sum at which score = 100)
+  assetLegitimacyScale: number;         // default 25
+  // Legitimacy blend: baseLegitimacy * baseWeight + assetLegitimacyScore * assetWeight
+  baseLegitimacyWeight: number;         // default 0.70
+  assetLegitimacyWeight: number;        // default 0.30
+  // Power: Organization × (legitimacyBase + Legitimacy / legitimacyScale) + powerModifier
+  legitimacyBase: number;               // default 0.5
+  legitimacyScale: number;              // default 100
+  // Leaderless penalty applied to CharacterStrength (not final power)
+  leaderlessPowerMultiplier: number;    // default 0.75
   // Belief derivation: value axis must exceed this to assign a non-neutral position
-  beliefDerivationThreshold: number; // default 0.4
+  beliefDerivationThreshold: number;    // default 0.4
 }
 
 export const DEFAULT_FORMULAS: FormulasConfig = {
   memberAvgWeight:            0.6,
   memberMaxWeight:            0.4,
-  baseInfluenceWeight:        0.45,
-  charInfluenceWeight:        0.35,
+  charInfluenceWeight:        0.40,
+  assetInfluenceWeight:       0.40,
   momentumInfluenceWeight:    0.20,
+  assetInfluenceScale:        25,
+  assetLegitimacyScale:       25,
+  baseLegitimacyWeight:       0.70,
+  assetLegitimacyWeight:      0.30,
   legitimacyBase:             0.5,
   legitimacyScale:            100,
   leaderlessPowerMultiplier:  0.75,
@@ -226,7 +249,7 @@ export const DEFAULT_FORMULAS: FormulasConfig = {
 export interface EffectPropDescriptor {
   property: string;
   label: string;
-  inputType: 'delta' | 'select' | 'none';
+  inputType: 'delta' | 'select' | 'none' | 'faction-select' | 'participate';
   selectOptions?: { value: string; label: string }[];
   needsSecondaryTarget?: boolean;  // true for relationshipBump
 }
@@ -253,7 +276,8 @@ export const CHARACTER_SUBTYPE_OPTIONS: { value: string; label: string }[] = [
 
 export const FACTION_EFFECT_PROPS: EffectPropDescriptor[] = [
   { property: 'momentum',              label: 'Momentum',              inputType: 'delta' },
-  { property: 'legitimacy',            label: 'Legitimacy',            inputType: 'delta' },
+  { property: 'baseLegitimacy',        label: 'Base Legitimacy',       inputType: 'delta' },
+  { property: 'powerModifier',         label: 'Power Modifier',        inputType: 'delta' },
   { property: 'relationshipBump',      label: 'Relationship Bump',     inputType: 'delta', needsSecondaryTarget: true },
   { property: 'partyRelationshipBump', label: 'Party Rel. Bump',       inputType: 'delta' },
 ];
@@ -282,9 +306,9 @@ export const COLONY_EFFECT_PROPS: EffectPropDescriptor[] = [
 //   the source property by `multiplier` and applies the result to the target.
 // effectType 'flat': adds `flatDelta` directly to the target property.
 
-export type FactionSourceProp = 'momentum' | 'legitimacy';
+export type FactionSourceProp = 'momentum' | 'baseLegitimacy';
 export type CharacterSourceProp = 'pressure' | 'conviction' | 'influence' | 'impressionable';
-export type FactionTargetProp = 'momentum' | 'legitimacy';
+export type FactionTargetProp = 'momentum' | 'baseLegitimacy';
 export type CharacterTargetProp = 'pressure' | 'conviction' | 'influence' | 'impressionable';
 
 export interface CascadeRule {
@@ -293,7 +317,7 @@ export interface CascadeRule {
 
   // ── Trigger ──
   triggerType: 'streak' | 'threshold' | 'event';
-  sourceEntityType: 'faction' | 'character';
+  sourceEntityType: 'faction' | 'character' | 'goal';
   sourceProperty: string;
   // streak trigger
   direction?: 'positive' | 'negative' | 'either';
@@ -302,8 +326,11 @@ export interface CascadeRule {
   thresholdOperator?: 'gt' | 'lt';
   thresholdValue?: number;
   // event trigger
-  sourceEntitySubtype?: string;     // e.g. 'FactionLeader', 'Faction', 'SocialClass', '' = any
+  sourceEntitySubtype?: string;     // faction/character: type filter; goal: priority filter (Critical/Major/Minor)
+  sourceEntityId?: string;          // goal: pin to a specific goal ID; '' = any
   sourcePropertyValue?: string[];   // for select-type properties; any listed value matches (OR logic)
+  // goal + any-goal mode: optional faction override — filters to goals owned by this faction AND applies effect there
+  targetEntityId?: string;
 
   // ── Effect ──
   effectType: 'multiplier' | 'flat';
@@ -316,11 +343,34 @@ export interface CascadeRule {
 }
 
 export const DEFAULT_CASCADE_RULES: CascadeRule[] = [
-  { id: 'neg-2', label: '2+ negative weeks',  triggerType: 'streak', sourceEntityType: 'faction', sourceProperty: 'momentum', direction: 'negative', minConsecutiveWeeks: 2, effectType: 'multiplier', targetEntityType: 'faction', targetProperty: 'legitimacy', multiplier: 2 },
-  { id: 'neg-3', label: '3+ negative weeks',  triggerType: 'streak', sourceEntityType: 'faction', sourceProperty: 'momentum', direction: 'negative', minConsecutiveWeeks: 3, effectType: 'multiplier', targetEntityType: 'faction', targetProperty: 'legitimacy', multiplier: 3 },
-  { id: 'pos-2', label: '2+ positive weeks',  triggerType: 'streak', sourceEntityType: 'faction', sourceProperty: 'momentum', direction: 'positive', minConsecutiveWeeks: 2, effectType: 'multiplier', targetEntityType: 'faction', targetProperty: 'legitimacy', multiplier: 2 },
-  { id: 'pos-3', label: '3+ positive weeks',  triggerType: 'streak', sourceEntityType: 'faction', sourceProperty: 'momentum', direction: 'positive', minConsecutiveWeeks: 3, effectType: 'multiplier', targetEntityType: 'faction', targetProperty: 'legitimacy', multiplier: 3 },
+  { id: 'neg-2', label: '2+ negative weeks',  triggerType: 'streak', sourceEntityType: 'faction', sourceProperty: 'momentum', direction: 'negative', minConsecutiveWeeks: 2, effectType: 'multiplier', targetEntityType: 'faction', targetProperty: 'baseLegitimacy', multiplier: 2 },
+  { id: 'neg-3', label: '3+ negative weeks',  triggerType: 'streak', sourceEntityType: 'faction', sourceProperty: 'momentum', direction: 'negative', minConsecutiveWeeks: 3, effectType: 'multiplier', targetEntityType: 'faction', targetProperty: 'baseLegitimacy', multiplier: 3 },
+  { id: 'pos-2', label: '2+ positive weeks',  triggerType: 'streak', sourceEntityType: 'faction', sourceProperty: 'momentum', direction: 'positive', minConsecutiveWeeks: 2, effectType: 'multiplier', targetEntityType: 'faction', targetProperty: 'baseLegitimacy', multiplier: 2 },
+  { id: 'pos-3', label: '3+ positive weeks',  triggerType: 'streak', sourceEntityType: 'faction', sourceProperty: 'momentum', direction: 'positive', minConsecutiveWeeks: 3, effectType: 'multiplier', targetEntityType: 'faction', targetProperty: 'baseLegitimacy', multiplier: 3 },
 ];
+
+// ── Stress Triggers ────────────────────────────────────────────────────────
+// Fires when a specific entity state/status transition occurs in the timeline,
+// applying a flat stress delta. oneShot triggers fire only once per entity
+// across the entire campaign timeline.
+
+export type StressTriggerEntityType = 'asset' | 'goal' | 'character' | 'faction';
+
+export interface StressTrigger {
+  id: string;
+  label: string;
+  sourceEntityType: StressTriggerEntityType;
+  // For status/state transitions: name of the property being watched (e.g. 'status', 'state')
+  sourceProperty: string;
+  // One or more values that trigger this rule (OR logic)
+  sourcePropertyValue: string[];
+  // Optional: filter by entity subtype (e.g. AssetType, GoalPriority, CharacterType)
+  sourceEntitySubtype?: string;
+  // Optional: restrict to a single specific entity by ID
+  sourceEntityId?: string;
+  flatDelta: number;
+  oneShot: boolean;
+}
 
 export interface RulesConfig {
   id: string;
@@ -349,6 +399,9 @@ export interface RulesConfig {
   stressWeightEnabled: boolean;
   stressWeightCurve: StressWeightCurve;
   stressWeightIntensity: number;
+
+  // Stress triggers — stored as JSON
+  stressTriggersJson: string;
 }
 
 export type StressWeightCurve = 'Linear' | 'Quadratic' | 'Cubic' | 'Exponential';
@@ -453,8 +506,9 @@ export interface ColonySnapshot {
   sessionId: string;
   sessionNumber: number;
   colonyStress: number;
-  factionMomentum: Record<string, number>;     // factionId → momentum
-  factionLegitimacy: Record<string, number>;   // factionId → legitimacy
+  factionMomentum: Record<string, number>;          // factionId → momentum
+  factionBaseLegitimacy: Record<string, number>;    // factionId → baseLegitimacy (cascade writes here)
+  factionPowerModifier: Record<string, number>;     // factionId → powerModifier
   characterPressure: Record<string, number>;   // characterId → pressure
   characterInfluence: Record<string, number>;  // characterId → influence
   characterStates: Record<string, CharacterState>;   // characterId → state at this point
@@ -463,12 +517,21 @@ export interface ColonySnapshot {
   factionRelationshipBumps: Record<string, Record<string, number>>; // sourceId → targetId → bump
   factionPartyBumps: Record<string, number>;   // factionId → cumulative party bump
   derivedEffects: DerivedEffect[];             // computed momentum cascade effects this session
+  // Assets — cumulative control and status state
+  assetControl: Record<string, string | undefined>;  // assetId → factionId
+  assetStatuses: Record<string, AssetStatus>;         // assetId → status
+  // Goals — cumulative status and participants
+  goalStatuses: Record<string, GoalStatus>;
+  goalParticipants: Record<string, Array<{ actorId: string; actorType: string; role: string; delta: number; sessionId: string }>>;
+  // Stress triggers that have fired (oneShot tracking)
+  firedStressTriggers: string[];
 }
 
 export interface ColonyImpact {
   stressDelta: number;
   momentumChanges: { factionId: string; delta: number }[];
-  legitimacyChanges: { factionId: string; delta: number }[];
+  baseLegitimacyChanges: { factionId: string; delta: number }[];
+  powerModifierChanges: { factionId: string; delta: number }[];
   characterDeaths: string[];
   defections: { characterId: string; fromFactionId: string; toFactionId: string }[];
   factionRelationshipChanges: { sourceId: string; targetId: string; delta: number }[];
@@ -480,6 +543,152 @@ export interface ColonyImpact {
 export interface RelationshipThreshold {
   label: RelationshipLabel;
   minScore: number;
+}
+
+// ── Assets ─────────────────────────────────────────────────────────────────
+
+export type AssetType   = 'Infrastructure' | 'Artifact' | 'Resource' | 'Intelligence';
+export type AssetRole   = 'Operational' | 'Strategic' | 'Symbolic' | 'Hidden' | 'Mandate';
+export type AssetStatus = 'Stable' | 'Contested' | 'Damaged' | 'Destroyed' | 'Hidden' | 'Lost';
+
+export const ASSET_TYPE_OPTIONS: { value: AssetType; label: string }[] = [
+  { value: 'Infrastructure', label: 'Infrastructure' },
+  { value: 'Artifact',       label: 'Artifact' },
+  { value: 'Resource',       label: 'Resource' },
+  { value: 'Intelligence',   label: 'Intelligence' },
+];
+
+export const ASSET_ROLE_OPTIONS: { value: AssetRole; label: string }[] = [
+  { value: 'Operational', label: 'Operational' },
+  { value: 'Strategic',   label: 'Strategic' },
+  { value: 'Symbolic',    label: 'Symbolic' },
+  { value: 'Hidden',      label: 'Hidden' },
+  { value: 'Mandate',     label: 'Mandate' },
+];
+
+export const ASSET_TIER_OPTIONS: { value: number; label: string }[] = [
+  { value: 1, label: '1' },
+  { value: 2, label: '2' },
+  { value: 3, label: '3' },
+  { value: 4, label: '4' },
+  { value: 5, label: '5' },
+];
+
+export const ASSET_STATUS_OPTIONS: { value: AssetStatus; label: string }[] = [
+  { value: 'Stable',    label: 'Stable' },
+  { value: 'Contested', label: 'Contested' },
+  { value: 'Damaged',   label: 'Damaged' },
+  { value: 'Destroyed', label: 'Destroyed' },
+  { value: 'Hidden',    label: 'Hidden' },
+  { value: 'Lost',      label: 'Lost' },
+];
+
+// Role weights: base influence and legitimacy per Value point.
+export const ASSET_ROLE_WEIGHTS: Record<AssetRole, { influence: number; legitimacy: number }> = {
+  Operational: { influence: 1.00, legitimacy: 1.00 },
+  Strategic:   { influence: 1.25, legitimacy: 0.25 },
+  Symbolic:    { influence: 0.25, legitimacy: 1.25 },
+  Hidden:      { influence: 1.00, legitimacy: 0.00 },
+  Mandate:     { influence: 0.00, legitimacy: 1.00 },
+};
+
+// Status multipliers are split: Hidden assets retain Influence but lose Legitimacy.
+export const ASSET_STATUS_MULTIPLIERS: Record<AssetStatus, { influence: number; legitimacy: number }> = {
+  Stable:    { influence: 1.00, legitimacy: 1.00 },
+  Contested: { influence: 0.50, legitimacy: 0.50 },
+  Damaged:   { influence: 0.25, legitimacy: 0.25 },
+  Destroyed: { influence: 0.00, legitimacy: 0.00 },
+  Hidden:    { influence: 1.00, legitimacy: 0.00 },
+  Lost:      { influence: 0.00, legitimacy: 0.00 },
+};
+
+export interface Asset {
+  id: string;
+  campaignId: string;
+  name: string;
+  description?: string;
+  type: AssetType;
+  role: AssetRole;
+  tier: number;
+  keystone: boolean;
+  controllingFactionId?: string;
+  location?: string;
+  status: AssetStatus;
+}
+
+export function computeAssetInfluence(asset: Asset): number {
+  const base = ASSET_ROLE_WEIGHTS[asset.role].influence * asset.tier;
+  return base * ASSET_STATUS_MULTIPLIERS[asset.status].influence;
+}
+
+export function computeAssetLegitimacy(asset: Asset): number {
+  const base = ASSET_ROLE_WEIGHTS[asset.role].legitimacy * asset.tier;
+  return base * ASSET_STATUS_MULTIPLIERS[asset.status].legitimacy;
+}
+
+// ── Faction Goals ──────────────────────────────────────────────────────────
+
+export type GoalStatus = 'Plotting' | 'Progressing' | 'Stalled' | 'Accomplished' | 'Failed';
+export type GoalPriority = 'Critical' | 'Major' | 'Minor';
+export type GoalVisibility = 'Open' | 'Known' | 'Secret';
+
+export const GOAL_STATUS_OPTIONS: { value: GoalStatus; label: string }[] = [
+  { value: 'Plotting',     label: 'Plotting' },
+  { value: 'Progressing',  label: 'Progressing' },
+  { value: 'Stalled',      label: 'Stalled' },
+  { value: 'Accomplished', label: 'Accomplished' },
+  { value: 'Failed',       label: 'Failed' },
+];
+
+export const GOAL_PRIORITY_OPTIONS: { value: GoalPriority; label: string }[] = [
+  { value: 'Critical', label: 'Critical' },
+  { value: 'Major',    label: 'Major' },
+  { value: 'Minor',    label: 'Minor' },
+];
+
+export const GOAL_VISIBILITY_OPTIONS: { value: GoalVisibility; label: string }[] = [
+  { value: 'Open',   label: 'Open' },
+  { value: 'Known',  label: 'Known' },
+  { value: 'Secret', label: 'Secret' },
+];
+
+export const ASSET_EFFECT_PROPS: EffectPropDescriptor[] = [
+  { property: 'controllingFactionId', label: 'Controlling Faction', inputType: 'faction-select' },
+  { property: 'status',               label: 'Status',              inputType: 'select', selectOptions: ASSET_STATUS_OPTIONS },
+  { property: 'stress',               label: 'Stress',              inputType: 'delta' },
+];
+
+export const GOAL_EFFECT_PROPS: EffectPropDescriptor[] = [
+  { property: 'status',      label: 'Status',        inputType: 'select', selectOptions: GOAL_STATUS_OPTIONS },
+  { property: 'participate', label: 'Participation', inputType: 'participate' },
+];
+
+export type GoalTargetEntityType = 'Faction' | 'Character' | 'Asset';
+export type GoalTargetOperator   = 'gte' | 'lte' | 'eq';
+
+// States available per target entity type
+export const CHARACTER_TARGET_STATES = ['Alive', 'Dead', 'Missing', 'Forgotten'] as const;
+export const ASSET_TARGET_STATES     = ['Stable', 'Contested', 'Damaged', 'Destroyed', 'Hidden', 'Lost'] as const;
+export const FACTION_TARGET_PROPS    = ['baseLegitimacy', 'momentum', 'power'] as const;
+
+export interface FactionGoal {
+  id: string;
+  campaignId: string;
+  factionId: string;
+  title: string;
+  description?: string;
+  status: GoalStatus;
+  priority: GoalPriority;
+  visibility: GoalVisibility;
+  // Structured target
+  targetEntityType?: GoalTargetEntityType;
+  targetEntityId?: string;
+  // Character / Asset: discrete state match
+  targetState?: string;
+  // Faction: numeric threshold
+  targetProperty?: string;
+  targetOperator?: GoalTargetOperator;
+  targetThreshold?: number;
 }
 
 // ── Character System ───────────────────────────────────────────────────────

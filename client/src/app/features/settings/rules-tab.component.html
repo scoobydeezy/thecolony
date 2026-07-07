@@ -1,4 +1,4 @@
-@if (form(); as f) {
+@if (rulesModel().id) {
   <!-- Stress Effect Preview Chart -->
   <div class="card">
     <h3 class="section-title">Relationship Preview</h3>
@@ -24,18 +24,16 @@
     </p>
     <div class="toggle-row">
       <label class="tuner-toggle" title="Enable stress-weight composition">
-        <input type="checkbox" [checked]="f.stressWeightEnabled"
-          (change)="boolField('stressWeightEnabled', $any($event.target).checked)" />
+        <input type="checkbox" [formField]="rulesForm.stressWeightEnabled" />
         <span class="toggle-track"></span>
       </label>
       <span class="toggle-label-text">Enable stress-weight composition</span>
     </div>
-    @if (f.stressWeightEnabled) {
+    @if (rulesModel().stressWeightEnabled) {
       <div class="grid-2">
         <div class="form-group">
           <label>Curve</label>
-          <select [value]="f.stressWeightCurve"
-            (change)="strField('stressWeightCurve', $any($event.target).value)">
+          <select [formField]="rulesForm.stressWeightCurve">
             <option value="Linear">Linear</option>
             <option value="Quadratic">Quadratic</option>
             <option value="Cubic">Cubic</option>
@@ -45,8 +43,7 @@
         </div>
         <div class="form-group">
           <label>Intensity</label>
-          <input type="number" step="0.05" min="0" max="1" [value]="f.stressWeightIntensity"
-            (input)="floatField('stressWeightIntensity', $any($event.target).value)" />
+          <input type="number" step="0.05" [formField]="rulesForm.stressWeightIntensity" />
           <small>0 = no shift, 1 = maximum — at stress 10 beliefs drop to 0×, values rise to 2×</small>
         </div>
       </div>
@@ -63,14 +60,12 @@
     <div class="grid-2">
       <div class="form-group">
         <label>Positive Multiplier / Point</label>
-        <input type="number" step="0.01" [value]="f.stressPositiveMultiplierPerPoint"
-          (input)="floatField('stressPositiveMultiplierPerPoint', $any($event.target).value)" />
+        <input type="number" step="0.01" [formField]="rulesForm.stressPositiveMultiplierPerPoint" />
         <small>Default: 0.25 — fades out as stress rises</small>
       </div>
       <div class="form-group">
         <label>Negative Multiplier / Point</label>
-        <input type="number" step="0.01" [value]="f.stressNegativeMultiplierPerPoint"
-          (input)="floatField('stressNegativeMultiplierPerPoint', $any($event.target).value)" />
+        <input type="number" step="0.01" [formField]="rulesForm.stressNegativeMultiplierPerPoint" />
         <small>Default: 0.20 — fades in as stress rises</small>
       </div>
     </div>
@@ -82,33 +77,27 @@
     <p class="help-text">
       Belief multipliers are weighted by the importance of its corresponding value to the faction or character.
     </p>
-
     <div class="rules-grid">
       <div class="rule-group">
         <h4>Values</h4>
         <div class="rule-row">
           <span class="rule-label">Alignment</span>
-          <input type="number" step="0.5" [value]="f.valueAlignmentScale"
-            (input)="numField('valueAlignmentScale', $any($event.target).value)" />
+          <input type="number" step="0.5" [formField]="rulesForm.valueAlignmentScale" />
         </div>
         <div class="rule-row">
           <span class="rule-label">Conflict</span>
-          <input type="number" step="0.5" [value]="f.valueConflictScale"
-            (input)="numField('valueConflictScale', $any($event.target).value)" />
+          <input type="number" step="0.5" [formField]="rulesForm.valueConflictScale" />
         </div>
       </div>
-
       <div class="rule-group">
         <h4>Beliefs</h4>
         <div class="rule-row">
           <span class="rule-label">Matching</span>
-          <input type="number" step="0.1" [value]="f.beliefMatch"
-            (input)="numField('beliefMatch', $any($event.target).value)" />
+          <input type="number" step="0.1" [formField]="rulesForm.beliefMatch" />
         </div>
         <div class="rule-row">
           <span class="rule-label">Conflicting</span>
-          <input type="number" step="0.1" [value]="f.beliefConflict"
-            (input)="numField('beliefConflict', $any($event.target).value)" />
+          <input type="number" step="0.1" [formField]="rulesForm.beliefConflict" />
         </div>
       </div>
     </div>
@@ -119,23 +108,21 @@
     <h3 class="section-title">Scoring Modes</h3>
     <div class="toggle-row">
       <label class="tuner-toggle" title="Enable positive relationship scoring">
-        <input type="checkbox" [checked]="f.positiveEnabled"
-          (change)="boolField('positiveEnabled', $any($event.target).checked)" />
+        <input type="checkbox" [formField]="rulesForm.positiveEnabled" />
         <span class="toggle-track"></span>
       </label>
       <span class="toggle-label-text">Enable positive relationship scoring</span>
     </div>
     <div class="toggle-row">
       <label class="tuner-toggle" title="Enable negative relationship scoring">
-        <input type="checkbox" [checked]="f.negativeEnabled"
-          (change)="boolField('negativeEnabled', $any($event.target).checked)" />
+        <input type="checkbox" [formField]="rulesForm.negativeEnabled" />
         <span class="toggle-track"></span>
       </label>
       <span class="toggle-label-text">Enable negative relationship scoring</span>
     </div>
   </div>
 
-  <!-- Relationship Thresholds -->
+  <!-- Relationship Thresholds — editing parsed JSON sub-array, stays hand-rolled -->
   <div class="card">
     <h3 class="section-title">Relationship Thresholds</h3>
     <p class="help-text">Minimum score required to reach each relationship level. Labels are applied top-down; the highest matching threshold wins. Hostile has no threshold — it applies to any score below Opposed.</p>

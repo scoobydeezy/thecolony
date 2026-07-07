@@ -1,5 +1,5 @@
 import { Component, inject, signal, effect, computed } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormField, form } from '@angular/forms/signals';
 import { BaseChartDirective } from 'ng2-charts';
 import { Chart, ChartData, ChartOptions } from 'chart.js';
 import type { AnnotationOptions } from 'chartjs-plugin-annotation';
@@ -20,8 +20,6 @@ const DEFAULT_THRESHOLDS: RelationshipThreshold[] = [
   { label: 'Opposed',     minScore: -6 },
 ];
 
-// Five canonical faction pairs spanning the full relationship spectrum.
-// Computed from seed data so the preview reflects actual game archetypes.
 interface PreviewPair {
   label: string;
   color: string;
@@ -32,37 +30,48 @@ interface PreviewPair {
 const PREVIEW_PAIRS: PreviewPair[] = [
   {
     label: 'Witnesses → Seekers',
-    color: 'rgba(248,113,113,0.9)',   // red — strongly hostile, stress amplifies hard
+    color: 'rgba(248,113,113,0.9)',
     src: { values: { a: 0.60, b: 0.25, c: 0.15 }, beliefc: 'positive',  beliefa: 'positive',  beliefb: 'negative' },
     tgt: { values: { a: 0.15, b: 0.25, c: 0.60 }, beliefc: 'negative',  beliefa: 'negative',  beliefb: 'positive' },
   },
   {
     label: 'Keepers → Cult',
-    color: 'rgba(251,146,60,0.9)',    // orange — negative, worsens under stress
+    color: 'rgba(251,146,60,0.9)',
     src: { values: { a: 0.25, b: 0.60, c: 0.15 }, beliefc: 'positive',  beliefa: 'negative',  beliefb: 'negative' },
     tgt: { values: { a: 0.60, b: 0.15, c: 0.25 }, beliefc: 'negative',  beliefa: 'neutral',   beliefb: 'positive' },
   },
   {
     label: 'Witnesses → Keepers',
-    color: 'rgba(148,163,184,0.9)',   // slate — dead neutral, flat through all stress
+    color: 'rgba(148,163,184,0.9)',
     src: { values: { a: 0.60, b: 0.25, c: 0.15 }, beliefc: 'positive',  beliefa: 'positive',  beliefb: 'negative' },
     tgt: { values: { a: 0.25, b: 0.60, c: 0.15 }, beliefc: 'positive',  beliefa: 'negative',  beliefb: 'negative' },
   },
   {
     label: 'Aspis → Civilians',
-    color: 'rgba(52,211,153,0.9)',    // green — mildly positive, smooth stress arc
+    color: 'rgba(52,211,153,0.9)',
     src: { values: { a: 0.15, b: 0.60, c: 0.25 } },
     tgt: { values: { a: 0.15, b: 0.60, c: 0.25 } },
   },
   {
     label: 'Keepers → Aspis',
-    color: 'rgba(96,165,250,0.9)',    // blue — solidly positive, stress boost then fade
+    color: 'rgba(96,165,250,0.9)',
     src: { values: { a: 0.25, b: 0.60, c: 0.15 }, beliefc: 'positive',  beliefa: 'negative',  beliefb: 'negative' },
     tgt: { values: { a: 0.15, b: 0.60, c: 0.25 }, beliefc: 'neutral',   beliefa: 'negative',  beliefb: 'negative' },
   },
 ];
 
 const STRESS_POINTS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+
+const DEFAULT_RULES_STUB: RulesConfig = {
+  id: '', beliefMatch: 3, beliefConflict: -2, valueAlignmentScale: 5.5,
+  valueConflictScale: 3, stressPositiveMultiplierPerPoint: 0.25,
+  stressNegativeMultiplierPerPoint: 0.2, positiveEnabled: true, negativeEnabled: true,
+  thresholdsJson: JSON.stringify(DEFAULT_THRESHOLDS),
+  valueLabelsJson: '{}', beliefAxisLabelsJson: '{}',
+  cascadeRulesJson: '[]', formulasJson: '{}', stressWeightEnabled: true,
+  stressWeightCurve: 'Cubic', stressWeightIntensity: 0.7,
+  influenceConvictionScale: 0.5, stressTriggersJson: '[]',
+};
 
 function previewScore(pair: PreviewPair, stress: number, rules: RulesConfig): number {
   const src: ScoringActor = { id: 'src', ...pair.src };
@@ -73,33 +82,30 @@ function previewScore(pair: PreviewPair, stress: number, rules: RulesConfig): nu
 @Component({
   selector: 'app-rules-tab',
   standalone: true,
-  imports: [FormsModule, BaseChartDirective],
+  imports: [FormField, BaseChartDirective],
   templateUrl: './rules-tab.component.html',
   styleUrl: './rules-tab.component.scss'
 })
 export class RulesTabComponent {
   store = inject(AppStore);
-  form = signal<RulesConfig | null>(null);
   saved = signal(false);
   thresholdLabels = THRESHOLD_LABELS;
+
+  readonly rulesModel = signal<RulesConfig>({ ...DEFAULT_RULES_STUB });
+  readonly rulesForm  = form(this.rulesModel);
 
   constructor() {
     effect(() => {
       const rules = this.store.rules();
-      if (rules && !this.form()) {
-        this.form.set({ ...rules });
+      if (rules && !this.rulesModel().id) {
+        this.rulesModel.set({ ...rules });
       }
     });
   }
 
   get parsedThresholds(): RelationshipThreshold[] {
-    const f = this.form();
-    if (!f) return DEFAULT_THRESHOLDS;
-    try {
-      return JSON.parse(f.thresholdsJson);
-    } catch {
-      return DEFAULT_THRESHOLDS;
-    }
+    try { return JSON.parse(this.rulesModel().thresholdsJson); }
+    catch { return DEFAULT_THRESHOLDS; }
   }
 
   thresholdMinScore(label: RelationshipLabel): number {
@@ -110,12 +116,12 @@ export class RulesTabComponent {
     const updated = this.parsedThresholds.map(t =>
       t.label === label ? { ...t, minScore: +value } : t
     );
-    this.form.update(f => f ? { ...f, thresholdsJson: JSON.stringify(updated) } : f);
+    this.rulesModel.update(f => ({ ...f, thresholdsJson: JSON.stringify(updated) }));
   }
 
   save(): void {
-    const f = this.form();
-    if (!f) return;
+    const f = this.rulesModel();
+    if (!f.id) return;
     this.store.saveRules(f);
     this.saved.set(true);
     setTimeout(() => {
@@ -126,7 +132,8 @@ export class RulesTabComponent {
 
   reset(): void {
     if (!confirm('Reset all rules to default values?')) return;
-    const defaults: Partial<RulesConfig> = {
+    this.rulesModel.update(f => ({
+      ...f,
       beliefMatch: 3.0,
       beliefConflict: -2.0,
       valueAlignmentScale: 5.5,
@@ -138,29 +145,12 @@ export class RulesTabComponent {
       stressWeightEnabled: true,
       stressWeightCurve: 'Cubic',
       stressWeightIntensity: 0.7,
-    };
-    this.form.update(f => f ? { ...f, ...defaults } : f);
-  }
-
-  numField(key: keyof RulesConfig, value: string): void {
-    this.form.update(f => f ? { ...f, [key]: +value } : f);
-  }
-
-  floatField(key: keyof RulesConfig, value: string): void {
-    this.form.update(f => f ? { ...f, [key]: parseFloat(value) } : f);
-  }
-
-  boolField(key: keyof RulesConfig, value: boolean): void {
-    this.form.update(f => f ? { ...f, [key]: value } : f);
-  }
-
-  strField(key: keyof RulesConfig, value: string): void {
-    this.form.update(f => f ? { ...f, [key]: value } : f);
+    }));
   }
 
   readonly previewChartData = computed((): ChartData<'line'> => {
-    const rules = this.form() ?? this.store.rules();
-    if (!rules) return { labels: [], datasets: [] };
+    const rules = this.rulesModel();
+    if (!rules.id) return { labels: [], datasets: [] };
     return {
       labels: STRESS_POINTS.map(String),
       datasets: PREVIEW_PAIRS.map(pair => ({
@@ -177,18 +167,17 @@ export class RulesTabComponent {
   });
 
   readonly previewChartOptions = computed((): ChartOptions<'line'> => {
-    const rules = this.form() ?? this.store.rules();
+    const rules = this.rulesModel();
     const annotations: Record<string, AnnotationOptions> = {};
 
-    // Compute Y range from actual data so sentinel values like -999 don't blow the axis
-    const allScores = rules
+    const allScores = rules.id
       ? PREVIEW_PAIRS.flatMap(pair => STRESS_POINTS.map(s => previewScore(pair, s, rules)))
       : [0];
     const dataPad = 1;
     const yMin = Math.floor(Math.min(...allScores)) - dataPad;
     const yMax = Math.ceil(Math.max(...allScores))  + dataPad;
 
-    if (rules) {
+    if (rules.id) {
       try {
         const thresholds: RelationshipThreshold[] = JSON.parse(rules.thresholdsJson);
         const sorted = [...thresholds].sort((a, b) => b.minScore - a.minScore);
@@ -221,7 +210,7 @@ export class RulesTabComponent {
               },
             };
           });
-      } catch { /* malformed thresholdsJson — skip annotations */ }
+      } catch { /* malformed thresholdsJson */ }
     }
 
     const textMuted = getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#9ca3af';

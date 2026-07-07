@@ -1,0 +1,98 @@
+@let t = triggerModel();
+
+<div class="rule-card event">
+
+  <div class="rule-header">
+    <input class="rule-label-input" type="text" placeholder="Trigger label" [formField]="triggerForm.label" />
+    <button class="remove-btn" type="button" (click)="remove.emit()" title="Remove">✕</button>
+  </div>
+
+  <div class="section-label">Trigger</div>
+  <div class="rule-fields">
+
+    <div class="field-group">
+      <label>Entity Type</label>
+      <select [value]="t.sourceEntityType"
+        (change)="patch({ sourceEntityType: $any($event.target).value })">
+        @for (opt of entityTypeOptions; track opt.value) {
+          <option [value]="opt.value" [selected]="t.sourceEntityType === opt.value">{{ opt.label }}</option>
+        }
+      </select>
+    </div>
+
+    <div class="field-group">
+      <label>Specific Entity</label>
+      <select [value]="t.sourceEntityId ?? ''"
+        (change)="patch({ sourceEntityId: $any($event.target).value || undefined })">
+        <option value="">— Any —</option>
+        @for (opt of specificEntityOptions(t); track opt.value) {
+          <option [value]="opt.value" [selected]="(t.sourceEntityId ?? '') === opt.value">{{ opt.label }}</option>
+        }
+      </select>
+    </div>
+
+    @if (propertyOptions(t).length > 0) {
+      <div class="field-group">
+        <label>Property</label>
+        <select [value]="t.sourceProperty"
+          (change)="patch({ sourceProperty: $any($event.target).value })">
+          @for (opt of propertyOptions(t); track opt.value) {
+            <option [value]="opt.value" [selected]="t.sourceProperty === opt.value">{{ opt.label }}</option>
+          }
+        </select>
+      </div>
+    }
+
+    @if (hasSubtype(t)) {
+      <div class="field-group">
+        <label>Subtype Filter</label>
+        <select [value]="t.sourceEntitySubtype ?? ''"
+          (change)="patch({ sourceEntitySubtype: $any($event.target).value || undefined })">
+          @for (opt of subtypeOptions(t); track opt.value) {
+            <option [value]="opt.value" [selected]="(t.sourceEntitySubtype ?? '') === opt.value">{{ opt.label }}</option>
+          }
+        </select>
+      </div>
+    }
+
+    @if (valueOptions(t).length > 0) {
+      <div class="field-group field-group--values">
+        <label>Value</label>
+        <div class="value-rows">
+          @for (val of (t.sourcePropertyValue ?? []); track $index) {
+            <app-or-value-row
+              [index]="$index"
+              [value]="val"
+              [options]="valueOptions(t)"
+              (remove)="removeValue($index)"
+              (valueChange)="setValue($index, $event)" />
+          }
+          @if (!(t.sourcePropertyValue?.length)) {
+            <span class="any-label">Any value</span>
+          }
+          <button class="btn-or" type="button" (click)="addValue()">+ OR</button>
+        </div>
+      </div>
+    }
+
+  </div>
+
+  <div class="section-label">Effect</div>
+  <div class="rule-fields">
+
+    <div class="field-group">
+      <label>Stress Delta</label>
+      <input type="number" step="1" [formField]="triggerForm.flatDelta" />
+    </div>
+
+    <div class="field-group field-group--checkbox">
+      <label>
+        <input type="checkbox" [formField]="triggerForm.oneShot" />
+        One-shot (fires once per entity)
+      </label>
+    </div>
+
+  </div>
+
+  <p class="rule-preview">{{ triggerPreview(t) }}</p>
+</div>

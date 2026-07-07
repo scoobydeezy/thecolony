@@ -31,6 +31,7 @@ export const DEFAULT_RULES: RulesConfig = {
   stressWeightEnabled: true,
   stressWeightCurve: 'Cubic',
   stressWeightIntensity: 0.7,
+  stressTriggersJson: '[]',
 };
 
 function scoreBelief<T>(a: T | undefined, b: T | undefined, isBuffer: (v: T) => boolean, rules: RulesConfig): number {

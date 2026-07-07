@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="48px" height="48px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="Witnesses">
+        <path d="M28.004,41.141C26.718,41.442 25.377,41.601 24,41.601C14.316,41.601 6.453,33.739 6.453,24.054C6.453,14.37 14.316,6.508 24,6.508C33.684,6.508 41.546,14.37 41.546,24.054C41.546,24.831 41.496,25.596 41.398,26.346C40.327,25.266 39.011,24.429 37.542,23.926C37.473,16.51 31.431,10.512 24,10.512C16.525,10.512 10.457,16.58 10.457,24.054C10.457,31.529 16.525,37.597 24,37.597C24.409,37.597 24.814,37.579 25.214,37.543C25.858,38.948 26.819,40.177 28.004,41.141Z"/>
+        <circle cx="34.303" cy="33.383" r="6.486"/>
+    </g>
+</svg>

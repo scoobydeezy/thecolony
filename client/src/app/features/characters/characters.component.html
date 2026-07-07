@@ -1,12 +1,14 @@
 <div class="page-header">
   <h2>Characters</h2>
   <div class="toolbar-actions">
-    <button class="btn btn-secondary" (click)="exportCsv()">Export CSV</button>
     @if (!store.isViewingSnapshot()) {
       <label class="btn btn-secondary">
-        Import CSV
+        <i class="fa-solid fa-right-to-bracket"></i> Import
         <input type="file" accept=".csv" style="display:none" (change)="importCsv($event)">
       </label>
+    }
+    <button class="btn btn-secondary" (click)="exportCsv()">Export <i class="fa-solid fa-right-from-bracket"></i></button>
+    @if (!store.isViewingSnapshot()) {
       <a routerLink="/characters/new" class="btn btn-primary">+ New Character</a>
     }
   </div>

@@ -68,6 +68,8 @@ export class App implements OnInit {
     this.store.loadSessionLog(undefined);
     this.store.loadCharacters(undefined);
     this.store.loadSessions(undefined);
+    this.store.loadAssets(undefined);
+    this.store.loadFactionGoals(undefined);
   }
 
   stressClass(): string {

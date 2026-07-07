@@ -1,0 +1,27 @@
+<div class="card">
+  <h3 class="section-title">Stress Triggers</h3>
+  <p class="help-text">
+    Fire when an entity's state or status changes to a listed value during a session.
+    One-shot triggers only fire once per entity across the entire campaign timeline.
+  </p>
+
+  <div class="rules-list">
+    @for (trigger of triggers(); track trigger.id) {
+      <app-stress-trigger-editor
+        [trigger]="trigger"
+        (remove)="removeTrigger(trigger.id)"
+        (change)="updateTrigger($event)" />
+    } @empty {
+      <p class="empty-msg">No stress triggers configured.</p>
+    }
+  </div>
+
+  <button class="btn btn-secondary add-btn" type="button" (click)="addTrigger()">+ Add Trigger</button>
+</div>
+
+<div class="save-bar">
+  <button class="btn btn-primary" (click)="save()">Save Triggers</button>
+  @if (saved()) {
+    <span class="saved-msg">Saved!</span>
+  }
+</div>

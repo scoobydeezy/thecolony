@@ -61,8 +61,11 @@ public class RulesConfig
     // Cascade rules — empty for new campaigns
     public string CascadeRulesJson { get; set; } = "[]";
 
+    // Stress triggers — empty for new campaigns
+    public string StressTriggersJson { get; set; } = "[]";
+
     // Formula weights — live defaults stored explicitly so new campaigns don't depend on client fallbacks
     public string FormulasJson { get; set; } = """
-        {"memberAvgWeight":0.6,"memberMaxWeight":0.4,"baseInfluenceWeight":0.45,"charInfluenceWeight":0.35,"momentumInfluenceWeight":0.20,"legitimacyBase":0.5,"legitimacyScale":100,"leaderlessPowerMultiplier":0.75,"beliefDerivationThreshold":0.4}
+        {"memberAvgWeight":0.6,"memberMaxWeight":0.4,"charInfluenceWeight":0.40,"assetInfluenceWeight":0.40,"momentumInfluenceWeight":0.20,"assetInfluenceScale":25,"assetLegitimacyScale":25,"baseLegitimacyWeight":0.70,"assetLegitimacyWeight":0.30,"legitimacyBase":0.5,"legitimacyScale":100,"leaderlessPowerMultiplier":0.75,"beliefDerivationThreshold":0.4}
         """;
 }

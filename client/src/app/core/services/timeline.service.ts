@@ -142,7 +142,7 @@ export class TimelineService {
         if (snap.factionMomentum[faction.id] === undefined) return null;
         switch (metric) {
           case 'momentum': return snap.factionMomentum[faction.id] ?? null;
-          case 'legitimacy': return snap.factionLegitimacy[faction.id] ?? null;
+          case 'legitimacy': return snap.factionBaseLegitimacy[faction.id] ?? null;
           case 'membership':
             return Object.entries(snap.characterFactions)
               .filter(([, fid]) => fid === faction.id).length;
@@ -150,8 +150,9 @@ export class TimelineService {
           case 'effectivePower': {
             const factionAtSnap: Faction = {
               ...faction,
-              momentum: snap.factionMomentum[faction.id] ?? faction.momentum,
-              legitimacy: snap.factionLegitimacy[faction.id] ?? faction.legitimacy,
+              momentum:       snap.factionMomentum[faction.id]       ?? faction.momentum,
+              baseLegitimacy: snap.factionBaseLegitimacy[faction.id] ?? faction.baseLegitimacy,
+              powerModifier:  snap.factionPowerModifier[faction.id]  ?? faction.powerModifier,
             };
             const membersAtSnap: Character[] = characters
               .filter(c => (snap.characterFactions[c.id] ?? c.factionId) === faction.id)

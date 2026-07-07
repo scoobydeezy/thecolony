@@ -10,12 +10,14 @@
     <button [class.active]="filterType() === 'SocialClass'" (click)="filterType.set('SocialClass')">Social Classes</button>
   </div>
   <div class="toolbar-actions">
-    <button class="btn btn-secondary" (click)="exportCsv()">Export CSV</button>
     @if (!store.isViewingSnapshot()) {
       <label class="btn btn-secondary">
-        Import CSV
+        <i class="fa-solid fa-right-to-bracket"></i> Import
         <input type="file" accept=".csv" style="display:none" (change)="importCsv($event)">
       </label>
+    }
+    <button class="btn btn-secondary" (click)="exportCsv()">Export <i class="fa-solid fa-right-from-bracket"></i></button>
+    @if (!store.isViewingSnapshot()) {
       <button class="btn btn-primary" (click)="openAdd()">+ Add Faction</button>
     }
   </div>
@@ -58,11 +60,16 @@
          (dragend)="onDragEnd()">
       <div class="faction-header">
         <div class="faction-header-left">
-          <div class="faction-name-row">
-            <h3>{{ f.name }}</h3>
-            <span class="type-chip" [class.social]="f.type === 'SocialClass'">{{ typeLabel(f.type) }}</span>
+          @if (f.iconPath) {
+            <img class="faction-card-icon" [src]="f.iconPath" [alt]="f.name" />
+          }
+          <div>
+            <div class="faction-name-row">
+              <h3>{{ f.name }}</h3>
+              <span class="type-chip" [class.social]="f.type === 'SocialClass'">{{ typeLabel(f.type) }}</span>
+            </div>
+            <p class="represents">{{ f.represents }}</p>
           </div>
-          <p class="represents">{{ f.represents }}</p>
         </div>
         <div class="faction-header-stats">
           <div class="card-stat">
@@ -90,8 +97,8 @@
             <p class="core-tenet">{{ f.coreTenet }}</p>
           }
 
-          @if (f.singleSentence) {
-            <p class="single-sentence">"{{ f.singleSentence }}"</p>
+          @if (f.summary) {
+            <p class="single-sentence">{{ f.summary }}</p>
           }
 
           <div class="fact-group">
@@ -141,412 +148,48 @@
         </div>
       </div>
 
-      @if (!store.isViewingSnapshot()) {
-        <div class="faction-actions" (click)="$event.stopPropagation()">
-          <button class="btn btn-secondary btn-sm" (click)="openEdit(f)">Edit</button>
-          <div class="faction-actions-right">
-            <button class="btn btn-secondary btn-sm" (click)="toggleActive(f)">
-              {{ f.active ? 'Deactivate' : 'Activate' }}
-            </button>
-            <button class="btn btn-danger btn-sm" (click)="delete(f.id)">Delete</button>
-          </div>
+      @let goalCount = factionGoalCount(f);
+      @if (goalCount > 0) {
+        <div class="card-goals-row">
+          <span class="card-goals-label">Active Goals</span>
+          <span class="card-goals-count">{{ goalCount }}</span>
         </div>
       }
     </div>
   }
 </div>
 
-<!-- Faction Detail Modal -->
-@if (detailFaction(); as faction) {
-  @let conflicts = beliefConflictsComputed(faction.values, faction.beliefc, faction.beliefa, faction.beliefb);
-  <div class="modal-backdrop" (click)="closeDetail()">
-    <div class="modal modal-detail" (click)="$event.stopPropagation()">
-      <div class="detail-header">
-        <div class="detail-title-row">
-          <h3>{{ faction.name }}</h3>
-          <span class="type-chip" [class.social]="faction.type === 'SocialClass'">{{ typeLabel(faction.type) }}</span>
-          @if (!faction.active) {
-            <span class="inactive-chip">Inactive</span>
-          }
-        </div>
-        @if (faction.represents) {
-          <p class="detail-represents">{{ faction.represents }}</p>
-        }
-        @if (faction.singleSentence) {
-          <p class="detail-single-sentence">"{{ faction.singleSentence }}"</p>
-        }
-      </div>
-
-      <div class="detail-body">
-        <div class="detail-left">
-          <div class="detail-influence-block">
-            <div class="detail-influence-hero">
-              <div class="detail-influence-hero-col">
-                <div class="detail-influence-total">{{ detailTotalInfluence() }}</div>
-                <div class="detail-influence-label">Influence</div>
-              </div>
-              <div class="detail-influence-hero-col">
-                <div class="detail-influence-total detail-influence-power">{{ detailEffectivePower() }}</div>
-                <div class="detail-influence-label">Power</div>
-              </div>
-              <div class="detail-influence-hero-col">
-                <i class="fa-solid momentum-icon"
-                   [class]="momentumIcon(faction.momentum)"
-                   [class.momentum-flip]="momentumFlip(faction.momentum)"
-                   [ngClass]="momentumClass(faction.momentum)"></i>
-                <span class="detail-influence-factor-label">Momentum</span>
-              </div>
-            </div>
-            <div class="detail-influence-factors">
-              <div class="detail-influence-factor">
-                <span class="detail-influence-factor-label">Institutional</span>
-                <span class="detail-influence-factor-value">{{ faction.baseInfluence }}</span>
-              </div>
-              <div class="detail-influence-factor">
-                <span class="detail-influence-factor-label">Characters</span>
-                <span class="detail-influence-factor-value">{{ detailCharInfluence() | number:'1.0-0' }}</span>
-              </div>
-              <div class="detail-influence-factor">
-                <span class="detail-influence-factor-label">Legitimacy</span>
-                <span class="detail-influence-factor-value">{{ faction.legitimacy }}</span>
-              </div>
-            </div>
-          </div>
-          <app-ternary-plot [values]="faction.values" [editable]="false" [size]="280" [showValueLabels]="true" [valueLabels]="store.valueLabels()" />
-        </div>
-
-        <div class="detail-right">
-          @if (faction.coreTenet) {
-            <div class="detail-section">
-              <div class="separator">Core Tenet</div>
-              <p class="detail-text">{{ faction.coreTenet }}</p>
-            </div>
-          }
-
-          @if (faction.certainOf || faction.rightAbout || faction.afraidOf || faction.wrongAbout) {
-            <div class="detail-section">
-              <div class="separator">Psychology</div>
-              @if (faction.certainOf) {
-                <div class="detail-field">
-                  <span class="detail-field-label">Certain of</span>
-                  <span class="detail-field-value">{{ faction.certainOf }}</span>
-                </div>
-              }
-              @if (faction.rightAbout) {
-                <div class="detail-field">
-                  <span class="detail-field-label">Right about</span>
-                  <span class="detail-field-value">{{ faction.rightAbout }}</span>
-                </div>
-              }
-              @if (faction.afraidOf) {
-                <div class="detail-field">
-                  <span class="detail-field-label">Afraid of</span>
-                  <span class="detail-field-value">{{ faction.afraidOf }}</span>
-                </div>
-              }
-              @if (faction.wrongAbout) {
-                <div class="detail-field">
-                  <span class="detail-field-label">Wrong about</span>
-                  <span class="detail-field-value">{{ faction.wrongAbout }}</span>
-                </div>
-              }
-            </div>
-          }
-
-          @if (faction.beliefc || faction.beliefa || faction.beliefb) {
-            <div class="detail-section">
-              <div class="separator">Beliefs</div>
-              <div class="detail-beliefs-row">
-                @if (faction.beliefc) {
-                  <div class="belief-item" [class.belief-conflict]="conflicts.beliefc">
-                    <span class="belief-label">{{ axisName('c') }}</span>
-                    <span class="belief-val {{ beliefClass('c', faction.beliefc) }}">{{ beliefLabel('c', faction.beliefc) }}</span>
-                  </div>
-                }
-                @if (faction.beliefa) {
-                  <div class="belief-item" [class.belief-conflict]="conflicts.beliefa">
-                    <span class="belief-label">{{ axisName('a') }}</span>
-                    <span class="belief-val {{ beliefClass('a', faction.beliefa) }}">{{ beliefLabel('a', faction.beliefa) }}</span>
-                  </div>
-                }
-                @if (faction.beliefb) {
-                  <div class="belief-item" [class.belief-conflict]="conflicts.beliefb">
-                    <span class="belief-label">{{ axisName('b') }}</span>
-                    <span class="belief-val {{ beliefClass('b', faction.beliefb) }}">{{ beliefLabel('b', faction.beliefb) }}</span>
-                  </div>
-                }
-              </div>
-            </div>
-          }
-
-          <div class="detail-section">
-            <div class="separator">Faction Dynamics</div>
-            <div class="detail-field">
-              <span class="detail-field-label">Most aligned</span>
-              <span class="detail-field-value">
-                @if (detailMostAligned().length > 0) {
-                  {{ detailMostAligned().map(f => f.name).join(', ') }}
-                } @else {
-                  <span class="detail-field-empty">—</span>
-                }
-              </span>
-            </div>
-            <div class="detail-field">
-              <span class="detail-field-label">Most opposed</span>
-              <span class="detail-field-value">
-                @if (detailMostOpposed().length > 0) {
-                  {{ detailMostOpposed().map(f => f.name).join(', ') }}
-                } @else {
-                  <span class="detail-field-empty">—</span>
-                }
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      @if (faction.notes) {
-        <div class="detail-notes">
-          <div class="separator">Notes</div>
-          <p class="detail-text">{{ faction.notes }}</p>
-        </div>
-      }
-
-      <div class="separator">Members</div>
-      <div class="detail-characters">
-        @if (detailCharacters().length === 0) {
-          <p class="no-members">No characters belong to this faction.</p>
-        } @else if (detailActiveCharacters().length === 0 && detailInactiveCharacters().length > 0) {
-          <p class="no-members">All members are deceased, missing, or forgotten.</p>
-        } @else {
-
-          @if (detailLeaders().length > 0) {
-            <p class="members-subsection-label">{{ detailFaction()?.type === 'SocialClass' ? 'Influential Members' : 'Faction Leader' }}</p>
-            @for (char of detailLeaders(); track char.id) {
-              @let drift = charDriftScore(char);
-              @let bestId = charBestFactionId(char);
-              <div class="character-row" [class.drift-risk]="bestId !== null && bestId !== detailFaction()?.id && drift > 0">
-                <div class="character-row-main">
-                  <span class="char-name">{{ char.name }}</span>
-                  <span class="char-type-chip leader">Leader</span>
-                  @if (detailFaction()?.type === 'SocialClass' && char.factionId) {
-                    <span class="char-type-chip faction-label">{{ factionNameById(char.factionId) }}</span>
-                  }
-                  @if (char.occupation) { <span class="char-meta">{{ char.occupation }}</span> }
-                  @if (char.class) { <span class="char-meta">{{ char.class }}{{ char.level ? ' ' + char.level : '' }}</span> }
-                  @if (char.doubtDirection) {
-                    <span class="char-drift-score" [class]="charDriftClass(drift)">Drift {{ drift > 0 ? '+' : '' }}{{ drift | number:'1.0-1' }}</span>
-                    @if (bestId !== null && bestId !== detailFaction()?.id && drift > 0) {
-                      <span class="char-misfit-badge">⚠ {{ factionNameById(bestId) }}</span>
-                    }
-                  }
-                </div>
-                @if (char.summary) { <p class="char-summary">{{ char.summary }}</p> }
-              </div>
-            }
-          }
-
-          @if (detailMembers().length > 0) {
-            @if (detailLeaders().length > 0) {
-              <p class="members-subsection-label">Members</p>
-            }
-            @for (char of detailMembers(); track char.id) {
-              @let drift = charDriftScore(char);
-              @let bestId = charBestFactionId(char);
-              <div class="character-row" [class.drift-risk]="bestId !== null && bestId !== detailFaction()?.id && drift > 0">
-                <div class="character-row-main">
-                  <span class="char-name">{{ char.name }}</span>
-                  <span class="char-type-chip" [class.party]="char.characterType === 'PartyMember'">
-                    {{ char.characterType === 'PartyMember' ? 'Party' : 'NPC' }}
-                  </span>
-                  @if (char.occupation) { <span class="char-meta">{{ char.occupation }}</span> }
-                  @if (char.class) { <span class="char-meta">{{ char.class }}{{ char.level ? ' ' + char.level : '' }}</span> }
-                  @if (char.doubtDirection) {
-                    <span class="char-drift-score" [class]="charDriftClass(drift)">Drift {{ drift > 0 ? '+' : '' }}{{ drift | number:'1.0-1' }}</span>
-                    @if (bestId !== null && bestId !== detailFaction()?.id && drift > 0) {
-                      <span class="char-misfit-badge">⚠ {{ factionNameById(bestId) }}</span>
-                    }
-                  }
-                </div>
-                @if (char.summary) { <p class="char-summary">{{ char.summary }}</p> }
-              </div>
-            }
-          }
-
-        }
-
-        @if (detailInactiveCharacters().length > 0) {
-          <p class="members-subsection-label former-members-label">Former Members</p>
-          @for (char of detailInactiveCharacters(); track char.id) {
-            <div class="character-row former-member">
-              <div class="character-row-main">
-                @if (stateIconClass(char.state)) {
-                  <i [class]="stateIconClass(char.state)" [title]="char.state"></i>
-                }
-                <span class="char-name">{{ char.name }}</span>
-                <span class="char-type-chip"
-                  [class.party]="char.characterType === 'PartyMember'"
-                  [class.leader]="char.characterType === 'FactionLeader'">
-                  {{ char.characterType === 'FactionLeader' ? 'Leader' : char.characterType === 'PartyMember' ? 'Party' : 'NPC' }}
-                </span>
-                @if (char.occupation) { <span class="char-meta">{{ char.occupation }}</span> }
-              </div>
-              @if (char.summary) { <p class="char-summary">{{ char.summary }}</p> }
-            </div>
-          }
-        }
-
-      </div>
-
-      <div class="modal-actions">
-        <button class="btn btn-secondary" (click)="closeDetail()">Close</button>
-        @if (!store.isViewingSnapshot()) {
-          <button class="btn btn-primary" (click)="closeDetail(); openEdit(faction)">Edit</button>
-        }
-      </div>
-    </div>
-  </div>
-}
-
-<!-- Edit/Add Modal -->
+<!-- Add Faction Modal -->
 @if (showModal()) {
   <div class="modal-backdrop" (click)="close()">
-    <div class="modal modal-wide" (click)="$event.stopPropagation()">
-      <h3>{{ editForm().id ? 'Edit' : 'Add' }} Faction</h3>
-
-      <div class="grid-2">
-        <div class="form-group">
-          <label>Name *</label>
-          <input type="text" [formField]="f.name" />
+    <div class="modal modal-add" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Add Faction</h3>
+        <button class="modal-close" (click)="close()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <label class="form-label">Name *</label>
+          <input class="form-input" type="text" [formField]="f.name" />
           @if (f.name().invalid() && f.name().touched()) {
             <p class="field-error">Name is required</p>
           }
         </div>
-        <div class="form-group">
-          <label>Represents</label>
-          <input type="text" [formField]="f.represents" />
+        <div class="form-row">
+          <label class="form-label">Represents</label>
+          <input class="form-input" type="text" [formField]="f.represents" placeholder="Who or what does this faction represent?" />
         </div>
-      </div>
-
-      <div class="grid-2">
-        <div class="form-group">
-          <label>Type</label>
-          <select [formField]="f.type">
+        <div class="form-row">
+          <label class="form-label">Type</label>
+          <select class="form-input" [formField]="f.type">
             <option value="Faction">Faction</option>
             <option value="SocialClass">Social Class</option>
           </select>
         </div>
-        <div class="form-group">
-          <label>Active</label>
-          <select [formField]="f.active">
-            <option value="true">Active</option>
-            <option value="false">Inactive</option>
-          </select>
-        </div>
       </div>
-
-      <div class="form-group">
-        <label>Core Tenet</label>
-        <input type="text" [formField]="f.coreTenet" />
-      </div>
-
-      <div class="grid-2">
-        <div class="form-group">
-          <label>Certain Of</label>
-          <input type="text" [formField]="f.certainOf" />
-        </div>
-        <div class="form-group">
-          <label>Right About</label>
-          <input type="text" [formField]="f.rightAbout" />
-        </div>
-        <div class="form-group">
-          <label>Afraid Of</label>
-          <input type="text" [formField]="f.afraidOf" />
-        </div>
-        <div class="form-group">
-          <label>Wrong About</label>
-          <input type="text" [formField]="f.wrongAbout" />
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>Single Sentence</label>
-        <input type="text" [formField]="f.singleSentence" />
-      </div>
-
-      <div class="form-group">
-        <label>Notes</label>
-        <textarea rows="3" [formField]="f.notes"></textarea>
-      </div>
-
-      <div class="separator">Core Values</div>
-
-      <div class="ternary-edit-row">
-        <app-ternary-plot
-          [values]="editValues()"
-          [editable]="true"
-          [valueLabels]="store.valueLabels()"
-          (valuesChange)="editValues.set($event)"
-        />
-        <p class="ternary-hint">Drag the point to adjust values. The derived labels update live.</p>
-      </div>
-
-      <div class="separator">Actionable Beliefs</div>
-
-      @if (editConflicts().any) {
-        <p class="belief-conflict-hint">{{ conflictHint() }}</p>
-      }
-
-      <div class="grid-3">
-        <div class="form-group" [class.belief-conflict-group]="editConflicts().beliefc">
-          <label [class.label-conflict]="editConflicts().beliefc">{{ axisName('c') }}</label>
-          <select [formField]="f.beliefc">
-            <option value="">— None —</option>
-            @for (opt of beliefcOptions(); track opt) {
-              <option [value]="opt">{{ beliefLabel('c', opt) }}</option>
-            }
-          </select>
-        </div>
-        <div class="form-group" [class.belief-conflict-group]="editConflicts().beliefa">
-          <label [class.label-conflict]="editConflicts().beliefa">{{ axisName('a') }}</label>
-          <select [formField]="f.beliefa">
-            <option value="">— None —</option>
-            @for (opt of beliefaOptions(); track opt) {
-              <option [value]="opt">{{ beliefLabel('a', opt) }}</option>
-            }
-          </select>
-        </div>
-        <div class="form-group" [class.belief-conflict-group]="editConflicts().beliefb">
-          <label [class.label-conflict]="editConflicts().beliefb">{{ axisName('b') }}</label>
-          <select [formField]="f.beliefb">
-            <option value="">— None —</option>
-            @for (opt of beliefbOptions(); track opt) {
-              <option [value]="opt">{{ beliefLabel('b', opt) }}</option>
-            }
-          </select>
-        </div>
-      </div>
-
-      <div class="separator">Influence</div>
-
-      <div class="grid-3">
-        <div class="form-group">
-          <label>Institutional Power <span class="range-hint">(0–100)</span></label>
-          <input type="number" [formField]="f.baseInfluence" />
-        </div>
-        <div class="form-group">
-          <label>Momentum <span class="range-hint">(–100 to +100)</span></label>
-          <input type="number" [formField]="f.momentum" />
-        </div>
-        <div class="form-group">
-          <label>Legitimacy <span class="range-hint">(1–100)</span></label>
-          <input type="number" [formField]="f.legitimacy" />
-        </div>
-      </div>
-
-      <div class="modal-actions">
+      <div class="modal-footer">
         <button class="btn btn-secondary" (click)="close()">Cancel</button>
-        <button class="btn btn-primary" (click)="save()" [disabled]="f().invalid()">Save</button>
+        <button class="btn btn-primary" (click)="save()" [disabled]="f().invalid()">Add</button>
       </div>
     </div>
   </div>

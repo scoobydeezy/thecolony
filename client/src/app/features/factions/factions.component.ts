@@ -1,112 +1,44 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { DecimalPipe, NgClass } from '@angular/common';
+import { Router } from '@angular/router';
 import { FormField, form, required } from '@angular/forms/signals';
 import { AppStore } from '../../store/app.store';
 import { FactionInfluenceService } from '../../core/services/faction-influence.service';
 import {
-  Faction, Character, CharacterState, GroupType, BeliefPosition,
+  Faction, GroupType, BeliefPosition,
   ValueVector, primaryValue, secondaryValue, sacrificedValue,
-  beliefConflicts, BeliefConflicts,
-  mostAlignedFactions, mostOpposedFactions, effectivePressure, topCompatibleFactions,
-  beliefAxisOptions, beliefPositionLabel
+  beliefConflicts, BeliefConflicts, beliefPositionLabel,
+  FactionGoal, GoalStatus, GoalPriority, GoalVisibility,
+  GOAL_STATUS_OPTIONS, GOAL_PRIORITY_OPTIONS, GOAL_VISIBILITY_OPTIONS,
 } from '../../core/models/types';
 import { TernaryPlotComponent, TernaryOverlayPoint } from '../../shared/ternary-plot/ternary-plot.component';
 import { downloadCsv, parseCsv, csvHeaderMap } from '../../core/utils/csv-export';
 import { oneOf, clampedInt, sanitizeValueVector } from '../../core/utils/validation';
 
-
-interface FactionFormModel {
-  id: string;
+interface AddFactionFormModel {
   name: string;
   represents: string;
   type: string;
-  coreTenet: string;
-  certainOf: string;
-  rightAbout: string;
-  afraidOf: string;
-  wrongAbout: string;
-  singleSentence: string;
-  beliefc: string;
-  beliefa: string;
-  beliefb: string;
-  active: string;
-  notes: string;
-  sortOrder: number;
-  baseInfluence: string;
-  momentum: string;
-  legitimacy: string;
 }
 
 const DEFAULT_VALUES: ValueVector = { a: 1/3, b: 1/3, c: 1/3 };
 
-const emptyForm = (): FactionFormModel => ({
-  id: '', name: '', represents: '', type: 'Faction',
-  coreTenet: '', certainOf: '', rightAbout: '', afraidOf: '',
-  wrongAbout: '', singleSentence: '',
-  beliefc: '', beliefa: '', beliefb: '',
-  active: 'true', notes: '', sortOrder: 0,
-  baseInfluence: '50', momentum: '0', legitimacy: '50'
-});
+const emptyAddForm = (): AddFactionFormModel => ({ name: '', represents: '', type: 'Faction' });
 
-const toFormModel = (f: Faction): FactionFormModel => ({
-  id: f.id,
-  name: f.name,
-  represents: f.represents,
-  type: f.type,
-  coreTenet: f.coreTenet,
-  certainOf: f.certainOf,
-  rightAbout: f.rightAbout,
-  afraidOf: f.afraidOf,
-  wrongAbout: f.wrongAbout,
-  singleSentence: f.singleSentence,
-  beliefc: f.beliefc ?? '',
-  beliefa: f.beliefa ?? '',
-  beliefb: f.beliefb ?? '',
-  active: f.active ? 'true' : 'false',
-  notes: f.notes ?? '',
-  sortOrder: f.sortOrder,
-  baseInfluence: f.baseInfluence.toString(),
-  momentum: f.momentum.toString(),
-  legitimacy: f.legitimacy.toString()
-});
-
-const fromFormModel = (fm: FactionFormModel, values: ValueVector): Faction => ({
-  id: fm.id,
-  name: fm.name,
-  represents: fm.represents,
-  type: fm.type as GroupType,
-  coreTenet: fm.coreTenet,
-  certainOf: fm.certainOf,
-  rightAbout: fm.rightAbout,
-  afraidOf: fm.afraidOf,
-  wrongAbout: fm.wrongAbout,
-  singleSentence: fm.singleSentence,
-  beliefc: (fm.beliefc as BeliefPosition) || undefined,
-  beliefa: (fm.beliefa as BeliefPosition) || undefined,
-  beliefb: (fm.beliefb as BeliefPosition) || undefined,
-  values,
-  active: fm.active === 'true',
-  notes: fm.notes || undefined,
-  sortOrder: fm.sortOrder,
-  baseInfluence: fm.baseInfluence !== '' ? +fm.baseInfluence : 50,
-  momentum: fm.momentum !== '' ? +fm.momentum : 0,
-  legitimacy: fm.legitimacy !== '' ? +fm.legitimacy : 50
-});
 
 @Component({
   selector: 'app-factions',
   standalone: true,
-  imports: [FormField, TernaryPlotComponent, DecimalPipe, NgClass],
+  imports: [FormField, TernaryPlotComponent],
   templateUrl: './factions.component.html',
   styleUrl: './factions.component.scss'
 })
 export class FactionsComponent {
-  store    = inject(AppStore);
+  store     = inject(AppStore);
   influence = inject(FactionInfluenceService);
+  router    = inject(Router);
 
-  showModal = signal(false);
-  detailFaction = signal<Faction | null>(null);
-  filterType = signal<'all' | 'Faction' | 'SocialClass'>('all');
+  showModal      = signal(false);
+  filterType     = signal<'all' | 'Faction' | 'SocialClass'>('all');
   showGlobalView = signal(false);
 
   readonly globalViewOverlays = computed<TernaryOverlayPoint[]>(() =>
@@ -118,19 +50,40 @@ export class FactionsComponent {
     }))
   );
 
-  readonly editForm = signal<FactionFormModel>(emptyForm());
-  readonly editValues = signal<ValueVector>({ ...DEFAULT_VALUES });
+  // ── Add faction form ────────────────────────────────────────────────────────
+
+  readonly editForm = signal<AddFactionFormModel>(emptyAddForm());
   readonly f = form(this.editForm, schema => {
     required(schema.name, { message: 'Name is required' });
   });
 
+  openAdd(): void {
+    this.editForm.set(emptyAddForm());
+    this.showModal.set(true);
+  }
+
+  close(): void { this.showModal.set(false); }
+
+  save(): void {
+    const fm = this.editForm();
+    if (!fm.name.trim()) return;
+    this.store.saveFaction({
+      id: '',
+      name: fm.name.trim(),
+      represents: fm.represents,
+      type: fm.type as GroupType,
+      coreTenet: '', certainOf: '', rightAbout: '', afraidOf: '', wrongAbout: '',
+      values: { ...DEFAULT_VALUES },
+      active: true, sortOrder: 0, momentum: 0, baseLegitimacy: 50, powerModifier: 0,
+    });
+    this.showModal.set(false);
+  }
+
+  // ── Card display helpers ────────────────────────────────────────────────────
+
   primaryValue    = primaryValue;
   secondaryValue  = secondaryValue;
   sacrificedValue = sacrificedValue;
-
-  readonly beliefcOptions = computed(() => beliefAxisOptions(this.store.beliefAxisLabels().c));
-  readonly beliefaOptions = computed(() => beliefAxisOptions(this.store.beliefAxisLabels().a));
-  readonly beliefbOptions = computed(() => beliefAxisOptions(this.store.beliefAxisLabels().b));
 
   valueLabel(v: string): string {
     const vl = this.store.valueLabels();
@@ -157,163 +110,47 @@ export class FactionsComponent {
     return this.store.beliefAxisLabels()[axis].axisName;
   }
 
-  // Full roster for display (includes Dead/Missing/Forgotten — historical record)
-  readonly detailCharacters = computed<Character[]>(() => {
-    const faction = this.detailFaction();
-    if (!faction) return [];
-    return this.store.viewCharacters().filter(c => c.factionId === faction.id || c.socialClassId === faction.id);
-  });
-
-  // Alive members only — used for all influence/power/peer calculations
-  readonly detailActiveCharacters = computed<Character[]>(() =>
-    this.detailCharacters().filter(c => c.state === 'Alive')
-  );
-
-  // Non-Alive members — shown in "Former Members" section, excluded from calculations
-  readonly detailInactiveCharacters = computed<Character[]>(() =>
-    this.detailCharacters().filter(c => c.state !== 'Alive').sort((a, b) => a.name.localeCompare(b.name))
-  );
-
-  readonly detailLeaders = computed<Character[]>(() =>
-    this.detailActiveCharacters()
-      .filter(c => c.characterType === 'FactionLeader')
-      .sort((a, b) => b.influence - a.influence)
-  );
-
-  readonly detailMembers = computed<Character[]>(() =>
-    this.detailActiveCharacters()
-      .filter(c => c.characterType !== 'FactionLeader')
-      .sort((a, b) => b.influence - a.influence)
-  );
-
-  readonly detailCharInfluence = computed(() =>
-    this.influence.calculateCharacterInfluence(this.detailActiveCharacters())
-  );
-
-  readonly detailNormalizedMomentum = computed(() => {
-    const f = this.detailFaction();
-    return f ? this.influence.calculateNormalizedMomentum(f.momentum) : 50;
-  });
-
-  readonly detailTotalInfluence = computed(() => {
-    const f = this.detailFaction();
-    return f ? this.influence.calculateTotalInfluence(f, this.detailActiveCharacters(), this.store.formulas()) : 0;
-  });
-
-  readonly detailEffectivePower = computed(() => {
-    const f = this.detailFaction();
-    return f ? this.influence.calculateEffectivePower(f, this.detailActiveCharacters(), this.store.formulas()) : 0;
-  });
-
-  formatMomentum(m: number): string {
-    return m > 0 ? `+${m}` : `${m}`;
+  typeLabel(t: string): string {
+    return t === 'Faction' ? 'Faction' : 'Social Class';
   }
 
-  momentumIcon(m: number): string {
-    const abs = Math.abs(m);
-    if (abs >= 50) return 'fa-arrow-trend-up';
-    if (abs >= 20) return 'fa-arrow-trend-up';
-    return 'fa-arrow-right-long';
+  factionMemberCount(f: Faction): number {
+    return this.store.viewCharacters().filter(c => c.factionId === f.id || c.socialClassId === f.id).length;
   }
 
-  momentumClass(m: number): string {
-    const abs = Math.abs(m);
-    const dir = m > 0 ? 'pos' : m < 0 ? 'neg' : 'neutral';
-    if (dir === 'neutral') return 'momentum-neutral';
-    const level = abs >= 50 ? 'high' : abs >= 20 ? 'mid' : 'low';
-    return `momentum-${dir}-${level}`;
+  factionTotalInfluence(f: Faction): number {
+    const members = this.store.viewCharacters().filter(c => c.state === 'Alive' && (c.factionId === f.id || c.socialClassId === f.id));
+    const assets  = this.store.viewAssets().filter(a => a.controllingFactionId === f.id);
+    return this.influence.calculateTotalInfluence(f, members, this.store.formulas(), assets);
   }
 
-  momentumFlip(m: number): boolean {
-    return m < 0;
+  factionEffectivePower(f: Faction): number {
+    const members = this.store.viewCharacters().filter(c => c.state === 'Alive' && (c.factionId === f.id || c.socialClassId === f.id));
+    const assets  = this.store.viewAssets().filter(a => a.controllingFactionId === f.id);
+    return this.influence.calculateEffectivePower(f, members, this.store.formulas(), assets);
   }
 
-  readonly colonyStress = computed(() => this.store.viewColonyStress());
-
-  charDriftScore(c: Character): number {
-    return effectivePressure(c, this.colonyStress()) - c.conviction;
+  factionGoalCount(f: Faction): number {
+    return this.store.factionGoals().filter(g => g.factionId === f.id && g.status !== 'Accomplished' && g.status !== 'Failed').length;
   }
 
-  charBestFactionId(c: Character): string | null {
-    const factions = this.store.viewFactions().filter(f => f.active && f.type === 'Faction');
-    const list = topCompatibleFactions(c, factions, this.store.formulas().beliefDerivationThreshold);
-    return list[0]?.factionId ?? null;
+  // ── Navigation ──────────────────────────────────────────────────────────────
+
+  openDetail(faction: Faction): void {
+    this.router.navigate(['/factions', faction.id]);
   }
 
-  charDriftClass(score: number): string {
-    if (score >= 30) return 'drift-high';
-    if (score >= 10) return 'drift-mid';
-    if (score > 0)   return 'drift-low';
-    return 'drift-none';
-  }
+  // ── Drag-to-reorder ─────────────────────────────────────────────────────────
 
-  factionNameById(id: string): string {
-    return this.store.factions().find(f => f.id === id)?.name ?? id;
-  }
-
-  private readonly stateIconMap: Record<CharacterState, string> = {
-    Alive:     '',
-    Dead:      'fa-solid fa-skull',
-    Missing:   'fa-solid fa-circle-question',
-    Forgotten: 'fa-solid fa-hourglass-start',
-  };
-
-  stateIconClass(state: CharacterState): string {
-    const icon = this.stateIconMap[state];
-    return icon ? `state-icon ${icon} state-icon--${state.toLowerCase()}` : '';
-  }
-
-  readonly detailMostAligned = computed<Faction[]>(() => {
-    const faction = this.detailFaction();
-    if (!faction) return [];
-    return mostAlignedFactions(faction, this.store.factions());
-  });
-
-  readonly detailMostOpposed = computed<Faction[]>(() => {
-    const faction = this.detailFaction();
-    if (!faction) return [];
-    return mostOpposedFactions(faction, this.store.factions());
-  });
-
-  // Conflicts for the faction currently being edited.
-  readonly editConflicts = computed<BeliefConflicts>(() => {
-    const fm = this.editForm();
-    return beliefConflicts(
-      this.editValues(),
-      (fm.beliefc as BeliefPosition) || undefined,
-      (fm.beliefa as BeliefPosition) || undefined,
-      (fm.beliefb as BeliefPosition) || undefined,
-      this.store.beliefAxisLabels(),
-    );
-  });
-
-  // Returns a human-readable hint for the edit modal, e.g. "Stability expects No on Change".
-  conflictHint(): string {
-    const primary = primaryValue(this.editValues());
-    const axisKey = primary.toLowerCase() as 'a' | 'b' | 'c';
-    const bl = this.store.beliefAxisLabels();
-    const cfg = bl[axisKey];
-    const alignedPos: BeliefPosition = cfg.positiveAligns ? 'positive' : 'negative';
-    const alignedLabel = cfg[alignedPos];
-    const vl = this.store.valueLabels();
-    const valueLabel = vl[axisKey];
-    return `High ${valueLabel} expects ${alignedLabel} on ${cfg.axisName}`;
-  }
-
-  // Drag state — tracked by faction id.
   private dragSourceId: string | null = null;
   readonly dragOverId = signal<string | null>(null);
 
   get displayFactions(): Faction[] {
     const type = this.filterType();
-    return this.store.viewFactions().filter(f =>
-      type === 'all' ? true : f.type === type
-    );
+    return this.store.viewFactions().filter(f => type === 'all' || f.type === type);
   }
 
-  onDragStart(id: string): void {
-    this.dragSourceId = id;
-  }
+  onDragStart(id: string): void { this.dragSourceId = id; }
 
   onDragOver(event: DragEvent, id: string): void {
     event.preventDefault();
@@ -329,8 +166,6 @@ export class FactionsComponent {
     const srcId = this.dragSourceId;
     this.dragSourceId = null;
     if (!srcId || srcId === targetId) return;
-
-    // Build new order by inserting src before target within the current visible list.
     const list = [...this.displayFactions];
     const srcIdx = list.findIndex(f => f.id === srcId);
     const tgtIdx = list.findIndex(f => f.id === targetId);
@@ -345,66 +180,7 @@ export class FactionsComponent {
     this.dragOverId.set(null);
   }
 
-  openDetail(faction: Faction): void {
-    this.detailFaction.set(faction);
-  }
-
-  closeDetail(): void {
-    this.detailFaction.set(null);
-  }
-
-  openAdd(): void {
-    this.editForm.set(emptyForm());
-    this.editValues.set({ ...DEFAULT_VALUES });
-    this.showModal.set(true);
-  }
-
-  openEdit(faction: Faction): void {
-    this.editForm.set(toFormModel(faction));
-    this.editValues.set({ ...faction.values });
-    this.showModal.set(true);
-  }
-
-  close(): void {
-    this.showModal.set(false);
-  }
-
-  save(): void {
-    const fm = this.editForm();
-    if (!fm.name.trim()) return;
-    this.store.saveFaction(fromFormModel(fm, this.editValues()));
-    this.showModal.set(false);
-    setTimeout(() => this.store.loadRelationships(undefined), 400);
-  }
-
-  delete(id: string): void {
-    if (confirm('Delete this faction?')) {
-      this.store.deleteFaction(id);
-    }
-  }
-
-  toggleActive(faction: Faction): void {
-    this.store.saveFaction({ ...faction, active: !faction.active });
-    setTimeout(() => this.store.loadRelationships(undefined), 400);
-  }
-
-  typeLabel(t: string): string {
-    return t === 'Faction' ? 'Faction' : 'Social Class';
-  }
-
-  factionMemberCount(f: Faction): number {
-    return this.store.viewCharacters().filter(c => c.factionId === f.id || c.socialClassId === f.id).length;
-  }
-
-  factionTotalInfluence(f: Faction): number {
-    const members = this.store.viewCharacters().filter(c => c.state === 'Alive' && (c.factionId === f.id || c.socialClassId === f.id));
-    return this.influence.calculateTotalInfluence(f, members, this.store.formulas());
-  }
-
-  factionEffectivePower(f: Faction): number {
-    const members = this.store.viewCharacters().filter(c => c.state === 'Alive' && (c.factionId === f.id || c.socialClassId === f.id));
-    return this.influence.calculateEffectivePower(f, members, this.store.formulas());
-  }
+  // ── CSV import / export ─────────────────────────────────────────────────────
 
   importCsv(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
@@ -416,34 +192,77 @@ export class FactionsComponent {
       const h = csvHeaderMap(rows[0]);
       const get = (row: string[], col: string) => row[h.get(col) ?? -1] ?? '';
 
-      for (const row of rows.slice(1)) {
-        const faction: Faction = {
-          id:             get(row, 'id'),
-          name:           get(row, 'name'),
-          type:           oneOf(get(row, 'type'), ['Faction', 'SocialClass'] as const) ?? 'Faction',
-          active:         get(row, 'active') !== 'false',
-          sortOrder:      clampedInt(get(row, 'sortorder'), 0, 99999, 0),
-          represents:     get(row, 'represents'),
-          coreTenet:      get(row, 'coretenet'),
-          certainOf:      get(row, 'certainof'),
-          rightAbout:     get(row, 'rightabout'),
-          afraidOf:       get(row, 'afraidof'),
-          wrongAbout:     get(row, 'wrongabout'),
-          singleSentence: get(row, 'singlesentence'),
-          beliefc: oneOf(get(row, 'beliefc'), ['positive', 'neutral', 'negative'] as const),
-          beliefa: oneOf(get(row, 'beliefa'), ['positive', 'neutral', 'negative'] as const),
-          beliefb: oneOf(get(row, 'beliefb'), ['positive', 'negative']             as const),
-          values: sanitizeValueVector(
-            parseFloat(get(row, 'valuea')),
-            parseFloat(get(row, 'valueb')),
-            parseFloat(get(row, 'valuec')),
-          ),
-          notes: get(row, 'notes') || undefined,
-          baseInfluence: parseInt(get(row, 'baseinfluence')) || 50,
-          momentum: parseInt(get(row, 'momentum')) || 0,
-          legitimacy: parseInt(get(row, 'legitimacy')) || 50,
-        };
-        this.store.saveFaction(faction);
+      if (h.has('factionid')) {
+        // Goals file
+        const factionIds = new Set(this.store.factions().map(f => f.id));
+        for (const row of rows.slice(1)) {
+          const factionId = get(row, 'factionid');
+          if (!factionIds.has(factionId)) continue;
+          const goal: FactionGoal = {
+            id:               get(row, 'id') || crypto.randomUUID(),
+            campaignId:       this.store.activeCampaign()!.id,
+            factionId,
+            title:            get(row, 'title'),
+            description:      get(row, 'description') || undefined,
+            status:           oneOf(get(row, 'status'),   GOAL_STATUS_OPTIONS.map(o => o.value)   as GoalStatus[])   ?? 'Plotting',
+            priority:         oneOf(get(row, 'priority'), GOAL_PRIORITY_OPTIONS.map(o => o.value) as GoalPriority[]) ?? 'Major',
+            visibility:       oneOf(get(row, 'visibility'), GOAL_VISIBILITY_OPTIONS.map(o => o.value) as GoalVisibility[]) ?? 'Open',
+            targetEntityType: oneOf(get(row, 'targetentitytype'), ['Character', 'Asset', 'Faction'] as const) || undefined,
+            targetEntityId:   get(row, 'targetentityid') || undefined,
+            targetState:      get(row, 'targetstate') || undefined,
+            targetProperty:   get(row, 'targetproperty') || undefined,
+            targetOperator:   oneOf(get(row, 'targetoperator'), ['gte', 'lte', 'eq'] as const) || undefined,
+            targetThreshold:  parseFloat(get(row, 'targetthreshold')) || undefined,
+          };
+          this.store.saveFactionGoal(goal);
+        }
+      } else {
+        // Factions file
+        const vl = this.store.valueLabels();
+        const bl = this.store.beliefAxisLabels();
+        // Try fixed key first (old exports), then display name (new exports)
+        const getCol = (row: string[], fixed: string, display: string) =>
+          get(row, fixed) || get(row, display.toLowerCase());
+        for (const row of rows.slice(1)) {
+          const faction: Faction = {
+            id:             get(row, 'id'),
+            name:           get(row, 'name'),
+            type:           oneOf(get(row, 'type'), ['Faction', 'SocialClass'] as const) ?? 'Faction',
+            active:         get(row, 'active') !== 'false',
+            sortOrder:      clampedInt(get(row, 'sortorder'), 0, 99999, 0),
+            represents:     get(row, 'represents'),
+            coreTenet:      get(row, 'coretenet'),
+            focus:          get(row, 'focus')      || undefined,
+            certainOf:      get(row, 'certainof'),
+            rightAbout:     get(row, 'rightabout'),
+            afraidOf:       get(row, 'afraidof'),
+            wrongAbout:     get(row, 'wrongabout'),
+            response:       get(row, 'response')   || undefined,
+            summary:        get(row, 'summary')    || undefined,
+            motto:          get(row, 'motto')      || undefined,
+            origin:         get(row, 'origin')     || undefined,
+            foundedAs:      get(row, 'foundedas')  || undefined,
+            became:         get(row, 'became')     || undefined,
+            publicFace:     get(row, 'publicface') || undefined,
+            selfImage:      get(row, 'selfimage')  || undefined,
+            history:        get(row, 'history')    || undefined,
+            beliefc: oneOf(getCol(row, 'beliefc', bl.c.axisName), ['positive', 'neutral', 'negative'] as const),
+            beliefa: oneOf(getCol(row, 'beliefa', bl.a.axisName), ['positive', 'neutral', 'negative'] as const),
+            beliefb: oneOf(getCol(row, 'beliefb', bl.b.axisName), ['positive', 'negative']             as const),
+            values: sanitizeValueVector(
+              parseFloat(getCol(row, 'valuea', vl.a)),
+              parseFloat(getCol(row, 'valueb', vl.b)),
+              parseFloat(getCol(row, 'valuec', vl.c)),
+            ),
+            notes:          get(row, 'notes')         || undefined,
+            primaryColor:   get(row, 'primarycolor')  || undefined,
+            secondaryColor: get(row, 'secondarycolor') || undefined,
+            momentum:        parseInt(get(row, 'momentum'))        || 0,
+            baseLegitimacy:  parseInt(get(row, 'baselegitimacy'))  || 50,
+            powerModifier:   parseInt(get(row, 'powermodifier'))   || 0,
+          };
+          this.store.saveFaction(faction);
+        }
       }
       (event.target as HTMLInputElement).value = '';
     };
@@ -451,24 +270,59 @@ export class FactionsComponent {
   }
 
   exportCsv(): void {
-    const header = [
+    const factions = this.store.factions();
+    const vl = this.store.valueLabels();
+    const bl = this.store.beliefAxisLabels();
+    const factionHeader = [
       'Id', 'Name', 'Type', 'Active', 'SortOrder',
-      'Represents', 'CoreTenet', 'CertainOf', 'RightAbout',
-      'AfraidOf', 'WrongAbout', 'SingleSentence',
-      'BeliefC', 'BeliefA', 'BeliefB',
-      'ValueA', 'ValueB', 'ValueC',
-      'BaseInfluence', 'Momentum', 'Legitimacy',
-      'Notes'
+      'Represents', 'CoreTenet', 'Focus', 'CertainOf', 'RightAbout',
+      'AfraidOf', 'WrongAbout', 'Response', 'Summary', 'Motto',
+      'Origin', 'FoundedAs', 'Became', 'PublicFace', 'SelfImage', 'History',
+      bl.c.axisName, bl.a.axisName, bl.b.axisName,
+      vl.a, vl.b, vl.c,
+      'Momentum', 'BaseLegitimacy', 'PowerModifier',
+      'Notes', 'PrimaryColor', 'SecondaryColor'
     ];
-    const rows = this.store.factions().map(f => [
+    const factionRows = factions.map(f => [
       f.id, f.name, f.type, f.active ? 'true' : 'false', f.sortOrder,
-      f.represents, f.coreTenet, f.certainOf, f.rightAbout,
-      f.afraidOf, f.wrongAbout, f.singleSentence,
+      f.represents, f.coreTenet, f.focus ?? '', f.certainOf, f.rightAbout,
+      f.afraidOf, f.wrongAbout, f.response ?? '', f.summary ?? '', f.motto ?? '',
+      f.origin ?? '', f.foundedAs ?? '', f.became ?? '', f.publicFace ?? '', f.selfImage ?? '', f.history ?? '',
       f.beliefc ?? '', f.beliefa ?? '', f.beliefb ?? '',
       f.values.a.toFixed(4), f.values.b.toFixed(4), f.values.c.toFixed(4),
-      f.baseInfluence, f.momentum, f.legitimacy,
-      f.notes ?? ''
+      f.momentum, f.baseLegitimacy, f.powerModifier,
+      f.notes ?? '', f.primaryColor ?? '', f.secondaryColor ?? ''
     ]);
-    downloadCsv([header, ...rows], 'factions.csv');
+    downloadCsv([factionHeader, ...factionRows], 'factions.csv');
+
+    const factionNameById = new Map(factions.map(f => [f.id, f.name]));
+    const characterNameById = new Map(this.store.characters().map(c => [c.id, c.name]));
+    const assetNameById = new Map(this.store.assets().map(a => [a.id, a.name]));
+    const resolveEntityName = (type: string | undefined, id: string | undefined): string => {
+      if (!id) return '';
+      if (type === 'Faction')   return factionNameById.get(id)   ?? id;
+      if (type === 'Character') return characterNameById.get(id) ?? id;
+      if (type === 'Asset')     return assetNameById.get(id)     ?? id;
+      return id;
+    };
+    const goals = this.store.factionGoals();
+    if (goals.length > 0) {
+      const goalHeader = [
+        'Id', 'FactionId', 'FactionName', 'Title', 'Description',
+        'Status', 'Priority', 'Visibility',
+        'TargetEntityType', 'TargetEntityId', 'TargetEntityName', 'TargetState',
+        'TargetProperty', 'TargetOperator', 'TargetThreshold'
+      ];
+      const goalRows = goals.map(g => [
+        g.id, g.factionId, factionNameById.get(g.factionId) ?? '',
+        g.title, g.description ?? '',
+        g.status, g.priority, g.visibility,
+        g.targetEntityType ?? '', g.targetEntityId ?? '',
+        resolveEntityName(g.targetEntityType, g.targetEntityId),
+        g.targetState ?? '',
+        g.targetProperty ?? '', g.targetOperator ?? '', g.targetThreshold ?? ''
+      ]);
+      downloadCsv([goalHeader, ...goalRows], 'faction-goals.csv');
+    }
   }
 }

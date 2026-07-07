@@ -124,39 +124,10 @@
   gap: 0.3rem;
 }
 
-.value-row {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-
-  select { flex: 1; }
-}
-
-.or-label {
-  font-size: 0.7rem;
-  font-weight: 700;
-  color: var(--text-muted);
-  letter-spacing: 0.05em;
-  min-width: 1.8rem;
-  text-align: center;
-}
-
 .any-label {
   font-size: 0.8rem;
   color: var(--text-muted);
   font-style: italic;
-}
-
-.remove-val-btn {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 0.75rem;
-  padding: 0.2rem 0.35rem;
-  border-radius: 4px;
-  line-height: 1;
-  &:hover { background: rgba(239, 68, 68, 0.15); color: #f87171; }
 }
 
 .btn-or {

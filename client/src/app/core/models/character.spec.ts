@@ -24,7 +24,7 @@ function makeFaction(id: string, values: ValueVector): Faction {
     represents: '',
     type: 'Faction',
     coreTenet: '', certainOf: '', rightAbout: '', afraidOf: '',
-    wrongAbout: '', singleSentence: '',
+    wrongAbout: '',
     values,
     active: true,
     sortOrder: 0,

@@ -4,12 +4,13 @@ import { ValuesTabComponent } from '../../features/settings/values-tab.component
 import { RulesTabComponent } from '../../features/settings/rules-tab.component';
 import { PowerRulesTabComponent } from '../../features/settings/power-rules-tab.component';
 import { EffectsTabComponent } from '../../features/settings/effects-tab.component';
-export type SettingsTab = 'labels' | 'rules' | 'power' | 'effects';
+import { StressTriggersTabComponent } from '../../features/settings/stress-triggers-tab.component';
+export type SettingsTab = 'labels' | 'rules' | 'power' | 'effects' | 'stress';
 
 @Component({
   selector: 'app-settings-drawer',
   standalone: true,
-  imports: [CommonModule, ValuesTabComponent, RulesTabComponent, PowerRulesTabComponent, EffectsTabComponent],
+  imports: [CommonModule, ValuesTabComponent, RulesTabComponent, PowerRulesTabComponent, EffectsTabComponent, StressTriggersTabComponent],
   templateUrl: './settings-drawer.component.html',
   styleUrl: './settings-drawer.component.scss'
 })
@@ -24,6 +25,7 @@ export class SettingsDrawerComponent {
     { id: 'rules',    label: 'Relationship Rules' },
     { id: 'power',    label: 'Power Rules' },
     { id: 'effects',  label: 'Session Effects' },
+    { id: 'stress',   label: 'Stress Triggers' },
   ];
 
   selectTab(tab: SettingsTab): void {

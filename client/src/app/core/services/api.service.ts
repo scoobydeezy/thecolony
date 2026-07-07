@@ -5,7 +5,8 @@ import { map } from 'rxjs/operators';
 import {
   Faction, ColonyState, RelationshipOverride, RulesConfig,
   RelationshipBreakdown, SessionLogEntry, Character,
-  Session, CampaignEvent, Campaign, AppSettings
+  Session, CampaignEvent, Campaign, AppSettings,
+  Asset, FactionGoal
 } from '../models/types';
 
 // The C# model stores value floats as truthValue/stabilityValue/agencyValue; map to/from ValueVector a/b/c.
@@ -93,6 +94,16 @@ export class ApiService {
   }
   reorderFactions(orderedIds: string[]): Observable<void> {
     return this.http.put<void>(`${this.base}/factions/reorder`, orderedIds);
+  }
+  uploadFactionGlyph(id: string, file: File): Observable<{ path: string }> {
+    const fd = new FormData();
+    fd.append('file', file);
+    return this.http.post<{ path: string }>(`${this.base}/factions/${id}/upload-glyph`, fd);
+  }
+  uploadFactionIcon(id: string, file: File): Observable<{ path: string }> {
+    const fd = new FormData();
+    fd.append('file', file);
+    return this.http.post<{ path: string }>(`${this.base}/factions/${id}/upload-icon`, fd);
   }
 
   // Colony State
@@ -194,6 +205,34 @@ export class ApiService {
 
   reorderEvents(orderedIds: string[]): Observable<void> {
     return this.http.put<void>(`${this.base}/events/reorder`, orderedIds);
+  }
+
+  // Assets
+  getAssets(): Observable<Asset[]> {
+    return this.http.get<Asset[]>(`${this.base}/assets`);
+  }
+  createAsset(asset: Omit<Asset, 'id' | 'campaignId'>): Observable<Asset> {
+    return this.http.post<Asset>(`${this.base}/assets`, asset);
+  }
+  updateAsset(asset: Asset): Observable<Asset> {
+    return this.http.put<Asset>(`${this.base}/assets/${asset.id}`, asset);
+  }
+  deleteAsset(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/assets/${id}`);
+  }
+
+  // Faction Goals
+  getFactionGoals(): Observable<FactionGoal[]> {
+    return this.http.get<FactionGoal[]>(`${this.base}/faction-goals`);
+  }
+  createFactionGoal(goal: Omit<FactionGoal, 'id' | 'campaignId'>): Observable<FactionGoal> {
+    return this.http.post<FactionGoal>(`${this.base}/faction-goals`, goal);
+  }
+  updateFactionGoal(goal: FactionGoal): Observable<FactionGoal> {
+    return this.http.put<FactionGoal>(`${this.base}/faction-goals/${goal.id}`, goal);
+  }
+  deleteFactionGoal(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/faction-goals/${id}`);
   }
 
   importSessions(sessions: Session[]): Observable<{ imported: number; skipped: number }> {

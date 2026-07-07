@@ -11,6 +11,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/factions/factions.component').then(m => m.FactionsComponent)
   },
   {
+    path: 'factions/:id',
+    loadComponent: () => import('./features/factions/faction-detail.component').then(m => m.FactionDetailComponent)
+  },
+  {
     path: 'relationships',
     loadComponent: () => import('./features/relationships/relationships.component').then(m => m.RelationshipsComponent)
   },
@@ -33,6 +37,10 @@ export const routes: Routes = [
   {
     path: 'characters/:id',
     loadComponent: () => import('./features/characters/character-detail.component').then(m => m.CharacterDetailComponent)
+  },
+  {
+    path: 'assets',
+    loadComponent: () => import('./features/assets/assets.component').then(m => m.AssetsComponent)
   },
   { path: '**', redirectTo: '/dashboard' }
 ];

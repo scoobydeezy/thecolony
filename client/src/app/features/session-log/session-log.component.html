@@ -74,55 +74,46 @@
       <div class="grid-3">
         <div class="form-group">
           <label>Date</label>
-          <input type="date" [value]="editingEntry().date"
-            (input)="editingEntry.update(e => ({...e, date: $any($event.target).value}))" />
+          <input type="date" [formField]="f.date" />
         </div>
         <div class="form-group">
           <label>Act</label>
-          <input type="number" min="1" [value]="editingEntry().act"
-            (input)="editingEntry.update(e => ({...e, act: +$any($event.target).value}))" />
+          <input type="number" [formField]="f.act" />
         </div>
         <div class="form-group">
           <label>Week</label>
-          <input type="number" min="1" [value]="editingEntry().week"
-            (input)="editingEntry.update(e => ({...e, week: +$any($event.target).value}))" />
+          <input type="number" [formField]="f.week" />
         </div>
       </div>
 
       <div class="form-group">
         <label>Summary</label>
-        <textarea rows="3" [value]="editingEntry().summary ?? ''"
-          (input)="editingEntry.update(e => ({...e, summary: $any($event.target).value}))"></textarea>
+        <textarea rows="3" [formField]="f.summary"></textarea>
       </div>
 
       <div class="form-group">
         <label>Party Actions</label>
-        <textarea rows="2" [value]="editingEntry().partyActions ?? ''"
-          (input)="editingEntry.update(e => ({...e, partyActions: $any($event.target).value}))"></textarea>
+        <textarea rows="2" [formField]="f.partyActions"></textarea>
       </div>
 
       <div class="form-group">
         <label>Faction Changes</label>
-        <textarea rows="2" [value]="editingEntry().factionChanges ?? ''"
-          (input)="editingEntry.update(e => ({...e, factionChanges: $any($event.target).value}))"></textarea>
+        <textarea rows="2" [formField]="f.factionChanges"></textarea>
       </div>
 
       <div class="form-group">
         <label>Global Stress Change</label>
-        <input type="number" [value]="editingEntry().colonyStressChange"
-          (input)="editingEntry.update(e => ({...e, colonyStressChange: +$any($event.target).value}))" />
+        <input type="number" [formField]="f.colonyStressChange" />
       </div>
 
       <div class="form-group">
         <label>Relationship Bumps</label>
-        <textarea rows="2" [value]="editingEntry().relationshipBumps ?? ''"
-          (input)="editingEntry.update(e => ({...e, relationshipBumps: $any($event.target).value}))"></textarea>
+        <textarea rows="2" [formField]="f.relationshipBumps"></textarea>
       </div>
 
       <div class="form-group">
         <label>Future Consequences</label>
-        <textarea rows="2" [value]="editingEntry().futureConsequences ?? ''"
-          (input)="editingEntry.update(e => ({...e, futureConsequences: $any($event.target).value}))"></textarea>
+        <textarea rows="2" [formField]="f.futureConsequences"></textarea>
       </div>
 
       <div class="modal-actions">

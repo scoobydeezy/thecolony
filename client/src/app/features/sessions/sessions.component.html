@@ -6,9 +6,9 @@
 <div class="toolbar">
   <button class="btn btn-primary" (click)="openAddSession()">+ New Session</button>
   <div class="toolbar-right">
-    <button class="btn btn-secondary" (click)="exportSessions()" title="Download all sessions as JSON backup">Export JSON</button>
+    <button class="btn btn-secondary" (click)="exportSessions()" title="Download all sessions as JSON backup">Export <i class="fa-solid fa-right-from-bracket"></i></button>
     <label class="btn btn-secondary" title="Restore sessions from a JSON backup">
-      Import JSON
+      <i class="fa-solid fa-right-to-bracket"></i> Import
       <input type="file" accept=".json" (change)="onImportFile($event)" style="display:none" />
     </label>
     @if (importError()) {
@@ -110,9 +110,11 @@
                         <!-- Target type -->
                         <select [value]="draft.targetType ?? 'faction'"
                           (change)="updateInlineEffect(ev.id, $index, 'targetType', $any($event.target).value)">
-                          <option value="colony">Colony</option>
-                          <option value="faction">Faction</option>
-                          <option value="character">Character</option>
+                          <option value="colony"    [selected]="(draft.targetType ?? 'faction') === 'colony'">Colony</option>
+                          <option value="faction"   [selected]="(draft.targetType ?? 'faction') === 'faction'">Faction</option>
+                          <option value="character" [selected]="(draft.targetType ?? 'faction') === 'character'">Character</option>
+                          <option value="asset"     [selected]="(draft.targetType ?? 'faction') === 'asset'">Asset</option>
+                          <option value="goal"      [selected]="(draft.targetType ?? 'faction') === 'goal'">Goal</option>
                         </select>
 
                         <!-- Primary target -->
@@ -122,7 +124,23 @@
                               (change)="updateInlineEffect(ev.id, $index, 'targetId', $any($event.target).value)">
                               <option value="">— character —</option>
                               @for (c of allCharacters; track c.id) {
-                                <option [value]="c.id">{{ c.name }}</option>
+                                <option [value]="c.id" [selected]="draft.targetId === c.id">{{ c.name }}</option>
+                              }
+                            </select>
+                          } @else if (draft.targetType === 'asset') {
+                            <select [value]="draft.targetId ?? ''"
+                              (change)="updateInlineEffect(ev.id, $index, 'targetId', $any($event.target).value)">
+                              <option value="">— asset —</option>
+                              @for (a of allAssets; track a.id) {
+                                <option [value]="a.id" [selected]="draft.targetId === a.id">{{ a.name }}</option>
+                              }
+                            </select>
+                          } @else if (draft.targetType === 'goal') {
+                            <select [value]="draft.targetId ?? ''"
+                              (change)="updateInlineEffect(ev.id, $index, 'targetId', $any($event.target).value)">
+                              <option value="">— goal —</option>
+                              @for (g of allGoals; track g.id) {
+                                <option [value]="g.id" [selected]="draft.targetId === g.id">{{ g.title }}</option>
                               }
                             </select>
                           } @else {
@@ -130,7 +148,7 @@
                               (change)="updateInlineEffect(ev.id, $index, 'targetId', $any($event.target).value)">
                               <option value="">— faction —</option>
                               @for (f of activeFactions; track f.id) {
-                                <option [value]="f.id">{{ f.name }}</option>
+                                <option [value]="f.id" [selected]="draft.targetId === f.id">{{ f.name }}</option>
                               }
                             </select>
                           }
@@ -140,7 +158,7 @@
                         <select [value]="draft.property ?? 'momentum'"
                           (change)="updateInlineEffect(ev.id, $index, 'property', $any($event.target).value)">
                           @for (d of descriptorsFor(draft.targetType ?? 'faction'); track d.property) {
-                            <option [value]="d.property">{{ d.label }}</option>
+                            <option [value]="d.property" [selected]="(draft.property ?? 'momentum') === d.property">{{ d.label }}</option>
                           }
                         </select>
 
@@ -151,7 +169,7 @@
                             <option value="">— with faction —</option>
                             @for (f of activeFactions; track f.id) {
                               @if (f.id !== draft.targetId) {
-                                <option [value]="f.id">{{ f.name }}</option>
+                                <option [value]="f.id" [selected]="draft.secondaryTargetId === f.id">{{ f.name }}</option>
                               }
                             }
                           </select>
@@ -163,7 +181,7 @@
                             <select [value]="draft.value ?? d.selectOptions?.[0]?.value ?? ''"
                               (change)="updateInlineEffect(ev.id, $index, 'value', $any($event.target).value)">
                               @for (opt of d.selectOptions ?? []; track opt.value) {
-                                <option [value]="opt.value">{{ opt.label }}</option>
+                                <option [value]="opt.value" [selected]="(draft.value ?? d.selectOptions?.[0]?.value ?? '') === opt.value">{{ opt.label }}</option>
                               }
                             </select>
                           } @else if (d.inputType === 'none') {
@@ -172,9 +190,38 @@
                               (change)="updateInlineEffect(ev.id, $index, 'value', $any($event.target).value)">
                               <option value="">— None —</option>
                               @for (f of activeFactions; track f.id) {
-                                <option [value]="f.id">{{ f.name }}</option>
+                                <option [value]="f.id" [selected]="draft.value === f.id">{{ f.name }}</option>
                               }
                             </select>
+                          } @else if (d.inputType === 'faction-select') {
+                            <!-- controllingFactionId: faction select stored in value -->
+                            <select [value]="draft.value ?? ''"
+                              (change)="updateInlineEffect(ev.id, $index, 'value', $any($event.target).value)">
+                              <option value="">— Uncontrolled —</option>
+                              @for (f of activeFactions; track f.id) {
+                                <option [value]="f.id" [selected]="draft.value === f.id">{{ f.name }}</option>
+                              }
+                            </select>
+                          } @else if (d.inputType === 'participate') {
+                            <!-- Participation: actor + role (Helping/Hindering) + magnitude -->
+                            <select [value]="draft.secondaryTargetId ?? ''"
+                              (change)="updateInlineEffect(ev.id, $index, 'secondaryTargetId', $any($event.target).value)">
+                              <option value="">— actor —</option>
+                              @for (actor of allActors; track actor.id) {
+                                <option [value]="actor.id" [selected]="draft.secondaryTargetId === actor.id">{{ actor.name }}</option>
+                              }
+                            </select>
+                            <select [value]="draft.value ?? 'Helping'"
+                              (change)="updateInlineEffect(ev.id, $index, 'value', $any($event.target).value)">
+                              <option value="Helping"   [selected]="(draft.value ?? 'Helping') === 'Helping'">Helping</option>
+                              <option value="Hindering" [selected]="(draft.value ?? 'Helping') === 'Hindering'">Hindering</option>
+                            </select>
+                            <div class="delta-stepper">
+                              <button class="stepper-btn stepper-minus" (click)="updateInlineEffect(ev.id, $index, 'delta', (draft.delta ?? 0) - 10)">−</button>
+                              <input type="number" class="delta-input" placeholder="mag" [value]="draft.delta ?? 0"
+                                (input)="updateInlineEffect(ev.id, $index, 'delta', +$any($event.target).value)" />
+                              <button class="stepper-btn stepper-plus" (click)="updateInlineEffect(ev.id, $index, 'delta', (draft.delta ?? 0) + 10)">+</button>
+                            </div>
                           } @else {
                             <!-- Numeric delta -->
                             <div class="delta-stepper">
@@ -225,47 +272,41 @@
       <div class="grid-2">
         <div class="form-group">
           <label>Session #</label>
-          <input type="number" min="1" [value]="editingSession().number"
-            (input)="editingSession.update(s => ({...s, number: +$any($event.target).value}))" />
+          <input type="number" [formField]="fs.number" />
         </div>
         <div class="form-group">
           <label>Date <span class="optional">(optional)</span></label>
-          <input type="date" [value]="editingSession().date ?? ''"
-            (input)="editingSession.update(s => ({...s, date: $any($event.target).value || undefined}))" />
+          <input type="date" [formField]="fs.date" />
         </div>
       </div>
 
       <div class="form-group">
         <label>Title</label>
-        <input type="text" placeholder="e.g. The Secret" [value]="editingSession().title ?? ''"
-          (input)="editingSession.update(s => ({...s, title: $any($event.target).value}))" />
+        <input type="text" placeholder="e.g. The Secret" [formField]="fs.title" />
       </div>
 
       <div class="grid-2">
         <div class="form-group">
           <label>Act</label>
-          <input type="number" min="1" [value]="editingSession().act"
-            (input)="editingSession.update(s => ({...s, act: +$any($event.target).value}))" />
+          <input type="number" [formField]="fs.act" />
         </div>
         <div class="form-group">
           <label>Week</label>
-          <input type="number" min="1" [value]="editingSession().week"
-            (input)="editingSession.update(s => ({...s, week: +$any($event.target).value}))" />
+          <input type="number" [formField]="fs.week" />
         </div>
       </div>
 
       <div class="form-group">
         <label>Summary <span class="optional">(optional)</span></label>
-        <textarea rows="3" [value]="editingSession().summary ?? ''"
-          (input)="editingSession.update(s => ({...s, summary: $any($event.target).value}))"></textarea>
+        <textarea rows="3" [formField]="fs.summary"></textarea>
       </div>
 
       <div class="modal-actions">
         @if (editingSession().id) {
-          <button class="btn btn-danger modal-delete" (click)="deleteSession(editingSession().id!); closeSessionModal()">Delete</button>
+          <button class="btn btn-danger modal-delete" (click)="deleteSession(editingSession().id); closeSessionModal()">Delete</button>
         }
         <button class="btn btn-secondary" (click)="closeSessionModal()">Cancel</button>
-        <button class="btn btn-primary" (click)="saveSession()" [disabled]="!editingSession().title?.trim()">Save</button>
+        <button class="btn btn-primary" (click)="saveSession()" [disabled]="!editingSession().title.trim()">Save</button>
       </div>
     </div>
   </div>
@@ -294,23 +335,20 @@
 
       <div class="form-group">
         <label>Title</label>
-        <input type="text" placeholder="e.g. The Party exposes Keeper records"
-          [value]="editingEvent().title ?? ''"
-          (input)="editingEvent.update(e => ({...e, title: $any($event.target).value}))" />
+        <input type="text" placeholder="e.g. The Party exposes Keeper records" [formField]="fe.title" />
       </div>
 
       <div class="form-group">
         <label>Description <span class="optional">(optional)</span></label>
-        <textarea rows="3" [value]="editingEvent().description ?? ''"
-          (input)="editingEvent.update(e => ({...e, description: $any($event.target).value}))"></textarea>
+        <textarea rows="3" [formField]="fe.description"></textarea>
       </div>
 
       <div class="modal-actions">
         @if (editingEvent().id) {
-          <button class="btn btn-danger modal-delete" (click)="deleteEvent(editingEvent().sessionId!, editingEvent().id!); closeEventModal()">Delete</button>
+          <button class="btn btn-danger modal-delete" (click)="deleteEvent(editingEvent().sessionId, editingEvent().id); closeEventModal()">Delete</button>
         }
         <button class="btn btn-secondary" (click)="closeEventModal()">Cancel</button>
-        <button class="btn btn-primary" (click)="saveEvent()" [disabled]="!editingEvent().title?.trim()">Save</button>
+        <button class="btn btn-primary" (click)="saveEvent()" [disabled]="!editingEvent().title.trim()">Save</button>
       </div>
     </div>
   </div>

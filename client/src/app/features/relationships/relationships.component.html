@@ -1,6 +1,6 @@
 <div class="page-header">
   <h2>Relationships</h2>
-  <button class="btn btn-secondary" (click)="exportCsv()">Export CSV</button>
+  <button class="btn btn-secondary" (click)="exportCsv()">Export <i class="fa-solid fa-right-from-bracket"></i></button>
   <p>Tune scoring rules and view faction relationships. Changes apply automatically.</p>
 </div>
 
@@ -174,10 +174,10 @@
 @if (showOverrideModal()) {
   <div class="modal-backdrop" (click)="showOverrideModal.set(false)">
     <div class="modal" (click)="$event.stopPropagation()">
-      <h3>{{ overrideEditId() ? 'Edit' : 'Add' }} Score Override</h3>
+      <h3>{{ overrideForm().id ? 'Edit' : 'Add' }} Score Override</h3>
       <div class="form-group">
         <label>Source Faction</label>
-        <select [(ngModel)]="overrideSourceId" [ngModelOptions]="{standalone: true}">
+        <select [formField]="fo.sourceId">
           <option value="">— Select —</option>
           @for (f of store.allActiveFactions(); track f.id) {
             <option [value]="f.id">{{ f.name }}</option>
@@ -186,7 +186,7 @@
       </div>
       <div class="form-group">
         <label>Target Faction</label>
-        <select [(ngModel)]="overrideTargetId" [ngModelOptions]="{standalone: true}">
+        <select [formField]="fo.targetId">
           <option value="">— Select —</option>
           @for (f of store.allActiveFactions(); track f.id) {
             <option [value]="f.id">{{ f.name }}</option>
@@ -196,11 +196,11 @@
       </div>
       <div class="form-group">
         <label>Score Bump</label>
-        <input type="number" [(ngModel)]="overrideScoreBump" [ngModelOptions]="{standalone: true}" />
+        <input type="number" [formField]="fo.scoreBump" />
       </div>
       <div class="form-group">
         <label>Notes (Optional)</label>
-        <textarea [(ngModel)]="overrideNotes" [ngModelOptions]="{standalone: true}" rows="3"></textarea>
+        <textarea rows="3" [formField]="fo.notes"></textarea>
       </div>
       <div class="modal-actions">
         <button class="btn btn-secondary" (click)="showOverrideModal.set(false)">Cancel</button>

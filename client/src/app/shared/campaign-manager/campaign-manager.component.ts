@@ -1,5 +1,4 @@
 import { Component, input, output, signal, computed, inject, effect } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { AppStore } from '../../store/app.store';
 import { Campaign } from '../../core/models/types';
 
@@ -8,7 +7,7 @@ export type CampaignManagerMode = 'new' | 'manage' | 'import' | null;
 @Component({
   selector: 'app-campaign-manager',
   standalone: true,
-  imports: [FormsModule],
+  imports: [],
   templateUrl: './campaign-manager.component.html',
   styleUrl: './campaign-manager.component.scss',
 })

@@ -1,5 +1,5 @@
-@if (rulesForm(); as r) {
-  @let f = formulasForm();
+@if (rulesModel().id) {
+  @let f = formulasForm;
 
   <!-- Influence -->
   <div class="card">
@@ -9,8 +9,7 @@
     </p>
     <div class="rule-row" style="max-width: 320px">
       <span class="rule-label">Conviction Scale</span>
-      <input type="number" step="0.05" [value]="r.influenceConvictionScale"
-        (input)="floatRules('influenceConvictionScale', $any($event.target).value)" />
+      <input type="number" step="0.05" [formField]="rulesForm.influenceConvictionScale" />
     </div>
     <small style="margin-top: 0.5rem; display: block">
       Default: 0.5 — bonus = factionInfluenceAvg × (impressionable / 100) × scale
@@ -31,51 +30,78 @@
       <div class="field-group">
         <label>Member Avg Weight</label>
         <small>Default: 0.6</small>
-        <input type="number" step="0.05" min="0" max="1"
-          [value]="f.memberAvgWeight"
-          (input)="floatFormulas('memberAvgWeight', $any($event.target).value)" />
+        <input type="number" step="0.05" [formField]="f.memberAvgWeight" />
       </div>
       <div class="field-group">
         <label>Member Max Weight</label>
         <small>Default: 0.4</small>
-        <input type="number" step="0.05" min="0" max="1"
-          [value]="f.memberMaxWeight"
-          (input)="floatFormulas('memberMaxWeight', $any($event.target).value)" />
+        <input type="number" step="0.05" [formField]="f.memberMaxWeight" />
       </div>
     </div>
   </div>
 
-  <!-- Total Faction Influence -->
+  <!-- Organization -->
   <div class="card">
-    <h3 class="section-title">Total Faction Influence</h3>
+    <h3 class="section-title">Organization</h3>
     <p class="help-text">
-      A faction's total influence combines its base influence, character influence, and normalized momentum.
+      Organization measures operational capability — a weighted blend of character strength, asset holdings, and momentum.
       Weights should sum to 1.
     </p>
     <div class="formula-row">
-      <code class="formula">totalInfluence = base × baseWeight + charInfluence × charWeight + momentum × momentumWeight</code>
+      <code class="formula">organization = charStrength × charWeight + assetInfluence × assetInfluenceWeight + normalizedMomentum × momentumWeight</code>
     </div>
     <div class="fields-3">
       <div class="field-group">
-        <label>Base Influence Weight</label>
-        <small>Default: 0.45</small>
-        <input type="number" step="0.05" min="0" max="1"
-          [value]="f.baseInfluenceWeight"
-          (input)="floatFormulas('baseInfluenceWeight', $any($event.target).value)" />
+        <label>Char Influence Weight</label>
+        <small>Default: 0.40</small>
+        <input type="number" step="0.05" [formField]="f.charInfluenceWeight" />
       </div>
       <div class="field-group">
-        <label>Char Influence Weight</label>
-        <small>Default: 0.35</small>
-        <input type="number" step="0.05" min="0" max="1"
-          [value]="f.charInfluenceWeight"
-          (input)="floatFormulas('charInfluenceWeight', $any($event.target).value)" />
+        <label>Asset Influence Weight</label>
+        <small>Default: 0.40</small>
+        <input type="number" step="0.05" [formField]="f.assetInfluenceWeight" />
       </div>
       <div class="field-group">
         <label>Momentum Weight</label>
         <small>Default: 0.20</small>
-        <input type="number" step="0.05" min="0" max="1"
-          [value]="f.momentumInfluenceWeight"
-          (input)="floatFormulas('momentumInfluenceWeight', $any($event.target).value)" />
+        <input type="number" step="0.05" [formField]="f.momentumInfluenceWeight" />
+      </div>
+    </div>
+    <div class="fields-2" style="margin-top: 0.75rem">
+      <div class="field-group">
+        <label>Asset Influence Scale</label>
+        <small>Default: 25 — raw asset tier sum that maps to 100% on the 0–100 scale</small>
+        <input type="number" step="1" [formField]="f.assetInfluenceScale" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Legitimacy -->
+  <div class="card">
+    <h3 class="section-title">Legitimacy</h3>
+    <p class="help-text">
+      Legitimacy measures public trust — a weighted blend of the faction's base legitimacy and its asset legitimacy score.
+    </p>
+    <div class="formula-row">
+      <code class="formula">legitimacy = baseLegitimacy × baseLegitimacyWeight + assetLegitimacy × assetLegitimacyWeight</code>
+    </div>
+    <div class="fields-2">
+      <div class="field-group">
+        <label>Base Legitimacy Weight</label>
+        <small>Default: 0.70</small>
+        <input type="number" step="0.05" [formField]="f.baseLegitimacyWeight" />
+      </div>
+      <div class="field-group">
+        <label>Asset Legitimacy Weight</label>
+        <small>Default: 0.30</small>
+        <input type="number" step="0.05" [formField]="f.assetLegitimacyWeight" />
+      </div>
+    </div>
+    <div class="fields-2" style="margin-top: 0.75rem">
+      <div class="field-group">
+        <label>Asset Legitimacy Scale</label>
+        <small>Default: 25 — raw asset tier sum that maps to 100% on the 0–100 scale</small>
+        <input type="number" step="1" [formField]="f.assetLegitimacyScale" />
       </div>
     </div>
   </div>
@@ -84,25 +110,21 @@
   <div class="card">
     <h3 class="section-title">Faction Power</h3>
     <p class="help-text">
-      Scales total influence into effective power based on a faction's legitimacy score (0–100).
+      Power combines Organization and Legitimacy. The legitimacy multiplier scales from a floor at legitimacy 0 up through legitimacyScale.
     </p>
     <div class="formula-row">
-      <code class="formula">effectivePower = totalInfluence × (legitimacyBase + legitimacy / legitimacyScale)</code>
+      <code class="formula">power = organization × (legitimacyBase + legitimacy / legitimacyScale) + powerModifier</code>
     </div>
     <div class="fields-2">
       <div class="field-group">
         <label>Legitimacy Base</label>
-        <small>Default: 0.5 — power floor at legitimacy 0</small>
-        <input type="number" step="0.05" min="0"
-          [value]="f.legitimacyBase"
-          (input)="floatFormulas('legitimacyBase', $any($event.target).value)" />
+        <small>Default: 0.5 — power floor when legitimacy = 0</small>
+        <input type="number" step="0.05" [formField]="f.legitimacyBase" />
       </div>
       <div class="field-group">
         <label>Legitimacy Scale</label>
         <small>Default: 100 — full legitimacy doubles the base</small>
-        <input type="number" step="10" min="1"
-          [value]="f.legitimacyScale"
-          (input)="floatFormulas('legitimacyScale', $any($event.target).value)" />
+        <input type="number" step="10" [formField]="f.legitimacyScale" />
       </div>
     </div>
   </div>
@@ -111,19 +133,17 @@
   <div class="card">
     <h3 class="section-title">Leaderless Penalty</h3>
     <p class="help-text">
-      If a faction has no alive Faction Leader, its effective power is multiplied by this value.
+      If a faction has no alive Faction Leader, its character strength is multiplied by this value.
       Set to 1 to disable the penalty.
     </p>
     <div class="formula-row">
-      <code class="formula">effectivePower × leaderlessPowerMultiplier (when no alive leader)</code>
+      <code class="formula">charStrength × leaderlessPowerMultiplier (when no alive leader)</code>
     </div>
     <div class="fields-1">
       <div class="field-group">
         <label>Leaderless Power Multiplier</label>
-        <small>Default: 0.75 — 25% power reduction</small>
-        <input type="number" step="0.05" min="0" max="1"
-          [value]="f.leaderlessPowerMultiplier ?? 0.75"
-          (input)="floatFormulas('leaderlessPowerMultiplier', $any($event.target).value)" />
+        <small>Default: 0.75 — 25% reduction to character strength</small>
+        <input type="number" step="0.05" [formField]="f.leaderlessPowerMultiplier" />
       </div>
     </div>
   </div>

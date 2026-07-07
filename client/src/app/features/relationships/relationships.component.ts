@@ -1,13 +1,24 @@
 import { Component, inject, signal, computed } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormField, form } from '@angular/forms/signals';
 import { AppStore } from '../../store/app.store';
 import { RelationshipBreakdown } from '../../core/models/types';
 import { downloadCsv } from '../../core/utils/csv-export';
 
+interface OverrideFormModel {
+  id: string;
+  sourceId: string;
+  targetId: string;
+  scoreBump: string;
+  notes: string;
+}
+
+const emptyOverrideForm = (): OverrideFormModel =>
+  ({ id: '', sourceId: '', targetId: '', scoreBump: '0', notes: '' });
+
 @Component({
   selector: 'app-relationships',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormField],
   templateUrl: './relationships.component.html',
   styleUrl: './relationships.component.scss'
 })
@@ -20,11 +31,8 @@ export class RelationshipsComponent {
 
   // ── Override modal ────────────────────────────────────────────────────────
   showOverrideModal = signal(false);
-  overrideSourceId = signal('');
-  overrideTargetId = signal('');
-  overrideScoreBump = signal(0);
-  overrideNotes = signal('');
-  overrideEditId = signal<string | null>(null);
+  readonly overrideForm = signal<OverrideFormModel>(emptyOverrideForm());
+  readonly fo = form(this.overrideForm);
 
   // ── Stress ────────────────────────────────────────────────────────────────
   get stress(): number {
@@ -87,32 +95,25 @@ export class RelationshipsComponent {
 
   // ── Override modal ────────────────────────────────────────────────────────
   openAddOverride(): void {
-    this.overrideEditId.set(null);
-    this.overrideSourceId.set('');
-    this.overrideTargetId.set('');
-    this.overrideScoreBump.set(0);
-    this.overrideNotes.set('');
+    this.overrideForm.set(emptyOverrideForm());
     this.showOverrideModal.set(true);
   }
 
   openEditOverride(id: string): void {
     const o = this.store.overrides().find(x => x.id === id);
     if (!o) return;
-    this.overrideEditId.set(o.id);
-    this.overrideSourceId.set(o.sourceId);
-    this.overrideTargetId.set(o.targetId);
-    this.overrideScoreBump.set(o.scoreBump);
-    this.overrideNotes.set(o.notes ?? '');
+    this.overrideForm.set({ id: o.id, sourceId: o.sourceId, targetId: o.targetId, scoreBump: o.scoreBump.toString(), notes: o.notes ?? '' });
     this.showOverrideModal.set(true);
   }
 
   saveOverride(): void {
+    const fm = this.overrideForm();
     this.store.saveOverride({
-      id: this.overrideEditId() ?? '',
-      sourceId: this.overrideSourceId(),
-      targetId: this.overrideTargetId(),
-      scoreBump: this.overrideScoreBump(),
-      notes: this.overrideNotes() || undefined
+      id: fm.id,
+      sourceId: fm.sourceId,
+      targetId: fm.targetId,
+      scoreBump: parseInt(fm.scoreBump, 10) || 0,
+      notes: fm.notes || undefined,
     });
     this.showOverrideModal.set(false);
   }

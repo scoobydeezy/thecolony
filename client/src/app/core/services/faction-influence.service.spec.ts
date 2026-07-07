@@ -1,83 +1,92 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { FactionInfluenceService } from './faction-influence.service';
-import { Character, Faction } from '../models/types';
+import { Character, Faction, DEFAULT_FORMULAS } from '../models/types';
 
 const svc = new FactionInfluenceService();
 
-function makeChar(influence: number): Character {
+function makeChar(influence: number, isLeader = false): Character {
   return {
-    id: crypto.randomUUID(), name: 'Test', characterType: 'NPC',
+    id: crypto.randomUUID(), name: 'Test', characterType: isLeader ? 'FactionLeader' : 'NPC',
     values: { a: 1/3, b: 1/3, c: 1/3 },
     conviction: 50, pressure: 0, influence, impressionable: 50
   };
 }
 
-function makeFaction(baseInfluence: number, momentum: number): Faction {
+function makeFaction(momentum: number, baseLegitimacy = 50, powerModifier = 0): Faction {
   return {
     id: 'f1', name: 'Test Faction', represents: '', type: 'Faction',
     coreTenet: '', certainOf: '', rightAbout: '', afraidOf: '', wrongAbout: '',
-    singleSentence: '', values: { a: 1/3, b: 1/3, c: 1/3 },
-    active: true, sortOrder: 0, baseInfluence, momentum
+    values: { a: 1/3, b: 1/3, c: 1/3 },
+    active: true, sortOrder: 0, momentum, baseLegitimacy, powerModifier
   };
 }
 
 describe('FactionInfluenceService', () => {
 
-  describe('calculateCharacterInfluence', () => {
+  describe('calculateCharacterStrength (via calculateCharacterInfluence)', () => {
     it('returns 0 for empty member list', () => {
       expect(svc.calculateCharacterInfluence([])).toBe(0);
     });
 
     it('single member: avg and max are the same', () => {
       const result = svc.calculateCharacterInfluence([makeChar(80)]);
+      // No leader → leaderless penalty (×0.75)
+      expect(result).toBeCloseTo((80 * 0.6 + 80 * 0.4) * 0.75);
+    });
+
+    it('single leader: no penalty', () => {
+      const result = svc.calculateCharacterInfluence([makeChar(80, true)]);
       expect(result).toBeCloseTo(80 * 0.6 + 80 * 0.4);
     });
 
-    it('avg=20, max=100 scenario from spec', () => {
-      // Four members at 0 influence + one at 100 → avg=20
-      const members = [makeChar(0), makeChar(0), makeChar(0), makeChar(0), makeChar(100)];
+    it('avg=20, max=100 with leader', () => {
+      const members = [makeChar(0), makeChar(0), makeChar(0), makeChar(0), makeChar(100, true)];
       const avg = 20, max = 100;
       expect(svc.calculateCharacterInfluence(members)).toBeCloseTo(avg * 0.6 + max * 0.4);
-    });
-
-    it('avg=60, max=60 scenario from spec', () => {
-      const members = [makeChar(60), makeChar(60), makeChar(60)];
-      expect(svc.calculateCharacterInfluence(members)).toBeCloseTo(60 * 0.6 + 60 * 0.4);
     });
   });
 
   describe('calculateNormalizedMomentum', () => {
-    it('-100 → 0', () => expect(svc.calculateNormalizedMomentum(-100)).toBe(0));
-    it('0 → 50',   () => expect(svc.calculateNormalizedMomentum(0)).toBe(50));
+    it('-100 → 0',   () => expect(svc.calculateNormalizedMomentum(-100)).toBe(0));
+    it('0 → 50',     () => expect(svc.calculateNormalizedMomentum(0)).toBe(50));
     it('+100 → 100', () => expect(svc.calculateNormalizedMomentum(100)).toBe(100));
   });
 
-  describe('calculateTotalInfluence', () => {
-    it('known values produce correct rounded total', () => {
-      // baseInfluence=80, charInfluence=68, momentum=+20 → normalizedMomentum=60
-      // 80*0.45 + 68*0.35 + 60*0.20 = 36 + 23.8 + 12 = 71.8 → 72
-      const faction = makeFaction(80, 20);
-      const members = [makeChar(68), makeChar(68)]; // avg=68, max=68 → charInfluence=68
-      expect(svc.calculateTotalInfluence(faction, members)).toBe(72);
+  describe('calculateOrganization (via calculateTotalInfluence)', () => {
+    it('no assets, leader present — charStrength×0.40 + momentum×0.20', () => {
+      // charStrength: avg=68, max=68, leader present → no penalty → 68
+      // normalizedMomentum(20) = 60
+      // 68×0.40 + 0×0.40 + 60×0.20 = 27.2 + 0 + 12 = 39.2 → 39
+      const faction = makeFaction(20);
+      const members = [makeChar(68, true), makeChar(68)];
+      expect(svc.calculateTotalInfluence(faction, members)).toBe(39);
     });
 
-    it('zero members uses only baseInfluence and momentum', () => {
-      const faction = makeFaction(60, 0);
-      // charInfluence=0, normalizedMomentum=50
-      // 60*0.45 + 0*0.35 + 50*0.20 = 27 + 0 + 10 = 37
-      expect(svc.calculateTotalInfluence(faction, [])).toBe(37);
+    it('zero members uses only momentum (charStrength=0)', () => {
+      // normalizedMomentum(0) = 50; 0×0.40 + 0×0.40 + 50×0.20 = 10
+      const faction = makeFaction(0);
+      expect(svc.calculateTotalInfluence(faction, [])).toBe(10);
     });
 
     it('result is clamped to 0-100', () => {
-      const faction = makeFaction(100, 100);
-      const members = [makeChar(100)];
+      const faction = makeFaction(100);
+      const members = [makeChar(100, true)];
       expect(svc.calculateTotalInfluence(faction, members)).toBeLessThanOrEqual(100);
+    });
+  });
+
+  describe('calculateEffectivePower', () => {
+    it('powerModifier is added to final result', () => {
+      const faction = makeFaction(0, 50, 10);
+      const base = svc.calculateEffectivePower({ ...faction, powerModifier: 0 }, [], DEFAULT_FORMULAS);
+      const withMod = svc.calculateEffectivePower(faction, [], DEFAULT_FORMULAS);
+      expect(withMod).toBe(base + 10);
     });
   });
 
   describe('topMembers', () => {
     it('returns top 5 by influence descending', () => {
-      const members = [20, 90, 55, 10, 100, 75, 30].map(makeChar);
+      const members = [20, 90, 55, 10, 100, 75, 30].map(i => makeChar(i));
       const top = svc.topMembers(members, 5);
       expect(top.map(c => c.influence)).toEqual([100, 90, 75, 55, 30]);
     });

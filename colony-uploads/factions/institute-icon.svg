@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="48px" height="48px" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+    <g id="EGRESS">
+        <path d="M24.161,1.229L43.914,12.634L43.914,35.443L24.161,46.848L4.407,35.443L4.407,12.634L24.161,1.229ZM24.161,5.848L8.407,14.943L8.407,33.134L24.161,42.229L39.914,33.134L39.914,14.943L24.161,5.848Z"/>
+        <circle cx="24.161" cy="24.038" r="5.301"/>
+        <path d="M24.237,2.289L43.181,34.843L5.293,34.843L24.237,2.289ZM24.237,6.265L8.77,32.843L39.703,32.843L24.237,6.265Z"/>
+        <path d="M24.194,45.553L5.25,12.998L43.138,12.998L24.194,45.553ZM24.194,41.576L39.66,14.998L8.728,14.998L24.194,41.576Z"/>
+        <path d="M8.282,14.662L39.764,32.838" style="fill:none;stroke:black;stroke-width:1px;"/>
+        <path d="M8.282,32.838L39.764,14.662" style="fill:none;stroke:black;stroke-width:1px;"/>
+        <path d="M24.023,5.574L24.023,41.926" style="fill:none;stroke:black;stroke-width:1px;"/>
+    </g>
+</svg>

@@ -1,5 +1,4 @@
-@let vl = valueLabels();
-@let bl = beliefAxisLabels();
+@let m = valuesModel();
 
 <!-- Core Values -->
 <div class="label-section">
@@ -9,15 +8,15 @@
   <div class="label-grid">
     <div class="label-row">
       <span class="label-key value-a">Value A</span>
-      <input type="text" [value]="vl.a" (input)="setValueLabel('a', $any($event.target).value)" />
+      <input type="text" [formField]="valuesForm.a" />
     </div>
     <div class="label-row">
       <span class="label-key value-b">Value B</span>
-      <input type="text" [value]="vl.b" (input)="setValueLabel('b', $any($event.target).value)" />
+      <input type="text" [formField]="valuesForm.b" />
     </div>
     <div class="label-row">
       <span class="label-key value-c">Value C</span>
-      <input type="text" [value]="vl.c" (input)="setValueLabel('c', $any($event.target).value)" />
+      <input type="text" [formField]="valuesForm.c" />
     </div>
   </div>
 </div>
@@ -29,16 +28,16 @@
 
   <div class="label-grid">
     <div class="label-row">
-      <span class="label-key edge">{{ vl.a }} / {{ vl.c }}</span>
-      <input type="text" [value]="vl.edgeAC" (input)="setValueLabel('edgeAC', $any($event.target).value)" />
+      <span class="label-key edge">{{ m.a }} / {{ m.c }}</span>
+      <input type="text" [formField]="valuesForm.edgeAC" />
     </div>
     <div class="label-row">
-      <span class="label-key edge">{{ vl.a }} / {{ vl.b }}</span>
-      <input type="text" [value]="vl.edgeAB" (input)="setValueLabel('edgeAB', $any($event.target).value)" />
+      <span class="label-key edge">{{ m.a }} / {{ m.b }}</span>
+      <input type="text" [formField]="valuesForm.edgeAB" />
     </div>
     <div class="label-row">
-      <span class="label-key edge">{{ vl.b }} / {{ vl.c }}</span>
-      <input type="text" [value]="vl.edgeBC" (input)="setValueLabel('edgeBC', $any($event.target).value)" />
+      <span class="label-key edge">{{ m.b }} / {{ m.c }}</span>
+      <input type="text" [formField]="valuesForm.edgeBC" />
     </div>
   </div>
 </div>
@@ -46,13 +45,13 @@
 <!-- Value A Axis -->
 <div class="label-section">
   <div class="axis-header">
-    <h3 class="label-section-title">Value A Axis <span class="axis-note">(Belief derived from {{ vl.a }})</span></h3>
+    <h3 class="label-section-title">Value A Axis <span class="axis-note">(Belief derived from {{ m.a }})</span></h3>
     <div class="axis-controls">
       <div class="type-tabs">
-        <button [class.active]="bl.a.type === 'opinion'" (click)="setAxisLabel('a', 'type', 'opinion')">Opinion</button>
-        <button [class.active]="bl.a.type === 'boolean'" (click)="setAxisLabel('a', 'type', 'boolean')">Boolean</button>
+        <button [class.active]="m.axisA.type === 'opinion'" (click)="toggleAxisType('axisA')">Opinion</button>
+        <button [class.active]="m.axisA.type === 'boolean'" (click)="toggleAxisType('axisA')">Boolean</button>
       </div>
-      <button class="btn-flip" (click)="togglePositiveAligns('a')" title="Flip which position aligns with this value">
+      <button class="btn-flip" (click)="togglePositiveAligns('axisA')" title="Flip which position aligns with this value">
         <i class="fa-solid fa-retweet"></i>
       </button>
     </div>
@@ -61,38 +60,38 @@
   <div class="label-grid">
     <div class="label-row">
       <span class="label-key muted">Belief name</span>
-      <input type="text" [value]="bl.a.axisName" (input)="setAxisLabel('a', 'axisName', $any($event.target).value)" />
+      <input type="text" [formField]="valuesForm.axisA.axisName" />
     </div>
     <div class="label-row">
-      <span class="label-key" [class.conflict-pos]="bl.a.positiveAligns" [class.conflict-neg]="!bl.a.positiveAligns">Positive</span>
-      <input type="text" [value]="bl.a.positive" (input)="setAxisLabel('a', 'positive', $any($event.target).value)" />
+      <span class="label-key" [class.conflict-pos]="m.axisA.positiveAligns" [class.conflict-neg]="!m.axisA.positiveAligns">Positive</span>
+      <input type="text" [formField]="valuesForm.axisA.positive" />
     </div>
-    @if (bl.a.type === 'opinion') {
+    @if (m.axisA.type === 'opinion') {
       <div class="label-row">
         <span class="label-key muted">Neutral</span>
-        <input type="text" [value]="bl.a.neutral" (input)="setAxisLabel('a', 'neutral', $any($event.target).value)" />
+        <input type="text" [formField]="valuesForm.axisA.neutral" />
       </div>
     }
     <div class="label-row">
-      <span class="label-key" [class.conflict-neg]="bl.a.positiveAligns" [class.conflict-pos]="!bl.a.positiveAligns">Negative</span>
-      <input type="text" [value]="bl.a.negative" (input)="setAxisLabel('a', 'negative', $any($event.target).value)" />
+      <span class="label-key" [class.conflict-neg]="m.axisA.positiveAligns" [class.conflict-pos]="!m.axisA.positiveAligns">Negative</span>
+      <input type="text" [formField]="valuesForm.axisA.negative" />
     </div>
   </div>
   <p class="axis-alignment-caption">
-    A high <strong>{{ vl.a }}</strong> value aligns with <strong>{{bl.a.axisName}} : {{ bl.a.positiveAligns ? bl.a.positive : bl.a.negative }}</strong>
+    A high <strong>{{ m.a }}</strong> value aligns with <strong>{{ m.axisA.axisName }} : {{ m.axisA.positiveAligns ? m.axisA.positive : m.axisA.negative }}</strong>
   </p>
 </div>
 
 <!-- Value B Axis -->
 <div class="label-section">
   <div class="axis-header">
-    <h3 class="label-section-title">Value B Axis <span class="axis-note">(Belief derived from {{ vl.b }})</span></h3>
+    <h3 class="label-section-title">Value B Axis <span class="axis-note">(Belief derived from {{ m.b }})</span></h3>
     <div class="axis-controls">
       <div class="type-tabs">
-        <button [class.active]="bl.b.type === 'opinion'" (click)="setAxisLabel('b', 'type', 'opinion')">Opinion</button>
-        <button [class.active]="bl.b.type === 'boolean'" (click)="setAxisLabel('b', 'type', 'boolean')">Boolean</button>
+        <button [class.active]="m.axisB.type === 'opinion'" (click)="toggleAxisType('axisB')">Opinion</button>
+        <button [class.active]="m.axisB.type === 'boolean'" (click)="toggleAxisType('axisB')">Boolean</button>
       </div>
-      <button class="btn-flip" (click)="togglePositiveAligns('b')" title="Flip which position aligns with this value">
+      <button class="btn-flip" (click)="togglePositiveAligns('axisB')" title="Flip which position aligns with this value">
         <i class="fa-solid fa-retweet"></i>
       </button>
     </div>
@@ -101,38 +100,38 @@
   <div class="label-grid">
     <div class="label-row">
       <span class="label-key muted">Belief name</span>
-      <input type="text" [value]="bl.b.axisName" (input)="setAxisLabel('b', 'axisName', $any($event.target).value)" />
+      <input type="text" [formField]="valuesForm.axisB.axisName" />
     </div>
     <div class="label-row">
-      <span class="label-key" [class.conflict-pos]="bl.b.positiveAligns" [class.conflict-neg]="!bl.b.positiveAligns">Positive</span>
-      <input type="text" [value]="bl.b.positive" (input)="setAxisLabel('b', 'positive', $any($event.target).value)" />
+      <span class="label-key" [class.conflict-pos]="m.axisB.positiveAligns" [class.conflict-neg]="!m.axisB.positiveAligns">Positive</span>
+      <input type="text" [formField]="valuesForm.axisB.positive" />
     </div>
-    @if (bl.b.type === 'opinion') {
+    @if (m.axisB.type === 'opinion') {
       <div class="label-row">
         <span class="label-key muted">Neutral</span>
-        <input type="text" [value]="bl.b.neutral" (input)="setAxisLabel('b', 'neutral', $any($event.target).value)" />
+        <input type="text" [formField]="valuesForm.axisB.neutral" />
       </div>
     }
     <div class="label-row">
-      <span class="label-key" [class.conflict-neg]="bl.b.positiveAligns" [class.conflict-pos]="!bl.b.positiveAligns">Negative</span>
-      <input type="text" [value]="bl.b.negative" (input)="setAxisLabel('b', 'negative', $any($event.target).value)" />
+      <span class="label-key" [class.conflict-neg]="m.axisB.positiveAligns" [class.conflict-pos]="!m.axisB.positiveAligns">Negative</span>
+      <input type="text" [formField]="valuesForm.axisB.negative" />
     </div>
   </div>
   <p class="axis-alignment-caption">
-    A high <strong>{{ vl.b }}</strong> value aligns with <strong>{{bl.b.axisName}} : {{ bl.b.positiveAligns ? bl.b.positive : bl.b.negative }}</strong>
+    A high <strong>{{ m.b }}</strong> value aligns with <strong>{{ m.axisB.axisName }} : {{ m.axisB.positiveAligns ? m.axisB.positive : m.axisB.negative }}</strong>
   </p>
 </div>
 
 <!-- Value C Axis -->
 <div class="label-section">
   <div class="axis-header">
-    <h3 class="label-section-title">Value C Axis <span class="axis-note">(Belief derived from {{ vl.c }})</span></h3>
+    <h3 class="label-section-title">Value C Axis <span class="axis-note">(Belief derived from {{ m.c }})</span></h3>
     <div class="axis-controls">
       <div class="type-tabs">
-        <button [class.active]="bl.c.type === 'opinion'" (click)="setAxisLabel('c', 'type', 'opinion')">Opinion</button>
-        <button [class.active]="bl.c.type === 'boolean'" (click)="setAxisLabel('c', 'type', 'boolean')">Boolean</button>
+        <button [class.active]="m.axisC.type === 'opinion'" (click)="toggleAxisType('axisC')">Opinion</button>
+        <button [class.active]="m.axisC.type === 'boolean'" (click)="toggleAxisType('axisC')">Boolean</button>
       </div>
-      <button class="btn-flip" (click)="togglePositiveAligns('c')" title="Flip which position aligns with this value">
+      <button class="btn-flip" (click)="togglePositiveAligns('axisC')" title="Flip which position aligns with this value">
         <i class="fa-solid fa-retweet"></i>
       </button>
     </div>
@@ -141,25 +140,25 @@
   <div class="label-grid">
     <div class="label-row">
       <span class="label-key muted">Belief name</span>
-      <input type="text" [value]="bl.c.axisName" (input)="setAxisLabel('c', 'axisName', $any($event.target).value)" />
+      <input type="text" [formField]="valuesForm.axisC.axisName" />
     </div>
     <div class="label-row">
-      <span class="label-key" [class.conflict-pos]="bl.c.positiveAligns" [class.conflict-neg]="!bl.c.positiveAligns">Positive</span>
-      <input type="text" [value]="bl.c.positive" (input)="setAxisLabel('c', 'positive', $any($event.target).value)" />
+      <span class="label-key" [class.conflict-pos]="m.axisC.positiveAligns" [class.conflict-neg]="!m.axisC.positiveAligns">Positive</span>
+      <input type="text" [formField]="valuesForm.axisC.positive" />
     </div>
-    @if (bl.c.type === 'opinion') {
+    @if (m.axisC.type === 'opinion') {
       <div class="label-row">
         <span class="label-key muted">Neutral</span>
-        <input type="text" [value]="bl.c.neutral" (input)="setAxisLabel('c', 'neutral', $any($event.target).value)" />
+        <input type="text" [formField]="valuesForm.axisC.neutral" />
       </div>
     }
     <div class="label-row">
-      <span class="label-key" [class.conflict-neg]="bl.c.positiveAligns" [class.conflict-pos]="!bl.c.positiveAligns">Negative</span>
-      <input type="text" [value]="bl.c.negative" (input)="setAxisLabel('c', 'negative', $any($event.target).value)" />
+      <span class="label-key" [class.conflict-neg]="m.axisC.positiveAligns" [class.conflict-pos]="!m.axisC.positiveAligns">Negative</span>
+      <input type="text" [formField]="valuesForm.axisC.negative" />
     </div>
   </div>
   <p class="axis-alignment-caption">
-    A high <strong>{{ vl.c }}</strong> value aligns with <strong>{{bl.c.axisName}} : {{ bl.c.positiveAligns ? bl.c.positive : bl.c.negative }}</strong>
+    A high <strong>{{ m.c }}</strong> value aligns with <strong>{{ m.axisC.axisName }} : {{ m.axisC.positiveAligns ? m.axisC.positive : m.axisC.negative }}</strong>
   </p>
 </div>
 
@@ -171,13 +170,11 @@
     A value must exceed this threshold to assign a non-neutral position.
   </p>
   <div class="formula-row">
-    <code class="formula">{{ beliefDerivationExample }}</code>
+    <code class="formula">{{ beliefDerivationExample() }}</code>
   </div>
   <div class="label-row" style="max-width: 340px; margin-top: 0.5rem">
     <span class="label-key muted">Threshold</span>
-    <input type="number" step="0.05" min="0" max="1"
-      [value]="beliefDerivationThreshold()"
-      (input)="beliefDerivationThreshold.set(+$any($event.target).value)" />
+    <input type="number" step="0.05" [formField]="valuesForm.beliefDerivationThreshold" />
   </div>
 </div>
 

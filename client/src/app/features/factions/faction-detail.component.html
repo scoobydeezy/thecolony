@@ -1,0 +1,803 @@
+<!-- ── PAGE HEADER ──────────────────────────────────────────────────────── -->
+<div class="page-header">
+  <div class="header-cols">
+
+    <!-- Col 1: identity -->
+    <div class="header-identity">
+      <div class="header-top-row">
+        <a routerLink="/factions" class="back-link">← Factions</a>
+        @if (!store.isViewingSnapshot()) {
+          <button class="card-edit-btn" (click)="openCard('header')" title="Edit">
+            <i class="fa-solid fa-pen"></i>
+          </button>
+        }
+      </div>
+      <div class="header-content-row">
+        <div class="header-icon-title">
+          @if (faction().iconPath) {
+            <img class="header-icon" [src]="faction().iconPath" [alt]="faction().name" />
+          }
+          <div class="header-title-row">
+            <h2>{{ faction().name }}</h2>
+            <span class="type-chip" [class.social]="faction().type === 'SocialClass'">{{ typeLabel(faction().type) }}</span>
+            @if (!faction().active) { <span class="inactive-chip">Inactive</span> }
+          </div>
+        </div>
+        @if (faction().represents) {
+          <p class="header-represents">{{ faction().represents }}</p>
+        }
+        @if (faction().motto) {
+          <p class="header-motto">"{{ faction().motto }}"</p>
+        }
+      </div>
+      @if (faction().summary) {
+        <h3 class="section-title">Summary</h3>
+        <p class="header-summary">{{ faction().summary }}</p>
+      }
+    </div>
+
+    <!-- Col 2+3: stats + glyph panel -->
+    <div class="header-panel">
+      <div class="header-stats">
+        <div class="influence-hero">
+          <div class="influence-hero-col">
+            <div class="influence-total">{{ totalInfluence() }}</div>
+            <div class="detail-label">Influence</div>
+          </div>
+          <div class="influence-hero-col">
+            <div class="influence-total influence-power">{{ effectivePower() }}</div>
+            <div class="detail-label">Power</div>
+          </div>
+          <div class="influence-hero-col">
+            <i class="fa-solid momentum-icon"
+              [class]="momentumIcon(faction().momentum)"
+              [class.momentum-flip]="momentumFlip(faction().momentum)"
+              [ngClass]="momentumClass(faction().momentum)"></i>
+            <span class="detail-label">Momentum</span>
+          </div>
+        </div>
+        @if (mostAligned().length > 0 || mostOpposed().length > 0) {
+          <div class="alignment-grid">
+            <div class="alignment-col">
+              <span class="detail-label">Most Aligned</span>
+              @for (f of mostAligned(); track f.id) {
+                <a class="alignment-link" [routerLink]="['/factions', f.id]">{{ f.name }}</a>
+              }
+            </div>
+            <div class="alignment-col">
+              <span class="detail-label">Most Opposed</span>
+              @for (f of mostOpposed(); track f.id) {
+                <a class="alignment-link" [routerLink]="['/factions', f.id]">{{ f.name }}</a>
+              }
+            </div>
+          </div>
+        }
+      </div>
+      @if (faction().glyphPath) {
+        <div class="header-glyph-col">
+          <img class="header-glyph-img" [src]="faction().glyphPath" [alt]="" />
+        </div>
+      }
+    </div>
+
+  </div>
+</div>
+
+<!-- ── TWO-COLUMN BODY ─────────────────────────────────────────────────────── -->
+<div class="detail-layout">
+
+  <!-- ── COLUMN 1: Character ─────────────────────────────────────────────── -->
+  <div class="detail-col">
+
+    <!-- Psychology -->
+    <div class="card" [class.card--editing]="isEditing('psychology')">
+      <div class="card-header-row">
+        <h3 class="section-title">Psychology</h3>
+        @if (!store.isViewingSnapshot()) {
+          <button class="card-edit-btn" (click)="isEditing('psychology') ? closeCard() : openCard('psychology')" [title]="isEditing('psychology') ? 'Cancel' : 'Edit'">
+            <i [class]="isEditing('psychology') ? 'fa-solid fa-xmark' : 'fa-solid fa-pen'"></i>
+          </button>
+        }
+      </div>
+
+      @if (isEditing('psychology')) {
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Core Tenet</label>
+            <input type="text" [formField]="f.coreTenet" />
+          </div>
+          <div class="form-group">
+            <label>Focused On</label>
+            <input type="text" [formField]="f.focus" />
+          </div>
+          <div class="form-group">
+            <label>Certain Of</label>
+            <input type="text" [formField]="f.certainOf" />
+          </div>
+          <div class="form-group">
+            <label>Right About</label>
+            <input type="text" [formField]="f.rightAbout" />
+          </div>
+          <div class="form-group">
+            <label>Afraid Of</label>
+            <input type="text" [formField]="f.afraidOf" />
+          </div>
+          <div class="form-group">
+            <label>Wrong About</label>
+            <input type="text" [formField]="f.wrongAbout" />
+          </div>
+        </div>
+        <div class="card-edit-actions">
+          <button class="btn btn-secondary btn-sm" (click)="closeCard()">Cancel</button>
+          <button class="btn btn-primary btn-sm" (click)="saveCard('psychology')">Save</button>
+        </div>
+      } @else {
+        @if (faction().coreTenet || faction().focus) {
+          <div class="detail-grid">
+            @if (faction().coreTenet) {
+              <div class="detail-item"><span class="detail-label">Core Tenet</span><span>{{ faction().coreTenet }}</span></div>
+            }
+            @if (faction().focus) {
+              <div class="detail-item"><span class="detail-label">Focused On</span><span>{{ faction().focus }}</span></div>
+            }
+          </div>
+        }
+        @if (faction().certainOf || faction().rightAbout || faction().afraidOf || faction().wrongAbout) {
+          <div class="detail-grid">
+            @if (faction().certainOf) {
+              <div class="detail-item"><span class="detail-label">Certain of</span><span>{{ faction().certainOf }}</span></div>
+            }
+            @if (faction().rightAbout) {
+              <div class="detail-item"><span class="detail-label">Right about</span><span>{{ faction().rightAbout }}</span></div>
+            }
+            @if (faction().afraidOf) {
+              <div class="detail-item"><span class="detail-label">Afraid of</span><span>{{ faction().afraidOf }}</span></div>
+            }
+            @if (faction().wrongAbout) {
+              <div class="detail-item"><span class="detail-label">Wrong about</span><span>{{ faction().wrongAbout }}</span></div>
+            }
+          </div>
+        }
+        @if (!faction().coreTenet && !faction().focus && !faction().certainOf && !faction().rightAbout && !faction().afraidOf && !faction().wrongAbout) {
+          <p class="empty-state">No psychology recorded.</p>
+        }
+      }
+    </div>
+
+    <!-- Values & Beliefs -->
+    <div class="card" [class.card--editing]="isEditing('beliefs')">
+      <div class="card-header-row">
+        <h3 class="section-title">Values</h3>
+        @if (!store.isViewingSnapshot()) {
+          <button class="card-edit-btn" (click)="isEditing('beliefs') ? closeCard() : openCard('beliefs')" [title]="isEditing('beliefs') ? 'Cancel' : 'Edit'">
+            <i [class]="isEditing('beliefs') ? 'fa-solid fa-xmark' : 'fa-solid fa-pen'"></i>
+          </button>
+        }
+      </div>
+
+      @if (isEditing('beliefs')) {
+        <div class="beliefs-layout">
+          <div class="beliefs-plot-col">
+            <app-ternary-plot
+              [values]="editValues()"
+              [editable]="true"
+              [valueLabels]="store.valueLabels()"
+              (valuesChange)="editValues.set($event)"
+            />
+          </div>
+          <div class="beliefs-fields-col">
+            <div class="form-group" [class.belief-conflict-group]="editConflicts().beliefc">
+              <label [class.label-conflict]="editConflicts().beliefc">{{ axisName('c') }}</label>
+              <select [formField]="f.beliefc">
+                <option value="">— None —</option>
+                @for (opt of beliefcOptions(); track opt) {
+                  <option [value]="opt">{{ beliefLabel('c', opt) }}</option>
+                }
+              </select>
+              @if (editConflicts().beliefc) {
+                <p class="belief-conflict-hint">{{ conflictHint() }}</p>
+              }
+            </div>
+            <div class="form-group" [class.belief-conflict-group]="editConflicts().beliefa">
+              <label [class.label-conflict]="editConflicts().beliefa">{{ axisName('a') }}</label>
+              <select [formField]="f.beliefa">
+                <option value="">— None —</option>
+                @for (opt of beliefaOptions(); track opt) {
+                  <option [value]="opt">{{ beliefLabel('a', opt) }}</option>
+                }
+              </select>
+              @if (editConflicts().beliefa) {
+                <p class="belief-conflict-hint">{{ conflictHint() }}</p>
+              }
+            </div>
+            <div class="form-group" [class.belief-conflict-group]="editConflicts().beliefb">
+              <label [class.label-conflict]="editConflicts().beliefb">{{ axisName('b') }}</label>
+              <select [formField]="f.beliefb">
+                <option value="">— None —</option>
+                @for (opt of beliefbOptions(); track opt) {
+                  <option [value]="opt">{{ beliefLabel('b', opt) }}</option>
+                }
+              </select>
+              @if (editConflicts().beliefb) {
+                <p class="belief-conflict-hint">{{ conflictHint() }}</p>
+              }
+            </div>
+            <div class="form-group">
+              <label>Response</label>
+              <textarea rows="3" [formField]="f.response" placeholder="How do they act on their beliefs?"></textarea>
+            </div>
+          </div>
+        </div>
+        <div class="card-edit-actions">
+          <button class="btn btn-secondary btn-sm" (click)="closeCard()">Cancel</button>
+          <button class="btn btn-primary btn-sm" (click)="saveCard('beliefs')">Save</button>
+        </div>
+      } @else {
+        <div class="beliefs-layout">
+          <div class="beliefs-plot-col">
+            <app-ternary-plot
+              [values]="faction().values"
+              [editable]="false"
+              [showValueLabels]="true"
+              [size]="280"
+              [valueLabels]="store.valueLabels()"
+            />
+          </div>
+          <div class="beliefs-fields-col">
+            @if (faction().beliefc || faction().beliefa || faction().beliefb) {
+              <div>
+                <span class="detail-label">Emergent Beliefs</span>
+                @let conflicts = factionConflicts();
+                <div class="beliefs-pills-row">
+                  @if (faction().beliefc) {
+                    <div class="belief-item" [class.belief-conflict]="conflicts.beliefc">
+                      <span class="belief-label">{{ axisName('c') }}</span>
+                      <span class="belief-val {{ beliefClass('c', faction().beliefc!) }}">{{ beliefLabel('c', faction().beliefc!) }}</span>
+                    </div>
+                  }
+                  @if (faction().beliefa) {
+                    <div class="belief-item" [class.belief-conflict]="conflicts.beliefa">
+                      <span class="belief-label">{{ axisName('a') }}</span>
+                      <span class="belief-val {{ beliefClass('a', faction().beliefa!) }}">{{ beliefLabel('a', faction().beliefa!) }}</span>
+                    </div>
+                  }
+                  @if (faction().beliefb) {
+                    <div class="belief-item" [class.belief-conflict]="conflicts.beliefb">
+                      <span class="belief-label">{{ axisName('b') }}</span>
+                      <span class="belief-val {{ beliefClass('b', faction().beliefb!) }}">{{ beliefLabel('b', faction().beliefb!) }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+            @if (faction().response) {
+              <div class="detail-block">
+                <span class="detail-label">Response</span>
+                <p class="detail-text">{{ faction().response }}</p>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Public Perception -->
+    <div class="card" [class.card--editing]="isEditing('perception')">
+      <div class="card-header-row">
+        <h3 class="section-title">Perception &amp; Influence</h3>
+        @if (!store.isViewingSnapshot()) {
+          <button class="card-edit-btn" (click)="isEditing('perception') ? closeCard() : openCard('perception')" [title]="isEditing('perception') ? 'Cancel' : 'Edit'">
+            <i [class]="isEditing('perception') ? 'fa-solid fa-xmark' : 'fa-solid fa-pen'"></i>
+          </button>
+        }
+      </div>
+
+      @if (isEditing('perception')) {
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Public Face</label>
+            <input type="text" [formField]="f.publicFace" placeholder="How others see them" />
+          </div>
+          <div class="form-group">
+            <label>Self Image</label>
+            <input type="text" [formField]="f.selfImage" placeholder="How they see themselves" />
+          </div>
+          <div class="form-group">
+            <label>Base Legitimacy <span class="range-hint">(0–100)</span></label>
+            <input type="number" [formField]="f.baseLegitimacy" />
+          </div>
+          <div class="form-group">
+            <label>Starting Momentum <span class="range-hint">(–100 to +100)</span></label>
+            <input type="number" [formField]="f.momentum" />
+          </div>
+          <div class="form-group">
+            <label>Power Modifier</label>
+            <input type="number" [formField]="f.powerModifier" />
+          </div>
+        </div>
+        <div class="card-edit-actions">
+          <button class="btn btn-secondary btn-sm" (click)="closeCard()">Cancel</button>
+          <button class="btn btn-primary btn-sm" (click)="saveCard('perception')">Save</button>
+        </div>
+      } @else {
+        @if (faction().publicFace || faction().selfImage) {
+          <div class="detail-grid">
+            @if (faction().publicFace) {
+              <div class="detail-item">
+                <span class="detail-label">Public Face</span>
+                <span>{{ faction().publicFace }}</span>
+              </div>
+            }
+            @if (faction().selfImage) {
+              <div class="detail-item">
+                <span class="detail-label">Self Image</span>
+                <span>{{ faction().selfImage }}</span>
+              </div>
+            }
+          </div>
+
+          <div class="influence-factors">
+            <div class="influence-factor">
+              <span class="influence-factor-label">Base Legitimacy</span>
+              <span class="influence-factor-value">{{ faction().baseLegitimacy }}</span>
+            </div>
+            @if (faction().powerModifier !== 0) {
+              <div class="influence-factor">
+                <span class="influence-factor-label">Power Modifier</span>
+                <span class="influence-factor-value">{{ faction().powerModifier > 0 ? '+' : '' }}{{ faction().powerModifier }}</span>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="empty-state">No perception recorded.</p>
+        }
+      }
+    </div>
+
+    <!-- History & Notes -->
+    <div class="card" [class.card--editing]="isEditing('history')">
+      <div class="card-header-row">
+        <h3 class="section-title">History &amp; Notes</h3>
+        @if (!store.isViewingSnapshot()) {
+          <button class="card-edit-btn" (click)="isEditing('history') ? closeCard() : openCard('history')" [title]="isEditing('history') ? 'Cancel' : 'Edit'">
+            <i [class]="isEditing('history') ? 'fa-solid fa-xmark' : 'fa-solid fa-pen'"></i>
+          </button>
+        }
+      </div>
+
+      @if (isEditing('history')) {
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Founded As</label>
+            <input type="text" [formField]="f.foundedAs" placeholder="e.g. Merchant guild" />
+          </div>
+          <div class="form-group">
+            <label>Became</label>
+            <input type="text" [formField]="f.became" placeholder="e.g. Power broker" />
+          </div>
+          <div class="form-group span-2">
+            <label>Origin</label>
+            <textarea rows="2" [formField]="f.origin" placeholder="Where did this faction come from?"></textarea>
+          </div>
+          <div class="form-group span-2">
+            <label>Notes</label>
+            <textarea rows="4" [formField]="f.notes" placeholder="Session notes, GM info, secrets."></textarea>
+          </div>
+          <div class="form-group span-2">
+            <label>Long-form History</label>
+            <textarea rows="6" [formField]="f.history" placeholder="Faction history, major events..."></textarea>
+          </div>
+        </div>
+        <div class="card-edit-actions">
+          <button class="btn btn-secondary btn-sm" (click)="closeCard()">Cancel</button>
+          <button class="btn btn-primary btn-sm" (click)="saveCard('history')">Save</button>
+        </div>
+      } @else {
+        @if (faction().foundedAs || faction().became) {
+          <div class="detail-grid" style="margin-bottom:0.75rem">
+            @if (faction().foundedAs) {
+              <div class="detail-item">
+                <span class="detail-label">Founded As</span>
+                <span>{{ faction().foundedAs }}</span>
+              </div>
+            }
+            @if (faction().became) {
+              <div class="detail-item">
+                <span class="detail-label">Became</span>
+                <span>{{ faction().became }}</span>
+              </div>
+            }
+          </div>
+        }
+        @if (faction().origin) {
+          <div class="detail-block">
+            <span class="detail-label">Origin</span>
+            <p class="detail-text">{{ faction().origin }}</p>
+          </div>
+        }
+        @if (faction().notes) {
+          <div class="detail-block">
+            <span class="detail-label">Notes</span>
+            <p class="detail-text">{{ faction().notes }}</p>
+          </div>
+        }
+        @if (faction().history) {
+          <div class="detail-block">
+            <p class="detail-text history-text">{{ faction().history }}</p>
+          </div>
+        }
+        @if (!faction().foundedAs && !faction().became && !faction().origin && !faction().notes && !faction().history) {
+          <p class="empty-state">No history recorded.</p>
+        }
+      }
+    </div>
+
+  </div><!-- /col 1 -->
+
+  <!-- ── COLUMN 2: Status ─────────────────────────────────────────────────── -->
+  <div class="entity-col">
+
+    <!-- Goals -->
+    <div class="entity-section">
+      <div class="entity-section-header">
+        <span class="section-title">Goals</span>
+        @if (!store.isViewingSnapshot()) {
+          <button class="btn btn-secondary btn-sm" (click)="openAddGoal()">+ Add</button>
+        }
+      </div>
+      @if (goals().length === 0) {
+        <p class="empty-state">No goals yet.</p>
+      }
+      @for (g of goals(); track g.id) {
+        <div class="entity-card">
+          <div class="goal-header">
+            <div class="goal-title">
+              <span class="goal-name">{{ g.title }}</span>
+              <span [class]="'badge ' + statusClass(g.status)">{{ g.status }}</span>
+              <span [class]="'badge ' + priorityClass(g.priority)">{{ g.priority }}</span>
+              <span [class]="'badge ' + visibilityClass(g.visibility)">{{ g.visibility }}</span>
+            </div>
+            @if (!store.isViewingSnapshot()) {
+              <div class="goal-actions">
+                <button class="btn btn-secondary btn-sm" (click)="openEditGoal(g)">Edit</button>
+                <button class="btn btn-danger btn-sm" (click)="deleteGoal(g.id)">Delete</button>
+              </div>
+            }
+          </div>
+          @let targetLabel = goalTargetLabel(g);
+          @if (targetLabel) {
+            <div class="goal-targets">
+              <span class="target-item"><span class="meta-label">Target</span> {{ targetLabel }}</span>
+            </div>
+          }
+          @if (g.description) {
+            <p class="goal-description">{{ g.description }}</p>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Assets -->
+    @if (assets().length > 0) {
+      <div class="entity-section">
+        <div class="entity-section-header">
+          <span class="section-title">Assets</span>
+          <span class="section-stat" title="Asset influence score / Asset legitimacy score (0–100)">{{ assetInfluenceScore() | number:'1.0-0' }} INF / {{ assetLegitimacyScore() | number:'1.0-0' }} LGT</span>
+        </div>
+        @for (a of assets(); track a.id) {
+          <div class="entity-card">
+            <div class="asset-row-main">
+              <div class="asset-row-left">
+                @if (a.keystone) {
+                  <i class="fa-solid fa-gem asset-keystone-icon" title="Keystone"></i>
+                }
+                <span class="asset-name">{{ a.name }}</span>
+                <span [class]="'status-badge ' + assetStatusClass(a.status)">{{ a.status }}</span>
+              </div>
+              <div class="asset-row-stars">
+                @for (n of [1,2,3,4,5]; track n) {
+                  <i [class]="'fa-star ' + (n <= a.tier ? 'fa-solid' : 'fa-regular')"></i>
+                }
+              </div>
+            </div>
+            @if (a.description) { <p class="char-summary">{{ a.description }}</p> }
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Members -->
+    <div class="entity-section">
+      <div class="entity-section-header">
+        <span class="section-title">Members</span>
+        <span class="section-stat">{{ charInfluence() | number:'1.0-0' }} INF</span>
+      </div>
+      @if (allCharacters().length === 0) {
+        <p class="empty-state">No characters belong to this faction.</p>
+      } @else if (activeCharacters().length === 0 && inactiveCharacters().length > 0) {
+        <p class="empty-state">All members are deceased, missing, or forgotten.</p>
+      } @else {
+
+        @if (leaders().length > 0) {
+          <p class="members-subsection-label">{{ faction().type === 'SocialClass' ? 'Influential Members' : 'Faction Leader' }}</p>
+          @for (char of leaders(); track char.id) {
+            @let drift = charDriftScore(char);
+            @let bestId = charBestFactionId(char);
+            <div class="entity-card" [class.drift-risk]="bestId !== null && bestId !== faction().id && drift > 0">
+              <div class="character-row-main">
+                <span class="char-name">{{ char.name }}</span>
+                <span class="char-type-chip leader">Leader</span>
+                @if (faction().type === 'SocialClass' && char.factionId) {
+                  <span class="char-type-chip faction-label">{{ factionNameById(char.factionId) }}</span>
+                }
+                @if (char.occupation) { <span class="char-meta">{{ char.occupation }}</span> }
+                @if (char.class) { <span class="char-meta">{{ char.class }}{{ char.level ? ' ' + char.level : '' }}</span> }
+                @if (char.doubtDirection) {
+                  <span class="char-drift-score" [class]="charDriftClass(drift)">Drift {{ drift > 0 ? '+' : '' }}{{ drift | number:'1.0-1' }}</span>
+                  @if (bestId !== null && bestId !== faction().id && drift > 0) {
+                    <span class="char-misfit-badge">⚠ {{ factionNameById(bestId) }}</span>
+                  }
+                }
+              </div>
+              @if (char.summary) { <p class="char-summary">{{ char.summary }}</p> }
+            </div>
+          }
+        }
+
+        @if (members().length > 0) {
+          @if (leaders().length > 0) { <p class="members-subsection-label">Members</p> }
+          @for (char of members(); track char.id) {
+            @let drift = charDriftScore(char);
+            @let bestId = charBestFactionId(char);
+            <div class="entity-card" [class.drift-risk]="bestId !== null && bestId !== faction().id && drift > 0">
+              <div class="character-row-main">
+                <span class="char-name">{{ char.name }}</span>
+                <span class="char-type-chip" [class.party]="char.characterType === 'PartyMember'">
+                  {{ char.characterType === 'PartyMember' ? 'Party' : 'NPC' }}
+                </span>
+                @if (char.occupation) { <span class="char-meta">{{ char.occupation }}</span> }
+                @if (char.class) { <span class="char-meta">{{ char.class }}{{ char.level ? ' ' + char.level : '' }}</span> }
+                @if (char.doubtDirection) {
+                  <span class="char-drift-score" [class]="charDriftClass(drift)">Drift {{ drift > 0 ? '+' : '' }}{{ drift | number:'1.0-1' }}</span>
+                  @if (bestId !== null && bestId !== faction().id && drift > 0) {
+                    <span class="char-misfit-badge">⚠ {{ factionNameById(bestId) }}</span>
+                  }
+                }
+              </div>
+              @if (char.summary) { <p class="char-summary">{{ char.summary }}</p> }
+            </div>
+          }
+        }
+
+      }
+
+      @if (inactiveCharacters().length > 0) {
+        <p class="members-subsection-label former-members-label">Former Members</p>
+        @for (char of inactiveCharacters(); track char.id) {
+          <div class="entity-card entity-card--former">
+            <div class="character-row-main">
+              @if (stateIconClass(char.state)) {
+                <i [class]="stateIconClass(char.state)" [title]="char.state"></i>
+              }
+              <span class="char-name">{{ char.name }}</span>
+              <span class="char-type-chip"
+                [class.party]="char.characterType === 'PartyMember'"
+                [class.leader]="char.characterType === 'FactionLeader'">
+                {{ char.characterType === 'FactionLeader' ? 'Leader' : char.characterType === 'PartyMember' ? 'Party' : 'NPC' }}
+              </span>
+              @if (char.occupation) { <span class="char-meta">{{ char.occupation }}</span> }
+            </div>
+            @if (char.summary) { <p class="char-summary">{{ char.summary }}</p> }
+          </div>
+        }
+      }
+    </div>
+
+
+  </div><!-- /col 2 -->
+
+</div><!-- /detail-layout -->
+
+<!-- ── Goal modal ──────────────────────────────────────────────────────────── -->
+@if (showGoalModal()) {
+  <div class="modal-backdrop" (click)="closeGoalModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ goalModel().id ? 'Edit Goal' : 'Add Goal' }}</h3>
+        <button class="modal-close" (click)="closeGoalModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <label class="form-label">Title *</label>
+          <input class="form-input" [formField]="goalForm.title" placeholder="e.g. Seize control of the Dock Office">
+        </div>
+        <div class="form-row three-col">
+          <div>
+            <label class="form-label">Status</label>
+            <select class="form-input" [formField]="goalForm.status">
+              @for (opt of statusOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Priority</label>
+            <select class="form-input" [formField]="goalForm.priority">
+              @for (opt of priorityOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Visibility</label>
+            <select class="form-input" [formField]="goalForm.visibility">
+              @for (opt of visibilityOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Target Entity Type</label>
+          <select class="form-input" [formField]="goalForm.targetEntityType" (change)="resetTargetFields()">
+            <option value="">— None —</option>
+            <option value="Character">Character</option>
+            <option value="Asset">Asset</option>
+            <option value="Faction">Faction</option>
+          </select>
+        </div>
+        @if (goalModel().targetEntityType) {
+          <div class="form-row two-col">
+            <div>
+              <label class="form-label">Target Entity</label>
+              <select class="form-input" [formField]="goalForm.targetEntityId">
+                <option value="">— Select —</option>
+                @for (e of goalTargetEntityOptions(); track e.id) {
+                  <option [value]="e.id">{{ e.name }}</option>
+                }
+              </select>
+            </div>
+            @if (goalModel().targetEntityType === 'Character' || goalModel().targetEntityType === 'Asset') {
+              <div>
+                <label class="form-label">Target State</label>
+                <select class="form-input" [formField]="goalForm.targetState">
+                  <option value="">— Select —</option>
+                  @for (s of goalTargetStateOptions(); track s) {
+                    <option [value]="s">{{ s }}</option>
+                  }
+                </select>
+              </div>
+            }
+          </div>
+          @if (goalModel().targetEntityType === 'Faction') {
+            <div class="form-row three-col">
+              <div>
+                <label class="form-label">Property</label>
+                <select class="form-input" [formField]="goalForm.targetProperty">
+                  <option value="">— Select —</option>
+                  @for (p of factionTargetProps; track p) { <option [value]="p">{{ p }}</option> }
+                </select>
+              </div>
+              <div>
+                <label class="form-label">Operator</label>
+                <select class="form-input" [formField]="goalForm.targetOperator">
+                  <option value="">— Select —</option>
+                  <option value="gte">≥ (at least)</option>
+                  <option value="lte">≤ (at most)</option>
+                  <option value="eq">= (exactly)</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label">Threshold</label>
+                <input class="form-input" type="number" [formField]="goalForm.targetThreshold">
+              </div>
+            </div>
+          }
+        }
+        <div class="form-row">
+          <label class="form-label">Description</label>
+          <textarea class="form-input" rows="3" [formField]="goalForm.description" placeholder="Optional description..."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeGoalModal()">Cancel</button>
+        <button class="btn btn-primary" (click)="saveGoal()" [disabled]="!goalModel().title.trim()">Save</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Header edit modal ───────────────────────────────────────────────────── -->
+@if (isEditing('header')) {
+  <div class="modal-backdrop" (click)="closeCard()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Edit Faction</h3>
+        <button class="modal-close" (click)="closeCard()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row two-col">
+          <div>
+            <label class="form-label">Name *</label>
+            <input class="form-input" type="text" [formField]="f.name" />
+            @if (f.name().invalid() && f.name().touched()) {
+              <p class="field-error">Name is required</p>
+            }
+          </div>
+          <div>
+            <label class="form-label">Represents</label>
+            <input class="form-input" type="text" [formField]="f.represents" />
+          </div>
+        </div>
+        <div class="form-row two-col">
+          <div>
+            <label class="form-label">Type</label>
+            <select class="form-input" [formField]="f.type">
+              <option value="Faction">Faction</option>
+              <option value="SocialClass">Social Class</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Active</label>
+            <select class="form-input" [formField]="f.active">
+              <option value="true">Active</option>
+              <option value="false">Inactive</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Motto</label>
+          <input class="form-input" type="text" [formField]="f.motto" placeholder="A short phrase the faction lives by" />
+        </div>
+        <div class="form-row">
+          <label class="form-label">Summary</label>
+          <textarea class="form-input" rows="3" [formField]="f.summary" placeholder="One or two sentences describing the faction"></textarea>
+        </div>
+        <div class="modal-section-title">Branding</div>
+        <div class="form-row two-col">
+          <div class="upload-field">
+            <span class="upload-label">Glyph</span>
+            <label class="btn btn-secondary btn-sm">
+              {{ faction().glyphPath ? 'Replace' : 'Upload' }} (.jpg / .png)
+              <input type="file" accept=".jpg,.jpeg,.png" style="display:none" (change)="uploadGlyph($event)">
+            </label>
+          </div>
+          <div class="upload-field">
+            <span class="upload-label">Icon</span>
+            <label class="btn btn-secondary btn-sm">
+              {{ faction().iconPath ? 'Replace' : 'Upload' }} (.svg / .png)
+              <input type="file" accept=".svg,.png" style="display:none" (change)="uploadIcon($event)">
+            </label>
+          </div>
+        </div>
+        <div class="form-row two-col">
+          <div class="color-picker-field">
+            <span class="form-label">Primary Color</span>
+            <div class="color-picker-row">
+              <input type="color" class="color-input"
+                [value]="editForm().primaryColor || '#000000'"
+                (input)="setColor('primaryColor', $any($event.target).value)">
+              <span class="color-value">{{ editForm().primaryColor || '—' }}</span>
+            </div>
+          </div>
+          <div class="color-picker-field">
+            <span class="form-label">Secondary Color</span>
+            <div class="color-picker-row">
+              <input type="color" class="color-input"
+                [value]="editForm().secondaryColor || '#000000'"
+                (input)="setColor('secondaryColor', $any($event.target).value)">
+              <span class="color-value">{{ editForm().secondaryColor || '—' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger" (click)="delete()">Delete Faction</button>
+        <div class="modal-footer-actions">
+          <button class="btn btn-secondary" (click)="closeCard()">Cancel</button>
+          <button class="btn btn-primary" (click)="saveCard('header')" [disabled]="f().invalid()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

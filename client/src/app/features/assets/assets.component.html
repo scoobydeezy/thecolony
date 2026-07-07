@@ -1,0 +1,173 @@
+<div class="page-header">
+  <h2>Assets</h2>
+  <p>Physical and cultural holdings that anchor faction influence.</p>
+</div>
+
+<div class="toolbar">
+  <div class="filter-tabs">
+    <button [class.active]="filterType() === 'all'" (click)="filterType.set('all')">All</button>
+    @for (opt of typeOptions; track opt.value) {
+      <button [class.active]="filterType() === opt.value" (click)="filterType.set(opt.value)">{{ opt.label }}</button>
+    }
+  </div>
+  <div class="toolbar-actions">
+    @if (!store.isViewingSnapshot()) {
+      <label class="btn btn-secondary">
+        <i class="fa-solid fa-right-to-bracket"></i> Import
+        <input type="file" accept=".csv" style="display:none" (change)="importCsv($event)">
+      </label>
+    }
+    <button class="btn btn-secondary" (click)="exportCsv()">Export <i class="fa-solid fa-right-from-bracket"></i></button>
+    @if (!store.isViewingSnapshot()) {
+      <button class="btn btn-primary" (click)="openAdd()">+ Add Asset</button>
+    }
+  </div>
+</div>
+
+@if (displayAssets().length === 0) {
+  <div class="empty-state card">
+    <p>No assets yet. Add one to anchor faction influence to physical holdings.</p>
+  </div>
+} @else {
+  <div class="asset-list">
+    @for (a of displayAssets(); track a.id) {
+      <div [class]="'asset-card card' + (a.keystone ? ' keystone' : '')">
+        <div class="asset-header">
+          <div class="asset-title">
+            @if (a.keystone) {
+              <i class="fa-solid fa-gem keystone-icon" title="Keystone"></i>
+            }
+            <span class="asset-name">{{ a.name }}</span>
+            <span class="asset-type-badge">{{ a.type }}</span>
+            <span [class]="'status-badge ' + statusClass(a.status)">{{ a.status }}</span>
+          </div>
+          @if (!store.isViewingSnapshot()) {
+            <div class="asset-actions">
+              <button class="btn btn-secondary btn-sm" (click)="openEdit(a)">Edit</button>
+              <button class="btn btn-danger btn-sm" (click)="delete(a.id)">Delete</button>
+            </div>
+          }
+        </div>
+
+        <div class="asset-meta">
+          <span class="meta-item">
+            <span class="meta-label">Role</span>
+            <span class="meta-value">{{ a.role }}</span>
+          </span>
+          <span class="meta-item">
+            <span class="meta-label">Tier</span>
+            <span class="meta-value card-stars">
+              @for (n of [1,2,3,4,5]; track n) {
+                <i [class]="'fa-star ' + (n <= a.tier ? 'fa-solid' : 'fa-regular')"></i>
+              }
+            </span>
+          </span>
+          <span class="meta-item">
+            <span class="meta-label">Controlling Faction</span>
+            <span class="meta-value">{{ factionName(a.controllingFactionId) }}</span>
+          </span>
+          @if (a.location) {
+            <span class="meta-item">
+              <span class="meta-label">Location</span>
+              <span class="meta-value">{{ a.location }}</span>
+            </span>
+          }
+        </div>
+
+        @if (a.description) {
+          <p class="asset-description">{{ a.description }}</p>
+        }
+      </div>
+    }
+  </div>
+}
+
+<!-- Add / Edit Modal -->
+@if (showModal()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal modal-asset" (click)="$event.stopPropagation()">
+      <h3>{{ editForm().id ? 'Edit Asset' : 'Add Asset' }}</h3>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Name *</label>
+          <input type="text" [formField]="f.name" placeholder="e.g. Dock Office">
+        </div>
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" [formField]="f.location" placeholder="e.g. Harbor District">
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="form-group">
+          <label>Type</label>
+          <select [formField]="f.type">
+            @for (opt of typeOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select [formField]="f.status">
+            @for (opt of statusOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Controlling Faction</label>
+          <select [formField]="f.controllingFactionId">
+            <option value="">— None —</option>
+            @for (faction of activeFactions(); track faction.id) {
+              <option [value]="faction.id">{{ faction.name }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="separator">Role &amp; Value</div>
+
+      <div class="grid-3">
+        <div class="form-group">
+          <label>Role</label>
+          <select [formField]="f.role">
+            @for (opt of roleOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tier</label>
+          <div class="star-rating">
+            @for (n of [1,2,3,4,5]; track n) {
+              <i [class]="'fa-star ' + (n <= +editForm().tier ? 'fa-solid' : 'fa-regular')"
+                 (click)="setStarValue(n)"
+                 [class.active]="n <= +editForm().tier"></i>
+            }
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Keystone</label>
+          <div class="toggle-wrap">
+            <label class="tuner-toggle" title="Mark as Keystone asset">
+              <input type="checkbox" [formField]="f.keystone">
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Description</label>
+        <textarea rows="3" [formField]="f.description" placeholder="Optional description..."></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button class="btn btn-primary" (click)="save()" [disabled]="!editForm().name.trim()">Save</button>
+      </div>
+    </div>
+  </div>
+}

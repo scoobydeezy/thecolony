@@ -8,7 +8,7 @@ namespace ColonyTracker.Api.Controllers;
 
 [ApiController]
 [Route("api/factions")]
-public class FactionsController(AppDbContext db, ICampaignContext campaign) : ControllerBase
+public class FactionsController(AppDbContext db, ICampaignContext campaign, IWebHostEnvironment env) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll()
@@ -44,6 +44,8 @@ public class FactionsController(AppDbContext db, ICampaignContext campaign) : Co
     public async Task<IActionResult> Update(string id, [FromBody] Faction faction)
     {
         if (id != faction.Id) return BadRequest();
+        var cid = await campaign.GetActiveIdAsync();
+        faction.CampaignId = cid;
         db.Entry(faction).State = EntityState.Modified;
         await db.SaveChangesAsync();
         return Ok(faction);
@@ -70,5 +72,40 @@ public class FactionsController(AppDbContext db, ICampaignContext campaign) : Co
         }
         await db.SaveChangesAsync();
         return NoContent();
+    }
+
+    [HttpPost("{id}/upload-glyph")]
+    public async Task<IActionResult> UploadGlyph(string id, IFormFile file)
+        => await UploadImage(id, file, "glyph");
+
+    [HttpPost("{id}/upload-icon")]
+    public async Task<IActionResult> UploadIcon(string id, IFormFile file)
+        => await UploadImage(id, file, "icon");
+
+    private async Task<IActionResult> UploadImage(string id, IFormFile? file, string kind)
+    {
+        if (file is null || file.Length == 0) return BadRequest("No file provided");
+        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (ext is not (".jpg" or ".jpeg" or ".png" or ".svg"))
+            return BadRequest("Only .jpg, .png, and .svg files are accepted");
+
+        var faction = await db.Factions.FindAsync(id);
+        if (faction is null) return NotFound();
+
+        var uploadsDir = Path.Combine(env.ContentRootPath, "uploads", "factions");
+        Directory.CreateDirectory(uploadsDir);
+
+        var fileName = $"{id}-{kind}{ext}";
+        var filePath = Path.Combine(uploadsDir, fileName);
+        await using var stream = System.IO.File.Create(filePath);
+        await file.CopyToAsync(stream);
+
+        var urlPath = $"/uploads/factions/{fileName}";
+        if (kind == "glyph") faction.GlyphPath = urlPath;
+        else faction.IconPath = urlPath;
+
+        db.Entry(faction).State = EntityState.Modified;
+        await db.SaveChangesAsync();
+        return Ok(new { path = urlPath });
     }
 }

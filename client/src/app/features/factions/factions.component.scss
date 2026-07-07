@@ -109,6 +109,17 @@
 .faction-header-left {
   flex: 1;
   min-width: 0;
+  display: flex;
+  gap: 0.6rem;
+}
+
+.faction-card-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.8;
 }
 
 .faction-header-stats {
@@ -306,6 +317,38 @@
 .modal-wide {
   min-width: 600px;
   max-width: 760px;
+}
+
+.modal-edit {
+  min-width: 680px;
+  max-width: 900px;
+  width: 90vw;
+}
+
+.edit-header {
+  margin-bottom: 0.5rem;
+}
+
+.edit-body {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  margin-bottom: 0.25rem;
+}
+
+.edit-left {
+  flex: 1;
+  min-width: 0;
+}
+
+.edit-right {
+  flex: 1;
+  min-width: 0;
+}
+
+.add-goal-btn {
+  width: 100%;
+  margin-top: 0.5rem;
 }
 
 .card-body {
@@ -568,6 +611,56 @@
   color: var(--text-muted);
 }
 
+// ── Assets list inside detail modal ──────────────────────────────────────────
+
+.detail-assets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.detail-asset-row {
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.detail-asset-main {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.asset-type-badge {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  background: #374151;
+  color: #9ca3af;
+}
+
+.status-badge {
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+
+  &.status-stable    { background: #14532d; color: #86efac; }
+  &.status-contested { background: #78350f; color: #fcd34d; }
+  &.status-damaged   { background: #7c2d12; color: #fca5a5; }
+  &.status-destroyed { background: #3f3f46; color: #a1a1aa; }
+  &.status-hidden    { background: #1e1b4b; color: #a5b4fc; }
+  &.status-lost      { background: #3f3f46; color: #71717a; }
+}
+
 // ── Characters list inside detail modal ──────────────────────────────────────
 
 .detail-characters {
@@ -685,4 +778,236 @@
   opacity: 0.6;
   background: transparent;
   border-color: #1e293b;
+}
+
+// ── Goals on faction card ─────────────────────────────────────────────────────
+
+.card-goals-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+  border-top: 1px solid var(--border);
+  margin-top: 0.25rem;
+}
+
+.card-goals-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+}
+
+.card-goals-count {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+// ── Goals in detail modal ─────────────────────────────────────────────────────
+
+.detail-goals-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.detail-goals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.goal-card {
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.75rem 1rem;
+}
+
+.goal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.goal-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.goal-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.goal-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.badge {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.12rem 0.45rem;
+  border-radius: 3px;
+
+  &.status-plotting     { background: #1e1b4b; color: #a5b4fc; }
+  &.status-progressing  { background: #14532d; color: #86efac; }
+  &.status-stalled      { background: #78350f; color: #fcd34d; }
+  &.status-accomplished { background: #166534; color: #4ade80; }
+  &.status-failed       { background: #450a0a; color: #fca5a5; }
+
+  &.priority-critical { background: #7c0000; color: #fca5a5; }
+  &.priority-major    { background: #431407; color: #fdba74; }
+  &.priority-minor    { background: #1c1917; color: #a8a29e; }
+
+  &.visibility-open   { background: #0c4a6e; color: #7dd3fc; }
+  &.visibility-known  { background: #1c1917; color: #a8a29e; }
+  &.visibility-secret { background: #2e1065; color: #d8b4fe; }
+}
+
+.progress-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.4rem;
+}
+
+.progress-bar-wrap {
+  flex: 1;
+  height: 6px;
+  background: var(--surface-2, #2a2a3a);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 3px;
+  transition: width 0.3s;
+}
+
+.progress-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  min-width: 2.5rem;
+  text-align: right;
+}
+
+.goal-targets {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.target-item {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+
+  .meta-label {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.65rem;
+    letter-spacing: 0.05em;
+    margin-right: 0.3rem;
+  }
+}
+
+.goal-description {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0.25rem 0 0;
+}
+
+// ── Goal modal form ───────────────────────────────────────────────────────────
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+
+  h3 { margin: 0; }
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  &:hover { color: var(--text-primary); }
+}
+
+.modal-body {
+  margin-bottom: 0.5rem;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.form-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.form-input {
+  width: 100%;
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.45rem 0.65rem;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+}
+
+.form-row {
+  margin-bottom: 1rem;
+
+  &.two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+
+  &.three-col {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+.progress-readout {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
 }

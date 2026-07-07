@@ -32,6 +32,7 @@ public class OverridesController(AppDbContext db, ICampaignContext campaign) : C
     public async Task<IActionResult> Update(string id, [FromBody] RelationshipOverride override_)
     {
         if (id != override_.Id) return BadRequest();
+        override_.CampaignId = await campaign.GetActiveIdAsync();
         db.Entry(override_).State = EntityState.Modified;
         await db.SaveChangesAsync();
         return Ok(override_);

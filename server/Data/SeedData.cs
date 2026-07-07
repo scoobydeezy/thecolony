@@ -26,7 +26,7 @@ public static class SeedData
                 RightAbout = "The threat is real. The burden must be contained.",
                 AfraidOf = "Collapse",
                 WrongAbout = "The current system is the only possible solution",
-                SingleSentence = "\"The ritual works.\" or \"Don't gamble with lives\" or \"Good intentions don't stop disasters.\"",
+                Summary ="\"The ritual works.\" or \"Don't gamble with lives\" or \"Good intentions don't stop disasters.\"",
                 BeliefC = BeliefPosition.Positive,
                 BeliefA = BeliefPosition.Negative,
                 BeliefB = BeliefPosition.Negative,
@@ -45,7 +45,7 @@ public static class SeedData
                 RightAbout = "The colony is losing sight of its cost. The burden must be acknowledged.",
                 AfraidOf = "Comfort built on amnesia.",
                 WrongAbout = "Remembrance itself creates change.",
-                SingleSentence = "\"If we must pay the price, we cannot forget it.\"",
+                Summary ="\"If we must pay the price, we cannot forget it.\"",
                 BeliefC = BeliefPosition.Positive,
                 BeliefA = BeliefPosition.Positive,
                 BeliefB = BeliefPosition.Negative,
@@ -64,7 +64,7 @@ public static class SeedData
                 RightAbout = "The compromise is unacceptable",
                 AfraidOf = "Complacency",
                 WrongAbout = "Every problem has a solution",
-                SingleSentence = "Just because it works doesn't mean it's right.",
+                Summary ="Just because it works doesn't mean it's right.",
                 BeliefC = BeliefPosition.Negative,
                 BeliefA = BeliefPosition.Negative,
                 BeliefB = BeliefPosition.Positive,
@@ -83,7 +83,7 @@ public static class SeedData
                 RightAbout = "The system is morally abhorrent",
                 AfraidOf = "Becoming complicit",
                 WrongAbout = "Destruction produces solutions",
-                SingleSentence = "\"If survival demands this, perhaps it shouldn't survive.\"",
+                Summary ="\"If survival demands this, perhaps it shouldn't survive.\"",
                 BeliefC = BeliefPosition.Negative,
                 BeliefA = BeliefPosition.Positive,
                 BeliefB = BeliefPosition.Positive,
@@ -102,7 +102,7 @@ public static class SeedData
                 RightAbout = "New solutions may exist",
                 AfraidOf = "Intellectual stagnation",
                 WrongAbout = "Knowledge alone solves human problems",
-                SingleSentence = "Every cage is just a puzzle waiting to be solved.",
+                Summary ="Every cage is just a puzzle waiting to be solved.",
                 BeliefC = BeliefPosition.Neutral,
                 BeliefA = BeliefPosition.Neutral,
                 BeliefB = BeliefPosition.Positive,
@@ -121,7 +121,7 @@ public static class SeedData
                 RightAbout = "The Keepers suppress information. Your understanding is incomplete.",
                 AfraidOf = "Ignorance",
                 WrongAbout = "The entity is benevolent",
-                SingleSentence = "The ritual misunderstands the relationship.",
+                Summary ="The ritual misunderstands the relationship.",
                 BeliefC = BeliefPosition.Negative,
                 BeliefA = BeliefPosition.Neutral,
                 BeliefB = BeliefPosition.Positive,
@@ -140,7 +140,7 @@ public static class SeedData
                 RightAbout = "The colony's systems have practical value",
                 AfraidOf = "Idealists disrupting stability",
                 WrongAbout = "Everything can be commodified",
-                SingleSentence = "The system exists. Use it.",
+                Summary ="The system exists. Use it.",
                 BeliefC = BeliefPosition.Neutral,
                 BeliefA = BeliefPosition.Negative,
                 BeliefB = BeliefPosition.Negative,
@@ -160,7 +160,7 @@ public static class SeedData
                 RightAbout = "Somebody has to keep society functioning",
                 AfraidOf = "Instability",
                 WrongAbout = "Survival is sufficient",
-                SingleSentence = "I still have to eat tomorrow.",
+                Summary ="I still have to eat tomorrow.",
                 // Desires Stability, Maintains Agency, Sacrifices Truth
                 StabilityValue = D, AgencyValue = M, TruthValue = S,
                 Active = true
@@ -176,7 +176,7 @@ public static class SeedData
                 RightAbout = "The compromise was imposed on them",
                 AfraidOf = "Becoming the next generation of caretakers",
                 WrongAbout = "The past can simply be discarded",
-                SingleSentence = "I didn't choose this.",
+                Summary ="I didn't choose this.",
                 // Desires Agency, Maintains Truth, Sacrifices Stability
                 AgencyValue = D, TruthValue = M, StabilityValue = S,
                 Active = true
@@ -192,7 +192,7 @@ public static class SeedData
                 RightAbout = "Most citizens underestimate the burden.",
                 AfraidOf = "Becoming the thing they hate.",
                 WrongAbout = "Knowledge necessarily grants wisdom.",
-                SingleSentence = "\"If we don't carry this, who will?\"",
+                Summary ="\"If we don't carry this, who will?\"",
                 // Desires Stability, Maintains Truth, Sacrifices Agency
                 StabilityValue = D, TruthValue = M, AgencyValue = S,
                 Active = true
@@ -208,7 +208,7 @@ public static class SeedData
                 RightAbout = "They perceive cracks others ignore",
                 AfraidOf = "Being silenced",
                 WrongAbout = "Their conclusions are often distorted by incomplete information",
-                SingleSentence = "Why does it feel like someone isn't here?",
+                Summary ="Why does it feel like someone isn't here?",
                 // Desires Truth, Maintains Agency, Sacrifices Stability
                 TruthValue = D, AgencyValue = M, StabilityValue = S,
                 Active = true
@@ -224,7 +224,7 @@ public static class SeedData
                 RightAbout = "The colony survives because of sacrifice",
                 AfraidOf = "Meaninglessness",
                 WrongAbout = "Their sacrifice alone can solve the deeper problem",
-                SingleSentence = "Remember me.",
+                Summary ="Remember me.",
                 // Desires Agency, Maintains Stability, Sacrifices Truth
                 AgencyValue = D, StabilityValue = M, TruthValue = S,
                 Active = true

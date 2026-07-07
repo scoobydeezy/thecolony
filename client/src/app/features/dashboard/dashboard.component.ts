@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { AppStore } from '../../store/app.store';
 import { BeliefPosition, primaryValue, secondaryValue, sacrificedValue, topCompatibleFactions, beliefPositionLabel, effectiveDriftScoreWithInfluence } from '../../core/models/types';
 import type { Faction, RelationshipBreakdown } from '../../core/models/types';
+import { FactionInfluenceService } from '../../core/services/faction-influence.service';
 import { TimelineStressTabComponent } from './timeline-stress-tab.component';
 import { TimelineFactionsTabComponent } from './timeline-factions-tab.component';
 import { TimelineRelationshipsTabComponent } from './timeline-relationships-tab.component';
@@ -35,6 +36,7 @@ type TimelineTab = 'stress' | 'factions' | 'relationships' | 'characters' | 'ana
 })
 export class DashboardComponent {
   store = inject(AppStore);
+  private influenceSvc = inject(FactionInfluenceService);
 
   activeTab = signal<TimelineTab>('stress');
   showEvents = signal(true);
@@ -141,11 +143,20 @@ export class DashboardComponent {
   }
 
   // Colony Alerts + Faction Rankings (merged from Colony State)
-  readonly factionRankings = computed(() =>
-    [...this.store.viewFactions().filter(f => f.active && f.type === 'Faction')]
-      .map(f => ({ faction: f, momentum: f.momentum, legitimacy: f.legitimacy, influence: f.baseInfluence }))
-      .sort((a, b) => b.momentum - a.momentum)
-  );
+  readonly factionRankings = computed(() => {
+    const factions = this.store.viewFactions().filter(f => f.active && f.type === 'Faction');
+    const members  = this.store.viewCharacters();
+    const formulas = this.store.formulas();
+    const assets   = this.store.assets();
+    return [...factions]
+      .map(f => ({
+        faction:    f,
+        momentum:   f.momentum,
+        legitimacy: f.baseLegitimacy,
+        power:      this.influenceSvc.calculateEffectivePower(f, members.filter(c => c.factionId === f.id), formulas, assets),
+      }))
+      .sort((a, b) => b.momentum - a.momentum);
+  });
 
   get mostInfluential(): { faction: Faction; momentum: number } | null {
     const ranks = this.factionRankings();

@@ -13,6 +13,8 @@ import {
   FormulasConfig, DEFAULT_FORMULAS,
   FACTION_EFFECT_PROPS, CHARACTER_EFFECT_PROPS,
   Campaign, AppSettings,
+  Asset, AssetStatus, FactionGoal, GoalStatus,
+  StressTrigger,
 } from '../core/models/types';
 import { ApiService } from '../core/services/api.service';
 import { scoreRelationship, ScoringActor } from '../core/services/scoring.service';
@@ -26,6 +28,8 @@ interface AppState {
   sessionLog: SessionLogEntry[];
   characters: Character[];
   sessions: Session[];
+  assets: Asset[];
+  factionGoals: FactionGoal[];
   loading: boolean;
   error: string | null;
   // 'baseline' | 'current' | sessionId
@@ -43,6 +47,8 @@ const initialState: AppState = {
   sessionLog: [],
   characters: [],
   sessions: [],
+  assets: [],
+  factionGoals: [],
   loading: false,
   error: null,
   viewingContext: 'current',
@@ -76,6 +82,14 @@ function parseCascadeRules(json: string | undefined): CascadeRule[] {
   } catch { return DEFAULT_CASCADE_RULES; }
 }
 
+function parseStressTriggers(json: string | undefined): StressTrigger[] {
+  if (!json) return [];
+  try {
+    const parsed = JSON.parse(json);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch { return []; }
+}
+
 function applyCharacterDelta(
   cid: string, prop: string, delta: number,
   pressure: Record<string, number>, influence: Record<string, number>
@@ -88,11 +102,13 @@ function applyCharacterDelta(
 function applyFactionDelta(
   fid: string, prop: string, delta: number,
   momentum: Record<string, number>,
-  legitimacy: Record<string, number>,
+  baseLegitimacy: Record<string, number>,
+  powerModifier: Record<string, number>,
   derivedDelta: Record<string, Record<string, number>>
 ): void {
   if (prop === 'momentum') momentum[fid] = (momentum[fid] ?? 0) + delta;
-  else if (prop === 'legitimacy') legitimacy[fid] = (legitimacy[fid] ?? 0) + delta;
+  else if (prop === 'baseLegitimacy') baseLegitimacy[fid] = (baseLegitimacy[fid] ?? 0) + delta;
+  else if (prop === 'powerModifier') powerModifier[fid] = (powerModifier[fid] ?? 0) + delta;
   if (!derivedDelta[fid]) derivedDelta[fid] = {};
   derivedDelta[fid][prop] = (derivedDelta[fid][prop] ?? 0) + delta;
 }
@@ -102,26 +118,45 @@ function buildColonySnapshots(
   factions: Faction[],
   characters: Character[],
   sessions: Session[],
-  rules: RulesConfig | null
+  rules: RulesConfig | null,
+  assets: Asset[] = [],
+  factionGoals: FactionGoal[] = []
 ): ColonySnapshot[] {
   if (!baseline || sessions.length === 0) return [];
 
   let stress = baseline.colonyStress;
   const momentum: Record<string, number> = {};
-  const legitimacy: Record<string, number> = {};
+  const baseLegitimacy: Record<string, number> = {};
+  const powerModifier: Record<string, number> = {};
   const pressure: Record<string, number> = {};
   const influence: Record<string, number> = {};
   const states: Record<string, CharacterState> = {};
   const factionIds: Record<string, string | undefined> = {};
   const relBumps: Record<string, Record<string, number>> = {};
   const partyBumps: Record<string, number> = {};
+  // Asset state — control and status, mutable across sessions
+  const assetControl: Record<string, string | undefined> = {};
+  const assetStatuses: Record<string, AssetStatus> = {};
+  // Goal state — status, mutable across sessions
+  const goalStatuses: Record<string, GoalStatus> = {};
+  const goalParticipants: Record<string, Array<{ actorId: string; actorType: string; role: string; delta: number; sessionId: string }>> = {};
+  // Stress trigger oneShot tracking — carries across sessions
+  const firedStressTriggers: string[] = [];
   // Consecutive streak counters: factionId → property → count
   const consecutiveNeg: Record<string, Record<string, number>> = {};
   const consecutivePos: Record<string, Record<string, number>> = {};
 
+  for (const a of assets) {
+    assetControl[a.id] = a.controllingFactionId;
+    assetStatuses[a.id] = a.status;
+  }
+  for (const g of factionGoals) {
+    goalStatuses[g.id] = g.status;
+  }
   for (const f of factions) {
     momentum[f.id] = f.momentum;
-    legitimacy[f.id] = f.legitimacy;
+    baseLegitimacy[f.id] = f.baseLegitimacy;
+    powerModifier[f.id] = f.powerModifier;
     consecutiveNeg[f.id] = {};
     consecutivePos[f.id] = {};
   }
@@ -133,6 +168,7 @@ function buildColonySnapshots(
   }
 
   const cascadeRules = parseCascadeRules(rules?.cascadeRulesJson);
+  const stressTriggers = parseStressTriggers(rules?.stressTriggersJson);
 
   return sessions.map(session => {
     // Manual-only deltas this session, keyed factionId → property.
@@ -142,6 +178,10 @@ function buildColonySnapshots(
     // Derived-only deltas accumulated while cascade rules run.
     const derivedDelta: Record<string, Record<string, number>> = {};
 
+    // Capture goal statuses before this session's effects + achievement pass so
+    // cascade rules can detect status transitions (prev ∉ target, new ∈ target).
+    const preSessionGoalStatuses: Record<string, GoalStatus> = { ...goalStatuses };
+
     // Apply manual effects from this session's events
     for (const ev of [...(session.events ?? [])].sort((a, b) => a.sortOrder - b.sortOrder)) {
       for (const ef of ev.effects) {
@@ -150,8 +190,10 @@ function buildColonySnapshots(
         } else if (ef.targetType === 'faction') {
           if (ef.property === 'momentum') {
             momentum[ef.targetId] = (momentum[ef.targetId] ?? 0) + ef.delta;
-          } else if (ef.property === 'legitimacy') {
-            legitimacy[ef.targetId] = (legitimacy[ef.targetId] ?? 0) + ef.delta;
+          } else if (ef.property === 'baseLegitimacy') {
+            baseLegitimacy[ef.targetId] = (baseLegitimacy[ef.targetId] ?? 0) + ef.delta;
+          } else if (ef.property === 'powerModifier') {
+            powerModifier[ef.targetId] = (powerModifier[ef.targetId] ?? 0) + ef.delta;
           } else if (ef.property === 'relationshipBump' && ef.secondaryTargetId) {
             if (!relBumps[ef.targetId]) relBumps[ef.targetId] = {};
             relBumps[ef.targetId][ef.secondaryTargetId] = (relBumps[ef.targetId][ef.secondaryTargetId] ?? 0) + ef.delta;
@@ -159,7 +201,7 @@ function buildColonySnapshots(
             partyBumps[ef.targetId] = (partyBumps[ef.targetId] ?? 0) + ef.delta;
           }
           // Track manual delta for streak-eligible numeric properties
-          if (ef.property === 'momentum' || ef.property === 'legitimacy') {
+          if (ef.property === 'momentum' || ef.property === 'baseLegitimacy') {
             if (!manualDelta[ef.targetId]) manualDelta[ef.targetId] = {};
             manualDelta[ef.targetId][ef.property] = (manualDelta[ef.targetId][ef.property] ?? 0) + ef.delta;
           }
@@ -172,6 +214,51 @@ function buildColonySnapshots(
             states[ef.targetId] = ef.value as CharacterState;
           } else if (ef.property === 'factionChange') {
             factionIds[ef.targetId] = ef.value || undefined;
+          }
+        } else if (ef.targetType === 'asset') {
+          if (ef.property === 'controllingFactionId') {
+            assetControl[ef.targetId] = ef.value || undefined;
+          } else if (ef.property === 'status' && ef.value) {
+            assetStatuses[ef.targetId] = ef.value as AssetStatus;
+          } else if (ef.property === 'stress') {
+            stress = Math.max(0, Math.min(10, stress + ef.delta));
+          }
+        } else if (ef.targetType === 'goal') {
+          if (ef.property === 'status' && ef.value) {
+            goalStatuses[ef.targetId] = ef.value as GoalStatus;
+          } else if (ef.property === 'participate' && ef.secondaryTargetId) {
+            const actorId = ef.secondaryTargetId;
+            const role = ef.value ?? 'Helping';
+            // Resolve actorType: check characters first, then factions, then 'party' literal
+            const actorChar = characters.find(c => c.id === actorId);
+            const actorType = actorId === 'party' ? 'party' : actorChar ? 'character' : 'faction';
+            if (!goalParticipants[ef.targetId]) goalParticipants[ef.targetId] = [];
+            goalParticipants[ef.targetId].push({ actorId, actorType, role, delta: ef.delta, sessionId: session.id });
+            // Derive relationship bump: Helping → positive, Hindering → negative
+            const bumpSign = role === 'Helping' ? 1 : -1;
+            const bumpMag = Math.abs(ef.delta) * bumpSign;
+            if (actorType === 'party') {
+              // Party participation bumps the goal's owning faction toward party
+              const goalFactionId = factionGoals.find(g => g.id === ef.targetId)?.factionId;
+              if (goalFactionId && bumpMag !== 0) {
+                partyBumps[goalFactionId] = (partyBumps[goalFactionId] ?? 0) + bumpMag;
+              }
+            } else if (actorType === 'character') {
+              // Character participation bumps their faction → goal's faction
+              const charFactionId = factionIds[actorId];
+              const goalFactionId = factionGoals.find(g => g.id === ef.targetId)?.factionId;
+              if (charFactionId && goalFactionId && charFactionId !== goalFactionId && bumpMag !== 0) {
+                if (!relBumps[charFactionId]) relBumps[charFactionId] = {};
+                relBumps[charFactionId][goalFactionId] = (relBumps[charFactionId][goalFactionId] ?? 0) + bumpMag;
+              }
+            } else if (actorType === 'faction') {
+              // Faction participation bumps actor faction → goal's faction
+              const goalFactionId = factionGoals.find(g => g.id === ef.targetId)?.factionId;
+              if (goalFactionId && actorId !== goalFactionId && bumpMag !== 0) {
+                if (!relBumps[actorId]) relBumps[actorId] = {};
+                relBumps[actorId][goalFactionId] = (relBumps[actorId][goalFactionId] ?? 0) + bumpMag;
+              }
+            }
           }
         }
       }
@@ -193,7 +280,7 @@ function buildColonySnapshots(
     // a leaderless event rule). The pass-2 refresh using total delta handles
     // the reset if the session genuinely had no net movement.
     for (const fid of Object.keys(momentum)) {
-      for (const prop of ['momentum', 'legitimacy']) {
+      for (const prop of ['momentum', 'baseLegitimacy']) {
         const delta = manualDelta[fid]?.[prop] ?? 0;
         if (!consecutiveNeg[fid]) consecutiveNeg[fid] = {};
         if (!consecutivePos[fid]) consecutivePos[fid] = {};
@@ -220,7 +307,7 @@ function buildColonySnapshots(
     // streak rule) can fire in the same session.
     if (pass === 1) {
       for (const fid of Object.keys(momentum)) {
-        for (const prop of ['momentum', 'legitimacy']) {
+        for (const prop of ['momentum', 'baseLegitimacy']) {
           const total = (manualDelta[fid]?.[prop] ?? 0) + (derivedDelta[fid]?.[prop] ?? 0);
           if (!consecutiveNeg[fid]) consecutiveNeg[fid] = {};
           if (!consecutivePos[fid]) consecutivePos[fid] = {};
@@ -273,7 +360,7 @@ function buildColonySnapshots(
             if (change === 0) continue;
 
             if (rule.targetEntityType === 'faction') {
-              applyFactionDelta(factionId, rule.targetProperty, change, momentum, legitimacy, derivedDelta);
+              applyFactionDelta(factionId, rule.targetProperty, change, momentum, baseLegitimacy, powerModifier, derivedDelta);
             } else if (rule.targetEntityType === 'character') {
               for (const cid of Object.keys(factionIds)) {
                 if (factionIds[cid] !== factionId) continue;
@@ -298,13 +385,13 @@ function buildColonySnapshots(
           for (const factionId of Object.keys(momentum)) {
             const fireKey = `${rule.id}::${factionId}`;
             if (firedSet.has(fireKey)) continue;
-            const val = rule.sourceProperty === 'momentum' ? momentum[factionId] : legitimacy[factionId];
+            const val = rule.sourceProperty === 'momentum' ? momentum[factionId] : baseLegitimacy[factionId];
             if (val === undefined) continue;
             if (op === 'gt' ? val <= tv : val >= tv) continue;
             const change = rule.effectType === 'flat' ? (rule.flatDelta ?? 0) : 0;
             if (change === 0) continue;
             if (rule.targetEntityType === 'faction') {
-              applyFactionDelta(factionId, rule.targetProperty, change, momentum, legitimacy, derivedDelta);
+              applyFactionDelta(factionId, rule.targetProperty, change, momentum, baseLegitimacy, powerModifier, derivedDelta);
             } else if (rule.targetEntityType === 'character') {
               for (const cid of Object.keys(factionIds)) {
                 if (factionIds[cid] !== factionId) continue;
@@ -334,7 +421,7 @@ function buildColonySnapshots(
             if (change === 0) continue;
             const targetFactionId = factionIds[cid];
             if (rule.targetEntityType === 'faction' && targetFactionId) {
-              applyFactionDelta(targetFactionId, rule.targetProperty, change, momentum, legitimacy, derivedDelta);
+              applyFactionDelta(targetFactionId, rule.targetProperty, change, momentum, baseLegitimacy, powerModifier, derivedDelta);
             } else if (rule.targetEntityType === 'character') {
               applyCharacterDelta(cid, rule.targetProperty as string, change, pressure, influence);
             }
@@ -370,7 +457,7 @@ function buildColonySnapshots(
             if (change === 0) continue;
             const targetFactionId = ef.targetId;
             if (rule.targetEntityType === 'faction') {
-              applyFactionDelta(targetFactionId, rule.targetProperty, change, momentum, legitimacy, derivedDelta);
+              applyFactionDelta(targetFactionId, rule.targetProperty, change, momentum, baseLegitimacy, powerModifier, derivedDelta);
             } else if (rule.targetEntityType === 'character') {
               for (const cid of Object.keys(factionIds)) {
                 if (factionIds[cid] !== targetFactionId) continue;
@@ -403,7 +490,7 @@ function buildColonySnapshots(
             if (change === 0) continue;
             const targetFactionId = factionIds[ef.targetId];
             if (rule.targetEntityType === 'faction' && targetFactionId) {
-              applyFactionDelta(targetFactionId, rule.targetProperty, change, momentum, legitimacy, derivedDelta);
+              applyFactionDelta(targetFactionId, rule.targetProperty, change, momentum, baseLegitimacy, powerModifier, derivedDelta);
             } else if (rule.targetEntityType === 'character') {
               applyCharacterDelta(ef.targetId, rule.targetProperty as string, change, pressure, influence);
             }
@@ -419,16 +506,115 @@ function buildColonySnapshots(
               factionId: targetFactionId, legitimacyChange: change,
             });
           }
+        } else if (rule.sourceEntityType === 'goal') {
+          // Fires when a goal's status *transitions into* one of the watched values this session.
+          // "Transition" = was not in the target set before this session, is now.
+          // Effect targets the owning faction (or its characters).
+          if (!rule.sourcePropertyValue?.length) continue;
+          const change = rule.flatDelta ?? 0;
+          if (change === 0) continue;
+          for (const goal of factionGoals) {
+            if (rule.sourceEntityId && rule.sourceEntityId !== goal.id) continue;
+            if (rule.sourceEntitySubtype && rule.sourceEntitySubtype !== goal.priority) continue;
+            // If a faction override is set, only fire for goals owned by that faction
+            if (rule.targetEntityId && rule.targetEntityId !== goal.factionId) continue;
+            const prevStatus = preSessionGoalStatuses[goal.id];
+            const newStatus  = goalStatuses[goal.id];
+            if (!newStatus) continue;
+            // Only fire on a genuine transition into the target set
+            if (rule.sourcePropertyValue.includes(prevStatus)) continue;
+            if (!rule.sourcePropertyValue.includes(newStatus)) continue;
+            const fireKey = `${rule.id}::${goal.id}`;
+            if (firedSet.has(fireKey)) continue;
+            // Use faction override if set, otherwise use the goal's owning faction
+            const ownerFactionId = rule.targetEntityId || goal.factionId;
+            if (rule.targetEntityType === 'faction') {
+              applyFactionDelta(ownerFactionId, rule.targetProperty, change, momentum, baseLegitimacy, powerModifier, derivedDelta);
+            } else if (rule.targetEntityType === 'character') {
+              for (const cid of Object.keys(factionIds)) {
+                if (factionIds[cid] !== ownerFactionId) continue;
+                applyCharacterDelta(cid, rule.targetProperty as string, change, pressure, influence);
+              }
+            }
+            firedSet.add(fireKey);
+            derivedEffects.push({
+              ruleId: rule.id, ruleLabel: rule.label,
+              sourceEntityType: 'faction', sourceEntityId: ownerFactionId, sourceProperty: 'status',
+              triggerType: 'event', eventStateValue: newStatus,
+              targetEntityType: rule.targetEntityType, targetEntityId: ownerFactionId,
+              targetProperty: rule.targetProperty,
+              delta: change,
+              factionId: ownerFactionId, legitimacyChange: change,
+            });
+          }
         }
       }
     }
     } // end pass loop
 
+    // Evaluate stress triggers — fire when an entity's property matches a listed value this session
+    for (const trigger of stressTriggers) {
+      const allEffects = (session.events ?? []).flatMap(ev => ev.effects);
+      if (trigger.sourceEntityType === 'asset') {
+        const relevantEffects = allEffects.filter(ef =>
+          ef.targetType === 'asset' && ef.property === trigger.sourceProperty
+          && trigger.sourcePropertyValue.includes(ef.value ?? '')
+        );
+        for (const ef of relevantEffects) {
+          if (trigger.sourceEntityId && ef.targetId !== trigger.sourceEntityId) continue;
+          const key = `${trigger.id}::${ef.targetId}`;
+          if (trigger.oneShot && firedStressTriggers.includes(key)) continue;
+          stress = Math.max(0, Math.min(10, stress + trigger.flatDelta));
+          if (trigger.oneShot) firedStressTriggers.push(key);
+        }
+      } else if (trigger.sourceEntityType === 'goal') {
+        const relevantEffects = allEffects.filter(ef =>
+          ef.targetType === 'goal' && ef.property === trigger.sourceProperty
+          && trigger.sourcePropertyValue.includes(ef.value ?? '')
+        );
+        for (const ef of relevantEffects) {
+          if (trigger.sourceEntityId && ef.targetId !== trigger.sourceEntityId) continue;
+          const key = `${trigger.id}::${ef.targetId}`;
+          if (trigger.oneShot && firedStressTriggers.includes(key)) continue;
+          stress = Math.max(0, Math.min(10, stress + trigger.flatDelta));
+          if (trigger.oneShot) firedStressTriggers.push(key);
+        }
+      } else if (trigger.sourceEntityType === 'character') {
+        const relevantEffects = allEffects.filter(ef =>
+          ef.targetType === 'character' && ef.property === trigger.sourceProperty
+          && trigger.sourcePropertyValue.includes(ef.value ?? '')
+        );
+        for (const ef of relevantEffects) {
+          if (trigger.sourceEntityId && ef.targetId !== trigger.sourceEntityId) continue;
+          if (trigger.sourceEntitySubtype) {
+            const char = characters.find(c => c.id === ef.targetId);
+            if (!char || char.characterType !== trigger.sourceEntitySubtype) continue;
+          }
+          const key = `${trigger.id}::${ef.targetId}`;
+          if (trigger.oneShot && firedStressTriggers.includes(key)) continue;
+          stress = Math.max(0, Math.min(10, stress + trigger.flatDelta));
+          if (trigger.oneShot) firedStressTriggers.push(key);
+        }
+      } else if (trigger.sourceEntityType === 'faction') {
+        const relevantEffects = allEffects.filter(ef =>
+          ef.targetType === 'faction' && ef.property === trigger.sourceProperty
+          && trigger.sourcePropertyValue.includes(ef.value ?? '')
+        );
+        for (const ef of relevantEffects) {
+          if (trigger.sourceEntityId && ef.targetId !== trigger.sourceEntityId) continue;
+          const key = `${trigger.id}::${ef.targetId}`;
+          if (trigger.oneShot && firedStressTriggers.includes(key)) continue;
+          stress = Math.max(0, Math.min(10, stress + trigger.flatDelta));
+          if (trigger.oneShot) firedStressTriggers.push(key);
+        }
+      }
+    }
+
     // Re-compute streak counters from pre-session baseline using total delta
     // (manual + derived) so derived changes chain into streak detection for
     // subsequent sessions.
     for (const fid of Object.keys(momentum)) {
-      for (const prop of ['momentum', 'legitimacy']) {
+      for (const prop of ['momentum', 'baseLegitimacy']) {
         const total = (manualDelta[fid]?.[prop] ?? 0) + (derivedDelta[fid]?.[prop] ?? 0);
         if (!consecutiveNeg[fid]) consecutiveNeg[fid] = {};
         if (!consecutivePos[fid]) consecutivePos[fid] = {};
@@ -445,12 +631,38 @@ function buildColonySnapshots(
       }
     }
 
+    // Goal achievement pass: auto-resolve goals whose structured target is now met.
+    // Only promotes Plotting/Progressing/Stalled → Accomplished; never overrides manual Failed.
+    for (const g of factionGoals) {
+      const current = goalStatuses[g.id];
+      if (current === 'Accomplished' || current === 'Failed') continue;
+      if (!g.targetEntityType || !g.targetEntityId) continue;
+      let achieved = false;
+      if (g.targetEntityType === 'Character' && g.targetState) {
+        achieved = states[g.targetEntityId] === g.targetState;
+      } else if (g.targetEntityType === 'Asset' && g.targetState) {
+        achieved = assetStatuses[g.targetEntityId] === g.targetState;
+      } else if (g.targetEntityType === 'Faction' && g.targetProperty && g.targetOperator && g.targetThreshold != null) {
+        const prop = g.targetProperty as 'baseLegitimacy' | 'momentum' | 'power';
+        const val  = prop === 'baseLegitimacy' ? baseLegitimacy[g.targetEntityId]
+                   : prop === 'momentum'       ? momentum[g.targetEntityId]
+                   : undefined;
+        if (val != null) {
+          achieved = g.targetOperator === 'gte' ? val >= g.targetThreshold
+                   : g.targetOperator === 'lte' ? val <= g.targetThreshold
+                   : val === g.targetThreshold;
+        }
+      }
+      if (achieved) goalStatuses[g.id] = 'Accomplished';
+    }
+
     return {
       sessionId: session.id,
       sessionNumber: session.number,
       colonyStress: stress,
       factionMomentum: { ...momentum },
-      factionLegitimacy: { ...legitimacy },
+      factionBaseLegitimacy: { ...baseLegitimacy },
+      factionPowerModifier: { ...powerModifier },
       characterPressure: { ...pressure },
       characterInfluence: { ...influence },
       characterStates: { ...states },
@@ -460,6 +672,13 @@ function buildColonySnapshots(
       ),
       factionPartyBumps: { ...partyBumps },
       derivedEffects,
+      assetControl: { ...assetControl },
+      assetStatuses: { ...assetStatuses },
+      goalStatuses: { ...goalStatuses },
+      goalParticipants: Object.fromEntries(
+        Object.entries(goalParticipants).map(([k, v]) => [k, [...v]])
+      ),
+      firedStressTriggers: [...firedStressTriggers],
     };
   });
 }
@@ -509,76 +728,55 @@ export const AppStore = signalStore(
       [...store.sessions()].sort((a, b) => b.number - a.number)
     ),
 
-    // Colony snapshots: cumulative state after each session, derived from baseline + events
+    // Single shared snapshot computation — all view projections derive from this.
+    // Sorted ascending by session number so time-travel accumulation is correct.
     colonySnapshots: computed((): ColonySnapshot[] =>
       buildColonySnapshots(
         store.colonyState(),
         store.factions(),
         store.characters(),
         [...store.sessions()].sort((a, b) => a.number - b.number),
-        store.rules()
+        store.rules(),
+        store.assets(),
+        store.factionGoals()
       )
     ),
 
     // ── View-context helpers ───────────────────────────────────────────────
     isViewingSnapshot: computed(() => store.viewingContext() !== 'baseline'),
 
-    // The snapshot to project onto the world, or null when viewing baseline
+  })),
+
+  // Block 2: activeSnapshot depends on colonySnapshots from block 1.
+  withComputed((store) => ({
     activeSnapshot: computed((): ColonySnapshot | null => {
       const ctx = store.viewingContext();
       if (ctx === 'baseline') return null;
-      const snaps = buildColonySnapshots(
-        store.colonyState(),
-        store.factions(),
-        store.characters(),
-        [...store.sessions()].sort((a, b) => a.number - b.number),
-        store.rules()
-      );
+      const snaps = store.colonySnapshots();
       if (snaps.length === 0) return null;
       if (ctx === 'current') return snaps[snaps.length - 1];
-      return snaps.find(s => s.sessionId === ctx) ?? snaps[snaps.length - 1];
+      return snaps.find((s: ColonySnapshot) => s.sessionId === ctx) ?? snaps[snaps.length - 1];
     }),
+  })),
 
-    // Factions with momentum/legitimacy projected to the active snapshot
+  // Block 3: view projections depend on activeSnapshot from block 2.
+  withComputed((store) => ({
+
+    // Factions with momentum/baseLegitimacy/powerModifier projected to the active snapshot
     viewFactions: computed((): Faction[] => {
-      const snap = (() => {
-        const ctx = store.viewingContext();
-        if (ctx === 'baseline') return null;
-        const snaps = buildColonySnapshots(
-          store.colonyState(),
-          store.factions(),
-          store.characters(),
-          [...store.sessions()].sort((a, b) => a.number - b.number),
-          store.rules()
-        );
-        if (snaps.length === 0) return null;
-        if (ctx === 'current') return snaps[snaps.length - 1];
-        return snaps.find(s => s.sessionId === ctx) ?? snaps[snaps.length - 1];
-      })();
+      const snap = store.activeSnapshot();
       if (!snap) return store.factions();
       return store.factions().map(f => ({
         ...f,
-        momentum:   snap.factionMomentum[f.id]   ?? f.momentum,
-        legitimacy: snap.factionLegitimacy[f.id] ?? f.legitimacy,
+        momentum:        snap.factionMomentum[f.id]        ?? f.momentum,
+        baseLegitimacy:  snap.factionBaseLegitimacy[f.id]  ?? f.baseLegitimacy,
+        powerModifier:   snap.factionPowerModifier[f.id]   ?? f.powerModifier,
       }));
     }),
 
     // Characters with pressure/influence/state/faction projected to the active snapshot
     viewCharacters: computed((): Character[] => {
-      const snap = (() => {
-        const ctx = store.viewingContext();
-        if (ctx === 'baseline') return null;
-        const snaps = buildColonySnapshots(
-          store.colonyState(),
-          store.factions(),
-          store.characters(),
-          [...store.sessions()].sort((a, b) => a.number - b.number),
-          store.rules()
-        );
-        if (snaps.length === 0) return null;
-        if (ctx === 'current') return snaps[snaps.length - 1];
-        return snaps.find(s => s.sessionId === ctx) ?? snaps[snaps.length - 1];
-      })();
+      const snap = store.activeSnapshot();
       if (!snap) return store.characters();
       return store.characters().map(c => ({
         ...c,
@@ -591,21 +789,25 @@ export const AppStore = signalStore(
       }));
     }),
 
+    // Assets with controllingFactionId and status projected to the active snapshot
+    viewAssets: computed((): Asset[] => {
+      const snap = store.activeSnapshot();
+      if (!snap) return store.assets();
+      return store.assets().map(a => ({
+        ...a,
+        controllingFactionId: snap.assetControl[a.id] !== undefined
+          ? (snap.assetControl[a.id] ?? undefined)
+          : a.controllingFactionId,
+        status: snap.assetStatuses[a.id] ?? a.status,
+      }));
+    }),
+
     // Colony stress projected to the active snapshot
     viewColonyStress: computed((): number => {
       const ctx = store.viewingContext();
       if (ctx === 'baseline') return store.colonyState()?.colonyStress ?? 0;
-      const snaps = buildColonySnapshots(
-        store.colonyState(),
-        store.factions(),
-        store.characters(),
-        [...store.sessions()].sort((a, b) => a.number - b.number),
-        store.rules()
-      );
-      if (snaps.length === 0) return store.colonyState()?.colonyStress ?? 0;
-      const snap = ctx === 'current'
-        ? snaps[snaps.length - 1]
-        : (snaps.find(s => s.sessionId === ctx) ?? snaps[snaps.length - 1]);
+      const snap = store.activeSnapshot();
+      if (!snap) return store.colonyState()?.colonyStress ?? 0;
       return snap.colonyStress;
     }),
 
@@ -1086,6 +1288,8 @@ export const AppStore = signalStore(
           api.getOverrides().subscribe({ next: (overrides) => patchState(store, { overrides }) });
           api.getRelationships().subscribe({ next: (relationships) => patchState(store, { relationships }) });
           api.getSessionLog().subscribe({ next: (sessionLog) => patchState(store, { sessionLog }) });
+          api.getAssets().subscribe({ next: (assets) => patchState(store, { assets }) });
+          api.getFactionGoals().subscribe({ next: (factionGoals) => patchState(store, { factionGoals }) });
         },
         error: (err: Error) => patchState(store, { error: err.message })
       });
@@ -1112,6 +1316,74 @@ export const AppStore = signalStore(
       api.deleteCampaign(id).subscribe({
         next: () =>
           patchState(store, { campaigns: store.campaigns().filter(c => c.id !== id) }),
+        error: (err: Error) => patchState(store, { error: err.message })
+      });
+    },
+
+    loadAssets: rxMethod<void>(
+      pipe(
+        switchMap(() =>
+          api.getAssets().pipe(
+            tapResponse({
+              next: (assets: Asset[]) => patchState(store, { assets }),
+              error: (err: Error) => patchState(store, { error: err.message })
+            })
+          )
+        )
+      )
+    ),
+
+    saveAsset(asset: Asset): void {
+      const existing = store.assets().find(a => a.id === asset.id);
+      const obs$ = existing ? api.updateAsset(asset) : api.createAsset(asset);
+      obs$.subscribe({
+        next: (saved) => {
+          const updated = existing
+            ? store.assets().map(a => a.id === saved.id ? saved : a)
+            : [...store.assets(), saved];
+          patchState(store, { assets: updated });
+        },
+        error: (err: Error) => patchState(store, { error: err.message })
+      });
+    },
+
+    deleteAsset(id: string): void {
+      api.deleteAsset(id).subscribe({
+        next: () => patchState(store, { assets: store.assets().filter(a => a.id !== id) }),
+        error: (err: Error) => patchState(store, { error: err.message })
+      });
+    },
+
+    loadFactionGoals: rxMethod<void>(
+      pipe(
+        switchMap(() =>
+          api.getFactionGoals().pipe(
+            tapResponse({
+              next: (factionGoals: FactionGoal[]) => patchState(store, { factionGoals }),
+              error: (err: Error) => patchState(store, { error: err.message })
+            })
+          )
+        )
+      )
+    ),
+
+    saveFactionGoal(goal: FactionGoal): void {
+      const existing = store.factionGoals().find(g => g.id === goal.id);
+      const obs$ = existing ? api.updateFactionGoal(goal) : api.createFactionGoal(goal);
+      obs$.subscribe({
+        next: (saved) => {
+          const updated = existing
+            ? store.factionGoals().map(g => g.id === saved.id ? saved : g)
+            : [...store.factionGoals(), saved];
+          patchState(store, { factionGoals: updated });
+        },
+        error: (err: Error) => patchState(store, { error: err.message })
+      });
+    },
+
+    deleteFactionGoal(id: string): void {
+      api.deleteFactionGoal(id).subscribe({
+        next: () => patchState(store, { factionGoals: store.factionGoals().filter(g => g.id !== id) }),
         error: (err: Error) => patchState(store, { error: err.message })
       });
     },

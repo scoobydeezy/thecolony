@@ -16,6 +16,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Session> Sessions => Set<Session>();
     public DbSet<Event> Events => Set<Event>();
     public DbSet<EventEffect> EventEffects => Set<EventEffect>();
+    public DbSet<Asset> Assets => Set<Asset>();
+    public DbSet<FactionGoal> FactionGoals => Set<FactionGoal>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

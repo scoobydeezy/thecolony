@@ -33,6 +33,48 @@ namespace ColonyTracker.Api.Migrations
                     b.ToTable("AppSettings");
                 });
 
+            modelBuilder.Entity("ColonyTracker.Api.Models.Asset", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CampaignId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ControllingFactionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Keystone")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Location")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Tier")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Assets");
+                });
+
             modelBuilder.Entity("ColonyTracker.Api.Models.Campaign", b =>
                 {
                     b.Property<string>("Id")
@@ -290,8 +332,11 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<double>("AgencyValue")
                         .HasColumnType("REAL");
 
-                    b.Property<int>("BaseInfluence")
+                    b.Property<int>("BaseLegitimacy")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Became")
+                        .HasColumnType("TEXT");
 
                     b.Property<int?>("BeliefA")
                         .HasColumnType("INTEGER");
@@ -314,11 +359,32 @@ namespace ColonyTracker.Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("Legitimacy")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Focus")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FoundedAs")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("GlyphPath")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("History")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("IconPath")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PrimaryColor")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SecondaryColor")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Momentum")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Motto")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -327,16 +393,27 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<string>("Notes")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Origin")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("PowerModifier")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("PublicFace")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Represents")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Response")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("RightAbout")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("SingleSentence")
-                        .IsRequired()
+                    b.Property<string>("SelfImage")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("SortOrder")
@@ -344,6 +421,9 @@ namespace ColonyTracker.Api.Migrations
 
                     b.Property<double>("StabilityValue")
                         .HasColumnType("REAL");
+
+                    b.Property<string>("Summary")
+                        .HasColumnType("TEXT");
 
                     b.Property<double>("TruthValue")
                         .HasColumnType("REAL");
@@ -358,6 +438,58 @@ namespace ColonyTracker.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Factions");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.FactionGoal", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CampaignId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FactionId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("TargetEntityId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("TargetEntityType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("TargetOperator")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TargetProperty")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TargetState")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int?>("TargetThreshold")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Visibility")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FactionGoals");
                 });
 
             modelBuilder.Entity("ColonyTracker.Api.Models.RelationshipOverride", b =>
@@ -429,6 +561,10 @@ namespace ColonyTracker.Api.Migrations
 
                     b.Property<double>("StressPositiveMultiplierPerPoint")
                         .HasColumnType("REAL");
+
+                    b.Property<string>("StressTriggersJson")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("StressWeightCurve")
                         .HasColumnType("INTEGER");
