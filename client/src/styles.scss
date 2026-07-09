@@ -17,6 +17,8 @@
   --color-valueb: #14b8a6;
   --color-valuec: #f43f5e;
 
+  --font-size-xs: 0.78rem;
+
   --color-belief-statusquo: #60a5fa;
   --color-belief-dissent:   #f87171;
   --color-belief-neutral:   #94a3b8;
@@ -130,7 +132,7 @@ html, body {
 
   label {
     display: block;
-    font-size: 0.78rem;
+    font-size: var(--font-size-xs);
     font-weight: 500;
     color: var(--text-secondary);
     margin-bottom: 0.35rem;
@@ -163,7 +165,7 @@ table {
 
   th {
     text-align: left;
-    font-size: 0.72rem;
+    font-size: var(--font-size-xs);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;

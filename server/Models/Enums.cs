@@ -5,7 +5,7 @@ public enum CoreValue { A, B, C }
 public enum RelationshipLabel { Aligned, Cooperative, Friendly, Tolerated, Strained, Opposed, Hostile }
 public enum GroupType { Faction, SocialClass }
 public enum CharacterType { NPC, PartyMember, FactionLeader }
-public enum DoubtDirection { A, B, C }
+public enum DoubtDirection { A, B, C, AB, AC, BC }
 public enum CharacterState { Alive, Dead, Missing, Forgotten }
 public enum AssetType { Infrastructure, Artifact, Resource, Intelligence }
 public enum AssetRole { Operational, Strategic, Symbolic, Hidden, Mandate }

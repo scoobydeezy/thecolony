@@ -1,8 +1,9 @@
 import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { DecimalPipe } from '@angular/common';
+import { DecimalPipe, NgClass } from '@angular/common';
 import { FormField, form, required } from '@angular/forms/signals';
 import { AppStore } from '../../store/app.store';
+import { ApiService } from '../../core/services/api.service';
 import {
   Character, CharacterType, CharacterState, DoubtDirection, ValueVector,
   BeliefPosition,
@@ -13,6 +14,9 @@ import {
 } from '../../core/models/types';
 import { TernaryPlotComponent, TernaryOverlayPoint } from '../../shared/ternary-plot/ternary-plot.component';
 import { scoreRelationship, ScoringActor, DEFAULT_RULES } from '../../core/services/scoring.service';
+import { getAncestryImagePath, FALLBACK_ANCESTRY_IMAGE } from '../../core/utils/ancestry-images';
+
+type EditingCard = 'header' | 'identity' | 'society' | 'narrative' | 'beliefs' | 'doubt' | null;
 
 interface CharacterFormModel {
   id: string;
@@ -85,57 +89,132 @@ const toFormModel = (c: Character): CharacterFormModel => ({
   impressionable: c.impressionable.toString()
 });
 
-const fromFormModel = (fm: CharacterFormModel, values: ValueVector): Character => ({
-  id: fm.id,
-  name: fm.name,
-  characterType: fm.characterType as CharacterType,
-  state: fm.state,
-  ancestry: fm.ancestry || undefined,
-  heritage: fm.heritage || undefined,
-  class: fm.class || undefined,
-  background: fm.background || undefined,
-  level: fm.level ? +fm.level : undefined,
-  gender: fm.gender || undefined,
-  age: fm.age ? +fm.age : undefined,
-  occupation: fm.occupation || undefined,
-  summary: fm.summary || undefined,
-  goals: fm.goals || undefined,
-  fears: fm.fears || undefined,
-  notes: fm.notes || undefined,
-  factionId: fm.factionId || undefined,
-  socialClassId: fm.socialClassId || undefined,
-  beliefc: (fm.beliefc as BeliefPosition) || undefined,
-  beliefa: (fm.beliefa as BeliefPosition) || undefined,
-  beliefb: (fm.beliefb as BeliefPosition) || undefined,
-  values,
-  doubtDirection: (fm.doubtDirection as DoubtDirection) || undefined,
-  conviction: fm.conviction !== '' ? +fm.conviction : 0,
-  pressure: fm.pressure !== '' ? +fm.pressure : 0,
-  influence: fm.influence !== '' ? +fm.influence : 0,
-  impressionable: fm.impressionable !== '' ? +fm.impressionable : 50
-});
 
 @Component({
   selector: 'app-character-detail',
   standalone: true,
-  imports: [RouterLink, FormField, TernaryPlotComponent, DecimalPipe],
+  imports: [RouterLink, FormField, TernaryPlotComponent, DecimalPipe, NgClass],
   templateUrl: './character-detail.component.html',
   styleUrl: './character-detail.component.scss'
 })
 export class CharacterDetailComponent implements OnInit {
   store  = inject(AppStore);
+  api    = inject(ApiService);
   route  = inject(ActivatedRoute);
   router = inject(Router);
 
-  isNew    = false;
-  editMode = signal(false);
+  // ── Per-card edit state ────────────────────────────────────────────────────
 
-  // Read-mode: the saved character
+  editingCard = signal<EditingCard>(null);
+
+  isEditing(card: EditingCard): boolean { return this.editingCard() === card; }
+
+  openCard(card: EditingCard): void {
+    this.editForm.set(toFormModel(this.character()));
+    this.editValues.set({ ...this.character().values });
+    this.editingCard.set(card);
+  }
+
+  closeCard(): void { this.editingCard.set(null); }
+
+  saveCard(card: EditingCard): void {
+    const fm = this.editForm();
+    const current = this.character();
+    let updated: Character;
+
+    switch (card) {
+      case 'header':
+        updated = { ...current, name: fm.name, characterType: fm.characterType as CharacterType, state: fm.state, summary: fm.summary || undefined };
+        break;
+      case 'identity':
+        updated = {
+          ...current,
+          gender: fm.gender || undefined,
+          age: fm.age ? +fm.age : undefined,
+          occupation: fm.occupation || undefined,
+          ancestry: fm.ancestry || undefined,
+          heritage: fm.heritage || undefined,
+          class: fm.class || undefined,
+          background: fm.background || undefined,
+          level: fm.level ? +fm.level : undefined,
+        };
+        break;
+      case 'society':
+        updated = {
+          ...current,
+          factionId: fm.factionId || undefined,
+          socialClassId: fm.socialClassId || undefined,
+          influence: fm.influence !== '' ? +fm.influence : 0,
+          impressionable: fm.impressionable !== '' ? +fm.impressionable : 50,
+        };
+        break;
+      case 'narrative':
+        updated = {
+          ...current,
+          summary: fm.summary || undefined,
+          goals: fm.goals || undefined,
+          fears: fm.fears || undefined,
+          notes: fm.notes || undefined,
+        };
+        break;
+      case 'beliefs':
+        updated = {
+          ...current,
+          values: this.editValues(),
+          beliefc: (fm.beliefc as BeliefPosition) || undefined,
+          beliefa: (fm.beliefa as BeliefPosition) || undefined,
+          beliefb: (fm.beliefb as BeliefPosition) || undefined,
+          doubtDirection: (fm.doubtDirection as DoubtDirection) || undefined,
+          conviction: fm.conviction !== '' ? +fm.conviction : 0,
+          pressure: fm.pressure !== '' ? +fm.pressure : 0,
+        };
+        break;
+      case 'doubt':
+        updated = {
+          ...current,
+          pressure: fm.pressure !== '' ? +fm.pressure : 0,
+          influence: fm.influence !== '' ? +fm.influence : 0,
+          impressionable: fm.impressionable !== '' ? +fm.impressionable : 50,
+        };
+        break;
+      default:
+        return;
+    }
+
+    this.store.saveCharacter(updated);
+    this.character.set({ ...updated, values: { ...updated.values } });
+    this.editingCard.set(null);
+  }
+
+  // ── Character state ────────────────────────────────────────────────────────
+
+  private portraitBust = signal<string | null>(null);
+
   character = signal<Character>({
     id: '', name: '', characterType: 'NPC', state: 'Alive',
     values: { ...DEFAULT_VALUES }, conviction: 50, pressure: 0,
     influence: 0, impressionable: 50
   });
+
+  readonly portrait = computed<string>(() => {
+    const bust = this.portraitBust();
+    if (bust != null) return bust;
+    const c = this.character();
+    return c.portraitPath ?? getAncestryImagePath(c.ancestry, c.gender);
+  });
+
+  onPortraitError(img: HTMLImageElement): void {
+    const current = img.src.replace(window.location.origin, '');
+    // female variant missing → try male variant
+    if (current.endsWith('-f.png')) {
+      img.src = current.replace(/-f\.png$/, '.png');
+      return;
+    }
+    // male variant missing → try human fallback
+    if (current !== FALLBACK_ANCESTRY_IMAGE) {
+      img.src = FALLBACK_ANCESTRY_IMAGE;
+    }
+  }
 
   // Edit-mode: signal form
   readonly editForm   = signal<CharacterFormModel>(emptyFormModel());
@@ -145,7 +224,7 @@ export class CharacterDetailComponent implements OnInit {
   });
 
   readonly stateOptions: CharacterState[] = ['Alive', 'Dead', 'Missing', 'Forgotten'];
-  readonly doubtDirections: DoubtDirection[] = ['a', 'b', 'c'];
+  readonly doubtDirections: DoubtDirection[] = ['a', 'b', 'c', 'ab', 'ac', 'bc'];
   readonly beliefcOptions = computed(() => beliefAxisOptions(this.store.beliefAxisLabels().c));
   readonly beliefaOptions = computed(() => beliefAxisOptions(this.store.beliefAxisLabels().a));
   readonly beliefbOptions = computed(() => beliefAxisOptions(this.store.beliefAxisLabels().b));
@@ -203,9 +282,26 @@ export class CharacterDetailComponent implements OnInit {
     return this.store.beliefAxisLabels()[axis].axisName;
   }
 
+  doubtAxisClass(direction: DoubtDirection | undefined): string {
+    switch (direction) {
+      case 'a': case 'bc': return 'valuea';
+      case 'b': case 'ac': return 'valueb';
+      case 'c': case 'ab': return 'valuec';
+      default: return '';
+    }
+  }
+
   doubtLabel(direction: DoubtDirection | undefined): string {
     if (!direction) return '—';
-    return this.store.valueLabels()[direction];
+    const vl = this.store.valueLabels();
+    switch (direction) {
+      case 'a':  return vl.a;
+      case 'b':  return vl.b;
+      case 'c':  return vl.c;
+      case 'ab': return vl.edgeAB;
+      case 'ac': return vl.edgeAC;
+      case 'bc': return vl.edgeBC;
+    }
   }
 
   readonly colonyStress = computed(() => this.store.viewColonyStress());
@@ -213,6 +309,11 @@ export class CharacterDetailComponent implements OnInit {
   readonly effectivePressureValue = computed(() =>
     effectivePressure(this.character(), this.colonyStress())
   );
+
+  readonly characterFaction = computed(() => {
+    const c = this.character();
+    return c.factionId ? (this.store.factions().find(f => f.id === c.factionId) ?? null) : null;
+  });
 
   readonly factionPeers = computed(() => {
     const c = this.character();
@@ -232,6 +333,10 @@ export class CharacterDetailComponent implements OnInit {
     this.character().conviction + this.influenceBonus()
   );
 
+  readonly driftScore = computed(() =>
+    this.effectivePressureValue() - this.effectiveConvictionValue()
+  );
+
   readonly driftTarget = computed<ValueVector | null>(() => {
     const c = this.character();
     if (!c.doubtDirection) return null;
@@ -244,8 +349,6 @@ export class CharacterDetailComponent implements OnInit {
     return computeDriftTarget(this.editValues(), dir);
   });
 
-  readonly editConviction = computed(() => Math.min(100, Math.max(0, Number(this.editForm().conviction) || 0)));
-
   readonly editEffectiveConviction = computed(() => {
     const fm = this.editForm();
     const base = Math.min(100, Math.max(0, Number(fm.conviction) || 0));
@@ -257,7 +360,7 @@ export class CharacterDetailComponent implements OnInit {
       : (peers.reduce((s, p) => s + p.influence, 0) / peers.length) * (impressionable / 100) * scale;
     return base + bonus;
   });
-  readonly editPressure   = computed(() => (Number(this.editForm().pressure) || 0) + this.colonyStress() * 10);
+  readonly editPressure = computed(() => (Number(this.editForm().pressure) || 0) + this.colonyStress() * 10);
 
   // Read-mode overlays
   readonly ternaryOverlays = computed<TernaryOverlayPoint[]>(() => {
@@ -274,7 +377,7 @@ export class CharacterDetailComponent implements OnInit {
     return overlays;
   });
 
-  // Edit-mode overlays (react to editForm's faction/class selection)
+  // Edit-mode overlays
   readonly editTernaryOverlays = computed<TernaryOverlayPoint[]>(() => {
     const fm = this.editForm();
     const overlays: TernaryOverlayPoint[] = [];
@@ -308,12 +411,6 @@ export class CharacterDetailComponent implements OnInit {
     return this.store.factions().find(f => f.id === top.factionId) ?? null;
   });
 
-  readonly currentFactionCompatibility = computed(() => {
-    const c = this.character();
-    if (!c.factionId) return null;
-    return this.compatibilityList().find(x => x.factionId === c.factionId) ?? null;
-  });
-
   readonly isPotentialDefection = computed(() => {
     const top = this.compatibilityList()[0];
     const c   = this.character();
@@ -323,35 +420,22 @@ export class CharacterDetailComponent implements OnInit {
   readonly driftedCharacter = computed(() => {
     const c = this.character();
     const target = this.driftTarget();
-
     if (!target) return null;
-
     const conviction = Math.min(100, Math.max(0, c.conviction));
     const t = 1 - conviction / 100;
-
     if (t <= 0) return null;
-
-    return {
-      ...c,
-      values: lerpValueVector(c.values, target, t),
-    };
+    return { ...c, values: lerpValueVector(c.values, target, t) };
   });
 
   readonly driftedCompatibilityList = computed(() => {
     const drifted = this.driftedCharacter();
-
     if (!drifted) return null;
-
     return topCompatibleFactions(drifted, this.activeFactions(), this.store.formulas().beliefDerivationThreshold);
   });
 
   readonly driftedBeliefs = computed(() => {
     const target = this.driftTarget();
-
-    return effectiveBeliefs({
-      ...this.character(),
-      values: target ?? this.character().values
-    });
+    return effectiveBeliefs({ ...this.character(), values: target ?? this.character().values });
   });
 
   readonly driftedTop3 = computed(() =>
@@ -391,15 +475,14 @@ export class CharacterDetailComponent implements OnInit {
   readonly derivedBeliefs = computed(() => effectiveBeliefs(this.character()));
 
   readonly driftedBeliefChanges = computed(() => {
-  const current = this.derivedBeliefs();
-  const drifted = this.driftedBeliefs();
-
-  return {
-    beliefc: current.beliefc !== drifted.beliefc,
-    beliefa: current.beliefa !== drifted.beliefa,
-    beliefb: current.beliefb !== drifted.beliefb,
-  };
-});
+    const current = this.derivedBeliefs();
+    const drifted = this.driftedBeliefs();
+    return {
+      beliefc: current.beliefc !== drifted.beliefc,
+      beliefa: current.beliefa !== drifted.beliefa,
+      beliefb: current.beliefb !== drifted.beliefb,
+    };
+  });
 
   readonly factionOptions = computed(() =>
     this.store.factions().filter(f => f.type === 'Faction' && f.active)
@@ -410,28 +493,23 @@ export class CharacterDetailComponent implements OnInit {
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    if (id === 'new') {
-      this.isNew = true;
-      this.editMode.set(true);
-      this.editForm.set(emptyFormModel());
-      this.editValues.set({ ...DEFAULT_VALUES });
+    const found = this.store.viewCharacters().find(c => c.id === id);
+    if (found) {
+      this.character.set({ ...found, values: { ...found.values } });
     } else {
-      const found = this.store.viewCharacters().find(c => c.id === id);
-      if (found) {
-        this.character.set({ ...found, values: { ...found.values } });
-      }
+      this.router.navigate(['/characters']);
     }
-  }
-
-  enterEditMode(): void {
-    this.editForm.set(toFormModel(this.character()));
-    this.editValues.set({ ...this.character().values });
-    this.editMode.set(true);
   }
 
   factionName(id?: string): string {
     if (!id) return '—';
     return this.store.factions().find(f => f.id === id)?.name ?? id;
+  }
+
+  typeLabel(t: CharacterType): string {
+    if (t === 'PartyMember') return 'Party Member';
+    if (t === 'FactionLeader') return 'Faction Leader';
+    return 'NPC';
   }
 
   private readonly stateIconMap: Record<CharacterState, string> = {
@@ -456,6 +534,13 @@ export class CharacterDetailComponent implements OnInit {
     return 'drift low';
   }
 
+  driftIconClass(score: number): string {
+    if (score >= 30) return 'fa-solid fa-arrow-trend-up drift-icon drift-high';
+    if (score >= 10) return 'fa-solid fa-arrow-trend-up drift-icon drift-mid';
+    if (score > 0)   return 'fa-solid fa-arrow-right-long drift-icon drift-neutral';
+    return 'fa-solid fa-arrow-trend-down drift-icon drift-low';
+  }
+
   formatPercent(value: number): string {
     return value >= 100 ? 'MAX' : `${Math.round(value)}%`;
   }
@@ -466,24 +551,19 @@ export class CharacterDetailComponent implements OnInit {
     return 'compat-score neg';
   }
 
-  save(): void {
-    const fm = this.editForm();
-    if (!fm.name.trim()) return;
-    const c = fromFormModel(fm, this.editValues());
-    this.store.saveCharacter(c);
-    this.character.set({ ...c, values: { ...c.values } });
-    if (this.isNew) {
-      this.router.navigate(['/characters']);
-    } else {
-      this.editMode.set(false);
-    }
+  uploadPortrait(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
+    this.api.uploadCharacterPortrait(this.character().id, file).subscribe(res => {
+      this.portraitBust.set(`${res.path}?v=${Date.now()}`);
+      this.store.saveCharacter({ ...this.character(), portraitPath: res.path });
+    });
+    (event.target as HTMLInputElement).value = '';
   }
 
-  cancel(): void {
-    if (this.isNew) {
-      this.router.navigate(['/characters']);
-    } else {
-      this.editMode.set(false);
-    }
+  delete(): void {
+    if (!confirm('Delete this character? This cannot be undone.')) return;
+    this.store.deleteCharacter(this.character().id);
+    this.router.navigate(['/characters']);
   }
 }

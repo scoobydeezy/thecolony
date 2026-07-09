@@ -47,6 +47,9 @@ public class Character
     public int Influence { get; set; } = 0;       // 0–100: how much this character stabilizes faction-mates
     public int Impressionable { get; set; } = 50;  // 0–100: how strongly this character is affected by others' influence
 
+    // Portrait image
+    public string? PortraitPath { get; set; }
+
     // Narrative state
     public CharacterState State { get; set; } = CharacterState.Alive;
     public string CampaignId { get; set; } = string.Empty;

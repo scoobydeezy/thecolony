@@ -7,7 +7,7 @@ import { AppStore } from '../../store/app.store';
 import { ApiService } from '../../core/services/api.service';
 import { FactionInfluenceService } from '../../core/services/faction-influence.service';
 import {
-  Faction, Asset, AssetStatus, Character, CharacterState, GroupType, BeliefPosition,
+  Faction, BannerShape, Asset, AssetStatus, Character, CharacterState, GroupType, BeliefPosition,
   ValueVector, primaryValue, secondaryValue, sacrificedValue,
   beliefConflicts, BeliefConflicts,
   mostAlignedFactions, mostOpposedFactions, effectivePressure, topCompatibleFactions,
@@ -89,6 +89,7 @@ interface FactionFormModel {
   history: string;
   primaryColor: string;
   secondaryColor: string;
+  bannerShape: BannerShape | '';
   beliefc: string;
   beliefa: string;
   beliefb: string;
@@ -124,6 +125,7 @@ const toFormModel = (f: Faction): FactionFormModel => ({
   history: f.history ?? '',
   primaryColor: f.primaryColor ?? '',
   secondaryColor: f.secondaryColor ?? '',
+  bannerShape: f.bannerShape ?? '',
   beliefc: f.beliefc ?? '',
   beliefa: f.beliefa ?? '',
   beliefb: f.beliefb ?? '',
@@ -169,6 +171,7 @@ const fromFormModel = (fm: FactionFormModel, values: ValueVector, existing: Fact
   momentum: fm.momentum !== '' ? +fm.momentum : 0,
   baseLegitimacy: fm.baseLegitimacy !== '' ? +fm.baseLegitimacy : 50,
   powerModifier: fm.powerModifier !== '' ? +fm.powerModifier : 0,
+  additionalMemberCount: existing.additionalMemberCount ?? 0,
 });
 
 @Component({
@@ -205,6 +208,10 @@ export class FactionDetailComponent implements OnInit, OnDestroy {
     this.editForm.update(fm => ({ ...fm, [field]: value }));
   }
 
+  setBannerShape(shape: BannerShape | ''): void {
+    this.editForm.update(fm => ({ ...fm, bannerShape: shape }));
+  }
+
   saveCard(card: EditingCard): void {
     const fm = this.editForm();
     const current = this.faction();
@@ -212,7 +219,7 @@ export class FactionDetailComponent implements OnInit, OnDestroy {
 
     switch (card) {
       case 'header':
-        updated = { ...current, name: fm.name, represents: fm.represents, type: fm.type as GroupType, active: fm.active === 'true', motto: fm.motto || undefined, summary: fm.summary || undefined, primaryColor: fm.primaryColor || undefined, secondaryColor: fm.secondaryColor || undefined };
+        updated = { ...current, name: fm.name, represents: fm.represents, type: fm.type as GroupType, active: fm.active === 'true', motto: fm.motto || undefined, summary: fm.summary || undefined, primaryColor: fm.primaryColor || undefined, secondaryColor: fm.secondaryColor || undefined, bannerShape: (fm.bannerShape as BannerShape) || undefined };
         break;
       case 'psychology':
         updated = { ...current, coreTenet: fm.coreTenet, focus: fm.focus || undefined, certainOf: fm.certainOf, rightAbout: fm.rightAbout, afraidOf: fm.afraidOf, wrongAbout: fm.wrongAbout };
@@ -235,6 +242,18 @@ export class FactionDetailComponent implements OnInit, OnDestroy {
     setTimeout(() => this.store.loadRelationships(undefined), 400);
   }
 
+  // ── Banner shape options ─────────────────────────────────────────────────
+
+  readonly bannerShapeOptions: { value: BannerShape; label: string }[] = [
+    { value: 'centered-triangle', label: 'Center'  },
+    { value: 'left-triangle',     label: 'Left'    },
+    { value: 'right-triangle',    label: 'Right'   },
+    { value: 'inverted-triangle', label: 'Notch'   },
+    { value: 'rectangle',         label: 'Flat'    },
+    { value: 'semi-circle',       label: 'Round'   },
+    { value: 'pennant',           label: 'Pennant' },
+  ];
+
   // ── Faction state ─────────────────────────────────────────────────────────
 
   private factionId = signal<string>('');
@@ -249,7 +268,7 @@ export class FactionDetailComponent implements OnInit, OnDestroy {
       id: '', name: '', represents: '', type: 'Faction' as GroupType,
       coreTenet: '', certainOf: '', rightAbout: '', afraidOf: '', wrongAbout: '',
       values: { ...DEFAULT_VALUES },
-      active: true, sortOrder: 0, momentum: 0, baseLegitimacy: 50, powerModifier: 0,
+      active: true, sortOrder: 0, momentum: 0, baseLegitimacy: 50, powerModifier: 0, additionalMemberCount: 0,
     };
     const icon  = this.iconBust();
     const glyph = this.glyphBust();
@@ -349,10 +368,16 @@ export class FactionDetailComponent implements OnInit, OnDestroy {
       .sort((a, b) => b.influence - a.influence)
   );
 
+  adjustAdditionalMembers(delta: number): void {
+    const current = this.faction();
+    const next = Math.max(0, (current.additionalMemberCount ?? 0) + delta);
+    this.store.saveFaction({ ...current, additionalMemberCount: next });
+  }
+
   // ── Influence ─────────────────────────────────────────────────────────────
 
   readonly charInfluence = computed(() =>
-    this.influence.calculateCharacterInfluence(this.activeCharacters())
+    this.influence.calculateCharacterInfluence(this.activeCharacters(), undefined, this.faction().additionalMemberCount ?? 0)
   );
 
   readonly assetInfluenceScore = computed(() =>
@@ -371,7 +396,8 @@ export class FactionDetailComponent implements OnInit, OnDestroy {
     this.influence.calculateEffectivePower(this.faction(), this.activeCharacters(), this.store.formulas(), this.assets())
   );
 
-  readonly colonyStress = computed(() => this.store.viewColonyStress());
+  readonly colonyStress   = computed(() => this.store.viewColonyStress());
+  readonly isBaselineView = computed(() => this.store.activeSnapshot() === null);
 
   formatMomentum(m: number): string { return m > 0 ? `+${m}` : `${m}`; }
 

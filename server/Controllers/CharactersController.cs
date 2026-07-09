@@ -8,7 +8,7 @@ namespace ColonyTracker.Api.Controllers;
 
 [ApiController]
 [Route("api/characters")]
-public class CharactersController(AppDbContext db, ICampaignContext campaign) : ControllerBase
+public class CharactersController(AppDbContext db, ICampaignContext campaign, IWebHostEnvironment env) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll()
@@ -56,5 +56,31 @@ public class CharactersController(AppDbContext db, ICampaignContext campaign) : 
         db.Characters.Remove(character);
         await db.SaveChangesAsync();
         return NoContent();
+    }
+
+    [HttpPost("{id}/upload-portrait")]
+    public async Task<IActionResult> UploadPortrait(string id, IFormFile file)
+    {
+        if (file is null || file.Length == 0) return BadRequest("No file provided");
+        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
+        if (ext is not (".jpg" or ".jpeg" or ".png"))
+            return BadRequest("Only .jpg and .png files are accepted");
+
+        var character = await db.Characters.FindAsync(id);
+        if (character is null) return NotFound();
+
+        var uploadsDir = Path.Combine(env.ContentRootPath, "uploads", "characters");
+        Directory.CreateDirectory(uploadsDir);
+
+        var fileName = $"{id}-portrait{ext}";
+        var filePath = Path.Combine(uploadsDir, fileName);
+        await using var stream = System.IO.File.Create(filePath);
+        await file.CopyToAsync(stream);
+
+        var urlPath = $"/uploads/characters/{fileName}";
+        character.PortraitPath = urlPath;
+        db.Entry(character).State = EntityState.Modified;
+        await db.SaveChangesAsync();
+        return Ok(new { path = urlPath });
     }
 }

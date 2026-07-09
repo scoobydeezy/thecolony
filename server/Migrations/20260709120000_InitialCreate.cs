@@ -93,6 +93,7 @@ namespace ColonyTracker.Api.Migrations
                     Name = table.Column<string>(type: "TEXT", nullable: false),
                     Notes = table.Column<string>(type: "TEXT", nullable: true),
                     Occupation = table.Column<string>(type: "TEXT", nullable: true),
+                    PortraitPath = table.Column<string>(type: "TEXT", nullable: true),
                     Pressure = table.Column<int>(type: "INTEGER", nullable: false),
                     SocialClassId = table.Column<string>(type: "TEXT", nullable: true),
                     StabilityValue = table.Column<double>(type: "REAL", nullable: false),
@@ -185,8 +186,10 @@ namespace ColonyTracker.Api.Migrations
                 {
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     Active = table.Column<bool>(type: "INTEGER", nullable: false),
+                    AdditionalMemberCount = table.Column<int>(type: "INTEGER", nullable: false),
                     AfraidOf = table.Column<string>(type: "TEXT", nullable: false),
                     AgencyValue = table.Column<double>(type: "REAL", nullable: false),
+                    BannerShape = table.Column<string>(type: "TEXT", nullable: true),
                     BaseLegitimacy = table.Column<int>(type: "INTEGER", nullable: false),
                     Became = table.Column<string>(type: "TEXT", nullable: true),
                     BeliefA = table.Column<int>(type: "INTEGER", nullable: true),

@@ -74,7 +74,7 @@ export class FactionsComponent {
       type: fm.type as GroupType,
       coreTenet: '', certainOf: '', rightAbout: '', afraidOf: '', wrongAbout: '',
       values: { ...DEFAULT_VALUES },
-      active: true, sortOrder: 0, momentum: 0, baseLegitimacy: 50, powerModifier: 0,
+      active: true, sortOrder: 0, momentum: 0, baseLegitimacy: 50, powerModifier: 0, additionalMemberCount: 0,
     });
     this.showModal.set(false);
   }
@@ -116,6 +116,10 @@ export class FactionsComponent {
 
   factionMemberCount(f: Faction): number {
     return this.store.viewCharacters().filter(c => c.factionId === f.id || c.socialClassId === f.id).length;
+  }
+
+  factionTotalMemberCount(f: Faction): number {
+    return this.factionMemberCount(f) + (f.additionalMemberCount ?? 0);
   }
 
   factionTotalInfluence(f: Faction): number {
@@ -257,9 +261,11 @@ export class FactionsComponent {
             notes:          get(row, 'notes')         || undefined,
             primaryColor:   get(row, 'primarycolor')  || undefined,
             secondaryColor: get(row, 'secondarycolor') || undefined,
-            momentum:        parseInt(get(row, 'momentum'))        || 0,
-            baseLegitimacy:  parseInt(get(row, 'baselegitimacy'))  || 50,
-            powerModifier:   parseInt(get(row, 'powermodifier'))   || 0,
+            bannerShape:    (get(row, 'bannershape')   || undefined) as import('../../core/models/types').BannerShape | undefined,
+            momentum:              parseInt(get(row, 'momentum'))              || 0,
+            baseLegitimacy:        parseInt(get(row, 'baselegitimacy'))        || 50,
+            powerModifier:         parseInt(get(row, 'powermodifier'))         || 0,
+            additionalMemberCount: parseInt(get(row, 'additionalmembercount')) || 0,
           };
           this.store.saveFaction(faction);
         }
@@ -281,7 +287,7 @@ export class FactionsComponent {
       bl.c.axisName, bl.a.axisName, bl.b.axisName,
       vl.a, vl.b, vl.c,
       'Momentum', 'BaseLegitimacy', 'PowerModifier',
-      'Notes', 'PrimaryColor', 'SecondaryColor'
+      'Notes', 'PrimaryColor', 'SecondaryColor', 'BannerShape'
     ];
     const factionRows = factions.map(f => [
       f.id, f.name, f.type, f.active ? 'true' : 'false', f.sortOrder,
@@ -291,7 +297,7 @@ export class FactionsComponent {
       f.beliefc ?? '', f.beliefa ?? '', f.beliefb ?? '',
       f.values.a.toFixed(4), f.values.b.toFixed(4), f.values.c.toFixed(4),
       f.momentum, f.baseLegitimacy, f.powerModifier,
-      f.notes ?? '', f.primaryColor ?? '', f.secondaryColor ?? ''
+      f.notes ?? '', f.primaryColor ?? '', f.secondaryColor ?? '', f.bannerShape ?? ''
     ]);
     downloadCsv([factionHeader, ...factionRows], 'factions.csv');
 

@@ -270,6 +270,12 @@
   &.card-stat-power { color: var(--accent); }
 }
 
+.card-stat-total {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
 .card-stat-divider {
   width: 1px;
   height: 1rem;

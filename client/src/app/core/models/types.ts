@@ -138,6 +138,15 @@ export function beliefConflicts(
   };
 }
 
+export type BannerShape =
+  | 'centered-triangle'
+  | 'left-triangle'
+  | 'right-triangle'
+  | 'inverted-triangle'
+  | 'rectangle'
+  | 'semi-circle'
+  | 'pennant';
+
 export interface Faction {
   id: string;
   name: string;
@@ -162,6 +171,7 @@ export interface Faction {
   iconPath?: string;
   primaryColor?: string;
   secondaryColor?: string;
+  bannerShape?: BannerShape;
   beliefc?: BeliefPosition;
   beliefa?: BeliefPosition;
   beliefb?: BeliefPosition;
@@ -172,6 +182,7 @@ export interface Faction {
   momentum: number;
   baseLegitimacy: number;
   powerModifier: number;
+  additionalMemberCount: number;
 }
 
 export interface ColonyState {
@@ -694,7 +705,9 @@ export interface FactionGoal {
 // ── Character System ───────────────────────────────────────────────────────
 
 export type CharacterType = 'NPC' | 'PartyMember' | 'FactionLeader';
-export type DoubtDirection = 'a' | 'b' | 'c';
+// Primary: doubt pulls toward a vertex (a, b, c)
+// Secondary: doubt pulls toward an edge — away from the opposite vertex (ab, ac, bc)
+export type DoubtDirection = 'a' | 'b' | 'c' | 'ab' | 'ac' | 'bc';
 export type CharacterState = 'Alive' | 'Dead' | 'Missing' | 'Forgotten';
 
 export interface Character {
@@ -740,6 +753,9 @@ export interface Character {
   // Influence system
   influence: number;      // 0–100: stabilizing effect this character exerts on faction-mates
   impressionable: number; // 0–100: how strongly this character is affected by faction peers' influence
+
+  // Portrait image
+  portraitPath?: string;
 
   // Narrative state
   state: CharacterState;
@@ -862,15 +878,21 @@ export function effectiveDriftScoreWithInfluence(
 }
 
 /**
- * Computes the drift target in barycentric space: the point on the opposite edge
- * of the triangle where the doubted component reaches zero, preserving the ratio
- * of the other two components. This is the furthest the character could drift.
+ * Computes the drift target in barycentric space.
+ *
+ * Primary directions (a, b, c): pull toward the named vertex — target is that pure corner.
+ * Secondary directions (ab, ac, bc): pull toward the named edge — zeros the opposite vertex
+ * and renormalizes, preserving the character's existing lean between the two edge values.
  */
 export function computeDriftTarget(values: ValueVector, doubtDirection: DoubtDirection): ValueVector {
-  const key = doubtDirection.toLowerCase() as keyof ValueVector;
-  const zeroed: ValueVector = { ...values, [key]: 0 };
-  const sum = zeroed.a + zeroed.b + zeroed.c || 1;
-  return { a: zeroed.a / sum, b: zeroed.b / sum, c: zeroed.c / sum };
+  switch (doubtDirection) {
+    case 'a':  return { a: 1, b: 0, c: 0 };
+    case 'b':  return { a: 0, b: 1, c: 0 };
+    case 'c':  return { a: 0, b: 0, c: 1 };
+    case 'bc': { const s = values.b + values.c || 1; return { a: 0, b: values.b / s, c: values.c / s }; }
+    case 'ac': { const s = values.a + values.c || 1; return { a: values.a / s, b: 0, c: values.c / s }; }
+    case 'ab': { const s = values.a + values.b || 1; return { a: values.a / s, b: values.b / s, c: 0 }; }
+  }
 }
 
 export interface FactionCompatibility {

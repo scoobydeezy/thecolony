@@ -27,6 +27,8 @@
 .table-card { padding: 0; overflow: auto; }
 
 .char-link {
+  position: relative;
+  z-index: 1;
   color: var(--color-text, #e2e8f0);
   font-weight: 600;
   text-decoration: none;
@@ -34,6 +36,8 @@
 }
 
 .occupation-tag {
+  position: relative;
+  z-index: 1;
   display: block;
   font-size: 0.7rem;
   color: var(--color-text-muted, #94a3b8);
@@ -49,13 +53,61 @@
   color: #94a3b8;
   border: 1px solid #334155;
   &.party  { background: #1e3a5f; color: #93c5fd; border-color: #3b82f6; }
-  &.leader { background: #1e3a5f; color: #93c5fd; border-color: #3b82f6; }
+  &.leader { background: color-mix(in srgb, #f59e0b 15%, transparent); color: #fbbf24; border-color: #f59e0b; }
+}
+
+tr.row--inactive {
+  background: rgba(0, 0, 0, 0.25);
+  opacity: 0.75;
 }
 
 .col-state {
-  width: 1.5rem;
+  width: 3.5rem;
+  padding: 0;
+  position: relative;
   text-align: center;
-  padding-right: 0;
+  height: 1px; // allows absolutely-positioned child to fill row height in table cells
+}
+
+.col-name {
+  position: relative;
+}
+
+// Flat fill for the icon cell — no shape needed, the extend handles the tail
+.faction-flair {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 1rem;
+}
+
+// Extends the faction color into the name cell, shaped tail on the right edge
+.faction-flair-extend {
+  position: absolute;
+  inset: 0 1.5rem 0 0;
+  pointer-events: none;
+
+  &.faction-flair--centered-triangle  { clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%); }
+  &.faction-flair--left-triangle      { clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 100%, 0 100%); }
+  &.faction-flair--right-triangle     { clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 100%, 0 100%); }
+  &.faction-flair--inverted-triangle  { clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 50%, 100% 100%, 0 100%); }
+  &.faction-flair--rectangle          { clip-path: none; }
+  &.faction-flair--semi-circle        { clip-path: none; border-radius: 0 999px 999px 0; }
+  &.faction-flair--pennant            { clip-path: polygon(0 0, 100% 50%, 0 100%); }
+}
+
+.faction-flair-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
 }
 
 .state-icon {
@@ -86,9 +138,114 @@
   &.low     { color: #4ade80; }
 }
 
-.actions { white-space: nowrap; }
+.actions {
+  width: 2.5rem;
+  text-align: center;
+  white-space: nowrap;
+}
 
-.btn-xs { padding: 2px 8px; font-size: 0.75rem; margin-left: 0.25rem; }
-.btn-danger { background: #7f1d1d; color: #fca5a5; border: 1px solid #b91c1c; }
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  opacity: 0;
+  transition: opacity 0.1s, color 0.1s, background 0.1s, border-color 0.1s;
+
+  &--danger {
+    color: #f87171;
+    &:hover:not(:disabled) {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: #b91c1c;
+    }
+    &:disabled { cursor: default; }
+  }
+}
+
+tr:hover .btn-icon {
+  opacity: 1;
+}
 
 .empty-row { text-align: center; color: var(--color-text-muted, #94a3b8); padding: 2rem; }
+
+// ── Add Character Modal ───────────────────────────────────────────────────────
+
+.modal-add {
+  min-width: 380px;
+  max-width: 480px;
+  width: 90vw;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+
+  h3 { margin: 0; }
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  &:hover { color: var(--text-primary); }
+}
+
+.modal-body {
+  margin-bottom: 0.5rem;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.form-row {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.form-input {
+  width: 100%;
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.45rem 0.65rem;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  box-sizing: border-box;
+
+  &:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+}
+
+.field-error {
+  font-size: 0.75rem;
+  color: #f87171;
+  margin-top: 0.25rem;
+}

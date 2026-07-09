@@ -64,10 +64,10 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Type")
+                    b.Property<int>("Tier")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("Tier")
+                    b.Property<int>("Type")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -172,6 +172,9 @@ namespace ColonyTracker.Api.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Occupation")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PortraitPath")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Pressure")
@@ -325,12 +328,18 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("AdditionalMemberCount")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("AfraidOf")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<double>("AgencyValue")
                         .HasColumnType("REAL");
+
+                    b.Property<string>("BannerShape")
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("BaseLegitimacy")
                         .HasColumnType("INTEGER");
@@ -374,12 +383,6 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<string>("IconPath")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("PrimaryColor")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SecondaryColor")
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("Momentum")
                         .HasColumnType("INTEGER");
 
@@ -399,6 +402,9 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<int>("PowerModifier")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("PrimaryColor")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("PublicFace")
                         .HasColumnType("TEXT");
 
@@ -411,6 +417,9 @@ namespace ColonyTracker.Api.Migrations
 
                     b.Property<string>("RightAbout")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SecondaryColor")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SelfImage")

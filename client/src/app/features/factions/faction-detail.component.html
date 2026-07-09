@@ -591,6 +591,23 @@
           </div>
         }
       }
+
+      @if (isBaselineView()) {
+        <div class="additional-members-row">
+          <span class="additional-members-label">
+            {{ (faction().additionalMemberCount ?? 0) + activeCharacters().length }} total
+            @if ((faction().additionalMemberCount ?? 0) > 0) {
+              <span class="additional-members-count">(+{{ faction().additionalMemberCount }} unrepresented)</span>
+            }
+          </span>
+          <div class="additional-members-controls">
+            <button class="adj-btn" (click)="adjustAdditionalMembers(-10)" [disabled]="(faction().additionalMemberCount ?? 0) < 10" title="−10">−10</button>
+            <button class="adj-btn" (click)="adjustAdditionalMembers(-1)"  [disabled]="(faction().additionalMemberCount ?? 0) < 1"  title="−1">−1</button>
+            <button class="adj-btn" (click)="adjustAdditionalMembers(1)"   title="+1">+1</button>
+            <button class="adj-btn" (click)="adjustAdditionalMembers(10)"  title="+10">+10</button>
+          </div>
+        </div>
+      }
     </div>
 
 
@@ -754,39 +771,101 @@
           <textarea class="form-input" rows="3" [formField]="f.summary" placeholder="One or two sentences describing the faction"></textarea>
         </div>
         <div class="modal-section-title">Branding</div>
-        <div class="form-row two-col">
-          <div class="upload-field">
-            <span class="upload-label">Glyph</span>
-            <label class="btn btn-secondary btn-sm">
-              {{ faction().glyphPath ? 'Replace' : 'Upload' }} (.jpg / .png)
-              <input type="file" accept=".jpg,.jpeg,.png" style="display:none" (change)="uploadGlyph($event)">
-            </label>
-          </div>
-          <div class="upload-field">
-            <span class="upload-label">Icon</span>
-            <label class="btn btn-secondary btn-sm">
-              {{ faction().iconPath ? 'Replace' : 'Upload' }} (.svg / .png)
-              <input type="file" accept=".svg,.png" style="display:none" (change)="uploadIcon($event)">
-            </label>
-          </div>
-        </div>
-        <div class="form-row two-col">
-          <div class="color-picker-field">
-            <span class="form-label">Primary Color</span>
-            <div class="color-picker-row">
-              <input type="color" class="color-input"
-                [value]="editForm().primaryColor || '#000000'"
-                (input)="setColor('primaryColor', $any($event.target).value)">
-              <span class="color-value">{{ editForm().primaryColor || '—' }}</span>
+        <div class="branding-layout">
+          <div class="branding-inputs">
+            <div class="form-row two-col">
+              <div class="upload-field">
+                <label class="btn btn-secondary btn-sm">
+                  {{ faction().glyphPath ? 'Replace' : 'Upload' }} Logo
+                  <input type="file" accept=".jpg,.jpeg,.png" style="display:none" (change)="uploadGlyph($event)">
+                </label>
+              </div>
+              <div class="upload-field">
+                <label class="btn btn-secondary btn-sm">
+                  {{ faction().iconPath ? 'Replace' : 'Upload' }} Icon
+                  <input type="file" accept=".svg,.png" style="display:none" (change)="uploadIcon($event)">
+                </label>
+              </div>
+            </div>
+            <div class="form-row two-col">
+              <div class="color-picker-field">
+                <span class="form-label">Primary Color</span>
+                <div class="color-picker-row">
+                  <input type="color" class="color-input"
+                    [value]="editForm().primaryColor || '#000000'"
+                    (input)="setColor('primaryColor', $any($event.target).value)">
+                  <span class="color-value">{{ editForm().primaryColor || '—' }}</span>
+                </div>
+              </div>
+              <div class="color-picker-field">
+                <span class="form-label">Secondary Color</span>
+                <div class="color-picker-row">
+                  <input type="color" class="color-input"
+                    [value]="editForm().secondaryColor || '#000000'"
+                    (input)="setColor('secondaryColor', $any($event.target).value)">
+                  <span class="color-value">{{ editForm().secondaryColor || '—' }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <span class="form-label">Banner Shape</span>
+              <div class="banner-shape-options">
+                @for (opt of bannerShapeOptions; track opt.value) {
+                  <button type="button"
+                    class="banner-shape-btn"
+                    [class.active]="editForm().bannerShape === opt.value"
+                    (click)="setBannerShape(opt.value)"
+                    [title]="opt.label">
+                    <svg viewBox="0 0 32 56" width="24" height="42">
+                      @switch (opt.value) {
+                        @case ('centered-triangle') {
+                          <rect x="0" y="0" width="32" height="42" fill="currentColor"/>
+                          <polygon points="0,42 32,42 16,56" fill="currentColor"/>
+                        }
+                        @case ('left-triangle') {
+                          <rect x="0" y="0" width="32" height="42" fill="currentColor"/>
+                          <polygon points="0,42 32,42 0,56" fill="currentColor"/>
+                        }
+                        @case ('right-triangle') {
+                          <rect x="0" y="0" width="32" height="42" fill="currentColor"/>
+                          <polygon points="0,42 32,42 32,56" fill="currentColor"/>
+                        }
+                        @case ('inverted-triangle') {
+                          <rect x="0" y="0" width="32" height="56" fill="currentColor"/>
+                          <polygon class="notch-fill" points="0,56 32,56 16,42"/>
+                        }
+                        @case ('rectangle') {
+                          <rect x="0" y="0" width="32" height="56" fill="currentColor"/>
+                        }
+                        @case ('semi-circle') {
+                          <rect x="0" y="0" width="32" height="40" fill="currentColor"/>
+                          <ellipse cx="16" cy="40" rx="16" ry="16" fill="currentColor"/>
+                        }
+                        @case ('pennant') {
+                          <polygon points="0,0 32,0 16,56" fill="currentColor"/>
+                        }
+                      }
+                    </svg>
+                    <span>{{ opt.label }}</span>
+                  </button>
+                }
+              </div>
             </div>
           </div>
-          <div class="color-picker-field">
-            <span class="form-label">Secondary Color</span>
-            <div class="color-picker-row">
-              <input type="color" class="color-input"
-                [value]="editForm().secondaryColor || '#000000'"
-                (input)="setColor('secondaryColor', $any($event.target).value)">
-              <span class="color-value">{{ editForm().secondaryColor || '—' }}</span>
+          <div class="banner-preview-wrap">
+            <span class="form-label">Preview</span>
+            <div class="banner-preview"
+              [style.background]="editForm().secondaryColor || '#1e293b'"
+              [ngClass]="'banner-shape--' + (editForm().bannerShape || 'centered-triangle')">
+              @if (faction().iconPath) {
+                <div class="banner-preview-icon"
+                  [style.background-color]="editForm().primaryColor || '#ffffff'"
+                  [style.-webkit-mask-image]="'url(' + faction().iconPath + ')'"
+                  [style.mask-image]="'url(' + faction().iconPath + ')'"></div>
+              } @else {
+                <i class="fa-solid fa-people-group banner-preview-icon-fallback"
+                  [style.color]="editForm().primaryColor || '#ffffff'"></i>
+              }
             </div>
           </div>
         </div>

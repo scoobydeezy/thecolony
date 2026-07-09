@@ -1,22 +1,20 @@
-# The Colony Campaign Tracker
+# Campaign Faction Tracker
 
-A local campaign management tool for **The Colony**, a Pathfinder 2e campaign built around competing factions, ideological conflict, societal stress, and long-term consequences.
+A local campaign management tool for faction-driven tabletop RPG campaigns.
 
-The application models how people, organizations, and communities respond to pressure over time.
+Build a living world, then watch it react.
 
-It is not intended to determine which faction is correct.
+Define factions with ideologies, goals, and assets. Populate them with characters who have their own values, doubts, and breaking points. Then run sessions — recording the events of each week and the consequences that follow. The simulation tracks how faction power and legitimacy shift, how characters drift under pressure, how relationships sour or solidify as stress rises. The dashboard surfaces it all: influence timelines, relationship trends, power balances, and a session-by-session record of how the world changed.
 
-It is intended to model how beliefs, values, influence, and circumstances interact within a living society.
+The point is not to plan outcomes. The point is to create conditions and see what emerges.
 
 ---
 
 ## Core Philosophy
 
-The Colony is not a static setting. It is a living system.
+Every action the party takes changes the state of the world. Every change creates consequences. Every consequence creates new tensions.
 
-Every action taken by Darkwing changes the state of the colony. Every change creates consequences. Every consequence creates new tensions.
-
-The application exists to help the GM track those changes and understand how the colony evolves over the course of a campaign.
+The application exists to help the GM track those changes and understand how the world evolves over the course of a campaign.
 
 > The application models perceived ideological compatibility under pressure.
 
@@ -123,9 +121,9 @@ Unit tests cover:
 
 The application is divided into three major domains.
 
-## Overview
+### Overview
 
-Provides dashboards, analytics, and historical views of the colony.
+Provides dashboards, analytics, and historical views of the world.
 
 Pages:
 
@@ -133,62 +131,64 @@ Pages:
 
 ---
 
-## World
+### World
 
 Defines what exists.
 
-World entities represent the baseline state of the colony.
+World entities represent the baseline state of the setting.
 
 Pages:
 
 - Factions
 - Characters
-- Relationships
+- Assets
 
 ---
 
-## Campaign
+### Campaign
 
 Defines what changes.
 
-Campaign systems record the evolution of the colony over time.
+Campaign systems record the evolution of the world over time.
 
 Pages:
 
-- Colony State
 - Sessions
+- Relationships
 - Party
+
+---
+
+### Settings
+
+Define the rules of the simulation.
+
+Tweak weights and create session rules that generate new emergent behavior.
+
+Pages:
+
+- Values
+- Relationship Rules
+- Power Rules
+- Session Effects
+- Stress Triggers
 
 ---
 
 ## Application Screens
 
-| Screen           | Purpose                                                   |
-| ---------------- | --------------------------------------------------------- |
-| Dashboard        | Colony overview, stress, major alliances, major conflicts |
-| Factions         | Manage factions and social classes                        |
-| Characters       | Create and manage NPCs and party members                  |
-| Character Detail | Values graph, pressure, conviction, drift analysis        |
-| Relationships    | Directional relationship matrix                           |
-| Colony State     | Stress, timeline, Party positions                         |
-| Sessions         | Campaign session management and event creation            |
-| Session Log      | Campaign history and notes                                |
+| Screen           | Purpose                                                          |
+| ---------------- | ---------------------------------------------------------------- |
+| Dashboard        | World overview, stress, timeline, major alliances and conflicts  |
+| Factions         | Create and view factions                                         |
+| Faction Detail   | View and edit faction details and goals                          |
+| Characters       | Create and manage NPCs and party members                         |
+| Character Detail | Values graph, pressure, conviction, drift analysis               |
+| Assets           | Manage in-world resources and infrastructure with scoring impact |
+| Sessions         | Campaign session management and event creation                   |
+| Relationships    | Directional relationship matrix                                  |
+| The Party        | Configure details about your adventuring party                   |
 
 ---
 
-## Campaign Truths
-
-These assumptions are foundational and should not change without deliberate intent.
-
-- Every faction is correct about something.
-- Every faction is blind to something.
-- No faction possesses the complete answer.
-- The campaign has no predetermined solution.
-- The colony itself functions as the primary antagonist.
-- Monsters are symptoms, not root causes.
-- The central question is not whether the compromise is wrong.
-- The central question is what should replace it.
-
----
-
-For the full simulation model — values, beliefs, influence, legitimacy, pressure, drift, sessions, events, effects, cascades, and snapshots — see [ARCHITECTURE.md](ARCHITECTURE.md).
+For the full simulation model — values, beliefs, influence, assets, faction goals, legitimacy, pressure, drift, sessions, events, effects, cascades, and snapshots — see [ARCHITECTURE.md](ARCHITECTURE.md).

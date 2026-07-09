@@ -4,12 +4,19 @@ import { Character, Faction, FormulasConfig, DEFAULT_FORMULAS, Asset, computeAss
 @Injectable({ providedIn: 'root' })
 export class FactionInfluenceService {
 
+  private static readonly ADDITIONAL_MEMBER_BASE_INFLUENCE = 30;
+
   // CharacterStrength = (avg * memberAvgWeight) + (max * memberMaxWeight)
   // Leaderless penalty applied here rather than to final power.
-  calculateCharacterStrength(members: Character[], f: FormulasConfig = DEFAULT_FORMULAS): number {
-    if (members.length === 0) return 0;
-    const avg = members.reduce((s, c) => s + c.influence, 0) / members.length;
-    const max = Math.max(...members.map(c => c.influence));
+  // additionalMemberCount pads the pool with baseline generics (influence 30) so large
+  // factions don't need every NPC entered to model their mass accurately.
+  calculateCharacterStrength(members: Character[], f: FormulasConfig = DEFAULT_FORMULAS, additionalMemberCount = 0): number {
+    const base = FactionInfluenceService.ADDITIONAL_MEMBER_BASE_INFLUENCE;
+    const totalCount = members.length + additionalMemberCount;
+    if (totalCount === 0) return 0;
+    const representedSum = members.reduce((s, c) => s + c.influence, 0);
+    const avg = (representedSum + additionalMemberCount * base) / totalCount;
+    const max = members.length > 0 ? Math.max(...members.map(c => c.influence)) : base;
     const raw = avg * f.memberAvgWeight + max * f.memberMaxWeight;
     const hasLeader = members.some(c => c.characterType === 'FactionLeader');
     return raw * (hasLeader ? 1 : (f.leaderlessPowerMultiplier ?? 0.75));
@@ -38,7 +45,7 @@ export class FactionInfluenceService {
 
   // Organization = CharacterStrength×charWeight + AssetInfluenceScore×assetWeight + NormalizedMomentum×momentumWeight
   calculateOrganization(faction: Faction, members: Character[], f: FormulasConfig = DEFAULT_FORMULAS, assets: Asset[] = []): number {
-    const charStrength = this.calculateCharacterStrength(members, f);
+    const charStrength = this.calculateCharacterStrength(members, f, faction.additionalMemberCount ?? 0);
     const assetInfluenceScore = this.calculateAssetInfluenceScore(assets, faction.id, f);
     const normalizedMomentum = this.calculateNormalizedMomentum(faction.momentum);
     const raw =
@@ -66,8 +73,8 @@ export class FactionInfluenceService {
   }
 
   // Kept for backwards compat with the faction detail influence card
-  calculateCharacterInfluence(members: Character[], f: FormulasConfig = DEFAULT_FORMULAS): number {
-    return this.calculateCharacterStrength(members, f);
+  calculateCharacterInfluence(members: Character[], f: FormulasConfig = DEFAULT_FORMULAS, additionalMemberCount = 0): number {
+    return this.calculateCharacterStrength(members, f, additionalMemberCount);
   }
 
   // Kept for backwards compat — now Organization is the equivalent of totalInfluence

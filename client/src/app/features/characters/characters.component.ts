@@ -1,20 +1,66 @@
 import { Component, inject, signal, computed } from '@angular/core';
-import { RouterLink } from '@angular/router';
-import { DecimalPipe } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
+import { DecimalPipe, NgClass } from '@angular/common';
+import { FormField, form, required } from '@angular/forms/signals';
 import { AppStore } from '../../store/app.store';
-import { Character, CharacterType, CharacterState, driftScore, effectivePressure, influenceConvictionBonus } from '../../core/models/types';
+import { Character, CharacterType, CharacterState, ValueVector, driftScore, effectivePressure, influenceConvictionBonus } from '../../core/models/types';
 import { downloadCsv, parseCsv, csvHeaderMap } from '../../core/utils/csv-export';
 import { oneOf, clampedInt, sanitizeValueVector } from '../../core/utils/validation';
+
+interface AddCharacterFormModel {
+  name: string;
+  characterType: string;
+  state: string;
+  summary: string;
+}
+
+const DEFAULT_VALUES: ValueVector = { a: 1/3, b: 1/3, c: 1/3 };
+const emptyAddForm = (): AddCharacterFormModel => ({ name: '', characterType: 'NPC', state: 'Alive', summary: '' });
 
 @Component({
   selector: 'app-characters',
   standalone: true,
-  imports: [RouterLink, DecimalPipe],
+  imports: [RouterLink, DecimalPipe, NgClass, FormField],
   templateUrl: './characters.component.html',
   styleUrl: './characters.component.scss'
 })
 export class CharactersComponent {
-  store = inject(AppStore);
+  store  = inject(AppStore);
+  router = inject(Router);
+
+  // ── Add character modal ─────────────────────────────────────────────────────
+
+  showModal = signal(false);
+
+  readonly editForm = signal<AddCharacterFormModel>(emptyAddForm());
+  readonly f = form(this.editForm, schema => {
+    required(schema.name, { message: 'Name is required' });
+  });
+
+  openAdd(): void {
+    this.editForm.set(emptyAddForm());
+    this.showModal.set(true);
+  }
+
+  close(): void { this.showModal.set(false); }
+
+  save(): void {
+    const fm = this.editForm();
+    if (!fm.name.trim()) return;
+    const newChar: Character = {
+      id: '',
+      name: fm.name.trim(),
+      characterType: fm.characterType as CharacterType,
+      state: fm.state as CharacterState,
+      summary: fm.summary || undefined,
+      values: { ...DEFAULT_VALUES },
+      conviction: 50, pressure: 0, influence: 0, impressionable: 50,
+    };
+    this.store.saveCharacter(newChar);
+    this.showModal.set(false);
+  }
+
+  // ── Filters ─────────────────────────────────────────────────────────────────
 
   filterType    = signal<'all' | CharacterType>('all');
   filterFaction = signal<string>('all');
@@ -92,6 +138,31 @@ export class CharactersComponent {
   stateIconClass(state: CharacterState): string {
     const icon = this.stateIconMap[state];
     return icon ? `state-icon ${icon} state-icon--${state.toLowerCase()}` : '';
+  }
+
+  private luminance(hex: string): number {
+    const c = hex.replace('#', '');
+    const r = parseInt(c.slice(0, 2), 16) / 255;
+    const g = parseInt(c.slice(2, 4), 16) / 255;
+    const b = parseInt(c.slice(4, 6), 16) / 255;
+    const linearize = (v: number) => v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+    return 0.2126 * linearize(r) + 0.7152 * linearize(g) + 0.0722 * linearize(b);
+  }
+
+  factionFlair(factionId?: string): { name: string; bg: string; iconColor: string; textColor: string; iconPath?: string; bannerShape: string } | null {
+    if (!factionId) return null;
+    const f = this.store.factions().find(f => f.id === factionId);
+    if (!f) return null;
+    const bg = f.secondaryColor || '#000000';
+    const textColor = this.luminance(bg) > 0.35 ? '#0f172a' : '#e2e8f0';
+    return {
+      name:        f.name,
+      bg,
+      textColor,
+      iconColor:   f.primaryColor   || '#ffffff',
+      iconPath:    f.iconPath       || undefined,
+      bannerShape: f.bannerShape    || 'centered-triangle',
+    };
   }
 
   typeLabel(t: CharacterType): string {

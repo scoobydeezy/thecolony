@@ -9,23 +9,13 @@
     }
     <button class="btn btn-secondary" (click)="exportCsv()">Export <i class="fa-solid fa-right-from-bracket"></i></button>
     @if (!store.isViewingSnapshot()) {
-      <a routerLink="/characters/new" class="btn btn-primary">+ New Character</a>
+      <button class="btn btn-primary" (click)="openAdd()">+ New Character</button>
     }
   </div>
 </div>
 
 <!-- Filters -->
 <div class="filter-bar">
-  <label>
-    Type
-    <select [value]="filterType()" (change)="filterType.set($any($event.target).value)">
-      <option value="all">All Types</option>
-      <option value="NPC">NPC</option>
-      <option value="FactionLeader">Faction Leader</option>
-      <option value="PartyMember">Party Member</option>
-    </select>
-  </label>
-
   <label>
     Faction
     <select [value]="filterFaction()" (change)="filterFaction.set($any($event.target).value)">
@@ -45,6 +35,16 @@
       @for (c of socialClassOptions(); track c.id) {
         <option [value]="c.id">{{ c.name }}</option>
       }
+    </select>
+  </label>
+
+  <label>
+    Type
+    <select [value]="filterType()" (change)="filterType.set($any($event.target).value)">
+      <option value="all">All Types</option>
+      <option value="NPC">NPC</option>
+      <option value="FactionLeader">Faction Leader</option>
+      <option value="PartyMember">Party Member</option>
     </select>
   </label>
 </div>
@@ -67,16 +67,34 @@
     </thead>
     <tbody>
       @for (c of displayCharacters(); track c.id) {
-        <tr>
+        @let flair = c.state === 'Alive' ? factionFlair(c.factionId) : null;
+        <tr [class.row--inactive]="c.state !== 'Alive'">
           <td class="col-state">
-            @if (c.state !== 'Alive') {
+            @if (c.state === 'Alive') {
+              @if (flair) {
+                <div class="faction-flair" [style.background]="flair.bg" [title]="flair.name">
+                  @if (flair.iconPath) {
+                    <div class="faction-flair-icon"
+                         [style.background-color]="flair.iconColor"
+                         [style.mask-image]="'url(' + flair.iconPath + ')'"
+                         [style.webkitMaskImage]="'url(' + flair.iconPath + ')'">
+                    </div>
+                  }
+                </div>
+              }
+            } @else {
               <i [class]="stateIconClass(c.state)" [title]="c.state"></i>
             }
           </td>
-          <td>
-            <a [routerLink]="['/characters', c.id]" class="char-link">{{ c.name }}</a>
+          <td class="col-name">
+            @if (flair) {
+              <div class="faction-flair-extend"
+                [style.background]="flair.bg"
+                [ngClass]="'faction-flair--' + flair.bannerShape"></div>
+            }
+            <a [routerLink]="['/characters', c.id]" class="char-link" [style.color]="flair?.textColor">{{ c.name }}</a>
             @if (c.occupation) {
-              <span class="occupation-tag">{{ c.occupation }}</span>
+              <span class="occupation-tag" [style.color]="flair?.textColor ? 'color-mix(in srgb, ' + flair!.textColor + ' 60%, transparent)' : null">{{ c.occupation }}</span>
             }
           </td>
           <td><span class="type-badge" [class.party]="c.characterType === 'PartyMember'" [class.leader]="c.characterType === 'FactionLeader'">{{ typeLabel(c.characterType) }}</span></td>
@@ -86,10 +104,10 @@
           <td><span [class]="pressureClass(effectivePressure(c, colonyStress()))">{{ formatPct(effectivePressure(c, colonyStress())) }}</span></td>
           <td><span [class]="driftClass(effectiveDriftScore(c))">{{ effectiveDriftScore(c) > 0 ? '+' : '' }}{{ effectiveDriftScore(c) | number:'1.0-1' }}</span></td>
           <td class="actions">
-            <a [routerLink]="['/characters', c.id]" class="btn btn-secondary btn-xs">View</a>
-            @if (!store.isViewingSnapshot()) {
-              <button class="btn btn-danger btn-xs" (click)="delete(c)">Delete</button>
-            }
+            <button class="btn-icon btn-icon--danger" (click)="delete(c)" title="Delete"
+              [disabled]="store.isViewingSnapshot()">
+              <i class="fa-solid fa-trash"></i>
+            </button>
           </td>
         </tr>
       }
@@ -101,3 +119,49 @@
     </tbody>
   </table>
 </div>
+
+<!-- Add Character Modal -->
+@if (showModal()) {
+  <div class="modal-backdrop" (click)="close()">
+    <div class="modal modal-add" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>New Character</h3>
+        <button class="modal-close" (click)="close()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <label class="form-label">Name *</label>
+          <input class="form-input" type="text" [formField]="f.name" placeholder="Character name" />
+          @if (f.name().invalid() && f.name().touched()) {
+            <p class="field-error">Name is required</p>
+          }
+        </div>
+        <div class="form-row">
+          <label class="form-label">Role</label>
+          <select class="form-input" [formField]="f.characterType">
+            <option value="NPC">NPC</option>
+            <option value="FactionLeader">Faction Leader</option>
+            <option value="PartyMember">Party Member</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">State</label>
+          <select class="form-input" [formField]="f.state">
+            <option value="Alive">Alive</option>
+            <option value="Dead">Dead</option>
+            <option value="Missing">Missing</option>
+            <option value="Forgotten">Forgotten</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Summary</label>
+          <textarea class="form-input" rows="3" [formField]="f.summary" placeholder="One or two sentences about this character."></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="close()">Cancel</button>
+        <button class="btn btn-primary" (click)="save()" [disabled]="f().invalid()">Add</button>
+      </div>
+    </div>
+  </div>
+}

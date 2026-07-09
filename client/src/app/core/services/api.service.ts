@@ -26,7 +26,7 @@ function lowerBeliefPositions(obj: any): void {
 function factionFromApi(f: any): Faction {
   const { truthValue, stabilityValue, agencyValue, ...rest } = f;
   lowerBeliefPositions(rest);
-  return { ...rest, sortOrder: rest.sortOrder ?? 0, values: { a: truthValue ?? 1/3, b: stabilityValue ?? 1/3, c: agencyValue ?? 1/3 } };
+  return { ...rest, sortOrder: rest.sortOrder ?? 0, additionalMemberCount: rest.additionalMemberCount ?? 0, values: { a: truthValue ?? 1/3, b: stabilityValue ?? 1/3, c: agencyValue ?? 1/3 } };
 }
 
 function upperBeliefPositions(obj: any): void {
@@ -57,6 +57,7 @@ function characterFromApi(c: any): Character {
 function characterToApi(c: Character): any {
   const { values, ...rest } = c;
   const out: any = { ...rest, truthValue: values.a, stabilityValue: values.b, agencyValue: values.c };
+  if (out.doubtDirection) out.doubtDirection = out.doubtDirection.toUpperCase();
   upperBeliefPositions(out);
   return out;
 }
@@ -156,6 +157,11 @@ export class ApiService {
   }
   deleteCharacter(id: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/characters/${id}`);
+  }
+  uploadCharacterPortrait(id: string, file: File): Observable<{ path: string }> {
+    const fd = new FormData();
+    fd.append('file', file);
+    return this.http.post<{ path: string }>(`${this.base}/characters/${id}/upload-portrait`, fd);
   }
 
   // Session Log

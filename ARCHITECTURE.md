@@ -1,6 +1,6 @@
-# The Colony — Simulation Architecture
+# Faction Campaign Tracker — Simulation Architecture
 
-This document describes the simulation model used by The Colony Campaign Tracker.
+This document describes the simulation model used by the Faction Campaign Tracker.
 
 It is the authoritative source of truth for future design decisions.
 
@@ -26,7 +26,7 @@ The simulation exists to answer:
 
 This distinction is foundational.
 
-**World** defines what exists: factions, characters, relationships. World state is the baseline — it changes slowly and deliberately.
+**World** defines what exists: factions, characters, assets, relationships. World state is the baseline — it changes slowly and deliberately.
 
 **Campaign** defines what changes: sessions, events, effects, colony state. Campaign state is the accumulated record of everything that has happened.
 
@@ -45,14 +45,6 @@ A + B + C = 1.0
 ```
 
 The three axis names, the three edge labels, and the three belief axis names are all user-configurable. The engine operates on position alone — the labels describe what the axes mean for a given campaign, not what the engine requires.
-
-The default configuration for this campaign:
-
-| Axis | Name      | Meaning                                       |
-| ---- | --------- | --------------------------------------------- |
-| A    | Truth     | Knowledge, remembrance, transparency          |
-| B    | Stability | Continuity, survival, order                   |
-| C    | Agency    | Choice, consent, self-determination           |
 
 ### Emergent Values
 
@@ -82,15 +74,7 @@ Values answer: *What matters?*
 
 Beliefs answer: *What should we do about it?*
 
-There are three belief axes, each corresponding to one value axis:
-
-| Belief Axis | Corresponds To | Default Question                           |
-| ----------- | -------------- | ------------------------------------------ |
-| Knowledge   | A (Truth)      | Should the truth be concealed or revealed? |
-| Change      | B (Stability)  | Should the current system be preserved?    |
-| Ritual      | C (Agency)     | Is the ritual justified?                   |
-
-Each belief axis has three positions: positive, neutral, negative. Which position counts as "aligned" with its value axis is itself configurable per axis.
+There are three belief axes, each corresponding to one value axis. Each belief axis has three positions: positive, neutral, negative. Which position counts as "aligned" with its value axis is configurable per axis.
 
 ### Derivation
 
@@ -114,27 +98,34 @@ Values should remain the primary source of ideological identity.
 
 ### Values and Beliefs Under Stress
 
-Two factions may hold identical beliefs for entirely different reasons.
+Two factions may hold identical beliefs for entirely different reasons. Because the underlying values differ, the factions may still strongly disagree despite reaching similar conclusions.
 
-Example: both the Keepers and Witnesses may believe the ritual should continue — the Keepers because Stability is paramount, the Witnesses because Truth requires remembering its cost. Because the underlying values differ, the factions may still strongly disagree despite reaching similar conclusions.
+Which layer of ideology drives relationships depends on Stress.
 
-Which layer of ideology drives relationships depends on Colony Stress.
+**Low stress** — belief positions are the dominant signal. Factions focus on methods and positions.
 
-**Low stress** — belief positions are the dominant signal. Factions focus on methods and positions: Should the ritual continue? Should knowledge be revealed? Should the system change?
+**High stress** — core values become the dominant signal. Survival pressure exposes what factions truly prioritize.
 
-**High stress** — core values become the dominant signal. Survival pressure exposes what factions truly prioritize: What are they willing to sacrifice? What are they protecting? What matters most?
-
-This shift is configurable. When stress-weight composition is disabled, the engine uses fixed relative weights with values carrying more emphasis. When enabled, the ratio shifts dynamically with Colony Stress according to a configurable curve and intensity.
+This shift is configurable. When stress-weight composition is disabled, the engine uses fixed relative weights with values carrying more emphasis. When enabled, the ratio shifts dynamically with stress according to a configurable curve and intensity.
 
 ---
 
 ## Factions
 
-Factions represent ideological responses to the colony's central compromise.
+Factions represent organized groups with distinct ideological positions and material interests.
 
 Every faction occupies a unique position in value space and maintains directional relationships toward every other faction and toward the Party.
 
 Every faction is correct about something. Every faction is blind to something.
+
+Factions have:
+
+- **Base Influence** — structural authority: wealth, infrastructure, ritual authority, expertise, logistics
+- **Momentum** — short-term public energy; positive or negative
+- **Base Legitimacy** — perceived moral authority (0–100)
+- **Power Modifier** — manual adjustment to effective power
+- **Goals** — structured ambitions with priority, visibility, and completion tracking
+- **Assets** — in-world resources and infrastructure the faction controls
 
 ---
 
@@ -162,13 +153,55 @@ Unlike factions, characters are not defined solely by ideology. The most interes
 
 ---
 
+## Assets
+
+Assets are in-world resources and infrastructure that factions control or operate.
+
+Assets answer: *What does this faction have?*
+
+Every asset has:
+
+- **Tier** (1–5) — scale and significance
+- **Type** — Infrastructure, Artifact, Resource, or Intelligence
+- **Role** — Operational, Strategic, Symbolic, Hidden, or Mandate; each role carries distinct influence and legitimacy weights
+- **Status** — Stable, Contested, Damaged, Destroyed, Hidden, or Lost; degraded statuses apply multipliers that reduce the asset's scoring contribution
+- **Keystone flag** — marks particularly critical assets whose loss has outsized consequences
+- **Controlling faction** — the faction that currently holds the asset
+
+### Asset Scoring
+
+Each asset contributes to its controlling faction's influence and legitimacy scores, derived from tier, role, and status. A Stable Strategic asset at Tier 4 contributes meaningfully more than a Damaged Symbolic asset at Tier 1.
+
+Assets can be targeted by faction goals and can have their status changed by session events or cascade rules.
+
+---
+
+## Faction Goals
+
+Faction goals model structured ambitions — what a faction is actively working toward or has already accomplished.
+
+Every goal has:
+
+- **Priority** — Critical, Major, or Minor
+- **Visibility** — Open (publicly known), Known (revealed to those paying attention), or Secret (hidden)
+- **Status** — Plotting, Progressing, Stalled, Accomplished, or Failed
+
+Goals support structured targets:
+
+- **Character or Asset target** — tracks whether a specific entity reaches a particular state
+- **Faction target** — tracks whether a faction's legitimacy, momentum, or power crosses a numeric threshold
+
+Goals are narrative and mechanical simultaneously: they communicate faction intent and can be wired to session effects to advance or complete automatically.
+
+---
+
 ## Relationship Scoring
 
 Relationships are directional.
 
 Faction A's opinion of Faction B may differ from B's opinion of A.
 
-The source's own values govern how much each component of the score matters. A faction that barely values Agency will barely react to a Ritual belief disagreement. This is what makes asymmetry real rather than merely possible.
+The source's own values govern how much each component of the score matters. A faction that barely values Agency will barely react to a belief disagreement on that axis. This is what makes asymmetry real rather than merely possible.
 
 ### Formula
 
@@ -233,8 +266,6 @@ Positive relationships receive a diminishing boost as stress increases — at pe
 Negative relationships receive an accelerating penalty as stress increases.
 Conflict escalates faster than cooperation under pressure.
 
-Because stress-weight composition runs first, the stress modifier amplifies a score whose ingredients have already shifted. At high stress with value conflict, values dominate the base score and the modifier then amplifies that negative — producing intense, visible antagonism rooted in incompatible priorities.
-
 **Final score:**
 
 ```text
@@ -269,12 +300,15 @@ For factions, influence is composed of three parts, each weighted separately:
 
 **Momentum** — short-term public energy. Stored as a raw value and normalized before entering the formula. (Weight: 0.20)
 
+**Asset Influence** — the sum of influence scores contributed by assets the faction controls. Asset influence replaces the base influence term when assets are present.
+
 ### Influence Formula
 
 ```text
-characterInfluence = (avg(member.influence) × memberAvgWeight) + (max(member.influence) × memberMaxWeight)
-normalizedMomentum = 50 + (momentum / 2)
-totalInfluence = (baseInfluence × 0.45) + (characterInfluence × 0.35) + (normalizedMomentum × 0.20)
+characterInfluence  = (avg(member.influence) × memberAvgWeight) + (max(member.influence) × memberMaxWeight)
+assetInfluence      = sum(asset.influenceScore for controlled assets)
+normalizedMomentum  = 50 + (momentum / 2)
+totalInfluence      = (baseInfluence × 0.45) + (characterInfluence × 0.35) + (normalizedMomentum × 0.20)
 ```
 
 All weights are configurable.
@@ -289,6 +323,8 @@ Legitimacy answers: *Do people believe this faction deserves power?*
 
 Legitimacy is intentionally separate from Influence. A faction may have high influence and low legitimacy, or the reverse.
 
+Assets contribute to legitimacy as well as influence — the weight depends on the asset's role. A Symbolic asset at Tier 3 raises perceived legitimacy more than it raises operational influence.
+
 ---
 
 ## Effective Power
@@ -301,7 +337,7 @@ Effective Power answers: *How much can this faction actually accomplish right no
 
 ```text
 legitimacyModifier = legitimacyBase + (legitimacy / legitimacyScale)
-effectivePower = totalInfluence × legitimacyModifier × leaderlessMultiplier
+effectivePower     = totalInfluence × legitimacyModifier × leaderlessMultiplier
 ```
 
 If a faction has no living faction leader, `leaderlessMultiplier` applies a penalty (default 0.75). All weights are configurable.
@@ -320,7 +356,7 @@ Low conviction: vulnerable to pressure, greater drift.
 Characters are not isolated. Belonging to a faction with influential members provides a conviction bonus — faction cohesion stabilizes individuals.
 
 ```text
-convictionBonus = mean(peer.influence) × (character.impressionable / 100) × scale
+convictionBonus    = mean(peer.influence) × (character.impressionable / 100) × scale
 effectiveConviction = conviction + convictionBonus
 ```
 
@@ -346,7 +382,7 @@ Range: `0–100` (stored value; effective pressure may exceed 100)
 
 Colony Stress represents overall societal strain.
 
-Stress answers: *How much tension is the colony under?*
+Stress answers: *How much tension is the world under?*
 
 Range: `0–10`
 
@@ -356,12 +392,10 @@ Stress is not only a modifier on relationship scores — it directly inflates th
 effectivePressure = character.pressure + (colonyStress × 10)
 ```
 
-Stress 5 adds 50 pressure to every character in the colony, regardless of their faction or circumstance. Rising stress is rising instability for everyone.
+Stress 5 adds 50 pressure to every character, regardless of faction or circumstance. Rising stress is rising instability for everyone.
 
 Low stress: compromise is easier, factions tolerate disagreement.
 High stress: alliances harden, ideological differences are magnified, the entire population is under strain.
-
-Stress is expected to increase throughout the campaign.
 
 ---
 
@@ -397,7 +431,7 @@ This is the furthest a character could drift, not an immediate destination.
 
 ## The Party
 
-The Party is modeled as a special actor within the colony.
+The Party is modeled as a special actor within the world.
 
 The Party has values, beliefs, and faction relationships. All factions calculate directional relationships toward the Party using the same scoring rules used everywhere else in the simulation.
 
@@ -417,23 +451,22 @@ Events are narrative containers. They describe what happened.
 
 Events themselves contain no simulation logic.
 
-Example: "Darkwing exposes Keeper records."
-
 ---
 
 ## Effects
 
 Effects are the source of simulation change.
 
-Effects modify colony state, factions, characters, and relationships. One event may contain multiple effects. Effects are explicit — they represent direct, stated consequences.
+Effects modify world state, factions, characters, assets, and relationships. One event may contain multiple effects. Effects are explicit — they represent direct, stated consequences.
 
 Effectful properties:
 
-| Target    | Properties                                                       |
-| --------- | ---------------------------------------------------------------- |
-| Colony    | Stress                                                           |
-| Faction   | Momentum, Legitimacy, Relationship Bump, Party Relationship Bump |
-| Character | Pressure, Influence, State, Faction Change                       |
+| Target    | Properties                                                        |
+| --------- | ----------------------------------------------------------------- |
+| Colony    | Stress                                                            |
+| Faction   | Momentum, Legitimacy, Relationship Bump, Party Relationship Bump  |
+| Character | Pressure, Influence, State, Faction Change                        |
+| Asset     | Status                                                            |
 
 ---
 
@@ -444,13 +477,10 @@ Cascades represent automatic reactions that fire within a session when a trigger
 There are three trigger types:
 
 **Streak** — fires when a property has moved in the same direction (positive, negative, or either) for a minimum number of consecutive sessions.
-Example: momentum has been negative for 3 consecutive sessions → legitimacy decreases.
 
 **Threshold** — fires when a property's current value crosses a fixed boundary.
-Example: legitimacy falls below 20 → additional momentum penalty.
 
 **Event** — fires when a specific effect occurs in the current session, optionally filtered by entity subtype or specific value.
-Example: a FactionLeader's state is set to Dead → faction momentum decreases.
 
 All cascade rules are configurable and can be added, removed, or modified in Settings.
 
@@ -462,20 +492,13 @@ Trends represent patterns detected across the historical record, distinct from w
 
 Where cascades fire in response to a single session's events, trends emerge from examining multiple sessions together.
 
-Example:
-
-```text
-Negative Momentum for 3 consecutive sessions
-  → Legitimacy decreases
-```
-
 ---
 
 ## Snapshots
 
-Snapshots preserve the historical state of the colony.
+Snapshots preserve the historical state of the world.
 
-A snapshot represents the full state of the colony immediately after a session completes: faction momentum and legitimacy, character pressure, influence, state, and faction membership, cumulative relationship bumps, and all derived cascade effects for that session.
+A snapshot represents the full state immediately after a session completes: faction momentum and legitimacy, character pressure, influence, state, and faction membership, cumulative relationship bumps, asset statuses, and all derived cascade effects for that session.
 
 Current State is simply the most recent snapshot. Snapshots enable historical analysis and trend detection.
 
@@ -485,13 +508,13 @@ Current State is simply the most recent snapshot. Snapshots enable historical an
 
 All scoring weights, formula coefficients, relationship thresholds, belief axis definitions, value axis labels, edge labels, and cascade rules are user-configurable through the application's Settings panel.
 
-The values documented above (2.5 belief match, 0.45 base influence weight, etc.) are defaults. They represent the calibrated starting point for this campaign, not fixed constraints of the system.
+The values documented above are defaults. They represent a calibrated starting point, not fixed constraints of the system.
 
 When a design decision depends on a specific weight or threshold, that dependency should be made explicit — because any of these values can change.
 
 ---
 
-## Campaign Truths
+## Simulation Axioms
 
 These assumptions are foundational and should not change without deliberate intent.
 
@@ -502,6 +525,6 @@ These assumptions are foundational and should not change without deliberate inte
 - Low stress reveals positions. High stress reveals priorities.
 - Stress accelerates conflict.
 - Influence and Legitimacy are different concepts.
-- The colony is the primary antagonist.
-- The campaign has no predetermined solution.
-- The purpose of the simulation is not to determine who is right. It is to understand how people respond to pressure.
+- Assets represent what factions have, not what they believe.
+- Goals reveal what factions want, not just what they do.
+- The purpose of the simulation is not to determine who is right. It is to understand how people and institutions respond to pressure.
