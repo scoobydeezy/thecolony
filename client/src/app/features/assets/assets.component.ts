@@ -19,6 +19,7 @@ interface AssetFormModel {
   keystone: boolean;
   status: AssetStatus;
   controllingFactionId: string;
+  statusActorFactionId: string;
   location: string;
 }
 
@@ -32,6 +33,7 @@ const emptyForm = (): AssetFormModel => ({
   keystone: false,
   status: 'Stable',
   controllingFactionId: '',
+  statusActorFactionId: '',
   location: '',
 });
 
@@ -45,6 +47,7 @@ const toFormModel = (a: Asset): AssetFormModel => ({
   keystone: a.keystone,
   status: a.status,
   controllingFactionId: a.controllingFactionId ?? '',
+  statusActorFactionId: a.statusActorFactionId ?? '',
   location: a.location ?? '',
 });
 
@@ -59,6 +62,7 @@ const fromFormModel = (fm: AssetFormModel): Asset => ({
   keystone: fm.keystone,
   status: fm.status,
   controllingFactionId: fm.controllingFactionId || undefined,
+  statusActorFactionId: fm.status !== 'Stable' ? (fm.statusActorFactionId || undefined) : undefined,
   location: fm.location.trim() || undefined,
 });
 
@@ -92,12 +96,57 @@ export class AssetsComponent {
   readonly displayAssets = computed(() => {
     const t = this.filterType();
     const assets = this.store.viewAssets();
-    return t === 'all' ? assets : assets.filter(a => a.type === t);
+    const filtered = t === 'all' ? assets : assets.filter(a => a.type === t);
+    return [...filtered].sort((a, b) => {
+      const key = (name: string) => name.replace(/^the\s+/i, '').toLowerCase();
+      return key(a.name).localeCompare(key(b.name));
+    });
   });
 
   factionName(id: string | undefined): string {
     if (!id) return '—';
     return this.store.factions().find(f => f.id === id)?.name ?? '—';
+  }
+
+  factionFlair(factionId: string | undefined): { bg: string; iconColor: string; iconPath?: string; bannerShape: string; name: string } | null {
+    if (!factionId) return null;
+    const f = this.store.factions().find(f => f.id === factionId);
+    if (!f) return null;
+    const bg = f.secondaryColor || '#1e293b';
+    return {
+      name:        f.name,
+      bg,
+      iconColor:   f.primaryColor   || '#ffffff',
+      iconPath:    f.iconPath       || undefined,
+      bannerShape: f.bannerShape    || 'centered-triangle',
+    };
+  }
+
+  readonly STATUS_SLOTS: AssetStatus[] = ['Stable', 'Contested', 'Damaged', 'Destroyed'];
+
+  readonly TYPE_ICONS: Record<AssetType, string> = {
+    Infrastructure: 'fa-duotone fa-landmark',
+    Artifact:       'fa-duotone fa-ring',
+    Resource:       'fa-duotone fa-treasure-chest',
+    Intelligence:   'fa-duotone fa-scroll-old',
+  };
+
+  readonly ROLE_HINTS: Record<AssetRole, string> = {
+    Operational: 'Balanced — contributes equally to Influence and Legitimacy (×1.0 / ×1.0).',
+    Strategic:   'Power-forward — high Influence, weak Legitimacy (×1.25 / ×0.25). Use for military or logistical holdings.',
+    Symbolic:    'Legitimacy-forward — weak Influence, high Legitimacy (×0.25 / ×1.25). Use for cultural or religious sites.',
+    Covert:      'Covert — full Influence, zero Legitimacy (×1.0 / ×0). Asset is known only to the controlling faction.',
+    Mandate:     'Civic — zero Influence, full Legitimacy (×0 / ×1.0). Derives power entirely from public recognition.',
+  };
+
+  slotIcon(status: AssetStatus): string {
+    const map: Record<AssetStatus, string> = {
+      Stable:    'fa-solid fa-house',
+      Contested: 'fa-solid fa-shield-halved',
+      Damaged:   'fa-solid fa-fire',
+      Destroyed: 'fa-solid fa-skull',
+    };
+    return map[status];
   }
 
   openAdd(): void {
@@ -129,12 +178,12 @@ export class AssetsComponent {
   exportCsv(): void {
     const header = [
       'Id', 'Name', 'Type', 'Role', 'Tier', 'Keystone',
-      'Status', 'ControllingFactionId', 'Location', 'Description',
+      'Status', 'ControllingFactionId', 'StatusActorFactionId', 'Location', 'Description',
     ];
     const rows = this.store.assets().map(a => [
       a.id, a.name, a.type, a.role, a.tier, a.keystone,
-      a.status, a.controllingFactionId ?? '', a.location ?? '',
-      a.description ?? '',
+      a.status, a.controllingFactionId ?? '', a.statusActorFactionId ?? '',
+      a.location ?? '', a.description ?? '',
     ]);
     downloadCsv([header, ...rows], 'assets.csv');
   }
@@ -179,12 +228,10 @@ export class AssetsComponent {
 
   statusClass(status: AssetStatus): string {
     const map: Record<AssetStatus, string> = {
-      Stable: 'status-stable',
+      Stable:    'status-stable',
       Contested: 'status-contested',
-      Damaged: 'status-damaged',
+      Damaged:   'status-damaged',
       Destroyed: 'status-destroyed',
-      Hidden: 'status-hidden',
-      Lost: 'status-lost',
     };
     return map[status];
   }

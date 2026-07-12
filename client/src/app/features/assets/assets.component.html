@@ -1,13 +1,15 @@
 <div class="page-header">
   <h2>Assets</h2>
-  <p>Physical and cultural holdings that anchor faction influence.</p>
+  <p>Physical and cultural holdings that anchor faction influence and legitimacy.</p>
 </div>
 
 <div class="toolbar">
   <div class="filter-tabs">
     <button [class.active]="filterType() === 'all'" (click)="filterType.set('all')">All</button>
     @for (opt of typeOptions; track opt.value) {
-      <button [class.active]="filterType() === opt.value" (click)="filterType.set(opt.value)">{{ opt.label }}</button>
+      <button [class.active]="filterType() === opt.value" (click)="filterType.set(opt.value)">
+        <i [class]="TYPE_ICONS[opt.value]"></i> {{ opt.label }}
+      </button>
     }
   </div>
   <div class="toolbar-actions">
@@ -29,54 +31,127 @@
     <p>No assets yet. Add one to anchor faction influence to physical holdings.</p>
   </div>
 } @else {
+  <!-- Column header row -->
+  <div class="asset-table-header">
+    <div></div>
+    <div></div>
+    <div></div>
+    <div class="slot-col-headers">
+      @for (slot of STATUS_SLOTS; track slot) {
+        <div class="slot-col-header">{{ slot }}</div>
+      }
+    </div>
+    <div></div>
+  </div>
+
   <div class="asset-list">
     @for (a of displayAssets(); track a.id) {
-      <div [class]="'asset-card card' + (a.keystone ? ' keystone' : '')">
-        <div class="asset-header">
-          <div class="asset-title">
-            @if (a.keystone) {
-              <i class="fa-solid fa-gem keystone-icon" title="Keystone"></i>
-            }
-            <span class="asset-name">{{ a.name }}</span>
-            <span class="asset-type-badge">{{ a.type }}</span>
-            <span [class]="'status-badge ' + statusClass(a.status)">{{ a.status }}</span>
-          </div>
-          @if (!store.isViewingSnapshot()) {
-            <div class="asset-actions">
-              <button class="btn btn-secondary btn-sm" (click)="openEdit(a)">Edit</button>
-              <button class="btn btn-danger btn-sm" (click)="delete(a.id)">Delete</button>
+      @let controllerFlair = factionFlair(a.controllingFactionId);
+      @let actorFlair = factionFlair(a.statusActorFactionId);
+      <div [class]="'asset-card card' + (a.keystone ? ' keystone' : '') + (a.status === 'Destroyed' ? ' destroyed' : '')">
+
+        <!-- Type icon column -->
+        <div class="asset-type-col">
+          <i [class]="TYPE_ICONS[a.type] + ' asset-type-icon' + (a.keystone ? ' asset-type-icon--keystone' : '')"
+             [title]="a.keystone ? a.type + ' · Keystone' : a.type"></i>
+        </div>
+
+        <!-- Left: asset info -->
+        <div class="asset-info">
+          <div class="asset-header">
+            <div class="asset-title">
+              <span class="asset-name">{{ a.name }}</span>
+              @if (!store.isViewingSnapshot()) {
+                <button class="card-edit-btn" (click)="openEdit(a)" title="Edit">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+              }
             </div>
+          </div>
+
+          <div class="asset-meta">
+            <span class="meta-item">
+              <span class="meta-label">Role</span>
+              <span class="meta-value">{{ a.role }}</span>
+            </span>
+            <span class="meta-item">
+              <span class="meta-label">Tier</span>
+              <span class="meta-value card-stars">
+                @for (n of [1,2,3,4,5]; track n) {
+                  <i [class]="'fa-star ' + (n <= a.tier ? 'fa-solid' : 'fa-regular')"></i>
+                }
+              </span>
+            </span>
+          </div>
+
+          @if (a.description) {
+            <p class="asset-description">{{ a.description }}</p>
           }
         </div>
 
-        <div class="asset-meta">
-          <span class="meta-item">
-            <span class="meta-label">Role</span>
-            <span class="meta-value">{{ a.role }}</span>
-          </span>
-          <span class="meta-item">
-            <span class="meta-label">Tier</span>
-            <span class="meta-value card-stars">
-              @for (n of [1,2,3,4,5]; track n) {
-                <i [class]="'fa-star ' + (n <= a.tier ? 'fa-solid' : 'fa-regular')"></i>
-              }
-            </span>
-          </span>
-          <span class="meta-item">
-            <span class="meta-label">Controlling Faction</span>
-            <span class="meta-value">{{ factionName(a.controllingFactionId) }}</span>
-          </span>
+        <!-- Context column — location, controlling faction, actor -->
+        <div class="asset-context">
           @if (a.location) {
             <span class="meta-item">
               <span class="meta-label">Location</span>
               <span class="meta-value">{{ a.location }}</span>
             </span>
           }
+          @if (a.controllingFactionId) {
+            <span class="meta-item">
+              <span class="meta-label">Controlling Faction</span>
+              <span class="meta-value">{{ factionName(a.controllingFactionId) }}</span>
+            </span>
+          }
+          @if (a.status !== 'Stable' && a.statusActorFactionId) {
+            <span class="meta-item">
+              <span class="meta-label">{{ a.status }} by</span>
+              <span class="meta-value">{{ factionName(a.statusActorFactionId) }}</span>
+            </span>
+          }
         </div>
 
-        @if (a.description) {
-          <p class="asset-description">{{ a.description }}</p>
+        <!-- Status slots -->
+        <div class="asset-slots">
+          @for (slot of STATUS_SLOTS; track slot) {
+            @let isActive = a.status === slot;
+            @let isStable = slot === 'Stable';
+            @let slotFlair = a.status === 'Destroyed'
+              ? (isActive ? controllerFlair : null)
+              : isStable ? ((isActive || actorFlair) ? controllerFlair : null) : (isActive ? (actorFlair ?? controllerFlair) : null);
+            <div class="status-slot">
+              @if (slotFlair) {
+                <div [class]="'slot-banner faction-banner--' + slotFlair.bannerShape"
+                     [style.background]="slotFlair.bg"
+                     [title]="slotFlair.name">
+                  @if (slotFlair.iconPath) {
+                    <div class="slot-banner-icon"
+                         [style.background-color]="slotFlair.iconColor"
+                         [style.mask-image]="'url(' + slotFlair.iconPath + ')'"
+                         [style.webkitMaskImage]="'url(' + slotFlair.iconPath + ')'">
+                    </div>
+                  }
+                </div>
+              } @else {
+                <i [class]="'slot-empty-icon ' + slotIcon(slot)"></i>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Actions column -->
+        @if (!store.isViewingSnapshot()) {
+          <div class="asset-actions">
+            <button class="btn-icon btn-icon--edit" (click)="openEdit(a)" title="Edit">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <div class="asset-actions-divider"></div>
+            <button class="btn-icon btn-icon--danger" (click)="delete(a.id)" title="Delete">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
         }
+
       </div>
     }
   </div>
@@ -127,6 +202,18 @@
         </div>
       </div>
 
+      @if (editForm().status !== 'Stable') {
+        <div class="form-group">
+          <label>Actor Faction <span class="field-hint-inline">(responsible for this status)</span></label>
+          <select [formField]="f.statusActorFactionId">
+            <option value="">— Unknown —</option>
+            @for (faction of activeFactions(); track faction.id) {
+              <option [value]="faction.id">{{ faction.name }}</option>
+            }
+          </select>
+        </div>
+      }
+
       <div class="separator">Role &amp; Value</div>
 
       <div class="grid-3">
@@ -158,6 +245,8 @@
           </div>
         </div>
       </div>
+
+      <p class="role-hint">{{ ROLE_HINTS[editForm().role] }}</p>
 
       <div class="form-group">
         <label>Description</label>

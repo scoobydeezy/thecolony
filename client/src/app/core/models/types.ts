@@ -477,6 +477,7 @@ export interface EventEffect {
   delta: number;                  // numeric effects
   value?: string;                 // non-numeric effects: CharacterState or factionId
   secondaryTargetId?: string;     // relationship bumps: the other faction id
+  actorFactionId?: string;        // asset status changes: faction responsible for the change
 }
 
 export interface CampaignEvent {
@@ -528,9 +529,10 @@ export interface ColonySnapshot {
   factionRelationshipBumps: Record<string, Record<string, number>>; // sourceId → targetId → bump
   factionPartyBumps: Record<string, number>;   // factionId → cumulative party bump
   derivedEffects: DerivedEffect[];             // computed momentum cascade effects this session
-  // Assets — cumulative control and status state
-  assetControl: Record<string, string | undefined>;  // assetId → factionId
-  assetStatuses: Record<string, AssetStatus>;         // assetId → status
+  // Assets — cumulative control, status, and status-actor state
+  assetControl: Record<string, string | undefined>;        // assetId → factionId
+  assetStatuses: Record<string, AssetStatus>;              // assetId → status
+  assetStatusActors: Record<string, string | undefined>;   // assetId → actorFactionId
   // Goals — cumulative status and participants
   goalStatuses: Record<string, GoalStatus>;
   goalParticipants: Record<string, Array<{ actorId: string; actorType: string; role: string; delta: number; sessionId: string }>>;
@@ -559,8 +561,8 @@ export interface RelationshipThreshold {
 // ── Assets ─────────────────────────────────────────────────────────────────
 
 export type AssetType   = 'Infrastructure' | 'Artifact' | 'Resource' | 'Intelligence';
-export type AssetRole   = 'Operational' | 'Strategic' | 'Symbolic' | 'Hidden' | 'Mandate';
-export type AssetStatus = 'Stable' | 'Contested' | 'Damaged' | 'Destroyed' | 'Hidden' | 'Lost';
+export type AssetRole   = 'Operational' | 'Strategic' | 'Symbolic' | 'Covert' | 'Mandate';
+export type AssetStatus = 'Stable' | 'Contested' | 'Damaged' | 'Destroyed';
 
 export const ASSET_TYPE_OPTIONS: { value: AssetType; label: string }[] = [
   { value: 'Infrastructure', label: 'Infrastructure' },
@@ -573,7 +575,7 @@ export const ASSET_ROLE_OPTIONS: { value: AssetRole; label: string }[] = [
   { value: 'Operational', label: 'Operational' },
   { value: 'Strategic',   label: 'Strategic' },
   { value: 'Symbolic',    label: 'Symbolic' },
-  { value: 'Hidden',      label: 'Hidden' },
+  { value: 'Covert',      label: 'Covert' },
   { value: 'Mandate',     label: 'Mandate' },
 ];
 
@@ -590,8 +592,6 @@ export const ASSET_STATUS_OPTIONS: { value: AssetStatus; label: string }[] = [
   { value: 'Contested', label: 'Contested' },
   { value: 'Damaged',   label: 'Damaged' },
   { value: 'Destroyed', label: 'Destroyed' },
-  { value: 'Hidden',    label: 'Hidden' },
-  { value: 'Lost',      label: 'Lost' },
 ];
 
 // Role weights: base influence and legitimacy per Value point.
@@ -599,18 +599,15 @@ export const ASSET_ROLE_WEIGHTS: Record<AssetRole, { influence: number; legitima
   Operational: { influence: 1.00, legitimacy: 1.00 },
   Strategic:   { influence: 1.25, legitimacy: 0.25 },
   Symbolic:    { influence: 0.25, legitimacy: 1.25 },
-  Hidden:      { influence: 1.00, legitimacy: 0.00 },
+  Covert:      { influence: 1.00, legitimacy: 0.00 },
   Mandate:     { influence: 0.00, legitimacy: 1.00 },
 };
 
-// Status multipliers are split: Hidden assets retain Influence but lose Legitimacy.
 export const ASSET_STATUS_MULTIPLIERS: Record<AssetStatus, { influence: number; legitimacy: number }> = {
   Stable:    { influence: 1.00, legitimacy: 1.00 },
   Contested: { influence: 0.50, legitimacy: 0.50 },
   Damaged:   { influence: 0.25, legitimacy: 0.25 },
   Destroyed: { influence: 0.00, legitimacy: 0.00 },
-  Hidden:    { influence: 1.00, legitimacy: 0.00 },
-  Lost:      { influence: 0.00, legitimacy: 0.00 },
 };
 
 export interface Asset {
@@ -625,6 +622,7 @@ export interface Asset {
   controllingFactionId?: string;
   location?: string;
   status: AssetStatus;
+  statusActorFactionId?: string;
 }
 
 export function computeAssetInfluence(asset: Asset): number {
@@ -637,9 +635,47 @@ export function computeAssetLegitimacy(asset: Asset): number {
   return base * ASSET_STATUS_MULTIPLIERS[asset.status].legitimacy;
 }
 
+// Standalone faction metric helpers — used by both the influence service and snapshot goal evaluation.
+// Mirror FactionInfluenceService but as pure functions so the store can call them without injection.
+
+export function computeFactionInfluence(
+  faction: Faction, members: Character[], assets: Asset[], f: FormulasConfig = DEFAULT_FORMULAS
+): number {
+  const ADDITIONAL_BASE = 30;
+  const totalCount = members.length + (faction.additionalMemberCount ?? 0);
+  let charStrength = 0;
+  if (totalCount > 0) {
+    const representedSum = members.reduce((s, c) => s + c.influence, 0);
+    const avg = (representedSum + (faction.additionalMemberCount ?? 0) * ADDITIONAL_BASE) / totalCount;
+    const max = members.length > 0 ? Math.max(...members.map(c => c.influence)) : ADDITIONAL_BASE;
+    const raw = avg * f.memberAvgWeight + max * f.memberMaxWeight;
+    const hasLeader = members.some(c => c.characterType === 'FactionLeader');
+    charStrength = raw * (hasLeader ? 1 : (f.leaderlessPowerMultiplier ?? 0.75));
+  }
+  const assetInflRaw = assets.filter(a => a.controllingFactionId === faction.id).reduce((s, a) => s + computeAssetInfluence(a), 0);
+  const assetInfluenceScore = Math.min(100, assetInflRaw / (f.assetInfluenceScale ?? 25) * 100);
+  const normalizedMomentum = 50 + faction.momentum / 2;
+  return Math.min(100, Math.max(0, Math.round(
+    charStrength * f.charInfluenceWeight + assetInfluenceScore * f.assetInfluenceWeight + normalizedMomentum * f.momentumInfluenceWeight
+  )));
+}
+
+export function computeFactionPower(
+  faction: Faction, members: Character[], assets: Asset[], f: FormulasConfig = DEFAULT_FORMULAS
+): number {
+  const influence = computeFactionInfluence(faction, members, assets, f);
+  const assetLgtRaw = assets.filter(a => a.controllingFactionId === faction.id).reduce((s, a) => s + computeAssetLegitimacy(a), 0);
+  const assetLegitimacyScore = Math.min(100, assetLgtRaw / (f.assetLegitimacyScale ?? 25) * 100);
+  const legitimacy = Math.min(100, Math.max(0, Math.round(
+    faction.baseLegitimacy * (f.baseLegitimacyWeight ?? 0.70) + assetLegitimacyScore * (f.assetLegitimacyWeight ?? 0.30)
+  )));
+  return Math.round(influence * (f.legitimacyBase + legitimacy / f.legitimacyScale) + faction.powerModifier);
+}
+
 // ── Faction Goals ──────────────────────────────────────────────────────────
 
 export type GoalStatus = 'Plotting' | 'Progressing' | 'Stalled' | 'Accomplished' | 'Failed';
+export type GoalConditionType = 'Achieve' | 'Maintain';
 export type GoalPriority = 'Critical' | 'Major' | 'Minor';
 export type GoalVisibility = 'Open' | 'Known' | 'Secret';
 
@@ -679,16 +715,16 @@ export type GoalTargetOperator   = 'gte' | 'lte' | 'eq';
 
 // States available per target entity type
 export const CHARACTER_TARGET_STATES = ['Alive', 'Dead', 'Missing', 'Forgotten'] as const;
-export const ASSET_TARGET_STATES     = ['Stable', 'Contested', 'Damaged', 'Destroyed', 'Hidden', 'Lost'] as const;
-export const FACTION_TARGET_PROPS    = ['baseLegitimacy', 'momentum', 'power'] as const;
+export const ASSET_TARGET_STATES     = ['Stable', 'Contested', 'Damaged', 'Destroyed'] as const;
+export const FACTION_TARGET_PROPS    = ['influence', 'power', 'momentum'] as const;
 
 export interface FactionGoal {
   id: string;
   campaignId: string;
   factionId: string;
   title: string;
-  description?: string;
   status: GoalStatus;
+  conditionType: GoalConditionType;
   priority: GoalPriority;
   visibility: GoalVisibility;
   // Structured target
@@ -696,6 +732,10 @@ export interface FactionGoal {
   targetEntityId?: string;
   // Character / Asset: discrete state match
   targetState?: string;
+  // Asset: ownership — which faction must control the asset
+  targetOwnerFactionId?: string;
+  // Champion: primary character stakeholder
+  championId?: string;
   // Faction: numeric threshold
   targetProperty?: string;
   targetOperator?: GoalTargetOperator;

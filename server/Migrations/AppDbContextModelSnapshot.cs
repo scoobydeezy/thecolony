@@ -64,6 +64,9 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("StatusActorFactionId")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("Tier")
                         .HasColumnType("INTEGER");
 
@@ -288,6 +291,9 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ActorFactionId")
+                        .HasColumnType("TEXT");
+
                     b.Property<double>("Delta")
                         .HasColumnType("REAL");
 
@@ -458,8 +464,11 @@ namespace ColonyTracker.Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("ChampionId")
                         .HasColumnType("TEXT");
+
+                    b.Property<int>("ConditionType")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("FactionId")
                         .IsRequired()
@@ -478,6 +487,9 @@ namespace ColonyTracker.Api.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("TargetOperator")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TargetOwnerFactionId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TargetProperty")

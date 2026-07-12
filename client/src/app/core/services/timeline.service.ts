@@ -56,7 +56,7 @@ export class TimelineService {
   // but markers are derived from effects (character state and faction changes between snapshots),
   // not from event container titles. Events are just containers; effects are the meaningful changes.
   //
-  // Icon codepoints are FA7 Solid (font-family "Font Awesome 7 Free", weight 900):
+  // Icon codepoints are FA6 Pro Solid (font-family "Font Awesome 6 Pro", weight 900):
   //   skull  = Dead, circle-question  = Missing, hourglass-start  = Forgotten
   //   shuffle  = faction change
   private static readonly STATE_ICONS: Partial<Record<string, string>> = {

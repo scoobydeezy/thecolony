@@ -108,7 +108,7 @@ export class TimelineAnalysisTabComponent {
             content: m.events.map(e => e.icon),
             position: 'start',
             color: 'rgba(255,255,255,0.85)',
-            font: { size: 11, family: '"Font Awesome 7 Free"', weight: 900 },
+            font: { size: 11, family: '"Font Awesome 6 Pro"', weight: 900 },
             backgroundColor: 'transparent',
           },
           enter: (_, event) => {

@@ -15,6 +15,9 @@
     overflow: hidden;
 
     button {
+      display: flex;
+      gap: .5rem;
+      align-items: center;
       background: none;
       border: none;
       padding: 0.5rem 1rem;
@@ -42,25 +45,97 @@
   padding: 2.5rem;
 }
 
+$actions-width: 44px;
+$type-col-width: 44px;
+$banner-overhang: 4px; // how far banner peeks above card top
+$asset-card-layout: $type-col-width 3fr 1.5fr 2fr $actions-width;
+
+// ── Column header row (above the card list) ──────────────────────────────────
+
+.asset-table-header {
+  display: grid;
+  grid-template-columns: $asset-card-layout;
+  padding: 0 0 0.4rem;
+  margin-bottom: 0.25rem;
+}
+
+.slot-col-headers {
+  display: flex;
+}
+
+.slot-col-header {
+  flex: 1;
+  max-width: 100px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+// ── Card list ────────────────────────────────────────────────────────────────
+
 .asset-list {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
+// Card: 5-column grid — type icon | info | context | slots | actions
+// overflow: visible so banners can hang above the card top edge
 .asset-card {
-  padding: 1rem 1.25rem;
+  display: grid;
+  grid-template-columns: $asset-card-layout;
+  align-items: stretch;
+  padding: 0;
+  overflow: visible;
 
   &.keystone {
     border-color: #92400e;
     box-shadow: 0 0 0 1px #92400e, inset 0 0 40px rgba(245, 158, 11, 0.04);
   }
+
+  &.destroyed {
+    background: var(--bg-base);
+  }
+}
+
+// Type icon column
+.asset-type-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--border);
+}
+
+.asset-type-icon {
+  font-size: 1.1rem;
+  color: var(--text-muted);
+
+  &--keystone { color: #f59e0b; }
+}
+
+// Left info column
+.asset-info {
+  padding: 0.85rem 1.25rem;
+  min-width: 0;
+}
+
+// Context column — location, controlling faction, actor
+.asset-context {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0.85rem 1rem;
+  min-width: 0;
+  border-left: 1px solid var(--border);
+  gap: 0.75rem;
 }
 
 .asset-header {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
   gap: 1rem;
   margin-bottom: 0.5rem;
 }
@@ -77,41 +152,166 @@
   font-size: 1rem;
 }
 
-.keystone-icon {
-  font-size: 0.75rem;
-  color: #f59e0b;
-}
 
-.asset-type-badge {
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0.15rem 0.5rem;
-  border-radius: 4px;
-  background: var(--surface-2, #2a2a3a);
+// ── Pen edit button (hover, in title row) ────────────────────────────────────
+
+.card-edit-btn {
+  background: none;
+  border: none;
   color: var(--text-muted);
-}
-
-.status-badge {
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 0.15rem 0.5rem;
+  cursor: pointer;
+  padding: 0.2rem 0.35rem;
   border-radius: 4px;
+  font-size: 0.8rem;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.1s, color 0.1s, background 0.1s;
 
-  &.status-stable    { background: #14532d; color: #86efac; }
-  &.status-contested { background: #78350f; color: #fcd34d; }
-  &.status-damaged   { background: #7c2d12; color: #fca5a5; }
-  &.status-destroyed { background: #3f3f46; color: #a1a1aa; }
-  &.status-hidden    { background: #1e1b4b; color: #a5b4fc; }
-  &.status-lost      { background: #3f3f46; color: #71717a; }
+  &:hover {
+    color: var(--text-primary);
+    background: color-mix(in srgb, var(--text-muted) 10%, transparent);
+  }
 }
+
+.asset-card:hover .card-edit-btn {
+  opacity: 1;
+}
+
+// ── Trash delete button (hover, top-right of card) ───────────────────────────
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.75rem;
+  opacity: 0;
+  flex-shrink: 0;
+  transition: opacity 0.1s, color 0.1s, background 0.1s, border-color 0.1s;
+
+  &--edit {
+    color: var(--text-muted);
+    &:hover:not(:disabled) {
+      color: var(--text-primary);
+      background: color-mix(in srgb, var(--text-muted) 10%, transparent);
+    }
+  }
+
+  &--danger {
+    color: #f87171;
+    &:hover:not(:disabled) {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: #b91c1c;
+    }
+  }
+}
+
+.asset-card:hover .btn-icon {
+  opacity: 1;
+}
+
+.asset-card:hover .asset-actions {
+  border-left-color: color-mix(in srgb, var(--border) 60%, transparent);
+}
+
+// ── Status slots container ───────────────────────────────────────────────────
+
+.asset-slots {
+  display: flex;
+  align-items: stretch;
+  border-left: 1px solid var(--border);
+  // Clip rounded top corners so banners that poke up stay within curved border
+  // but we still need overflow visible for the overhang — handled per-slot.
+}
+
+.status-slot {
+  flex: 1;
+  max-width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  // Give the slot its own stacking context so the banner can overlap upward
+  position: relative;
+  overflow: visible;
+  padding-top: $banner-overhang;
+}
+
+// ── Banner — hangs from above the card top edge ──────────────────────────────
+
+.slot-banner {
+  // Fills from $banner-overhang above the card top down to the card bottom
+  position: absolute;
+  top: -$banner-overhang;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 52px;
+  // Height = card height + overhang; align-items:stretch means the slot is full card height,
+  // so 100% of the slot + the overhang = correct total.
+  height: calc(100% - #{$banner-overhang});
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  // Rounded top corners for the "wrapping from behind" look
+  border-radius: 6px 6px 0 0;
+
+  // Shape the bottom termination using the faction's bannerShape
+  &.faction-banner--centered-triangle  { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 22px), 50% 100%, 0 calc(100% - 22px)); }
+  &.faction-banner--left-triangle      { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 22px), 0 100%); }
+  &.faction-banner--right-triangle     { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 calc(100% - 22px)); }
+  &.faction-banner--inverted-triangle  { clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 22px), 0 100%); }
+  &.faction-banner--rectangle          { clip-path: none; border-radius: 6px 6px 0 0; }
+  &.faction-banner--semi-circle        { clip-path: none; border-radius: 6px 6px 50% 50% / 6px 6px 24px 24px; }
+  &.faction-banner--pennant            { clip-path: polygon(0 0, 100% 0, 50% 100%); border-radius: 0; }
+}
+
+.slot-banner-icon {
+  width: 2rem;
+  height: 2rem;
+  margin-top: 1rem;
+  flex-shrink: 0;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  position: relative;
+  z-index: 1;
+}
+
+.slot-empty-icon {
+  font-size: 1.1rem;
+  color: var(--bg-base);
+  padding: .75rem;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, .1);
+}
+
+// ── Actions column ───────────────────────────────────────────────────────────
 
 .asset-actions {
   display: flex;
-  gap: 0.4rem;
+  flex-direction: column;
+  align-items: stretch;
+  border-left: 1px solid var(--border);
+
+  .btn-icon {
+    flex: 1;
+    width: 100%;
+    border-radius: 0;
+  }
+}
+
+.asset-actions-divider {
+  width: 100%;
+  height: 1px;
+  background: var(--border);
   flex-shrink: 0;
 }
 
@@ -157,9 +357,22 @@
   margin: 0.5rem 0 1rem;
 }
 
+.role-hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: -0.25rem 0 1rem;
+  line-height: 1.4;
+}
+
+.field-hint-inline {
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: var(--text-muted);
+  margin-left: 0.25rem;
+}
+
 .modal-asset {
-  min-width: 520px;
-  max-width: 680px;
+  width: 580px;
 
   .grid-2, .grid-3 {
     margin-bottom: 1rem;

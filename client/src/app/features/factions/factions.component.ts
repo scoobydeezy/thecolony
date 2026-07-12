@@ -81,6 +81,11 @@ export class FactionsComponent {
 
   // ── Card display helpers ────────────────────────────────────────────────────
 
+  readonly TYPE_ICONS: Record<GroupType, string> = {
+    SocialClass: 'fa-duotone fa-users',
+    Faction:     'fa-duotone fa-sitemap',
+  };
+
   primaryValue    = primaryValue;
   secondaryValue  = secondaryValue;
   sacrificedValue = sacrificedValue;
@@ -135,7 +140,7 @@ export class FactionsComponent {
   }
 
   factionGoalCount(f: Faction): number {
-    return this.store.factionGoals().filter(g => g.factionId === f.id && g.status !== 'Accomplished' && g.status !== 'Failed').length;
+    return this.store.viewGoals().filter(g => g.factionId === f.id && g.status !== 'Accomplished' && g.status !== 'Failed').length;
   }
 
   // ── Navigation ──────────────────────────────────────────────────────────────
@@ -207,14 +212,16 @@ export class FactionsComponent {
             campaignId:       this.store.activeCampaign()!.id,
             factionId,
             title:            get(row, 'title'),
-            description:      get(row, 'description') || undefined,
             status:           oneOf(get(row, 'status'),   GOAL_STATUS_OPTIONS.map(o => o.value)   as GoalStatus[])   ?? 'Plotting',
+            conditionType:    oneOf(get(row, 'conditiontype'), ['Achieve', 'Maintain'] as const) ?? 'Achieve',
             priority:         oneOf(get(row, 'priority'), GOAL_PRIORITY_OPTIONS.map(o => o.value) as GoalPriority[]) ?? 'Major',
             visibility:       oneOf(get(row, 'visibility'), GOAL_VISIBILITY_OPTIONS.map(o => o.value) as GoalVisibility[]) ?? 'Open',
             targetEntityType: oneOf(get(row, 'targetentitytype'), ['Character', 'Asset', 'Faction'] as const) || undefined,
             targetEntityId:   get(row, 'targetentityid') || undefined,
-            targetState:      get(row, 'targetstate') || undefined,
-            targetProperty:   get(row, 'targetproperty') || undefined,
+            targetState:            get(row, 'targetstate') || undefined,
+            targetOwnerFactionId:   get(row, 'targetownerfactionid') || undefined,
+            championId:             get(row, 'championid') || undefined,
+            targetProperty:         get(row, 'targetproperty') || undefined,
             targetOperator:   oneOf(get(row, 'targetoperator'), ['gte', 'lte', 'eq'] as const) || undefined,
             targetThreshold:  parseFloat(get(row, 'targetthreshold')) || undefined,
           };
@@ -314,19 +321,23 @@ export class FactionsComponent {
     const goals = this.store.factionGoals();
     if (goals.length > 0) {
       const goalHeader = [
-        'Id', 'FactionId', 'FactionName', 'Title', 'Description',
-        'Status', 'Priority', 'Visibility',
+        'Id', 'FactionId', 'FactionName', 'Title',
+        'Status', 'ConditionType', 'Priority', 'Visibility',
         'TargetEntityType', 'TargetEntityId', 'TargetEntityName', 'TargetState',
-        'TargetProperty', 'TargetOperator', 'TargetThreshold'
+        'TargetOwnerFactionId',
+        'TargetProperty', 'TargetOperator', 'TargetThreshold',
+        'ChampionId'
       ];
       const goalRows = goals.map(g => [
         g.id, g.factionId, factionNameById.get(g.factionId) ?? '',
-        g.title, g.description ?? '',
-        g.status, g.priority, g.visibility,
+        g.title,
+        g.status, g.conditionType, g.priority, g.visibility,
         g.targetEntityType ?? '', g.targetEntityId ?? '',
         resolveEntityName(g.targetEntityType, g.targetEntityId),
         g.targetState ?? '',
-        g.targetProperty ?? '', g.targetOperator ?? '', g.targetThreshold ?? ''
+        g.targetOwnerFactionId ?? '',
+        g.targetProperty ?? '', g.targetOperator ?? '', g.targetThreshold ?? '',
+        g.championId ?? ''
       ]);
       downloadCsv([goalHeader, ...goalRows], 'faction-goals.csv');
     }

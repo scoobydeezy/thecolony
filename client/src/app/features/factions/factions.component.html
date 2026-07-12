@@ -6,8 +6,12 @@
 <div class="toolbar">
   <div class="filter-tabs">
     <button [class.active]="filterType() === 'all'" (click)="filterType.set('all')">All</button>
-    <button [class.active]="filterType() === 'Faction'" (click)="filterType.set('Faction')">Factions</button>
-    <button [class.active]="filterType() === 'SocialClass'" (click)="filterType.set('SocialClass')">Social Classes</button>
+    <button [class.active]="filterType() === 'Faction'" (click)="filterType.set('Faction')">
+      <i [class]="TYPE_ICONS['Faction']"></i>Factions
+    </button>
+    <button [class.active]="filterType() === 'SocialClass'" (click)="filterType.set('SocialClass')">
+      <i [class]="TYPE_ICONS['SocialClass']"></i>Social Classes
+    </button>
   </div>
   <div class="toolbar-actions">
     @if (!store.isViewingSnapshot()) {

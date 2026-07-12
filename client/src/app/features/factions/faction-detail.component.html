@@ -445,35 +445,93 @@
           <button class="btn btn-secondary btn-sm" (click)="openAddGoal()">+ Add</button>
         }
       </div>
-      @if (goals().length === 0) {
+      @if (activeGoals().length === 0 && resolvedGoals().length === 0) {
         <p class="empty-state">No goals yet.</p>
       }
-      @for (g of goals(); track g.id) {
-        <div class="entity-card">
-          <div class="goal-header">
-            <div class="goal-title">
+      @for (g of activeGoals(); track g.id) {
+        <div class="entity-card goal-card">
+          <!-- Col 1: priority icon -->
+          <div class="goal-priority-col">
+            <app-priority-icon [priority]="g.priority"
+              [class]="'goal-priority-icon priority-' + g.priority.toLowerCase()"
+              [title]="g.priority"></app-priority-icon>
+          </div>
+          <!-- Col 2: content -->
+          <div class="goal-content">
+            <div class="goal-row-top">
               <span class="goal-name">{{ g.title }}</span>
-              <span [class]="'badge ' + statusClass(g.status)">{{ g.status }}</span>
-              <span [class]="'badge ' + priorityClass(g.priority)">{{ g.priority }}</span>
               <span [class]="'badge ' + visibilityClass(g.visibility)">{{ g.visibility }}</span>
             </div>
-            @if (!store.isViewingSnapshot()) {
-              <div class="goal-actions">
-                <button class="btn btn-secondary btn-sm" (click)="openEditGoal(g)">Edit</button>
-                <button class="btn btn-danger btn-sm" (click)="deleteGoal(g.id)">Delete</button>
+            @let targetLabel = goalTargetLabel(g);
+            @if (targetLabel) {
+              <div class="goal-row-bottom">
+                <span class="target-item">TARGET: <strong>{{ targetLabel }}</strong></span>
               </div>
             }
           </div>
-          @let targetLabel = goalTargetLabel(g);
-          @if (targetLabel) {
-            <div class="goal-targets">
-              <span class="target-item"><span class="meta-label">Target</span> {{ targetLabel }}</span>
-            </div>
-          }
-          @if (g.description) {
-            <p class="goal-description">{{ g.description }}</p>
-          }
+          <!-- Col 3: status pill -->
+          <div [class]="'goal-status-pill ' + goalStatusClass(g)">
+            <i [class]="'fa-solid ' + goalStatusIcon(g)"></i>
+            {{ goalStatusLabel(g).toUpperCase() }}
+          </div>
+          <!-- Col 4: champion -->
+          <div class="goal-champion-col">
+            @let champ = championFor(g);
+            @if (champ) {
+              <div class="champion-avatar" [title]="champ.name" [class.champion-avatar--inactive]="isChampionInactive(champ)"
+                   [style.background-image]="'url(' + championPortrait(champ) + ')'">
+                @if (stateIconClass(champ.state)) {
+                  <i [class]="stateIconClass(champ.state) + ' champion-avatar__state-icon'"></i>
+                }
+              </div>
+            }
+          </div>
+          <!-- Col 5: actions -->
+          <div class="goal-actions">
+            @if (!store.isViewingSnapshot()) {
+              <button class="goal-icon-btn" (click)="openEditGoal(g)" title="Edit">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+            }
+          </div>
         </div>
+      }
+
+      <!-- Resolved Goals -->
+      @if (resolvedGoals().length > 0) {
+        <div class="goal-resolved-header">Resolved</div>
+        @for (g of resolvedGoals(); track g.id) {
+          <div class="entity-card goal-card goal-card--resolved">
+            <!-- Col 1: outcome icon -->
+            <div class="goal-priority-col">
+              @if (g.status === 'Accomplished') {
+                <i class="fa-solid fa-check goal-priority-icon goal-accomplished" title="Accomplished"></i>
+              } @else {
+                <i class="fa-solid fa-xmark goal-priority-icon goal-failed" title="Failed"></i>
+              }
+            </div>
+            <!-- Col 2: content -->
+            <div class="goal-content">
+              <div class="goal-row-top">
+                <span class="goal-name">{{ g.title }}</span>
+              </div>
+              @let targetLabel = goalTargetLabel(g);
+              @if (targetLabel) {
+                <div class="goal-row-bottom">
+                  <span class="target-item">{{ targetLabel }}</span>
+                </div>
+              }
+            </div>
+            <!-- Col 3: actions -->
+            <div class="goal-actions">
+              @if (!store.isViewingSnapshot()) {
+                <button class="goal-icon-btn" (click)="openEditGoal(g)" title="Edit">
+                  <i class="fa-solid fa-pen"></i>
+                </button>
+              }
+            </div>
+          </div>
+        }
       }
     </div>
 
@@ -486,21 +544,24 @@
         </div>
         @for (a of assets(); track a.id) {
           <div class="entity-card">
-            <div class="asset-row-main">
-              <div class="asset-row-left">
-                @if (a.keystone) {
-                  <i class="fa-solid fa-gem asset-keystone-icon" title="Keystone"></i>
-                }
-                <span class="asset-name">{{ a.name }}</span>
-                <span [class]="'status-badge ' + assetStatusClass(a.status)">{{ a.status }}</span>
+            <i [class]="assetTypeIcon(a.type) + ' asset-type-icon' + (a.keystone ? ' asset-type-icon--keystone' : '')" [title]="a.keystone ? a.type + ' · Keystone' : a.type"></i>
+            <div class="asset-card-body">
+              <div class="asset-row-main">
+                <div class="asset-row-left">
+                  <span class="asset-name">{{ a.name }}</span>
+                  <span [class]="'status-badge ' + assetStatusClass(a.status)">{{ a.status }}</span>
+                  @if (a.status !== 'Stable' && a.statusActorFactionId) {
+                    <span class="asset-actor-label">by {{ factionNameById(a.statusActorFactionId) }}</span>
+                  }
+                </div>
+                <div class="asset-row-stars">
+                  @for (n of [1,2,3,4,5]; track n) {
+                    <i [class]="'fa-star ' + (n <= a.tier ? 'fa-solid' : 'fa-regular')"></i>
+                  }
+                </div>
               </div>
-              <div class="asset-row-stars">
-                @for (n of [1,2,3,4,5]; track n) {
-                  <i [class]="'fa-star ' + (n <= a.tier ? 'fa-solid' : 'fa-regular')"></i>
-                }
-              </div>
+              @if (a.description) { <p class="char-summary">{{ a.description }}</p> }
             </div>
-            @if (a.description) { <p class="char-summary">{{ a.description }}</p> }
           </div>
         }
       </div>
@@ -628,15 +689,25 @@
           <label class="form-label">Title *</label>
           <input class="form-input" [formField]="goalForm.title" placeholder="e.g. Seize control of the Dock Office">
         </div>
-        <div class="form-row three-col">
+        <div class="form-row two-col">
           <div>
-            <label class="form-label">Status</label>
-            <select class="form-input" [formField]="goalForm.status">
-              @for (opt of statusOptions; track opt.value) {
+            <label class="form-label">Condition Type</label>
+            <select class="form-input" [formField]="goalForm.conditionType">
+              @for (opt of conditionTypeOptions; track opt.value) {
                 <option [value]="opt.value">{{ opt.label }}</option>
               }
             </select>
           </div>
+          <div>
+            <label class="form-label">Status</label>
+            <select class="form-input" [formField]="goalForm.status">
+              @for (opt of goalStatusOptions(); track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="form-row three-col">
           <div>
             <label class="form-label">Priority</label>
             <select class="form-input" [formField]="goalForm.priority">
@@ -650,6 +721,17 @@
             <select class="form-input" [formField]="goalForm.visibility">
               @for (opt of visibilityOptions; track opt.value) {
                 <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Champion</label>
+            <select class="form-input" [formField]="goalForm.championId">
+              <option value="">— None —</option>
+              @for (c of store.characters(); track c.id) {
+                @if (c.factionId === faction().id) {
+                  <option [value]="c.id">{{ c.name }}</option>
+                }
               }
             </select>
           </div>
@@ -674,7 +756,7 @@
                 }
               </select>
             </div>
-            @if (goalModel().targetEntityType === 'Character' || goalModel().targetEntityType === 'Asset') {
+            @if (goalModel().targetEntityType === 'Character') {
               <div>
                 <label class="form-label">Target State</label>
                 <select class="form-input" [formField]="goalForm.targetState">
@@ -685,7 +767,43 @@
                 </select>
               </div>
             }
+            @if (goalModel().targetEntityType === 'Asset') {
+              <div>
+                <label class="form-label">Asset Condition</label>
+                <select class="form-input" [value]="goalModel().targetOwnerFactionId ? 'ownership' : 'status'"
+                  (change)="onAssetConditionModeChange($any($event.target).value)">
+                  <option value="status">Reaches state</option>
+                  <option value="ownership">Comes under control</option>
+                </select>
+              </div>
+            }
           </div>
+          @if (goalModel().targetEntityType === 'Asset' && !goalModel().targetOwnerFactionId) {
+            <div class="form-row">
+              <div>
+                <label class="form-label">Target State</label>
+                <select class="form-input" [formField]="goalForm.targetState">
+                  <option value="">— Select —</option>
+                  @for (s of goalTargetStateOptions(); track s) {
+                    <option [value]="s">{{ s }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+          }
+          @if (goalModel().targetEntityType === 'Asset' && goalModel().targetOwnerFactionId !== '') {
+            <div class="form-row">
+              <div>
+                <label class="form-label">Controlling Faction</label>
+                <select class="form-input" [formField]="goalForm.targetOwnerFactionId">
+                  <option value="">— Select —</option>
+                  @for (f of store.factions(); track f.id) {
+                    @if (f.active) { <option [value]="f.id">{{ f.name }}</option> }
+                  }
+                </select>
+              </div>
+            </div>
+          }
           @if (goalModel().targetEntityType === 'Faction') {
             <div class="form-row three-col">
               <div>
@@ -711,14 +829,17 @@
             </div>
           }
         }
-        <div class="form-row">
-          <label class="form-label">Description</label>
-          <textarea class="form-input" rows="3" [formField]="goalForm.description" placeholder="Optional description..."></textarea>
-        </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="closeGoalModal()">Cancel</button>
-        <button class="btn btn-primary" (click)="saveGoal()" [disabled]="!goalModel().title.trim()">Save</button>
+        @if (goalModel().id) {
+          <button class="btn btn-danger" (click)="deleteGoal(goalModel().id); closeGoalModal()">Delete</button>
+        } @else {
+          <span></span>
+        }
+        <div class="modal-footer-actions">
+          <button class="btn btn-secondary" (click)="closeGoalModal()">Cancel</button>
+          <button class="btn btn-primary" (click)="saveGoal()" [disabled]="!goalModel().title.trim()">Save</button>
+        </div>
       </div>
     </div>
   </div>

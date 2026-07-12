@@ -13,4 +13,5 @@ public class Asset
     public string? ControllingFactionId { get; set; }
     public string? Location { get; set; }
     public AssetStatus Status { get; set; } = AssetStatus.Stable;
+    public string? StatusActorFactionId { get; set; }
 }

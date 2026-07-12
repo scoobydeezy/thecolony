@@ -13,7 +13,7 @@ import {
   FormulasConfig, DEFAULT_FORMULAS,
   FACTION_EFFECT_PROPS, CHARACTER_EFFECT_PROPS,
   Campaign, AppSettings,
-  Asset, AssetStatus, FactionGoal, GoalStatus,
+  Asset, AssetStatus, FactionGoal, GoalStatus, computeFactionInfluence, computeFactionPower,
   StressTrigger,
 } from '../core/models/types';
 import { ApiService } from '../core/services/api.service';
@@ -134,9 +134,10 @@ function buildColonySnapshots(
   const factionIds: Record<string, string | undefined> = {};
   const relBumps: Record<string, Record<string, number>> = {};
   const partyBumps: Record<string, number> = {};
-  // Asset state — control and status, mutable across sessions
+  // Asset state — control, status, and status-actor, mutable across sessions
   const assetControl: Record<string, string | undefined> = {};
   const assetStatuses: Record<string, AssetStatus> = {};
+  const assetStatusActors: Record<string, string | undefined> = {};
   // Goal state — status, mutable across sessions
   const goalStatuses: Record<string, GoalStatus> = {};
   const goalParticipants: Record<string, Array<{ actorId: string; actorType: string; role: string; delta: number; sessionId: string }>> = {};
@@ -149,6 +150,7 @@ function buildColonySnapshots(
   for (const a of assets) {
     assetControl[a.id] = a.controllingFactionId;
     assetStatuses[a.id] = a.status;
+    assetStatusActors[a.id] = a.statusActorFactionId;
   }
   for (const g of factionGoals) {
     goalStatuses[g.id] = g.status;
@@ -169,6 +171,7 @@ function buildColonySnapshots(
 
   const cascadeRules = parseCascadeRules(rules?.cascadeRulesJson);
   const stressTriggers = parseStressTriggers(rules?.stressTriggersJson);
+  const formulas = parseFormulas(rules?.formulasJson);
 
   return sessions.map(session => {
     // Manual-only deltas this session, keyed factionId → property.
@@ -220,6 +223,7 @@ function buildColonySnapshots(
             assetControl[ef.targetId] = ef.value || undefined;
           } else if (ef.property === 'status' && ef.value) {
             assetStatuses[ef.targetId] = ef.value as AssetStatus;
+            assetStatusActors[ef.targetId] = ef.actorFactionId || undefined;
           } else if (ef.property === 'stress') {
             stress = Math.max(0, Math.min(10, stress + ef.delta));
           }
@@ -631,29 +635,51 @@ function buildColonySnapshots(
       }
     }
 
-    // Goal achievement pass: auto-resolve goals whose structured target is now met.
-    // Only promotes Plotting/Progressing/Stalled → Accomplished; never overrides manual Failed.
+    // Goal condition pass: auto-resolve goals whose structured target condition is evaluated.
+    // 'achieve': promotes active → Accomplished when condition met; never overrides manual Failed.
+    // 'maintain': fails active → Failed when condition is NOT met; never overrides manual Accomplished.
     for (const g of factionGoals) {
       const current = goalStatuses[g.id];
+      const isMaintain = g.conditionType === 'Maintain';
       if (current === 'Accomplished' || current === 'Failed') continue;
       if (!g.targetEntityType || !g.targetEntityId) continue;
-      let achieved = false;
+      let conditionMet = false;
       if (g.targetEntityType === 'Character' && g.targetState) {
-        achieved = states[g.targetEntityId] === g.targetState;
-      } else if (g.targetEntityType === 'Asset' && g.targetState) {
-        achieved = assetStatuses[g.targetEntityId] === g.targetState;
+        conditionMet = states[g.targetEntityId] === g.targetState;
+      } else if (g.targetEntityType === 'Asset') {
+        if (g.targetOwnerFactionId) {
+          conditionMet = assetControl[g.targetEntityId] === g.targetOwnerFactionId;
+        } else if (g.targetState) {
+          conditionMet = assetStatuses[g.targetEntityId] === g.targetState;
+        }
       } else if (g.targetEntityType === 'Faction' && g.targetProperty && g.targetOperator && g.targetThreshold != null) {
-        const prop = g.targetProperty as 'baseLegitimacy' | 'momentum' | 'power';
-        const val  = prop === 'baseLegitimacy' ? baseLegitimacy[g.targetEntityId]
-                   : prop === 'momentum'       ? momentum[g.targetEntityId]
-                   : undefined;
+        const prop = g.targetProperty as 'influence' | 'power' | 'momentum';
+        const targetFaction = factions.find(f => f.id === g.targetEntityId);
+        let val: number | undefined;
+        if (targetFaction) {
+          const factionWithSnap: typeof targetFaction = {
+            ...targetFaction,
+            momentum:      momentum[g.targetEntityId]      ?? targetFaction.momentum,
+            baseLegitimacy: baseLegitimacy[g.targetEntityId] ?? targetFaction.baseLegitimacy,
+            powerModifier:  powerModifier[g.targetEntityId]  ?? targetFaction.powerModifier,
+          };
+          const factionMembers = characters.filter(c => c.factionId === g.targetEntityId && states[c.id] === 'Alive');
+          const factionAssets  = assets.filter(a => assetControl[a.id] === g.targetEntityId);
+          if (prop === 'momentum')  val = factionWithSnap.momentum;
+          else if (prop === 'influence') val = computeFactionInfluence(factionWithSnap, factionMembers, factionAssets, formulas);
+          else if (prop === 'power')     val = computeFactionPower(factionWithSnap, factionMembers, factionAssets, formulas);
+        }
         if (val != null) {
-          achieved = g.targetOperator === 'gte' ? val >= g.targetThreshold
-                   : g.targetOperator === 'lte' ? val <= g.targetThreshold
-                   : val === g.targetThreshold;
+          conditionMet = g.targetOperator === 'gte' ? val >= g.targetThreshold
+                       : g.targetOperator === 'lte' ? val <= g.targetThreshold
+                       : val === g.targetThreshold;
         }
       }
-      if (achieved) goalStatuses[g.id] = 'Accomplished';
+      if (isMaintain) {
+        if (!conditionMet) goalStatuses[g.id] = 'Failed';
+      } else {
+        if (conditionMet) goalStatuses[g.id] = 'Accomplished';
+      }
     }
 
     return {
@@ -674,6 +700,7 @@ function buildColonySnapshots(
       derivedEffects,
       assetControl: { ...assetControl },
       assetStatuses: { ...assetStatuses },
+      assetStatusActors: { ...assetStatusActors },
       goalStatuses: { ...goalStatuses },
       goalParticipants: Object.fromEntries(
         Object.entries(goalParticipants).map(([k, v]) => [k, [...v]])
@@ -789,7 +816,7 @@ export const AppStore = signalStore(
       }));
     }),
 
-    // Assets with controllingFactionId and status projected to the active snapshot
+    // Assets with controllingFactionId, status, and statusActorFactionId projected to the active snapshot
     viewAssets: computed((): Asset[] => {
       const snap = store.activeSnapshot();
       if (!snap) return store.assets();
@@ -799,6 +826,19 @@ export const AppStore = signalStore(
           ? (snap.assetControl[a.id] ?? undefined)
           : a.controllingFactionId,
         status: snap.assetStatuses[a.id] ?? a.status,
+        statusActorFactionId: snap.assetStatusActors[a.id] !== undefined
+          ? snap.assetStatusActors[a.id]
+          : a.statusActorFactionId,
+      }));
+    }),
+
+    // Goals with status projected to the active snapshot (auto-resolved statuses visible)
+    viewGoals: computed((): FactionGoal[] => {
+      const snap = store.activeSnapshot();
+      if (!snap) return store.factionGoals();
+      return store.factionGoals().map(g => ({
+        ...g,
+        status: snap.goalStatuses[g.id] ?? g.status,
       }));
     }),
 

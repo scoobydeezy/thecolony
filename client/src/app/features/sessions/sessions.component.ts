@@ -234,6 +234,7 @@ export class SessionsComponent {
           property: firstProp,
           targetId: value === 'colony' ? 'colony' : '',
           secondaryTargetId: undefined,
+          actorFactionId: undefined,
           value: undefined,
           delta: 0,
         };
@@ -243,6 +244,7 @@ export class SessionsComponent {
         effects[index] = {
           ...effects[index],
           secondaryTargetId: undefined,
+          actorFactionId: undefined,
           value: d?.inputType === 'select' ? (d.selectOptions?.[0]?.value ?? '')
                : d?.inputType === 'faction-select' ? ''
                : d?.inputType === 'participate' ? 'Helping'
@@ -284,6 +286,7 @@ export class SessionsComponent {
       delta: (d?.inputType === 'select' || d?.inputType === 'none') ? 0 : Number(draft.delta ?? 0),
       value: draft.value,
       secondaryTargetId: draft.secondaryTargetId,
+      actorFactionId: draft.actorFactionId,
     };
 
     const updated: CampaignEvent = { ...ev, effects: [...ev.effects, newEffect] };
@@ -307,6 +310,10 @@ export class SessionsComponent {
     }
     if (ef.property === 'controllingFactionId') {
       return ef.value ? `→ ${this.factionName(ef.value)}` : '→ Uncontrolled';
+    }
+    if (ef.targetType === 'asset' && ef.property === 'status') {
+      const actor = ef.actorFactionId ? ` by ${this.factionName(ef.actorFactionId)}` : '';
+      return `→ ${ef.value ?? '?'}${actor}`;
     }
     if (ef.property === 'relationshipBump') {
       return `↔ ${this.factionName(ef.secondaryTargetId ?? '')} ${ef.delta > 0 ? '+' : ''}${ef.delta}`;

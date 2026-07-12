@@ -7,16 +7,18 @@ import { AppStore } from '../../store/app.store';
 import { ApiService } from '../../core/services/api.service';
 import { FactionInfluenceService } from '../../core/services/faction-influence.service';
 import {
-  Faction, BannerShape, Asset, AssetStatus, Character, CharacterState, GroupType, BeliefPosition,
+  Faction, BannerShape, Asset, AssetType, AssetStatus, Character, CharacterState, GroupType, BeliefPosition,
   ValueVector, primaryValue, secondaryValue, sacrificedValue,
   beliefConflicts, BeliefConflicts,
   mostAlignedFactions, mostOpposedFactions, effectivePressure, topCompatibleFactions,
   beliefAxisOptions, beliefPositionLabel,
-  FactionGoal, GoalStatus, GoalPriority, GoalVisibility, GoalTargetEntityType, GoalTargetOperator,
+  FactionGoal, GoalStatus, GoalConditionType, GoalPriority, GoalVisibility, GoalTargetEntityType, GoalTargetOperator,
   GOAL_STATUS_OPTIONS, GOAL_PRIORITY_OPTIONS, GOAL_VISIBILITY_OPTIONS,
   CHARACTER_TARGET_STATES, ASSET_TARGET_STATES, FACTION_TARGET_PROPS,
 } from '../../core/models/types';
 import { TernaryPlotComponent } from '../../shared/ternary-plot/ternary-plot.component';
+import { PriorityIconComponent } from '../../shared/priority-icon/priority-icon.component';
+import { getAncestryImagePath } from '../../core/utils/ancestry-images';
 
 type EditingCard = 'header' | 'psychology' | 'beliefs' | 'perception' | 'influence' | 'history' | null;
 
@@ -24,32 +26,37 @@ interface GoalFormModel {
   id: string;
   factionId: string;
   title: string;
-  description: string;
   status: GoalStatus;
+  conditionType: GoalConditionType;
   priority: GoalPriority;
   visibility: GoalVisibility;
   targetEntityType: GoalTargetEntityType | '';
   targetEntityId: string;
   targetState: string;
+  targetOwnerFactionId: string;
+  championId: string;
   targetProperty: string;
   targetOperator: GoalTargetOperator | '';
   targetThreshold: string;
 }
 
 const emptyGoalForm = (factionId = ''): GoalFormModel => ({
-  id: '', factionId, title: '', description: '',
-  status: 'Plotting', priority: 'Major', visibility: 'Known',
+  id: '', factionId, title: '',
+  status: 'Plotting', conditionType: 'Achieve', priority: 'Major', visibility: 'Known',
   targetEntityType: '', targetEntityId: '',
-  targetState: '', targetProperty: '', targetOperator: '', targetThreshold: '',
+  targetState: '', targetOwnerFactionId: '', championId: '', targetProperty: '', targetOperator: '', targetThreshold: '',
 });
 
 const toGoalFormModel = (g: FactionGoal): GoalFormModel => ({
   id: g.id, factionId: g.factionId, title: g.title,
-  description: g.description ?? '', status: g.status,
+  status: g.status,
+  conditionType: g.conditionType ?? 'Achieve',
   priority: g.priority, visibility: g.visibility,
   targetEntityType: g.targetEntityType ?? '',
   targetEntityId: g.targetEntityId ?? '',
   targetState: g.targetState ?? '',
+  targetOwnerFactionId: g.targetOwnerFactionId ?? '',
+  championId: g.championId ?? '',
   targetProperty: g.targetProperty ?? '',
   targetOperator: g.targetOperator ?? '',
   targetThreshold: g.targetThreshold != null ? g.targetThreshold.toString() : '',
@@ -57,11 +64,13 @@ const toGoalFormModel = (g: FactionGoal): GoalFormModel => ({
 
 const fromGoalFormModel = (fm: GoalFormModel): FactionGoal => ({
   id: fm.id, campaignId: '', factionId: fm.factionId,
-  title: fm.title.trim(), description: fm.description.trim() || undefined,
-  status: fm.status, priority: fm.priority, visibility: fm.visibility,
+  title: fm.title.trim(),
+  status: fm.status, conditionType: fm.conditionType, priority: fm.priority, visibility: fm.visibility,
   targetEntityType: fm.targetEntityType || undefined,
   targetEntityId: fm.targetEntityId || undefined,
-  targetState: (fm.targetEntityType === 'Character' || fm.targetEntityType === 'Asset') && fm.targetState ? fm.targetState : undefined,
+  targetState: (fm.targetEntityType === 'Character' || (fm.targetEntityType === 'Asset' && !fm.targetOwnerFactionId)) && fm.targetState ? fm.targetState : undefined,
+  targetOwnerFactionId: fm.targetEntityType === 'Asset' && fm.targetOwnerFactionId ? fm.targetOwnerFactionId : undefined,
+  championId: fm.championId || undefined,
   targetProperty: fm.targetEntityType === 'Faction' && fm.targetProperty ? fm.targetProperty : undefined,
   targetOperator: fm.targetEntityType === 'Faction' && fm.targetOperator ? fm.targetOperator as GoalTargetOperator : undefined,
   targetThreshold: fm.targetEntityType === 'Faction' && fm.targetThreshold ? parseInt(fm.targetThreshold, 10) : undefined,
@@ -177,7 +186,7 @@ const fromFormModel = (fm: FactionFormModel, values: ValueVector, existing: Fact
 @Component({
   selector: 'app-faction-detail',
   standalone: true,
-  imports: [RouterLink, FormField, TernaryPlotComponent, DecimalPipe, NgClass],
+  imports: [RouterLink, FormField, TernaryPlotComponent, PriorityIconComponent, DecimalPipe, NgClass],
   templateUrl: './faction-detail.component.html',
   styleUrl: './faction-detail.component.scss'
 })
@@ -430,17 +439,80 @@ export class FactionDetailComponent implements OnInit, OnDestroy {
 
   // ── Goals ─────────────────────────────────────────────────────────────────
 
+  private readonly PRIORITY_ORDER: Record<GoalPriority, number> = { Critical: 0, Major: 1, Minor: 2 };
+
   readonly goals = computed<FactionGoal[]>(() =>
-    this.store.factionGoals().filter(g => g.factionId === this.faction().id)
+    this.store.viewGoals()
+      .filter(g => g.factionId === this.faction().id)
+      .sort((a, b) => this.PRIORITY_ORDER[a.priority] - this.PRIORITY_ORDER[b.priority])
   );
 
-  readonly statusOptions    = GOAL_STATUS_OPTIONS;
+  readonly activeGoals   = computed<FactionGoal[]>(() =>
+    this.goals().filter(g => g.status !== 'Accomplished' && g.status !== 'Failed')
+  );
+
+  readonly resolvedGoals = computed<FactionGoal[]>(() =>
+    this.goals().filter(g => g.status === 'Accomplished' || g.status === 'Failed')
+  );
+
   readonly priorityOptions  = GOAL_PRIORITY_OPTIONS;
   readonly visibilityOptions = GOAL_VISIBILITY_OPTIONS;
+  readonly conditionTypeOptions: { value: GoalConditionType; label: string }[] = [
+    { value: 'Achieve',  label: 'Achieve'  },
+    { value: 'Maintain', label: 'Maintain' },
+  ];
 
   readonly showGoalModal = signal(false);
   readonly goalModel     = signal<GoalFormModel>(emptyGoalForm());
   readonly goalForm      = form(this.goalModel);
+
+  readonly goalStatusOptions = computed<{ value: GoalStatus; label: string }[]>(() => {
+    if (this.goalModel().conditionType === 'Maintain') {
+      return [
+        { value: 'Plotting',    label: 'Plotting' },
+        { value: 'Progressing', label: 'Maintaining' },
+        { value: 'Stalled',     label: 'At Risk' },
+        { value: 'Failed',      label: 'Failed' },
+      ];
+    }
+    return GOAL_STATUS_OPTIONS;
+  });
+
+  private readonly MAINTAIN_STATUS_LABELS: Partial<Record<GoalStatus, string>> = {
+    Progressing: 'Maintaining',
+    Stalled:     'At Risk',
+  };
+
+  goalStatusLabel(g: FactionGoal): string {
+    if (g.conditionType === 'Maintain') {
+      return this.MAINTAIN_STATUS_LABELS[g.status] ?? g.status;
+    }
+    return g.status;
+  }
+
+  goalStatusIcon(g: FactionGoal): string {
+    const label = this.goalStatusLabel(g);
+    switch (label) {
+      case 'Plotting':     return 'fa-compass-drafting';
+      case 'Progressing':  return 'fa-ellipsis';
+      case 'Maintaining':  return 'fa-ellipsis';
+      case 'Stalled':      return 'fa-road-barrier';
+      case 'At Risk':      return 'fa-triangle-exclamation';
+      default:             return 'fa-ellipsis';
+    }
+  }
+
+  goalStatusClass(g: FactionGoal): string {
+    const label = this.goalStatusLabel(g);
+    switch (label) {
+      case 'Plotting':    return 'status-plotting';
+      case 'Progressing': return 'status-progressing';
+      case 'Maintaining': return 'status-progressing';
+      case 'Stalled':     return 'status-stalled';
+      case 'At Risk':     return 'status-stalled';
+      default:            return '';
+    }
+  }
 
   readonly goalTargetStateOptions = computed<string[]>(() => {
     const t = this.goalModel().targetEntityType;
@@ -485,9 +557,31 @@ export class FactionDetailComponent implements OnInit, OnDestroy {
 
   resetTargetFields(): void {
     this.goalModel.update(f => ({
-      ...f, targetEntityId: '', targetState: '',
+      ...f, targetEntityId: '', targetState: '', targetOwnerFactionId: '',
       targetProperty: '', targetOperator: '', targetThreshold: '',
     }));
+  }
+
+  championFor(g: FactionGoal): Character | undefined {
+    return g.championId
+      ? this.store.viewCharacters().find(c => c.id === g.championId)
+      : undefined;
+  }
+
+  isChampionInactive(c: Character): boolean {
+    return c.state === 'Dead' || c.state === 'Forgotten';
+  }
+
+  championPortrait(c: Character): string {
+    return c.portraitPath ?? getAncestryImagePath(c.ancestry, c.gender);
+  }
+
+  onAssetConditionModeChange(mode: 'status' | 'ownership'): void {
+    if (mode === 'ownership') {
+      this.goalModel.update(f => ({ ...f, targetState: '', targetOwnerFactionId: f.factionId }));
+    } else {
+      this.goalModel.update(f => ({ ...f, targetOwnerFactionId: '', targetState: '' }));
+    }
   }
 
   goalTargetLabel(g: FactionGoal): string {
@@ -501,15 +595,25 @@ export class FactionDetailComponent implements OnInit, OnDestroy {
       const opLabel = g.targetOperator === 'gte' ? '≥' : g.targetOperator === 'lte' ? '≤' : '=';
       return `${entityName} ${g.targetProperty} ${opLabel} ${g.targetThreshold}`;
     }
+    if (g.targetEntityType === 'Asset' && g.targetOwnerFactionId) {
+      const ownerName = this.factionNameById(g.targetOwnerFactionId);
+      return `${entityName} controlled by ${ownerName}`;
+    }
     if (g.targetState) return `${entityName} → ${g.targetState}`;
     return entityName;
   }
 
   // ── Assets ────────────────────────────────────────────────────────────────
 
-  readonly assets = computed<Asset[]>(() =>
-    this.store.viewAssets().filter(a => a.controllingFactionId === this.faction().id)
-  );
+  readonly assets = computed<Asset[]>(() => {
+    const key = (name: string) => name.replace(/^the\s+/i, '').toLowerCase();
+    return this.store.viewAssets()
+      .filter(a => a.controllingFactionId === this.faction().id)
+      .sort((a, b) => {
+        if (a.keystone !== b.keystone) return a.keystone ? -1 : 1;
+        return key(a.name).localeCompare(key(b.name));
+      });
+  });
 
   // ── Character helpers ─────────────────────────────────────────────────────
 
@@ -574,9 +678,19 @@ export class FactionDetailComponent implements OnInit, OnDestroy {
   assetStatusClass(status: AssetStatus): string {
     const map: Record<AssetStatus, string> = {
       Stable: 'status-stable', Contested: 'status-contested', Damaged: 'status-damaged',
-      Destroyed: 'status-destroyed', Hidden: 'status-hidden', Lost: 'status-lost',
+      Destroyed: 'status-destroyed',
     };
     return map[status];
+  }
+
+  assetTypeIcon(type: AssetType): string {
+    const map: Record<AssetType, string> = {
+      Infrastructure: 'fa-duotone fa-landmark',
+      Artifact:       'fa-duotone fa-ring',
+      Resource:       'fa-duotone fa-treasure-chest',
+      Intelligence:   'fa-duotone fa-scroll-old',
+    };
+    return map[type];
   }
 
   // ── Image upload ──────────────────────────────────────────────────────────

@@ -233,6 +233,17 @@
                           }
                         }
 
+                        <!-- Actor faction selector for asset status changes -->
+                        @if (draft.targetType === 'asset' && draft.property === 'status') {
+                          <select [value]="draft.actorFactionId ?? ''"
+                            (change)="updateInlineEffect(ev.id, $index, 'actorFactionId', $any($event.target).value)">
+                            <option value="">— actor faction —</option>
+                            @for (f of activeFactions; track f.id) {
+                              <option [value]="f.id" [selected]="draft.actorFactionId === f.id">{{ f.name }}</option>
+                            }
+                          </select>
+                        }
+
                         <button class="btn btn-primary" (click)="saveInlineEffect(ev.id, $index)">Add</button>
                         <button class="btn btn-secondary" (click)="removeInlineEffect(ev.id, $index)">✕</button>
                       </div>

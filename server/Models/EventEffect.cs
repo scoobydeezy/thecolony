@@ -14,6 +14,8 @@ public class EventEffect
     public string? Value { get; set; }
     // For two-party effects (relationshipBump, partyRelationshipBump) — the second faction/target
     public string? SecondaryTargetId { get; set; }
+    // For asset status changes — the faction responsible for the state change
+    public string? ActorFactionId { get; set; }
     [JsonIgnore]
     public Event? Event { get; set; }
 }
