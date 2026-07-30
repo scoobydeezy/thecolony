@@ -5,8 +5,11 @@ import { FormField, form, required } from '@angular/forms/signals';
 import { AppStore } from '../../store/app.store';
 import { ApiService } from '../../core/services/api.service';
 import {
-  Character, CharacterType, CharacterState, DoubtDirection, ValueVector,
-  BeliefPosition,
+  Character, CharacterType, CharacterState, NarrativeTier, DoubtDirection, ValueVector,
+  BeliefPosition, NARRATIVE_TIER_OPTIONS,
+  CharacterNarrativeProfile, CharacterDetail, CharacterRelationship,
+  NarrativeVisibility, RelationshipState,
+  NARRATIVE_VISIBILITY_OPTIONS, RELATIONSHIP_STATE_OPTIONS,
   effectivePressure, computeDriftTarget, lerpValueVector,
   topCompatibleFactions, effectiveBeliefs,
   primaryValue, secondaryValue, sacrificedValue,
@@ -18,10 +21,25 @@ import { getAncestryImagePath, FALLBACK_ANCESTRY_IMAGE } from '../../core/utils/
 
 type EditingCard = 'header' | 'identity' | 'society' | 'narrative' | 'beliefs' | 'doubt' | null;
 
+interface RelFormModel {
+  relationshipType: string;
+  targetCharacterId: string;
+  summary: string;
+  state: string;
+  visibility: string;
+}
+
+interface DetailFormModel {
+  heading: string;
+  body: string;
+  visibility: string;
+}
+
 interface CharacterFormModel {
   id: string;
   name: string;
   characterType: string;
+  narrativeTier: string;
   state: CharacterState;
   ancestry: string;
   heritage: string;
@@ -29,12 +47,11 @@ interface CharacterFormModel {
   background: string;
   level: string;
   gender: string;
+  pronouns: string;
   age: string;
   occupation: string;
+  aliases: string;
   summary: string;
-  goals: string;
-  fears: string;
-  notes: string;
   factionId: string;
   socialClassId: string;
   beliefc: string;
@@ -50,10 +67,10 @@ interface CharacterFormModel {
 const DEFAULT_VALUES: ValueVector = { a: 1/3, b: 1/3, c: 1/3 };
 
 const emptyFormModel = (): CharacterFormModel => ({
-  id: '', name: '', characterType: 'NPC', state: 'Alive',
+  id: '', name: '', characterType: 'NPC', narrativeTier: 'Minor', state: 'Alive',
   ancestry: '', heritage: '', class: '', background: '', level: '',
-  gender: '', age: '', occupation: '',
-  summary: '', goals: '', fears: '', notes: '',
+  gender: '', pronouns: '', age: '', occupation: '', aliases: '',
+  summary: '',
   factionId: '', socialClassId: '',
   beliefc: '', beliefa: '', beliefb: '',
   doubtDirection: '', conviction: '50', pressure: '0',
@@ -64,6 +81,7 @@ const toFormModel = (c: Character): CharacterFormModel => ({
   id: c.id,
   name: c.name,
   characterType: c.characterType,
+  narrativeTier: c.narrativeTier ?? 'Minor',
   state: c.state,
   ancestry: c.ancestry ?? '',
   heritage: c.heritage ?? '',
@@ -71,12 +89,11 @@ const toFormModel = (c: Character): CharacterFormModel => ({
   background: c.background ?? '',
   level: c.level?.toString() ?? '',
   gender: c.gender ?? '',
+  pronouns: c.pronouns ?? '',
   age: c.age?.toString() ?? '',
   occupation: c.occupation ?? '',
+  aliases: c.aliases ?? '',
   summary: c.summary ?? '',
-  goals: c.goals ?? '',
-  fears: c.fears ?? '',
-  notes: c.notes ?? '',
   factionId: c.factionId ?? '',
   socialClassId: c.socialClassId ?? '',
   beliefc: c.beliefc ?? '',
@@ -124,14 +141,16 @@ export class CharacterDetailComponent implements OnInit {
 
     switch (card) {
       case 'header':
-        updated = { ...current, name: fm.name, characterType: fm.characterType as CharacterType, state: fm.state, summary: fm.summary || undefined };
+        updated = { ...current, name: fm.name, characterType: fm.characterType as CharacterType, narrativeTier: fm.narrativeTier as NarrativeTier, state: fm.state, summary: fm.summary || undefined };
         break;
       case 'identity':
         updated = {
           ...current,
           gender: fm.gender || undefined,
+          pronouns: fm.pronouns || undefined,
           age: fm.age ? +fm.age : undefined,
           occupation: fm.occupation || undefined,
+          aliases: fm.aliases || undefined,
           ancestry: fm.ancestry || undefined,
           heritage: fm.heritage || undefined,
           class: fm.class || undefined,
@@ -149,13 +168,7 @@ export class CharacterDetailComponent implements OnInit {
         };
         break;
       case 'narrative':
-        updated = {
-          ...current,
-          summary: fm.summary || undefined,
-          goals: fm.goals || undefined,
-          fears: fm.fears || undefined,
-          notes: fm.notes || undefined,
-        };
+        updated = { ...current, summary: fm.summary || undefined };
         break;
       case 'beliefs':
         updated = {
@@ -223,6 +236,7 @@ export class CharacterDetailComponent implements OnInit {
     required(schema.name, { message: 'Name is required' });
   });
 
+  readonly narrativeTierOptions = NARRATIVE_TIER_OPTIONS;
   readonly stateOptions: CharacterState[] = ['Alive', 'Dead', 'Missing', 'Forgotten'];
   readonly doubtDirections: DoubtDirection[] = ['a', 'b', 'c', 'ab', 'ac', 'bc'];
   readonly beliefcOptions = computed(() => beliefAxisOptions(this.store.beliefAxisLabels().c));
@@ -232,9 +246,8 @@ export class CharacterDetailComponent implements OnInit {
   readonly genderOptions = ['Male', 'Female', 'Unknown', 'Unspecified'];
 
   readonly roleOptions: { value: CharacterType; label: string }[] = [
-    { value: 'NPC',           label: 'NPC' },
-    { value: 'FactionLeader', label: 'Faction Leader' },
-    { value: 'PartyMember',   label: 'Party Member' },
+    { value: 'NPC',          label: 'NPC' },
+    { value: 'PartyMember',  label: 'Party Member' },
   ];
 
   readonly ancestryOptions = [
@@ -472,6 +485,10 @@ export class CharacterDetailComponent implements OnInit {
 
   readonly partyName = computed(() => this.store.colonyState()?.partyName ?? 'Party');
 
+  readonly championGoals = computed(() =>
+    this.store.viewGoals().filter(g => g.championId === this.character().id)
+  );
+
   readonly derivedBeliefs = computed(() => effectiveBeliefs(this.character()));
 
   readonly driftedBeliefChanges = computed(() => {
@@ -496,9 +513,179 @@ export class CharacterDetailComponent implements OnInit {
     const found = this.store.viewCharacters().find(c => c.id === id);
     if (found) {
       this.character.set({ ...found, values: { ...found.values } });
+      this.loadNarrativeData(found.id);
     } else {
       this.router.navigate(['/characters']);
     }
+  }
+
+  // ── Narrative Profile ──────────────────────────────────────────────────────
+
+  narrativeProfile = signal<CharacterNarrativeProfile | null>(null);
+  editingProfile = signal(false);
+  profileForm = signal<Partial<CharacterNarrativeProfile>>({});
+
+  openProfileEdit(): void {
+    this.profileForm.set({ ...(this.narrativeProfile() ?? { characterId: this.character().id }) });
+    this.editingProfile.set(true);
+  }
+  closeProfileEdit(): void { this.editingProfile.set(false); }
+
+  saveProfile(): void {
+    const form = { ...this.profileForm(), characterId: this.character().id } as CharacterNarrativeProfile;
+    this.api.upsertNarrativeProfile(form).subscribe({
+      next: (saved) => { this.narrativeProfile.set(saved); this.editingProfile.set(false); },
+    });
+  }
+
+  // ── Character Details ──────────────────────────────────────────────────────
+
+  characterDetails = signal<CharacterDetail[]>([]);
+  private editingDetailSrc = signal<CharacterDetail | null>(null);
+  editingDetailId = signal<string | 'new' | null>(null);
+  readonly detailFormModel = signal<DetailFormModel>({ heading: '', body: '', visibility: 'GMOnly' });
+  readonly df = form(this.detailFormModel);
+
+  readonly visibilityOptions = NARRATIVE_VISIBILITY_OPTIONS;
+
+  openDetailEdit(detail?: CharacterDetail): void {
+    if (detail) {
+      this.editingDetailSrc.set(detail);
+      this.detailFormModel.set({ heading: detail.heading, body: detail.body ?? '', visibility: detail.visibility });
+      this.editingDetailId.set(detail.id);
+    } else {
+      this.editingDetailSrc.set(null);
+      this.detailFormModel.set({ heading: '', body: '', visibility: 'GMOnly' });
+      this.editingDetailId.set('new');
+    }
+  }
+
+  closeDetailEdit(): void { this.editingDetailId.set(null); }
+
+  saveDetail(): void {
+    const fm = this.detailFormModel();
+    const src = this.editingDetailSrc();
+    const charId = this.character().id;
+    const isNew = this.editingDetailId() === 'new';
+    const key = fm.heading ? fm.heading.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') : '';
+    const payload: CharacterDetail = {
+      ...(src ?? {} as CharacterDetail),
+      heading: fm.heading,
+      body: fm.body || undefined,
+      visibility: fm.visibility as NarrativeVisibility,
+      key: src?.key || key,
+      sortOrder: src?.sortOrder ?? this.characterDetails().length,
+    };
+    const obs$ = isNew
+      ? this.api.createCharacterDetail(charId, payload)
+      : this.api.updateCharacterDetail(charId, payload);
+    obs$.subscribe({
+      next: (saved) => {
+        if (isNew) {
+          this.characterDetails.update(d => [...d, saved]);
+        } else {
+          this.characterDetails.update(d => d.map(x => x.id === saved.id ? saved : x));
+        }
+        this.editingDetailId.set(null);
+      },
+    });
+  }
+
+  deleteDetail(id: string): void {
+    this.api.deleteCharacterDetail(this.character().id, id).subscribe({
+      next: () => this.characterDetails.update(d => d.filter(x => x.id !== id)),
+    });
+  }
+
+  // ── Character Relationships ────────────────────────────────────────────────
+
+  characterRelationships = signal<CharacterRelationship[]>([]);
+  private editingRelSrc = signal<CharacterRelationship | null>(null);
+  editingRelId = signal<string | 'new' | null>(null);
+  readonly relFormModel = signal<RelFormModel>({ relationshipType: '', targetCharacterId: '', summary: '', state: 'Active', visibility: 'GMOnly' });
+  readonly rf = form(this.relFormModel);
+
+  readonly relationshipStateOptions = RELATIONSHIP_STATE_OPTIONS;
+
+  openRelEdit(rel?: CharacterRelationship): void {
+    if (rel) {
+      this.editingRelSrc.set(rel);
+      this.relFormModel.set({
+        relationshipType: rel.relationshipType ?? '',
+        targetCharacterId: rel.targetCharacterId ?? '',
+        summary: rel.summary ?? '',
+        state: rel.state,
+        visibility: rel.visibility,
+      });
+      this.editingRelId.set(rel.id);
+    } else {
+      this.editingRelSrc.set(null);
+      this.relFormModel.set({ relationshipType: '', targetCharacterId: '', summary: '', state: 'Active', visibility: 'GMOnly' });
+      this.editingRelId.set('new');
+    }
+  }
+
+  closeRelEdit(): void { this.editingRelId.set(null); }
+
+  saveRel(): void {
+    const fm = this.relFormModel();
+    const src = this.editingRelSrc();
+    const charId = this.character().id;
+    const isNew = this.editingRelId() === 'new';
+    const payload: CharacterRelationship = {
+      ...(src ?? {} as CharacterRelationship),
+      relationshipType: fm.relationshipType,
+      targetCharacterId: fm.targetCharacterId || undefined,
+      summary: fm.summary || undefined,
+      state: fm.state as RelationshipState,
+      visibility: fm.visibility as NarrativeVisibility,
+      sortOrder: src?.sortOrder ?? this.characterRelationships().length,
+    };
+    const obs$ = isNew
+      ? this.api.createCharacterRelationship(charId, payload)
+      : this.api.updateCharacterRelationship(charId, payload);
+    obs$.subscribe({
+      next: (saved) => {
+        if (isNew) {
+          this.characterRelationships.update(r => [...r, saved]);
+        } else {
+          this.characterRelationships.update(r => r.map(x => x.id === saved.id ? saved : x));
+        }
+        this.editingRelId.set(null);
+      },
+    });
+  }
+
+  deleteRel(id: string): void {
+    this.api.deleteCharacterRelationship(this.character().id, id).subscribe({
+      next: () => this.characterRelationships.update(r => r.filter(x => x.id !== id)),
+    });
+  }
+
+  resolveTargetName(rel: CharacterRelationship): string {
+    if (!rel.targetCharacterId) return '—';
+    return this.store.viewCharacters().find(c => c.id === rel.targetCharacterId)?.name ?? rel.targetCharacterId;
+  }
+
+  targetCharacterOptions(): { value: string; label: string }[] {
+    return this.store.viewCharacters()
+      .filter(c => c.id !== this.character().id)
+      .map(c => ({ value: c.id, label: c.name }));
+  }
+
+  private loadNarrativeData(characterId: string): void {
+    this.api.getNarrativeProfile(characterId).subscribe({
+      next: (p) => this.narrativeProfile.set(p),
+      error: () => {},
+    });
+    this.api.getCharacterDetails(characterId).subscribe({
+      next: (d) => this.characterDetails.set(d),
+      error: () => {},
+    });
+    this.api.getCharacterRelationships(characterId).subscribe({
+      next: (r) => this.characterRelationships.set(r),
+      error: () => {},
+    });
   }
 
   factionName(id?: string): string {
@@ -508,7 +695,6 @@ export class CharacterDetailComponent implements OnInit {
 
   typeLabel(t: CharacterType): string {
     if (t === 'PartyMember') return 'Party Member';
-    if (t === 'FactionLeader') return 'Faction Leader';
     return 'NPC';
   }
 

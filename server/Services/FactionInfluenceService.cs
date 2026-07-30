@@ -4,7 +4,7 @@ namespace ColonyTracker.Api.Services;
 
 public interface IFactionInfluenceService
 {
-    double CalculateCharacterStrength(IEnumerable<Character> members, int additionalMemberCount = 0);
+    double CalculateCharacterStrength(IEnumerable<Character> members, int additionalMemberCount = 0, string? leaderId = null);
     int CalculateOrganization(Faction faction, IEnumerable<Character> members);
     int CalculateLegitimacy(Faction faction);
     int CalculateEffectivePower(Faction faction, IEnumerable<Character> members);
@@ -17,7 +17,7 @@ public class FactionInfluenceService : IFactionInfluenceService
     // CharacterStrength = (avg * 0.6) + (max * 0.4); leaderless penalty applied here.
     // additionalMemberCount pads the pool with baseline-strength generics so large factions
     // don't require fully populating every member to model their mass accurately.
-    public double CalculateCharacterStrength(IEnumerable<Character> members, int additionalMemberCount = 0)
+    public double CalculateCharacterStrength(IEnumerable<Character> members, int additionalMemberCount = 0, string? leaderId = null)
     {
         var list = members.ToList();
         var totalCount = list.Count + additionalMemberCount;
@@ -29,7 +29,7 @@ public class FactionInfluenceService : IFactionInfluenceService
         var max = list.Count > 0 ? list.Max(c => (double)c.Influence) : AdditionalMemberBaseInfluence;
         var raw = avg * 0.6 + max * 0.4;
 
-        var hasLeader = list.Any(c => c.CharacterType == CharacterType.FactionLeader);
+        var hasLeader = leaderId != null && list.Any(c => c.Id == leaderId);
         return raw * (hasLeader ? 1.0 : 0.75);
     }
 
@@ -38,7 +38,7 @@ public class FactionInfluenceService : IFactionInfluenceService
     // normalizedMomentum = 50 + (momentum / 2)
     public int CalculateOrganization(Faction faction, IEnumerable<Character> members)
     {
-        var charStrength       = CalculateCharacterStrength(members, faction.AdditionalMemberCount);
+        var charStrength       = CalculateCharacterStrength(members, faction.AdditionalMemberCount, faction.LeaderId);
         var normalizedMomentum = 50.0 + faction.Momentum / 2.0;
 
         var raw =

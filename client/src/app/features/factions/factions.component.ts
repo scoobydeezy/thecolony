@@ -201,7 +201,19 @@ export class FactionsComponent {
       const h = csvHeaderMap(rows[0]);
       const get = (row: string[], col: string) => row[h.get(col) ?? -1] ?? '';
 
-      if (h.has('factionid')) {
+      if (h.has('narrativetier') || h.has('characterid')) {
+        alert(`Wrong file: this looks like a characters export. Import it from the Characters page instead.`);
+        (event.target as HTMLInputElement).value = '';
+        return;
+      }
+
+      if (h.has('keystone')) {
+        alert(`Wrong file: this looks like an assets export. Import it from the Assets page instead.`);
+        (event.target as HTMLInputElement).value = '';
+        return;
+      }
+
+      if (h.has('conditiontype')) {
         // Goals file
         const factionIds = new Set(this.store.factions().map(f => f.id));
         for (const row of rows.slice(1)) {
@@ -227,16 +239,21 @@ export class FactionsComponent {
           };
           this.store.saveFactionGoal(goal);
         }
-      } else {
+      } else if (h.has('bannershape')) {
         // Factions file
         const vl = this.store.valueLabels();
         const bl = this.store.beliefAxisLabels();
         // Try fixed key first (old exports), then display name (new exports)
         const getCol = (row: string[], fixed: string, display: string) =>
           get(row, fixed) || get(row, display.toLowerCase());
+        const existingById = new Map(this.store.factions().map(f => [f.id, f]));
         for (const row of rows.slice(1)) {
+          const id = get(row, 'id');
+          const existing = existingById.get(id);
           const faction: Faction = {
-            id:             get(row, 'id'),
+            // Preserve fields not present in the CSV (e.g. iconPath set via the UI)
+            ...existing,
+            id,
             name:           get(row, 'name'),
             type:           oneOf(get(row, 'type'), ['Faction', 'SocialClass'] as const) ?? 'Faction',
             active:         get(row, 'active') !== 'false',
@@ -273,9 +290,12 @@ export class FactionsComponent {
             baseLegitimacy:        parseInt(get(row, 'baselegitimacy'))        || 50,
             powerModifier:         parseInt(get(row, 'powermodifier'))         || 0,
             additionalMemberCount: parseInt(get(row, 'additionalmembercount')) || 0,
+            leaderId:              get(row, 'leaderid') || undefined,
           };
           this.store.saveFaction(faction);
         }
+      } else {
+        alert(`Unrecognized file format. Expected a factions or faction goals export.`);
       }
       (event.target as HTMLInputElement).value = '';
     };
@@ -294,7 +314,7 @@ export class FactionsComponent {
       bl.c.axisName, bl.a.axisName, bl.b.axisName,
       vl.a, vl.b, vl.c,
       'Momentum', 'BaseLegitimacy', 'PowerModifier',
-      'Notes', 'PrimaryColor', 'SecondaryColor', 'BannerShape'
+      'Notes', 'PrimaryColor', 'SecondaryColor', 'BannerShape', 'LeaderId'
     ];
     const factionRows = factions.map(f => [
       f.id, f.name, f.type, f.active ? 'true' : 'false', f.sortOrder,
@@ -304,7 +324,8 @@ export class FactionsComponent {
       f.beliefc ?? '', f.beliefa ?? '', f.beliefb ?? '',
       f.values.a.toFixed(4), f.values.b.toFixed(4), f.values.c.toFixed(4),
       f.momentum, f.baseLegitimacy, f.powerModifier,
-      f.notes ?? '', f.primaryColor ?? '', f.secondaryColor ?? '', f.bannerShape ?? ''
+      f.notes ?? '', f.primaryColor ?? '', f.secondaryColor ?? '', f.bannerShape ?? '',
+      f.leaderId ?? ''
     ]);
     downloadCsv([factionHeader, ...factionRows], 'factions.csv');
 

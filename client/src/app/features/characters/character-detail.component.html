@@ -2,21 +2,23 @@
 <div class="page-header">
   <div class="header-cols">
 
-    <!-- Col 0: faction banner -->
-    @if (characterFaction()) {
+    <!-- Col 0: faction banner (always present to hold grid column) -->
+    @if (characterFaction(); as faction) {
       <div class="faction-banner"
-        [ngClass]="'faction-banner--' + (characterFaction()!.bannerShape || 'centered-triangle')"
-        [style.background]="characterFaction()!.secondaryColor || '#1e293b'">
-        @if (characterFaction()!.iconPath) {
+        [ngClass]="'faction-banner--' + (faction.bannerShape || 'centered-triangle')"
+        [style.background]="faction.secondaryColor || '#1e293b'">
+        @if (faction.iconPath) {
           <div class="faction-banner-icon"
-            [style.background-color]="characterFaction()!.primaryColor || '#ffffff'"
-            [style.-webkit-mask-image]="'url(' + characterFaction()!.iconPath + ')'"
-            [style.mask-image]="'url(' + characterFaction()!.iconPath + ')'"></div>
+            [style.background-color]="faction.primaryColor || '#ffffff'"
+            [style.-webkit-mask-image]="'url(' + faction.iconPath + ')'"
+            [style.mask-image]="'url(' + faction.iconPath + ')'"></div>
         } @else {
           <i class="fa-solid fa-people-group faction-banner-icon-fallback"
-            [style.color]="characterFaction()!.primaryColor || '#ffffff'"></i>
+            [style.color]="faction.primaryColor || '#ffffff'"></i>
         }
       </div>
+    } @else {
+      <div class="faction-banner-placeholder"></div>
     }
 
     <!-- Col 1: identity -->
@@ -33,15 +35,27 @@
         <div class="header-title-row">
           <h2>{{ character().name }}</h2>
           <span class="type-chip"
-            [class.party]="character().characterType === 'PartyMember'"
-            [class.leader]="character().characterType === 'FactionLeader'">
+            [class.party]="character().characterType === 'PartyMember'">
             {{ typeLabel(character().characterType) }}
           </span>
+          @if (character().narrativeTier && character().narrativeTier !== 'Minor') {
+            <span class="tier-chip tier-chip--{{ character().narrativeTier!.toLowerCase() }}">{{ character().narrativeTier }}</span>
+          }
         </div>
         @if (character().occupation) {
           <p class="header-represents">{{ character().occupation }}</p>
         }
       </div>
+      @if (championGoals().length) {
+        <div class="champion-goals">
+          <span class="section-title">Goal Champion</span>
+          <div class="champion-goals-chips">
+            @for (g of championGoals(); track g.id) {
+              <span class="goal-chip goal-chip--{{ g.status.toLowerCase() }}" [title]="g.status">{{ g.title }}</span>
+            }
+          </div>
+        </div>
+      }
       @if (character().summary) {
         <h3 class="section-title">Summary</h3>
         <p class="header-summary">{{ character().summary }}</p>
@@ -137,6 +151,10 @@
             </select>
           </div>
           <div class="form-group">
+            <label>Pronouns</label>
+            <input type="text" [formField]="f.pronouns" placeholder="e.g. He/Him, She/Her, They/Them" />
+          </div>
+          <div class="form-group">
             <label>Age</label>
             <input type="number" [formField]="f.age" />
           </div>
@@ -170,6 +188,10 @@
             <label>Level</label>
             <input type="number" [formField]="f.level" />
           </div>
+          <div class="form-group form-group--wide">
+            <label>Aliases</label>
+            <input type="text" [formField]="f.aliases" placeholder="Comma-separated e.g. His Prominence, The Elder" />
+          </div>
         </div>
         <div class="card-edit-actions">
           <button class="btn btn-secondary btn-sm" (click)="closeCard()">Cancel</button>
@@ -182,6 +204,9 @@
               <span class="detail-label">Race &amp; Gender</span>
               <span>{{ character().ancestry }} {{ character().gender }}</span>
             </div>
+          }
+          @if (character().pronouns) {
+            <div class="detail-item"><span class="detail-label">Pronouns</span><span>{{ character().pronouns }}</span></div>
           }
           @if (character().age) {
             <div class="detail-item"><span class="detail-label">Age</span><span>{{ character().age }}</span></div>
@@ -204,60 +229,76 @@
           @if (character().background) {
             <div class="detail-item"><span class="detail-label">Background</span><span>{{ character().background }}</span></div>
           }
+          @if (character().aliases) {
+            <div class="detail-item detail-item--wide"><span class="detail-label">Aliases</span><span>{{ character().aliases }}</span></div>
+          }
         </div>
-        @if (!character().gender && !character().ancestry && !character().age && !character().occupation && !character().heritage && !character().class && !character().background) {
+        @if (!character().gender && !character().ancestry && !character().age && !character().occupation && !character().heritage && !character().class && !character().background && !character().aliases) {
           <p class="empty-state">No identity recorded.</p>
         }
       }
     </div>
 
-    <!-- Narrative -->
-    <div class="card" [class.card--editing]="isEditing('narrative')">
+    <!-- Society -->
+    <div class="card" [class.card--editing]="isEditing('society')">
       <div class="card-header-row">
-        <h3 class="section-title">Narrative</h3>
+        <h3 class="section-title">Society</h3>
         @if (!store.isViewingSnapshot()) {
-          <button class="card-edit-btn" (click)="isEditing('narrative') ? closeCard() : openCard('narrative')" [title]="isEditing('narrative') ? 'Cancel' : 'Edit'">
-            <i [class]="isEditing('narrative') ? 'fa-solid fa-xmark' : 'fa-solid fa-pen'"></i>
+          <button class="card-edit-btn" (click)="isEditing('society') ? closeCard() : openCard('society')" [title]="isEditing('society') ? 'Cancel' : 'Edit'">
+            <i [class]="isEditing('society') ? 'fa-solid fa-xmark' : 'fa-solid fa-pen'"></i>
           </button>
         }
       </div>
 
-      @if (isEditing('narrative')) {
-        <div class="form-stack">
+      @if (isEditing('society')) {
+        <div class="form-grid">
           <div class="form-group">
-            <label>Goals</label>
-            <textarea rows="2" [formField]="f.goals"></textarea>
+            <label>Social Class</label>
+            <select [formField]="f.socialClassId">
+              <option value="">None</option>
+              @for (sc of socialClassOptions(); track sc.id) { <option [value]="sc.id">{{ sc.name }}</option> }
+            </select>
           </div>
           <div class="form-group">
-            <label>Fears</label>
-            <textarea rows="2" [formField]="f.fears"></textarea>
+            <label>Faction</label>
+            <select [formField]="f.factionId">
+              <option value="">None</option>
+              @for (faction of factionOptions(); track faction.id) { <option [value]="faction.id">{{ faction.name }}</option> }
+            </select>
           </div>
           <div class="form-group">
-            <label>Notes</label>
-            <textarea rows="3" [formField]="f.notes" placeholder="Session notes, secrets, GM info."></textarea>
+            <label>Influence (0–100)</label>
+            <input type="number" [formField]="f.influence" />
+          </div>
+          <div class="form-group">
+            <label>Impressionable (0–100)</label>
+            <input type="number" [formField]="f.impressionable" />
           </div>
         </div>
+        <p class="pressure-hint">Influence stabilizes faction-mates' conviction.</p>
         <div class="card-edit-actions">
           <button class="btn btn-secondary btn-sm" (click)="closeCard()">Cancel</button>
-          <button class="btn btn-primary btn-sm" (click)="saveCard('narrative')">Save</button>
+          <button class="btn btn-primary btn-sm" (click)="saveCard('society')">Save</button>
         </div>
       } @else {
-        @if (character().goals || character().fears || character().notes) {
-          <div class="narrative-grid">
-            @if (character().goals) {
-              <div class="narrative-block"><span class="narrative-label">Goals</span><p>{{ character().goals }}</p></div>
-            }
-            @if (character().fears) {
-              <div class="narrative-block"><span class="narrative-label">Fears</span><p>{{ character().fears }}</p></div>
-            }
-            @if (character().notes) {
-              <div class="narrative-block span-2"><span class="narrative-label">Notes</span><p>{{ character().notes }}</p></div>
-            }
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">Faction</span>
+            <span>{{ factionName(character().factionId) }}</span>
           </div>
-        }
-        @if (!character().goals && !character().fears && !character().notes) {
-          <p class="empty-state">No narrative recorded.</p>
-        }
+          <div class="detail-item">
+            <span class="detail-label">Social Class</span>
+            <span>{{ factionName(character().socialClassId) }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Influence</span>
+            <span>{{ character().influence }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Impressionable</span>
+            <span>{{ character().impressionable }}</span>
+          </div>
+        </div>
       }
     </div>
 
@@ -396,73 +437,6 @@
       }
     </div>
 
-  </div><!-- /col 1 -->
-
-  <!-- ── COLUMN 2: Analysis ────────────────────────────────────────────────── -->
-  <div class="detail-col">
-
-    <!-- Society -->
-    <div class="card" [class.card--editing]="isEditing('society')">
-      <div class="card-header-row">
-        <h3 class="section-title">Society</h3>
-        @if (!store.isViewingSnapshot()) {
-          <button class="card-edit-btn" (click)="isEditing('society') ? closeCard() : openCard('society')" [title]="isEditing('society') ? 'Cancel' : 'Edit'">
-            <i [class]="isEditing('society') ? 'fa-solid fa-xmark' : 'fa-solid fa-pen'"></i>
-          </button>
-        }
-      </div>
-
-      @if (isEditing('society')) {
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Social Class</label>
-            <select [formField]="f.socialClassId">
-              <option value="">None</option>
-              @for (sc of socialClassOptions(); track sc.id) { <option [value]="sc.id">{{ sc.name }}</option> }
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Faction</label>
-            <select [formField]="f.factionId">
-              <option value="">None</option>
-              @for (faction of factionOptions(); track faction.id) { <option [value]="faction.id">{{ faction.name }}</option> }
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Influence (0–100)</label>
-            <input type="number" [formField]="f.influence" />
-          </div>
-          <div class="form-group">
-            <label>Impressionable (0–100)</label>
-            <input type="number" [formField]="f.impressionable" />
-          </div>
-        </div>
-        <p class="pressure-hint">Influence stabilizes faction-mates' conviction.</p>
-        <div class="card-edit-actions">
-          <button class="btn btn-secondary btn-sm" (click)="closeCard()">Cancel</button>
-          <button class="btn btn-primary btn-sm" (click)="saveCard('society')">Save</button>
-        </div>
-      } @else {
-        <div class="detail-grid">
-          <div class="detail-item">
-            <span class="detail-label">Faction</span>
-            <span>{{ factionName(character().factionId) }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Social Class</span>
-            <span>{{ factionName(character().socialClassId) }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Influence</span>
-            <span>{{ character().influence }}</span>
-          </div>
-          <div class="detail-item">
-            <span class="detail-label">Impressionable</span>
-            <span>{{ character().impressionable }}</span>
-          </div>
-        </div>
-      }
-    </div>
 
     <!-- Alignment Analysis -->
     <div class="card alignment-card">
@@ -584,9 +558,287 @@
       </div>
     </div>
 
+  </div><!-- /col 1 -->
+
+  <!-- ── COLUMN 2: Analysis ────────────────────────────────────────────────── -->
+  <div class="detail-col">
+
+    <!-- Narrative -->
+    <div class="card" [class.card--editing]="editingProfile()">
+      <div class="card-header-row">
+        <h3 class="section-title">Narrative</h3>
+        @if (!store.isViewingSnapshot()) {
+          <button class="card-edit-btn" (click)="editingProfile() ? closeProfileEdit() : openProfileEdit()" [title]="editingProfile() ? 'Cancel' : 'Edit'">
+            <i [class]="editingProfile() ? 'fa-solid fa-xmark' : 'fa-solid fa-pen'"></i>
+          </button>
+        }
+      </div>
+
+      @let tier = character().narrativeTier ?? 'Minor';
+      @let isFull = tier === 'Major' || tier === 'Supporting';
+
+      @if (editingProfile()) {
+        <div class="profile-edit-grid">
+
+          <div class="profile-section-label">Story</div>
+          <div class="form-group form-group--wide">
+            <label>Overview</label>
+            <textarea rows="3" [value]="profileForm().overview ?? ''" (input)="profileForm.update(p => ({...p, overview: $any($event.target).value}))"></textarea>
+          </div>
+          @if (isFull) {
+            <div class="form-group form-group--wide">
+              <label>Narrative Role</label>
+              <textarea rows="2" [value]="profileForm().narrativeRole ?? ''" (input)="profileForm.update(p => ({...p, narrativeRole: $any($event.target).value}))"></textarea>
+            </div>
+            <div class="form-group form-group--wide">
+              <label>Signature Quote</label>
+              <textarea rows="2" [value]="profileForm().signatureQuote ?? ''" (input)="profileForm.update(p => ({...p, signatureQuote: $any($event.target).value}))"></textarea>
+            </div>
+            <div class="form-group form-group--wide">
+              <label>Signature Object</label>
+              <input type="text" [value]="profileForm().signatureObject ?? ''" (input)="profileForm.update(p => ({...p, signatureObject: $any($event.target).value}))" />
+            </div>
+            <div class="profile-section-label">Portrayal</div>
+            <div class="form-group">
+              <label>Inspiration</label>
+              <input type="text" [value]="profileForm().performanceInspiration ?? ''" (input)="profileForm.update(p => ({...p, performanceInspiration: $any($event.target).value}))" placeholder="e.g. Bill Nighy" />
+            </div>
+            <div class="form-group form-group--wide">
+              <label>Personality</label>
+              <textarea rows="2" [value]="profileForm().personality ?? ''" (input)="profileForm.update(p => ({...p, personality: $any($event.target).value}))"></textarea>
+            </div>
+            <div class="form-group form-group--wide">
+              <label>Under Pressure</label>
+              <textarea rows="2" [value]="profileForm().pressureResponse ?? ''" (input)="profileForm.update(p => ({...p, pressureResponse: $any($event.target).value}))"></textarea>
+            </div>
+            <div class="form-group form-group--wide">
+              <label>Portrayal Notes</label>
+              <textarea rows="2" [value]="profileForm().portrayalNotes ?? ''" (input)="profileForm.update(p => ({...p, portrayalNotes: $any($event.target).value}))"></textarea>
+            </div>
+          }
+
+          <div class="profile-section-label">Psychology</div>
+          <div class="form-group form-group--wide">
+            <label>Motivation</label>
+            <textarea rows="2" [value]="profileForm().motivation ?? ''" (input)="profileForm.update(p => ({...p, motivation: $any($event.target).value}))"></textarea>
+          </div>
+          <div class="form-group form-group--wide">
+            <label>Fears</label>
+            <textarea rows="2" [value]="profileForm().fears ?? ''" (input)="profileForm.update(p => ({...p, fears: $any($event.target).value}))"></textarea>
+          </div>
+          @if (isFull) {
+            <div class="form-group form-group--wide">
+              <label>Primary Protection</label>
+              <textarea rows="2" [value]="profileForm().primaryProtection ?? ''" (input)="profileForm.update(p => ({...p, primaryProtection: $any($event.target).value}))"></textarea>
+            </div>
+            <div class="form-group form-group--wide">
+              <label>Blind Spot</label>
+              <textarea rows="2" [value]="profileForm().blindSpot ?? ''" (input)="profileForm.update(p => ({...p, blindSpot: $any($event.target).value}))"></textarea>
+            </div>
+          }
+
+          <div class="profile-section-label">Notes</div>
+          <div class="form-group form-group--wide">
+            <textarea rows="3" [value]="profileForm().notes ?? ''" (input)="profileForm.update(p => ({...p, notes: $any($event.target).value}))" placeholder="Session notes, secrets, GM info."></textarea>
+          </div>
+
+        </div>
+        <div class="card-edit-actions">
+          <button class="btn btn-secondary btn-sm" (click)="closeProfileEdit()">Cancel</button>
+          <button class="btn btn-primary btn-sm" (click)="saveProfile()">Save</button>
+        </div>
+      } @else {
+        @let p = narrativeProfile();
+        @if (p) {
+          <div class="profile-read-grid">
+
+            @if (p.overview || (isFull && (p.narrativeRole || p.signatureQuote || p.signatureObject))) {
+              <div class="profile-section-label profile-section-label--read">Story</div>
+              @if (p.overview)       { <div class="profile-field profile-field--wide"><span class="profile-label">Overview</span><p>{{ p.overview }}</p></div> }
+              @if (isFull) {
+                @if (p.narrativeRole)  { <div class="profile-field profile-field--wide"><span class="profile-label">Narrative Role</span><p>{{ p.narrativeRole }}</p></div> }
+                @if (p.signatureQuote) { <div class="profile-field profile-field--wide profile-field--quote"><span class="profile-label">Signature Quote</span><blockquote>{{ p.signatureQuote }}</blockquote></div> }
+                @if (p.signatureObject){ <div class="profile-field profile-field--wide"><span class="profile-label">Signature Object</span><p>{{ p.signatureObject }}</p></div> }
+              }
+            }
+
+            @if (isFull && (p.performanceInspiration || p.personality || p.pressureResponse || p.portrayalNotes)) {
+              <div class="profile-section-label profile-section-label--read">Portrayal</div>
+              @if (p.performanceInspiration) { <div class="profile-field"><span class="profile-label">Inspiration</span><p>{{ p.performanceInspiration }}</p></div> }
+              @if (p.personality)            { <div class="profile-field profile-field--wide"><span class="profile-label">Personality</span><p>{{ p.personality }}</p></div> }
+              @if (p.pressureResponse)       { <div class="profile-field profile-field--wide"><span class="profile-label">Under Pressure</span><p>{{ p.pressureResponse }}</p></div> }
+              @if (p.portrayalNotes)         { <div class="profile-field profile-field--wide"><span class="profile-label">Portrayal Notes</span><p>{{ p.portrayalNotes }}</p></div> }
+            }
+
+            @if (p.motivation || p.fears || (isFull && (p.primaryProtection || p.blindSpot))) {
+              <div class="profile-section-label profile-section-label--read">Psychology</div>
+              @if (p.motivation)         { <div class="profile-field"><span class="profile-label">Motivation</span><p>{{ p.motivation }}</p></div> }
+              @if (p.fears)             { <div class="profile-field"><span class="profile-label">Fears</span><p>{{ p.fears }}</p></div> }
+              @if (isFull) {
+                @if (p.primaryProtection){ <div class="profile-field"><span class="profile-label">Primary Protection</span><p>{{ p.primaryProtection }}</p></div> }
+                @if (p.blindSpot)        { <div class="profile-field"><span class="profile-label">Blind Spot</span><p>{{ p.blindSpot }}</p></div> }
+              }
+            }
+
+            @if (p.notes) {
+              <div class="profile-section-label profile-section-label--read">Notes</div>
+              <div class="profile-field profile-field--wide"><p>{{ p.notes }}</p></div>
+            }
+
+          </div>
+        } @else {
+          <p class="empty-state">No narrative recorded.</p>
+        }
+      }
+    </div>
+
+    <!-- ── CHARACTER DETAILS ──────────────────────────────────────────────────── -->
+    <div class="card card--details">
+      <div class="card-header-row">
+        <h3 class="section-title">Details</h3>
+        @if (!store.isViewingSnapshot()) {
+          <button class="btn btn-secondary btn-sm" (click)="openDetailEdit()">+ Add</button>
+        }
+      </div>
+
+      @for (detail of characterDetails(); track detail.id) {
+        <div class="detail-block">
+          <div class="detail-block-header">
+            <span class="detail-block-heading">{{ detail.heading }}</span>
+            <span class="visibility-badge visibility-badge--{{ detail.visibility.toLowerCase() }}">{{ detail.visibility }}</span>
+            @if (!store.isViewingSnapshot()) {
+              <button class="btn-icon btn-icon--muted" (click)="openDetailEdit(detail)" title="Edit"><i class="fa-solid fa-pen"></i></button>
+              <button class="btn-icon btn-icon--danger" (click)="deleteDetail(detail.id)" title="Delete"><i class="fa-solid fa-trash"></i></button>
+            }
+          </div>
+          @if (detail.body) { <p class="detail-block-body">{{ detail.body }}</p> }
+        </div>
+      }
+      @empty {
+        <p class="empty-state">No details recorded.</p>
+      }
+
+      @if (editingDetailId() !== null) {
+        <div class="modal-backdrop" (click)="closeDetailEdit()">
+          <div class="modal modal-sm" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+              <h3>{{ editingDetailId() === 'new' ? 'New Detail' : 'Edit Detail' }}</h3>
+              <button class="modal-close" (click)="closeDetailEdit()">✕</button>
+            </div>
+            <div class="modal-body">
+              <div class="form-row">
+                <label class="form-label">Heading *</label>
+                <input class="form-input" type="text" [formField]="df.heading" placeholder="e.g. Bad Maps" />
+              </div>
+              <div class="form-row">
+                <label class="form-label">Body</label>
+                <textarea class="form-input" rows="5" [formField]="df.body"></textarea>
+              </div>
+              <div class="form-row">
+                <label class="form-label">Visibility</label>
+                <select class="form-input" [formField]="df.visibility">
+                  @for (opt of visibilityOptions; track opt.value) {
+                    <option [value]="opt.value">{{ opt.label }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-secondary" (click)="closeDetailEdit()">Cancel</button>
+              <button class="btn btn-primary" (click)="saveDetail()">Save</button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- ── RELATIONSHIPS ──────────────────────────────────────────────────────── -->
+    <div class="card card--relationships">
+      <div class="card-header-row">
+        <h3 class="section-title">Relationships</h3>
+        @if (!store.isViewingSnapshot()) {
+          <button class="btn btn-secondary btn-sm" (click)="openRelEdit()">+ Add</button>
+        }
+      </div>
+
+      @for (rel of characterRelationships(); track rel.id) {
+        <div class="rel-row">
+          <div class="rel-row-main">
+            <span class="rel-type">{{ rel.relationshipType }}</span>
+            <span class="rel-target">{{ resolveTargetName(rel) }}</span>
+            <span class="rel-state-badge rel-state-badge--{{ rel.state.toLowerCase() }}">{{ rel.state }}</span>
+            <span class="visibility-badge visibility-badge--{{ rel.visibility.toLowerCase() }}">{{ rel.visibility }}</span>
+            @if (!store.isViewingSnapshot()) {
+              <button class="btn-icon btn-icon--muted" (click)="openRelEdit(rel)" title="Edit"><i class="fa-solid fa-pen"></i></button>
+              <button class="btn-icon btn-icon--danger" (click)="deleteRel(rel.id)" title="Delete"><i class="fa-solid fa-trash"></i></button>
+            }
+          </div>
+          @if (rel.summary) { <p class="rel-summary">{{ rel.summary }}</p> }
+        </div>
+      }
+      @empty {
+        <p class="empty-state">No relationships recorded.</p>
+      }
+
+      @if (editingRelId() !== null) {
+        <div class="modal-backdrop" (click)="closeRelEdit()">
+          <div class="modal modal-sm" (click)="$event.stopPropagation()">
+            <div class="modal-header">
+              <h3>{{ editingRelId() === 'new' ? 'New Relationship' : 'Edit Relationship' }}</h3>
+              <button class="modal-close" (click)="closeRelEdit()">✕</button>
+            </div>
+            <div class="modal-body">
+              <div class="form-row two-col">
+                <div>
+                  <label class="form-label">Type</label>
+                  <input class="form-input" type="text" [formField]="rf.relationshipType" placeholder="e.g. Mentor, Rival, Spouse" />
+                </div>
+                <div>
+                  <label class="form-label">Character</label>
+                  <select class="form-input" [formField]="rf.targetCharacterId">
+                    <option value="">— Select —</option>
+                    @for (opt of targetCharacterOptions(); track opt.value) {
+                      <option [value]="opt.value">{{ opt.label }}</option>
+                    }
+                  </select>
+                </div>
+              </div>
+              <div class="form-row">
+                <label class="form-label">Summary</label>
+                <textarea class="form-input" rows="3" [formField]="rf.summary"></textarea>
+              </div>
+              <div class="form-row two-col">
+                <div>
+                  <label class="form-label">State</label>
+                  <select class="form-input" [formField]="rf.state">
+                    @for (opt of relationshipStateOptions; track opt.value) {
+                      <option [value]="opt.value">{{ opt.label }}</option>
+                    }
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label">Visibility</label>
+                  <select class="form-input" [formField]="rf.visibility">
+                    @for (opt of visibilityOptions; track opt.value) {
+                      <option [value]="opt.value">{{ opt.label }}</option>
+                    }
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-secondary" (click)="closeRelEdit()">Cancel</button>
+              <button class="btn btn-primary" (click)="saveRel()">Save</button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
   </div><!-- /col 2 -->
 
 </div><!-- /detail-layout -->
+
 
 <!-- ── Header edit modal ───────────────────────────────────────────────────── -->
 @if (isEditing('header')) {
@@ -619,6 +871,14 @@
             <label class="form-label">State</label>
             <select class="form-input" [formField]="f.state">
               @for (s of stateOptions; track s) { <option [value]="s">{{ s }}</option> }
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Narrative Tier</label>
+            <select class="form-input" [formField]="f.narrativeTier">
+              @for (opt of narrativeTierOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
             </select>
           </div>
         </div>

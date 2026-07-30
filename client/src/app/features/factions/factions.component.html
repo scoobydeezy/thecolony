@@ -102,8 +102,8 @@
         <app-ternary-plot [values]="f.values" [editable]="false" [size]="160" [showValueLabels]="false" [valueLabels]="store.valueLabels()" />
 
         <div class="beliefs-col">
-          @if (f.coreTenet) {
-            <p class="core-tenet">{{ f.coreTenet }}</p>
+          @if (f.motto || f.coreTenet) {
+            <p class="core-tenet">{{ f.motto || f.coreTenet }}</p>
           }
 
           @if (f.summary) {

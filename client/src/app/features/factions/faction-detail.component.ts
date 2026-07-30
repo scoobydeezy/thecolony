@@ -365,17 +365,22 @@ export class FactionDetailComponent implements OnInit, OnDestroy {
     this.allCharacters().filter(c => c.state !== 'Alive').sort((a, b) => a.name.localeCompare(b.name))
   );
 
-  readonly leaders = computed<Character[]>(() =>
-    this.activeCharacters()
-      .filter(c => c.characterType === 'FactionLeader')
-      .sort((a, b) => b.influence - a.influence)
-  );
+  readonly leaders = computed<Character[]>(() => {
+    const leaderId = this.faction().leaderId;
+    if (!leaderId) return [];
+    return this.activeCharacters().filter(c => c.id === leaderId);
+  });
 
-  readonly members = computed<Character[]>(() =>
-    this.activeCharacters()
-      .filter(c => c.characterType !== 'FactionLeader')
-      .sort((a, b) => b.influence - a.influence)
-  );
+  readonly members = computed<Character[]>(() => {
+    const leaderId = this.faction().leaderId;
+    return this.activeCharacters()
+      .filter(c => c.id !== leaderId)
+      .sort((a, b) => b.influence - a.influence);
+  });
+
+  setLeader(id: string | null): void {
+    this.store.saveFaction({ ...this.faction(), leaderId: id ?? undefined });
+  }
 
   adjustAdditionalMembers(delta: number): void {
     const current = this.faction();

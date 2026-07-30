@@ -585,22 +585,31 @@
             @let drift = charDriftScore(char);
             @let bestId = charBestFactionId(char);
             <div class="entity-card" [class.drift-risk]="bestId !== null && bestId !== faction().id && drift > 0">
-              <div class="character-row-main">
-                <span class="char-name">{{ char.name }}</span>
-                <span class="char-type-chip leader">Leader</span>
-                @if (faction().type === 'SocialClass' && char.factionId) {
-                  <span class="char-type-chip faction-label">{{ factionNameById(char.factionId) }}</span>
-                }
-                @if (char.occupation) { <span class="char-meta">{{ char.occupation }}</span> }
-                @if (char.class) { <span class="char-meta">{{ char.class }}{{ char.level ? ' ' + char.level : '' }}</span> }
-                @if (char.doubtDirection) {
-                  <span class="char-drift-score" [class]="charDriftClass(drift)">Drift {{ drift > 0 ? '+' : '' }}{{ drift | number:'1.0-1' }}</span>
-                  @if (bestId !== null && bestId !== faction().id && drift > 0) {
-                    <span class="char-misfit-badge">⚠ {{ factionNameById(bestId) }}</span>
+              <div class="member-card-body">
+                <div class="character-row-main">
+                  <span class="char-name">{{ char.name }}</span>
+                  <span class="char-type-chip leader">Leader</span>
+                  @if (faction().type === 'SocialClass' && char.factionId) {
+                    <span class="char-type-chip faction-label">{{ factionNameById(char.factionId) }}</span>
                   }
-                }
+                  @if (char.occupation) { <span class="char-meta">{{ char.occupation }}</span> }
+                  @if (char.class) { <span class="char-meta">{{ char.class }}{{ char.level ? ' ' + char.level : '' }}</span> }
+                  @if (char.doubtDirection) {
+                    <span class="char-drift-score" [class]="charDriftClass(drift)">Drift {{ drift > 0 ? '+' : '' }}{{ drift | number:'1.0-1' }}</span>
+                    @if (bestId !== null && bestId !== faction().id && drift > 0) {
+                      <span class="char-misfit-badge">⚠ {{ factionNameById(bestId) }}</span>
+                    }
+                  }
+                </div>
+                @if (char.summary) { <p class="char-summary">{{ char.summary }}</p> }
               </div>
-              @if (char.summary) { <p class="char-summary">{{ char.summary }}</p> }
+              @if (!store.isViewingSnapshot()) {
+                <div class="member-card-actions">
+                  <button class="btn-icon btn-icon--danger btn-icon--leader-action" title="Demote from leader" (click)="setLeader(null)">
+                    <i class="fa-solid fa-circle-minus"></i>
+                  </button>
+                </div>
+              }
             </div>
           }
         }
@@ -611,21 +620,30 @@
             @let drift = charDriftScore(char);
             @let bestId = charBestFactionId(char);
             <div class="entity-card" [class.drift-risk]="bestId !== null && bestId !== faction().id && drift > 0">
-              <div class="character-row-main">
-                <span class="char-name">{{ char.name }}</span>
-                <span class="char-type-chip" [class.party]="char.characterType === 'PartyMember'">
-                  {{ char.characterType === 'PartyMember' ? 'Party' : 'NPC' }}
-                </span>
-                @if (char.occupation) { <span class="char-meta">{{ char.occupation }}</span> }
-                @if (char.class) { <span class="char-meta">{{ char.class }}{{ char.level ? ' ' + char.level : '' }}</span> }
-                @if (char.doubtDirection) {
-                  <span class="char-drift-score" [class]="charDriftClass(drift)">Drift {{ drift > 0 ? '+' : '' }}{{ drift | number:'1.0-1' }}</span>
-                  @if (bestId !== null && bestId !== faction().id && drift > 0) {
-                    <span class="char-misfit-badge">⚠ {{ factionNameById(bestId) }}</span>
+              <div class="member-card-body">
+                <div class="character-row-main">
+                  <span class="char-name">{{ char.name }}</span>
+                  <span class="char-type-chip" [class.party]="char.characterType === 'PartyMember'">
+                    {{ char.characterType === 'PartyMember' ? 'Party' : 'NPC' }}
+                  </span>
+                  @if (char.occupation) { <span class="char-meta">{{ char.occupation }}</span> }
+                  @if (char.class) { <span class="char-meta">{{ char.class }}{{ char.level ? ' ' + char.level : '' }}</span> }
+                  @if (char.doubtDirection) {
+                    <span class="char-drift-score" [class]="charDriftClass(drift)">Drift {{ drift > 0 ? '+' : '' }}{{ drift | number:'1.0-1' }}</span>
+                    @if (bestId !== null && bestId !== faction().id && drift > 0) {
+                      <span class="char-misfit-badge">⚠ {{ factionNameById(bestId) }}</span>
+                    }
                   }
-                }
+                </div>
+                @if (char.summary) { <p class="char-summary">{{ char.summary }}</p> }
               </div>
-              @if (char.summary) { <p class="char-summary">{{ char.summary }}</p> }
+              @if (!store.isViewingSnapshot() && faction().type !== 'SocialClass' && !faction().leaderId) {
+                <div class="member-card-actions">
+                  <button class="btn-icon btn-icon--muted btn-icon--leader-action" title="Promote to leader" (click)="setLeader(char.id)">
+                    <i class="fa-solid fa-circle-plus"></i>
+                  </button>
+                </div>
+              }
             </div>
           }
         }
@@ -643,8 +661,8 @@
               <span class="char-name">{{ char.name }}</span>
               <span class="char-type-chip"
                 [class.party]="char.characterType === 'PartyMember'"
-                [class.leader]="char.characterType === 'FactionLeader'">
-                {{ char.characterType === 'FactionLeader' ? 'Leader' : char.characterType === 'PartyMember' ? 'Party' : 'NPC' }}
+                [class.leader]="char.id === faction().leaderId">
+                {{ char.id === faction().leaderId ? 'Leader' : char.characterType === 'PartyMember' ? 'Party' : 'NPC' }}
               </span>
               @if (char.occupation) { <span class="char-meta">{{ char.occupation }}</span> }
             </div>

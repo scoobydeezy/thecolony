@@ -201,6 +201,24 @@ export class AssetsComponent {
       const validRoles    = ASSET_ROLE_OPTIONS.map(o => o.value);
       const validStatuses = ASSET_STATUS_OPTIONS.map(o => o.value);
 
+      if (h.has('bannershape') || h.has('conditiontype')) {
+        alert(`Wrong file: this looks like a factions export. Import it from the Factions page instead.`);
+        (event.target as HTMLInputElement).value = '';
+        return;
+      }
+
+      if (h.has('narrativetier') || h.has('characterid')) {
+        alert(`Wrong file: this looks like a characters export. Import it from the Characters page instead.`);
+        (event.target as HTMLInputElement).value = '';
+        return;
+      }
+
+      if (!h.has('keystone')) {
+        alert(`Unrecognized file format. Expected an assets export.`);
+        (event.target as HTMLInputElement).value = '';
+        return;
+      }
+
       for (const row of rows.slice(1)) {
         const asset: Asset = {
           id:                   get(row, 'id'),

@@ -13,16 +13,18 @@ public class Character
     public string? Background { get; set; }
     public int? Level { get; set; }
 
+    // Narrative tier
+    public NarrativeTier NarrativeTier { get; set; } = NarrativeTier.Minor;
+
     // Demographics
     public string? Gender { get; set; }
+    public string? Pronouns { get; set; }
     public int? Age { get; set; }
     public string? Occupation { get; set; }
+    public string? Aliases { get; set; }
 
     // Narrative
     public string? Summary { get; set; }
-    public string? Goals { get; set; }
-    public string? Fears { get; set; }
-    public string? Notes { get; set; }
 
     // Group membership (both optional)
     public string? FactionId { get; set; }

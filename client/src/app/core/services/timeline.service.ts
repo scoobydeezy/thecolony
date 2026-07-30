@@ -269,9 +269,11 @@ export class TimelineService {
       case 'single':
         characters = allCharacters.filter(c => c.id === selector.characterId);
         break;
-      case 'allLeaders':
-        characters = allCharacters.filter(c => c.characterType === 'FactionLeader');
+      case 'allLeaders': {
+        const leaderIds = new Set(this.store.factions().map(f => f.leaderId).filter((id): id is string => id != null));
+        characters = allCharacters.filter(c => leaderIds.has(c.id));
         break;
+      }
       case 'factionMembers':
         characters = allCharacters.filter(c => c.factionId === selector.factionId);
         break;

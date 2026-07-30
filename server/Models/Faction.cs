@@ -39,5 +39,6 @@ public class Faction
     public string? PrimaryColor { get; set; }
     public string? SecondaryColor { get; set; }
     public string? BannerShape { get; set; }
+    public string? LeaderId { get; set; }
     public string CampaignId { get; set; } = string.Empty;
 }

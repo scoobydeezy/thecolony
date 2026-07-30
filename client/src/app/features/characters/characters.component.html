@@ -39,12 +39,12 @@
   </label>
 
   <label>
-    Type
-    <select [value]="filterType()" (change)="filterType.set($any($event.target).value)">
-      <option value="all">All Types</option>
-      <option value="NPC">NPC</option>
-      <option value="FactionLeader">Faction Leader</option>
-      <option value="PartyMember">Party Member</option>
+    Tier
+    <select [value]="filterTier()" (change)="filterTier.set($any($event.target).value)">
+      <option value="all">All Tiers</option>
+      @for (opt of narrativeTierOptions; track opt.value) {
+        <option [value]="opt.value">{{ opt.label }}</option>
+      }
     </select>
   </label>
 </div>
@@ -56,7 +56,7 @@
       <tr>
         <th class="col-state"></th>
         <th>Name</th>
-        <th>Type</th>
+        <th>Tier</th>
         <th>Faction</th>
         <th>Social Class</th>
         <th>Conviction</th>
@@ -97,7 +97,7 @@
               <span class="occupation-tag" [style.color]="flair?.textColor ? 'color-mix(in srgb, ' + flair!.textColor + ' 60%, transparent)' : null">{{ c.occupation }}</span>
             }
           </td>
-          <td><span class="type-badge" [class.party]="c.characterType === 'PartyMember'" [class.leader]="c.characterType === 'FactionLeader'">{{ typeLabel(c.characterType) }}</span></td>
+          <td><span class="tier-chip" [class]="'tier-chip tier-chip--' + (c.narrativeTier ?? 'Minor').toLowerCase()">{{ c.narrativeTier ?? 'Minor' }}</span></td>
           <td>{{ factionName(c.factionId) }}</td>
           <td>{{ factionName(c.socialClassId) }}</td>
           <td><span [class]="convictionClass(c.conviction)">{{ formatPct(c.conviction) }}</span></td>
@@ -140,8 +140,15 @@
           <label class="form-label">Role</label>
           <select class="form-input" [formField]="f.characterType">
             <option value="NPC">NPC</option>
-            <option value="FactionLeader">Faction Leader</option>
             <option value="PartyMember">Party Member</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Narrative Tier</label>
+          <select class="form-input" [formField]="f.narrativeTier">
+            @for (opt of narrativeTierOptions; track opt.value) {
+              <option [value]="opt.value">{{ opt.label }}</option>
+            }
           </select>
         </div>
         <div class="form-row">

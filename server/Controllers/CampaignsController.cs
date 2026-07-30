@@ -178,9 +178,6 @@ public class CampaignsController(AppDbContext db) : ControllerBase
                     Age = c.Age,
                     Occupation = c.Occupation,
                     Summary = c.Summary,
-                    Goals = c.Goals,
-                    Fears = c.Fears,
-                    Notes = c.Notes,
                     FactionId = newFactionId,
                     SocialClassId = null, // social classes are factions; null if not imported
                     TruthValue = c.TruthValue,

@@ -6,7 +6,8 @@ import {
   Faction, ColonyState, RelationshipOverride, RulesConfig,
   RelationshipBreakdown, SessionLogEntry, Character,
   Session, CampaignEvent, Campaign, AppSettings,
-  Asset, FactionGoal
+  Asset, FactionGoal,
+  CharacterNarrativeProfile, CharacterDetail, CharacterRelationship
 } from '../models/types';
 
 // The C# model stores value floats as truthValue/stabilityValue/agencyValue; map to/from ValueVector a/b/c.
@@ -268,5 +269,47 @@ export class ApiService {
   }
   setActiveCampaign(campaignId: string): Observable<AppSettings> {
     return this.http.patch<AppSettings>(`${this.base}/settings`, { activeCampaignId: campaignId });
+  }
+
+  // Character Narrative Profile
+  getNarrativeProfile(characterId: string): Observable<CharacterNarrativeProfile> {
+    return this.http.get<CharacterNarrativeProfile>(`${this.base}/characters/${characterId}/narrative-profile`);
+  }
+  upsertNarrativeProfile(profile: CharacterNarrativeProfile): Observable<CharacterNarrativeProfile> {
+    return this.http.put<CharacterNarrativeProfile>(`${this.base}/characters/${profile.characterId}/narrative-profile`, profile);
+  }
+  deleteNarrativeProfile(characterId: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/characters/${characterId}/narrative-profile`);
+  }
+
+  // Character Details
+  getCharacterDetails(characterId: string): Observable<CharacterDetail[]> {
+    return this.http.get<CharacterDetail[]>(`${this.base}/characters/${characterId}/details`);
+  }
+  createCharacterDetail(characterId: string, detail: Omit<CharacterDetail, 'id' | 'characterId'>): Observable<CharacterDetail> {
+    return this.http.post<CharacterDetail>(`${this.base}/characters/${characterId}/details`, detail);
+  }
+  updateCharacterDetail(characterId: string, detail: CharacterDetail): Observable<CharacterDetail> {
+    return this.http.put<CharacterDetail>(`${this.base}/characters/${characterId}/details/${detail.id}`, detail);
+  }
+  deleteCharacterDetail(characterId: string, detailId: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/characters/${characterId}/details/${detailId}`);
+  }
+  reorderCharacterDetails(characterId: string, orderedIds: string[]): Observable<void> {
+    return this.http.patch<void>(`${this.base}/characters/${characterId}/details/reorder`, orderedIds);
+  }
+
+  // Character Relationships
+  getCharacterRelationships(characterId: string): Observable<CharacterRelationship[]> {
+    return this.http.get<CharacterRelationship[]>(`${this.base}/characters/${characterId}/relationships`);
+  }
+  createCharacterRelationship(characterId: string, rel: Omit<CharacterRelationship, 'id' | 'sourceCharacterId'>): Observable<CharacterRelationship> {
+    return this.http.post<CharacterRelationship>(`${this.base}/characters/${characterId}/relationships`, rel);
+  }
+  updateCharacterRelationship(characterId: string, rel: CharacterRelationship): Observable<CharacterRelationship> {
+    return this.http.put<CharacterRelationship>(`${this.base}/characters/${characterId}/relationships/${rel.id}`, rel);
+  }
+  deleteCharacterRelationship(characterId: string, relId: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/characters/${characterId}/relationships/${relId}`);
   }
 }

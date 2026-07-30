@@ -183,6 +183,7 @@ export interface Faction {
   baseLegitimacy: number;
   powerModifier: number;
   additionalMemberCount: number;
+  leaderId?: string;
 }
 
 export interface ColonyState {
@@ -279,10 +280,9 @@ export const FACTION_SUBTYPE_OPTIONS: { value: string; label: string }[] = [
 ];
 
 export const CHARACTER_SUBTYPE_OPTIONS: { value: string; label: string }[] = [
-  { value: '',             label: 'Any' },
-  { value: 'FactionLeader', label: 'Faction Leader' },
-  { value: 'NPC',           label: 'NPC' },
-  { value: 'PartyMember',   label: 'Party Member' },
+  { value: '',           label: 'Any' },
+  { value: 'NPC',        label: 'NPC' },
+  { value: 'PartyMember', label: 'Party Member' },
 ];
 
 export const FACTION_EFFECT_PROPS: EffectPropDescriptor[] = [
@@ -649,7 +649,7 @@ export function computeFactionInfluence(
     const avg = (representedSum + (faction.additionalMemberCount ?? 0) * ADDITIONAL_BASE) / totalCount;
     const max = members.length > 0 ? Math.max(...members.map(c => c.influence)) : ADDITIONAL_BASE;
     const raw = avg * f.memberAvgWeight + max * f.memberMaxWeight;
-    const hasLeader = members.some(c => c.characterType === 'FactionLeader');
+    const hasLeader = faction.leaderId != null;
     charStrength = raw * (hasLeader ? 1 : (f.leaderlessPowerMultiplier ?? 0.75));
   }
   const assetInflRaw = assets.filter(a => a.controllingFactionId === faction.id).reduce((s, a) => s + computeAssetInfluence(a), 0);
@@ -742,9 +742,73 @@ export interface FactionGoal {
   targetThreshold?: number;
 }
 
+// ── Narrative System ───────────────────────────────────────────────────────
+
+export type NarrativeTier = 'Major' | 'Supporting' | 'Minor' | 'Background';
+export type NarrativeVisibility = 'Public' | 'GMOnly' | 'Revealed';
+export type RelationshipState = 'Active' | 'Estranged' | 'Severed' | 'Unknown';
+
+export const NARRATIVE_TIER_OPTIONS: { value: NarrativeTier; label: string }[] = [
+  { value: 'Major',      label: 'Major' },
+  { value: 'Supporting', label: 'Supporting' },
+  { value: 'Minor',      label: 'Minor' },
+  { value: 'Background', label: 'Background' },
+];
+
+export const NARRATIVE_VISIBILITY_OPTIONS: { value: NarrativeVisibility; label: string }[] = [
+  { value: 'GMOnly',   label: 'GM Only' },
+  { value: 'Revealed', label: 'Revealed' },
+  { value: 'Public',   label: 'Public' },
+];
+
+export const RELATIONSHIP_STATE_OPTIONS: { value: RelationshipState; label: string }[] = [
+  { value: 'Active',    label: 'Active' },
+  { value: 'Estranged', label: 'Estranged' },
+  { value: 'Severed',   label: 'Severed' },
+  { value: 'Unknown',   label: 'Unknown' },
+];
+
+export interface CharacterNarrativeProfile {
+  characterId: string;
+  overview?: string;
+  personality?: string;
+  motivation?: string;
+  primaryProtection?: string;
+  fears?: string;
+  blindSpot?: string;
+  narrativeRole?: string;
+  performanceInspiration?: string;
+  portrayalNotes?: string;
+  pressureResponse?: string;
+  signatureQuote?: string;
+  signatureObject?: string;
+  notes?: string;
+}
+
+export interface CharacterDetail {
+  id: string;
+  characterId: string;
+  key: string;
+  heading: string;
+  body?: string;
+  sortOrder: number;
+  visibility: NarrativeVisibility;
+}
+
+export interface CharacterRelationship {
+  id: string;
+  sourceCharacterId: string;
+  targetCharacterId?: string;
+  relationshipType: string;
+  summary?: string;
+  state: RelationshipState;
+  visibility: NarrativeVisibility;
+  sortOrder: number;
+}
+
 // ── Character System ───────────────────────────────────────────────────────
 
-export type CharacterType = 'NPC' | 'PartyMember' | 'FactionLeader';
+export type CharacterType = 'NPC' | 'PartyMember';
 // Primary: doubt pulls toward a vertex (a, b, c)
 // Secondary: doubt pulls toward an edge — away from the opposite vertex (ab, ac, bc)
 export type DoubtDirection = 'a' | 'b' | 'c' | 'ab' | 'ac' | 'bc';
@@ -754,6 +818,7 @@ export interface Character {
   id: string;
   name: string;
   characterType: CharacterType;
+  narrativeTier?: NarrativeTier;
 
   // Pathfinder (optional)
   ancestry?: string;
@@ -764,14 +829,13 @@ export interface Character {
 
   // Demographics
   gender?: string;
+  pronouns?: string;
   age?: number;
   occupation?: string;
+  aliases?: string;
 
   // Narrative
   summary?: string;
-  goals?: string;
-  fears?: string;
-  notes?: string;
 
   // Membership
   factionId?: string;

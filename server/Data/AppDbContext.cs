@@ -18,6 +18,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<EventEffect> EventEffects => Set<EventEffect>();
     public DbSet<Asset> Assets => Set<Asset>();
     public DbSet<FactionGoal> FactionGoals => Set<FactionGoal>();
+    public DbSet<CharacterNarrativeProfile> CharacterNarrativeProfiles => Set<CharacterNarrativeProfile>();
+    public DbSet<CharacterDetail> CharacterDetails => Set<CharacterDetail>();
+    public DbSet<CharacterRelationship> CharacterRelationships => Set<CharacterRelationship>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -43,5 +46,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .WithOne(ef => ef.Event)
             .HasForeignKey(ef => ef.EventId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<CharacterNarrativeProfile>()
+            .HasKey(p => p.CharacterId);
     }
 }

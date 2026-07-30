@@ -4,45 +4,54 @@ import { Character, Faction, DEFAULT_FORMULAS } from '../models/types';
 
 const svc = new FactionInfluenceService();
 
-function makeChar(influence: number, isLeader = false): Character {
+function makeChar(influence: number): Character {
   return {
-    id: crypto.randomUUID(), name: 'Test', characterType: isLeader ? 'FactionLeader' : 'NPC',
+    id: crypto.randomUUID(), name: 'Test', characterType: 'NPC',
     values: { a: 1/3, b: 1/3, c: 1/3 },
     conviction: 50, pressure: 0, influence, impressionable: 50
   };
 }
 
-function makeFaction(momentum: number, baseLegitimacy = 50, powerModifier = 0): Faction {
+function makeFaction(momentum: number, baseLegitimacy = 50, powerModifier = 0, leaderId?: string): Faction {
   return {
     id: 'f1', name: 'Test Faction', represents: '', type: 'Faction',
     coreTenet: '', certainOf: '', rightAbout: '', afraidOf: '', wrongAbout: '',
     values: { a: 1/3, b: 1/3, c: 1/3 },
-    active: true, sortOrder: 0, momentum, baseLegitimacy, powerModifier
+    active: true, sortOrder: 0, momentum, baseLegitimacy, powerModifier, leaderId
   };
 }
 
 describe('FactionInfluenceService', () => {
 
-  describe('calculateCharacterStrength (via calculateCharacterInfluence)', () => {
+  describe('calculateCharacterStrength', () => {
     it('returns 0 for empty member list', () => {
-      expect(svc.calculateCharacterInfluence([])).toBe(0);
+      expect(svc.calculateCharacterStrength([])).toBe(0);
     });
 
-    it('single member: avg and max are the same', () => {
-      const result = svc.calculateCharacterInfluence([makeChar(80)]);
-      // No leader → leaderless penalty (×0.75)
+    it('single member without leader: leaderless penalty applied', () => {
+      const member = makeChar(80);
+      const result = svc.calculateCharacterStrength([member]);
+      // No leaderId → leaderless penalty (×0.75)
       expect(result).toBeCloseTo((80 * 0.6 + 80 * 0.4) * 0.75);
     });
 
-    it('single leader: no penalty', () => {
-      const result = svc.calculateCharacterInfluence([makeChar(80, true)]);
+    it('single member with leaderId matching: no penalty', () => {
+      const leader = makeChar(80);
+      const result = svc.calculateCharacterStrength([leader], DEFAULT_FORMULAS, 0, leader.id);
       expect(result).toBeCloseTo(80 * 0.6 + 80 * 0.4);
     });
 
     it('avg=20, max=100 with leader', () => {
-      const members = [makeChar(0), makeChar(0), makeChar(0), makeChar(0), makeChar(100, true)];
+      const leader = makeChar(100);
+      const members = [makeChar(0), makeChar(0), makeChar(0), makeChar(0), leader];
       const avg = 20, max = 100;
-      expect(svc.calculateCharacterInfluence(members)).toBeCloseTo(avg * 0.6 + max * 0.4);
+      expect(svc.calculateCharacterStrength(members, DEFAULT_FORMULAS, 0, leader.id)).toBeCloseTo(avg * 0.6 + max * 0.4);
+    });
+  });
+
+  describe('calculateCharacterInfluence (backwards-compat wrapper)', () => {
+    it('returns 0 for empty member list', () => {
+      expect(svc.calculateCharacterInfluence([])).toBe(0);
     });
   });
 
@@ -57,8 +66,9 @@ describe('FactionInfluenceService', () => {
       // charStrength: avg=68, max=68, leader present → no penalty → 68
       // normalizedMomentum(20) = 60
       // 68×0.40 + 0×0.40 + 60×0.20 = 27.2 + 0 + 12 = 39.2 → 39
-      const faction = makeFaction(20);
-      const members = [makeChar(68, true), makeChar(68)];
+      const leader = makeChar(68);
+      const members = [leader, makeChar(68)];
+      const faction = makeFaction(20, 50, 0, leader.id);
       expect(svc.calculateTotalInfluence(faction, members)).toBe(39);
     });
 
@@ -69,9 +79,9 @@ describe('FactionInfluenceService', () => {
     });
 
     it('result is clamped to 0-100', () => {
-      const faction = makeFaction(100);
-      const members = [makeChar(100, true)];
-      expect(svc.calculateTotalInfluence(faction, members)).toBeLessThanOrEqual(100);
+      const leader = makeChar(100);
+      const faction = makeFaction(100, 50, 0, leader.id);
+      expect(svc.calculateTotalInfluence(faction, [leader])).toBeLessThanOrEqual(100);
     });
   });
 

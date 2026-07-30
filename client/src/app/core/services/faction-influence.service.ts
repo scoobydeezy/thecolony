@@ -10,7 +10,7 @@ export class FactionInfluenceService {
   // Leaderless penalty applied here rather than to final power.
   // additionalMemberCount pads the pool with baseline generics (influence 30) so large
   // factions don't need every NPC entered to model their mass accurately.
-  calculateCharacterStrength(members: Character[], f: FormulasConfig = DEFAULT_FORMULAS, additionalMemberCount = 0): number {
+  calculateCharacterStrength(members: Character[], f: FormulasConfig = DEFAULT_FORMULAS, additionalMemberCount = 0, leaderId?: string): number {
     const base = FactionInfluenceService.ADDITIONAL_MEMBER_BASE_INFLUENCE;
     const totalCount = members.length + additionalMemberCount;
     if (totalCount === 0) return 0;
@@ -18,7 +18,7 @@ export class FactionInfluenceService {
     const avg = (representedSum + additionalMemberCount * base) / totalCount;
     const max = members.length > 0 ? Math.max(...members.map(c => c.influence)) : base;
     const raw = avg * f.memberAvgWeight + max * f.memberMaxWeight;
-    const hasLeader = members.some(c => c.characterType === 'FactionLeader');
+    const hasLeader = leaderId != null;
     return raw * (hasLeader ? 1 : (f.leaderlessPowerMultiplier ?? 0.75));
   }
 
@@ -45,7 +45,7 @@ export class FactionInfluenceService {
 
   // Organization = CharacterStrength×charWeight + AssetInfluenceScore×assetWeight + NormalizedMomentum×momentumWeight
   calculateOrganization(faction: Faction, members: Character[], f: FormulasConfig = DEFAULT_FORMULAS, assets: Asset[] = []): number {
-    const charStrength = this.calculateCharacterStrength(members, f, faction.additionalMemberCount ?? 0);
+    const charStrength = this.calculateCharacterStrength(members, f, faction.additionalMemberCount ?? 0, faction.leaderId);
     const assetInfluenceScore = this.calculateAssetInfluenceScore(assets, faction.id, f);
     const normalizedMomentum = this.calculateNormalizedMomentum(faction.momentum);
     const raw =

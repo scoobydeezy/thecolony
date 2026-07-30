@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ColonyTracker.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260712182628_InitialCreate")]
+    [Migration("20260730162944_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -115,6 +115,9 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<double>("AgencyValue")
                         .HasColumnType("REAL");
 
+                    b.Property<string>("Aliases")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Ancestry")
                         .HasColumnType("TEXT");
 
@@ -149,13 +152,7 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<string>("FactionId")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Fears")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Gender")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Goals")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Heritage")
@@ -174,8 +171,8 @@ namespace ColonyTracker.Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Notes")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("NarrativeTier")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Occupation")
                         .HasColumnType("TEXT");
@@ -185,6 +182,9 @@ namespace ColonyTracker.Api.Migrations
 
                     b.Property<int>("Pressure")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Pronouns")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("SocialClassId")
                         .HasColumnType("TEXT");
@@ -204,6 +204,119 @@ namespace ColonyTracker.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Characters");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.CharacterDetail", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Body")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CharacterId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Heading")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Visibility")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CharacterDetails");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.CharacterNarrativeProfile", b =>
+                {
+                    b.Property<string>("CharacterId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("BlindSpot")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Fears")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Motivation")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NarrativeRole")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Overview")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PerformanceInspiration")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Personality")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PortrayalNotes")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PressureResponse")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PrimaryProtection")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SignatureObject")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SignatureQuote")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("CharacterId");
+
+                    b.ToTable("CharacterNarrativeProfiles");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.CharacterRelationship", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RelationshipType")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SourceCharacterId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("State")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Summary")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TargetCharacterId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Visibility")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CharacterRelationships");
                 });
 
             modelBuilder.Entity("ColonyTracker.Api.Models.ColonyState", b =>
@@ -390,6 +503,9 @@ namespace ColonyTracker.Api.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("IconPath")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LeaderId")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Momentum")
