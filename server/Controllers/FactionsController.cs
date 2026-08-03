@@ -8,7 +8,7 @@ namespace ColonyTracker.Api.Controllers;
 
 [ApiController]
 [Route("api/factions")]
-public class FactionsController(AppDbContext db, ICampaignContext campaign, IWebHostEnvironment env) : ControllerBase
+public class FactionsController(AppDbContext db, ICampaignContext campaign, IWebHostEnvironment env, IConfiguration config) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll()
@@ -92,7 +92,11 @@ public class FactionsController(AppDbContext db, ICampaignContext campaign, IWeb
         var faction = await db.Factions.FindAsync(id);
         if (faction is null) return NotFound();
 
-        var uploadsDir = Path.Combine(env.ContentRootPath, "uploads", "factions");
+        var uploadsRaw = config["UploadsPath"] ?? "../colony-uploads";
+        var uploadsRoot = Path.IsPathRooted(uploadsRaw)
+            ? uploadsRaw
+            : Path.GetFullPath(Path.Combine(env.ContentRootPath, uploadsRaw));
+        var uploadsDir = Path.Combine(uploadsRoot, "factions");
         Directory.CreateDirectory(uploadsDir);
 
         var fileName = $"{id}-{kind}{ext}";
@@ -100,7 +104,7 @@ public class FactionsController(AppDbContext db, ICampaignContext campaign, IWeb
         await using var stream = System.IO.File.Create(filePath);
         await file.CopyToAsync(stream);
 
-        var urlPath = $"/uploads/factions/{fileName}";
+        var urlPath = $"/colony-uploads/factions/{fileName}";
         if (kind == "glyph") faction.GlyphPath = urlPath;
         else faction.IconPath = urlPath;
 

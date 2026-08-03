@@ -11,7 +11,7 @@ public class Asset
     public int Tier { get; set; } = 3;
     public bool Keystone { get; set; } = false;
     public string? ControllingFactionId { get; set; }
-    public string? Location { get; set; }
+    public string? LocationId { get; set; }
     public AssetStatus Status { get; set; } = AssetStatus.Stable;
     public string? StatusActorFactionId { get; set; }
 }

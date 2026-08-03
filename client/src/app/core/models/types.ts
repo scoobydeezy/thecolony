@@ -254,14 +254,16 @@ export const DEFAULT_FORMULAS: FormulasConfig = {
 
 // ── Session Effect Descriptors (single source of truth) ───────────────────
 // Used by both the session event editor and the cascade event rule trigger.
-// inputType 'delta'  → numeric stepper (delta field)
-// inputType 'select' → string value dropdown (value field, options provided)
-// inputType 'none'   → no value input (e.g. factionChange uses a separate target select)
+// inputType 'delta'           → numeric stepper (delta field)
+// inputType 'select'          → string value dropdown (value field, options provided)
+// inputType 'none'            → no value input (e.g. factionChange uses a separate target select)
+// inputType 'faction-select'  → faction dropdown stored in value
+// inputType 'location-select' → location dropdown stored in value
 
 export interface EffectPropDescriptor {
   property: string;
   label: string;
-  inputType: 'delta' | 'select' | 'none' | 'faction-select' | 'participate';
+  inputType: 'delta' | 'select' | 'none' | 'faction-select' | 'participate' | 'location-select';
   selectOptions?: { value: string; label: string }[];
   needsSecondaryTarget?: boolean;  // true for relationshipBump
 }
@@ -298,6 +300,7 @@ export const CHARACTER_EFFECT_PROPS: EffectPropDescriptor[] = [
   { property: 'influence',   label: 'Influence',   inputType: 'delta' },
   { property: 'state',       label: 'State',       inputType: 'select', selectOptions: CHARACTER_STATE_OPTIONS },
   { property: 'factionChange', label: 'Faction Change', inputType: 'none' },
+  { property: 'locationChange', label: 'Location Change', inputType: 'location-select' },
 ];
 
 export const COLONY_EFFECT_PROPS: EffectPropDescriptor[] = [
@@ -486,6 +489,7 @@ export interface CampaignEvent {
   title: string;
   description?: string;
   sortOrder: number;
+  isSynthetic?: boolean;
   effects: EventEffect[];
 }
 
@@ -538,6 +542,12 @@ export interface ColonySnapshot {
   goalParticipants: Record<string, Array<{ actorId: string; actorType: string; role: string; delta: number; sessionId: string }>>;
   // Stress triggers that have fired (oneShot tracking)
   firedStressTriggers: string[];
+  // Locations — cumulative state and entity placements
+  locationStates: Record<string, LocationState>;           // locationId → state
+  characterLocations: Record<string, string | undefined>;  // characterId → locationId
+  assetLocations: Record<string, string | undefined>;      // assetId → locationId
+  // Map geometry overrides — entityId → { mapId, geometryType, geometryData } or 'removed'
+  placementOverrides: Record<string, { mapId: string; geometryType: GeometryType; geometryData: string } | 'removed'>;
 }
 
 export interface ColonyImpact {
@@ -557,6 +567,64 @@ export interface RelationshipThreshold {
   label: RelationshipLabel;
   minScore: number;
 }
+
+// ── Locations ──────────────────────────────────────────────────────────────
+
+export type LocationState = 'Active' | 'Abandoned' | 'Ruined' | 'Unknown';
+export type GeometryType = 'Point' | 'Polygon' | 'MultiPoint';
+export type PlacementSubjectType = 'Location' | 'Character' | 'Asset';
+
+export const LOCATION_STATE_OPTIONS: { value: LocationState; label: string }[] = [
+  { value: 'Active',    label: 'Active' },
+  { value: 'Abandoned', label: 'Abandoned' },
+  { value: 'Ruined',    label: 'Ruined' },
+  { value: 'Unknown',   label: 'Unknown' },
+];
+
+export type LocationType = 'Point' | 'Zone' | 'Distributed';
+
+export const LOCATION_TYPE_OPTIONS: { value: LocationType; label: string }[] = [
+  { value: 'Point',       label: 'Point of Interest' },
+  { value: 'Zone',        label: 'Zone' },
+  { value: 'Distributed', label: 'Distributed' },
+];
+
+export interface Location {
+  id: string;
+  campaignId: string;
+  name: string;
+  description?: string;
+  parentLocationId?: string;
+  state: LocationState;
+  linkedAssetId?: string;
+  locationType?: LocationType;
+  markerColor?: string;
+}
+
+export interface ColonyMap {
+  id: string;
+  campaignId: string;
+  name: string;
+  locationId?: string;
+  imagePath?: string;
+  imageWidth: number;
+  imageHeight: number;
+  isHero: boolean;
+}
+
+export interface MapPlacement {
+  id: string;
+  mapId: string;
+  subjectType: PlacementSubjectType;
+  subjectId: string;
+  geometryType: GeometryType;
+  geometryData: string; // JSON: [x,y] for Point, [[x,y],...] for Polygon — normalized 0–1
+  isHidden: boolean;
+}
+
+export const LOCATION_EFFECT_PROPS: EffectPropDescriptor[] = [
+  { property: 'state', label: 'State', inputType: 'select', selectOptions: LOCATION_STATE_OPTIONS },
+];
 
 // ── Assets ─────────────────────────────────────────────────────────────────
 
@@ -620,7 +688,7 @@ export interface Asset {
   tier: number;
   keystone: boolean;
   controllingFactionId?: string;
-  location?: string;
+  locationId?: string;
   status: AssetStatus;
   statusActorFactionId?: string;
 }
@@ -703,6 +771,7 @@ export const ASSET_EFFECT_PROPS: EffectPropDescriptor[] = [
   { property: 'controllingFactionId', label: 'Controlling Faction', inputType: 'faction-select' },
   { property: 'status',               label: 'Status',              inputType: 'select', selectOptions: ASSET_STATUS_OPTIONS },
   { property: 'stress',               label: 'Stress',              inputType: 'delta' },
+  { property: 'locationChange',       label: 'Location Change',     inputType: 'location-select' },
 ];
 
 export const GOAL_EFFECT_PROPS: EffectPropDescriptor[] = [
@@ -863,6 +932,9 @@ export interface Character {
 
   // Narrative state
   state: CharacterState;
+
+  // Spatial location
+  locationId?: string;
 }
 
 /**

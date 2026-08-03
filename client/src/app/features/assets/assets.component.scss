@@ -152,6 +152,11 @@ $asset-card-layout: $type-col-width 3fr 1.5fr 2fr $actions-width;
   font-size: 1rem;
 }
 
+.asset-linked-icon {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
 
 // ── Pen edit button (hover, in title row) ────────────────────────────────────
 
@@ -369,6 +374,37 @@ $asset-card-layout: $type-col-width 3fr 1.5fr 2fr $actions-width;
   font-weight: 400;
   color: var(--text-muted);
   margin-left: 0.25rem;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+
+  h3 { margin: 0; font-size: 1.1rem; }
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  &:hover { color: var(--text-primary); }
+}
+
+.modal-body {
+  margin-bottom: 0.5rem;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
 }
 
 .modal-asset {

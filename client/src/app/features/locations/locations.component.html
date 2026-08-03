@@ -1,0 +1,599 @@
+<div class="page-header">
+  <h2>Locations</h2>
+  <p>Semantic places within the campaign world, organized hierarchically.</p>
+</div>
+
+<div class="toolbar">
+  <div class="view-toggle">
+    <button [class.active]="viewMode() === 'map'" (click)="setViewMode('map')">
+      <i class="fa-solid fa-map"></i> Map
+    </button>
+    <button [class.active]="viewMode() === 'list'" (click)="setViewMode('list')">
+      <i class="fa-solid fa-list"></i> List
+    </button>
+  </div>
+  @if (viewMode() === 'map') {
+    <div class="layer-toggles">
+      @for (t of layerToggles; track t.key) {
+        <button class="layer-toggle-btn"
+                [class.layer-toggle-btn--off]="!isLayerVisible(t.key)"
+                (click)="toggleLayerType(t.key)"
+                [title]="(isLayerVisible(t.key) ? 'Hide ' : 'Show ') + t.label">
+          <i class="fa-solid" [class]="t.icon"></i>
+          <span>{{ t.label }}</span>
+        </button>
+      }
+      <button class="layer-toggle-btn"
+              [class.layer-toggle-btn--off]="!allTrailsEnabled()"
+              (click)="toggleAllTrails()"
+              title="{{ allTrailsEnabled() ? 'Hide all trails' : 'Show all trails' }}">
+        <i class="fa-solid fa-route"></i>
+        <span>Trails</span>
+      </button>
+    </div>
+  }
+  <div class="toolbar-actions">
+    @if (!store.isViewingSnapshot()) {
+      <button class="btn btn-primary" (click)="openAdd()">+ Add Location</button>
+    }
+  </div>
+</div>
+
+<!-- ── List view ──────────────────────────────────────────────────────────── -->
+
+@if (viewMode() === 'list') {
+  @if (rootLocations().length === 0) {
+    <div class="empty-state card">
+      <p>No locations yet. Add one to start building a spatial picture of the campaign.</p>
+    </div>
+  } @else {
+    <div class="location-list">
+      @for (item of visibleLocations(); track item.loc.id) {
+        <div class="loc-tree-row" [style.--loc-depth]="item.depth">
+          @if (item.depth > 0) {
+            <div class="loc-tree-rail">
+              @for (cont of item.continuations; track $index) {
+                <div class="loc-tree-pipe" [class.loc-tree-pipe--cont]="cont"></div>
+              }
+              <div class="loc-tree-elbow" [class.loc-tree-elbow--mid]="!item.isLast"></div>
+            </div>
+          }
+          <ng-container *ngTemplateOutlet="locationCard; context: { loc: item.loc, depth: item.depth }"></ng-container>
+        </div>
+      }
+    </div>
+  }
+}
+
+<!-- ── Map view ───────────────────────────────────────────────────────────── -->
+
+@if (viewMode() === 'map') {
+  @if (store.locations().length === 0) {
+    <div class="empty-state card">
+      <p>At least one location must be added before a map can be displayed.</p>
+    </div>
+  } @else if (store.colonyMaps().length === 0) {
+    <div class="empty-state card">
+      <p>No maps exist yet. Edit a location and add a map to it.</p>
+    </div>
+  } @else {
+    <div class="map-view-layout">
+
+      <!-- Breadcrumb + context row -->
+      @if (currentMap(); as cm) {
+        @let crumbs = breadcrumbItems();
+        @let cpStats = currentMapChildrenPlaced();
+        @let placementCount = placementsForCurrentMap().length;
+        <div class="map-breadcrumb-row">
+          <div class="map-breadcrumb">
+            <i class="fa-solid fa-map-location-dot map-breadcrumb-icon"></i>
+            @for (item of crumbs; track item.id; let i = $index; let last = $last) {
+              @if (i > 0) { <span class="map-breadcrumb-sep">›</span> }
+              @if (!last) {
+                <button class="map-breadcrumb-link" (click)="navigateToMap(item.id)">
+                  {{ item.loc?.name ?? item.map?.name ?? item.id }}
+                </button>
+              } @else {
+                <span class="map-breadcrumb-current">
+                  {{ item.loc?.name ?? item.map?.name ?? item.id }}
+                  @if (!store.isViewingSnapshot() && cm.locationId) {
+                    <button class="map-breadcrumb-edit" (click)="openEditCurrentMap()" title="Edit location">
+                      <i class="fa-solid fa-pen"></i>
+                    </button>
+                  }
+                </span>
+              }
+            }
+          </div>
+          <div class="map-context-stats">
+            <button class="map-stat-link" (click)="showPlacementsModal.set(true)" title="View all placements">
+              {{ placementCount }} Placement{{ placementCount === 1 ? '' : 's' }}
+            </button>
+            @if (cpStats.total > 0) {
+              <span class="map-stat-sep">·</span>
+              <span class="map-stat">{{ cpStats.placed }}/{{ cpStats.total }} Children Placed</span>
+            }
+            <span class="map-stat-sep">·</span>
+            <span class="map-stat">{{ cm.imageWidth }} × {{ cm.imageHeight }}</span>
+          </div>
+        </div>
+      }
+
+      <!-- Map canvas -->
+      @if (currentMap(); as cm) {
+        <div class="map-canvas-wrap">
+          <div class="map-canvas"
+               leaflet
+               [leafletOptions]="leafletOptions()"
+               [leafletLayers]="layers()"
+               (leafletMapReady)="onMapReady($event)">
+          </div>
+
+          <!-- Baseline placement panel -->
+          @if (!store.isViewingSnapshot()) {
+            @if (pendingShape(); as shape) {
+              <div class="placement-panel card">
+                <div class="placement-panel-header">
+                  <span class="placement-panel-title">Place Entity</span>
+                  <button class="placement-panel-close" (click)="discardPendingShape()" title="Cancel">✕</button>
+                </div>
+                <div class="form-group-inline">
+                  <label class="form-label-sm">Type</label>
+                  <select class="form-select-sm" [value]="pendingSubjectType()"
+                          (change)="pendingSubjectType.set($any($event.target).value); pendingSubjectId.set(''); pendingLocationId.set('')">
+                    <option value="Location">Location</option>
+                    <option value="Character">Character</option>
+                    <option value="Asset">Asset</option>
+                  </select>
+                </div>
+                <div class="form-group-inline">
+                  <label class="form-label-sm">Entity</label>
+                  <select class="form-select-sm" [value]="pendingSubjectId()"
+                          (change)="pendingSubjectId.set($any($event.target).value)">
+                    <option value="">— Select —</option>
+                    @if (pendingSubjectType() === 'Location') {
+                      @for (loc of store.locations(); track loc.id) {
+                        <option [value]="loc.id">{{ loc.name }}</option>
+                      }
+                    }
+                    @if (pendingSubjectType() === 'Character') {
+                      @for (char of store.characters(); track char.id) {
+                        <option [value]="char.id">{{ char.name }}</option>
+                      }
+                    }
+                    @if (pendingSubjectType() === 'Asset') {
+                      @for (asset of store.assets(); track asset.id) {
+                        <option [value]="asset.id">{{ asset.name }}</option>
+                      }
+                    }
+                  </select>
+                </div>
+                @if (pendingLocationOptions().length > 1) {
+                  <div class="form-group-inline">
+                    <label class="form-label-sm">Location</label>
+                    <select class="form-select-sm" [value]="pendingLocationId()"
+                            (change)="pendingLocationId.set($any($event.target).value)">
+                      @for (opt of pendingLocationOptions(); track opt.id) {
+                        <option [value]="opt.id">{{ opt.name }}</option>
+                      }
+                    </select>
+                  </div>
+                }
+                <div class="placement-panel-actions">
+                  <button class="btn btn-secondary btn-sm" (click)="discardPendingShape()">Cancel</button>
+                  <button class="btn btn-primary btn-sm" (click)="confirmPlacement()"
+                          [disabled]="!pendingSubjectId()">Confirm</button>
+                </div>
+              </div>
+            }
+          }
+
+          <!-- Snapshot placement panel (draw in snapshot edit mode) -->
+          @if (store.isViewingSnapshot()) { @if (pendingShape(); as shape) {
+            <div class="placement-panel card">
+              <div class="placement-panel-header">
+                <span class="placement-panel-title">Place in Snapshot</span>
+                <button class="placement-panel-close" (click)="discardPendingShape()" title="Cancel">✕</button>
+              </div>
+              <div class="form-group-inline">
+                <label class="form-label-sm">Character</label>
+                <select class="form-select-sm" [value]="pendingSubjectId()"
+                        (change)="pendingSubjectId.set($any($event.target).value)">
+                  <option value="">— Select —</option>
+                  @for (char of store.characters(); track char.id) {
+                    <option [value]="char.id">{{ char.name }}</option>
+                  }
+                </select>
+              </div>
+              @if (pendingLocationOptions().length > 1) {
+                <div class="form-group-inline">
+                  <label class="form-label-sm">Location</label>
+                  <select class="form-select-sm" [value]="pendingLocationId()"
+                          (change)="pendingLocationId.set($any($event.target).value)">
+                    @for (opt of pendingLocationOptions(); track opt.id) {
+                      <option [value]="opt.id">{{ opt.name }}</option>
+                    }
+                  </select>
+                </div>
+              }
+              <div class="placement-panel-actions">
+                <button class="btn btn-secondary btn-sm" (click)="discardPendingShape()">Cancel</button>
+                <button class="btn btn-primary btn-sm" (click)="confirmSnapshotPlacement()"
+                        [disabled]="!pendingSubjectId()">Confirm</button>
+              </div>
+            </div>
+          } }
+        </div>
+      } @else {
+        <div class="empty-state card"><p>No map available.</p></div>
+      }
+
+    </div>
+  }
+}
+
+<!-- ── Location card template ─────────────────────────────────────────────── -->
+
+<ng-template #locationCard let-loc="loc" let-depth="depth">
+  @let children = childrenOf(loc.id);
+  @let maps = mapsForLocation(loc.id);
+  @let assets = assetsAt(loc);
+  @let chars = charactersAt(loc);
+  @let placedCount = childrenPlacedCount(loc.id);
+  @let linked = linkedAsset(loc);
+
+  <div class="loc-card card">
+
+    <!-- Left: location info -->
+    <div class="loc-info">
+      <div class="loc-name-row">
+        @if (children.length > 0) {
+          <button class="btn-caret" (click)="toggleExpand(loc.id)" [title]="isExpanded(loc.id) ? 'Collapse' : 'Expand children'">
+            <i class="fa-solid" [class.fa-caret-down]="isExpanded(loc.id)" [class.fa-caret-right]="!isExpanded(loc.id)"></i>
+          </button>
+        }
+        <span class="loc-name">{{ loc.name }}</span>
+        @if (linked) {
+          <i class="fa-solid fa-link loc-icon" [title]="'Linked asset: ' + linked.name"></i>
+        }
+        @if (hasPlacementOnParentMap(loc)) {
+          <i class="fa-solid fa-crosshairs loc-icon" title="Placed on parent map"></i>
+        }
+        @if (!store.isViewingSnapshot()) {
+          <button class="card-edit-btn" (click)="openEdit(loc)" title="Edit">
+            <i class="fa-solid fa-pen"></i>
+          </button>
+        }
+      </div>
+      @if (loc.description) {
+        <p class="loc-desc">{{ loc.description }}</p>
+      }
+      <span [class]="'state-badge ' + stateClass(loc.state)">{{ loc.state }}</span>
+
+      @if (maps.length > 0) {
+        <div class="loc-maps">
+          @for (map of maps; track map.id) {
+            <div class="loc-map-row">
+              <button class="loc-map-link" (click)="navigateToMap(map.id)">
+                <i class="fa-solid fa-map"></i> {{ map.name }}
+              </button>
+              @if (map.isHero) {
+                <i class="fa-solid fa-map-pin loc-map-hero-icon" title="Hero map"></i>
+              }
+            </div>
+          }
+          @if (children.length > 0) {
+            <span class="loc-placed-count">{{ placedCount.placed }}/{{ placedCount.total }} Children Placed</span>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Right: assets + characters -->
+    <div class="loc-right">
+
+      <!-- Assets: inline comma-separated (read-only; edit via Edit Location modal) -->
+      <div class="loc-section loc-section--inline">
+        <span class="loc-section-label">ASSETS</span>
+        <div class="loc-assets-inline loc-section-content">
+          @for (item of assets; track item.asset.id; let last = $last) {
+            <span class="loc-asset-tag" [class.loc-asset-tag--inherited]="item.inherited">
+              <span class="loc-asset-tag-name">{{ item.asset.name }}@if (!last) { <span class="loc-sep">,</span> }</span>
+            </span>
+          }
+        </div>
+      </div>
+
+      <!-- Characters: horizontal chip row (read-only; edit via Edit Location modal) -->
+      <div class="loc-section loc-section--inline">
+        <span class="loc-section-label">CHARACTERS</span>
+        <div class="loc-char-chips loc-section-content">
+          @for (item of chars; track item.character.id) {
+            <div class="char-chip" [class.char-chip--inherited]="item.inherited"
+                 [title]="item.character.name"
+                 [style.background-image]="'url(' + characterPortrait(item.character) + ')'">
+            </div>
+          }
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Actions -->
+    <div class="loc-actions">
+      <button class="btn-icon btn-icon--edit" (click)="openEdit(loc)" title="Edit"
+              [style.visibility]="store.isViewingSnapshot() ? 'hidden' : 'visible'">
+        <i class="fa-solid fa-pen"></i>
+      </button>
+      <div class="loc-actions-divider"></div>
+      <button class="btn-icon btn-icon--danger" (click)="delete(loc.id)" title="Delete"
+              [style.visibility]="store.isViewingSnapshot() ? 'hidden' : 'visible'">
+        <i class="fa-solid fa-trash"></i>
+      </button>
+    </div>
+
+  </div>
+</ng-template>
+
+<!-- ── Add / Edit Modal ───────────────────────────────────────────────────── -->
+
+@if (showModal()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal modal-loc" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ editForm().id ? 'Edit Location' : 'Add Location' }}</h3>
+        <button class="modal-close" (click)="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <div class="form-row-modal two-col">
+          <div>
+            <label class="form-label">Name *</label>
+            <input class="form-input" type="text" [formField]="f.name" placeholder="Location name" />
+          </div>
+          <div>
+            <label class="form-label">State</label>
+            <select class="form-input" [formField]="f.state">
+              @for (opt of stateOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row-modal">
+          <label class="form-label">Description</label>
+          <textarea class="form-input" [formField]="f.description" rows="2" placeholder="Brief description (optional)"></textarea>
+        </div>
+
+        <div class="form-row-modal two-col">
+          <div>
+            <label class="form-label">Parent Location</label>
+            <select class="form-input" [formField]="f.parentLocationId">
+              <option value="">— None (top-level) —</option>
+              @for (opt of parentOptions(); track opt.id) {
+                <option [value]="opt.id">{{ opt.name }}</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Linked Asset</label>
+            <select class="form-input" [formField]="f.linkedAssetId">
+              <option value="">— None —</option>
+              @for (a of store.assets(); track a.id) {
+                <option [value]="a.id">{{ a.name }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row-modal">
+          <div>
+            <label class="form-label">Marker Color</label>
+            <div class="color-input-row">
+              <input class="form-input color-input-text" type="text" [formField]="f.markerColor" placeholder="#60a5fa" />
+              <input class="color-input-swatch" type="color"
+                     [value]="editForm().markerColor || '#60a5fa'"
+                     (input)="editForm.update(fm => ({ ...fm, markerColor: $any($event.target).value }))" />
+            </div>
+          </div>
+        </div>
+
+        @if (editForm().id) {
+          <div class="form-row-modal">
+            <div class="modal-maps-header">
+              <label class="form-label" style="margin:0">Maps</label>
+              <button class="btn btn-secondary btn-sm" type="button" (click)="openAddMap()">+ Add Map</button>
+            </div>
+            @let editMaps = mapsForLocation(editForm().id);
+            @if (editMaps.length === 0) {
+              <p class="modal-maps-empty">No maps linked to this location yet.</p>
+            } @else {
+              <div class="modal-map-list">
+                @for (map of editMaps; track map.id) {
+                  <div class="modal-map-row">
+                    <button class="modal-map-name" (click)="navigateToMap(map.id); closeModal()">
+                      <i class="fa-solid fa-map"></i> {{ map.name }}
+                    </button>
+                    <span class="modal-map-dims">{{ map.imageWidth }}×{{ map.imageHeight }}</span>
+                    <button class="btn-icon-sm" [class.btn-icon-sm--active]="map.isHero" (click)="toggleHero(map)" title="Toggle hero map">
+                      <i class="fa-solid fa-thumbtack"></i>
+                    </button>
+                    <label class="btn-icon-sm" [title]="uploadingMapId() === map.id ? 'Uploading…' : 'Upload image'">
+                      @if (uploadingMapId() === map.id) {
+                        <i class="fa-solid fa-spinner fa-spin"></i>
+                      } @else {
+                        <i class="fa-solid fa-image"></i>
+                      }
+                      <input type="file" accept=".jpg,.jpeg,.png,.webp" style="display:none" (change)="uploadMapImage($event, map)">
+                    </label>
+                    <button class="btn-icon-sm btn-icon-sm--danger" (click)="deleteMap(map.id)" title="Delete map">
+                      <i class="fa-solid fa-trash"></i>
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Entities section (visible when editing an existing location) -->
+        @if (editForm().id) {
+          @let currentEntities = modalCurrentEntities();
+          <div class="form-row-modal">
+            <label class="form-label">Entities</label>
+
+            <!-- Current characters -->
+            @if (currentEntities.characters.length > 0) {
+              <div class="modal-entity-list">
+                @for (c of currentEntities.characters; track c.id) {
+                  <div class="modal-entity-row">
+                    <i class="fa-solid fa-user modal-entity-icon modal-entity-icon--char"></i>
+                    <span class="modal-entity-name">{{ c.name }}</span>
+                    <button class="btn-icon-sm btn-icon-sm--danger" (click)="removeEntityFromLocation(c.id, 'character')" title="Remove">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Current assets -->
+            @if (currentEntities.assets.length > 0) {
+              <div class="modal-entity-list">
+                @for (a of currentEntities.assets; track a.id) {
+                  <div class="modal-entity-row">
+                    <i [class]="assetTypeIcon(a) + ' modal-entity-icon modal-entity-icon--asset'"></i>
+                    <span class="modal-entity-name">{{ a.name }}</span>
+                    <button class="btn-icon-sm btn-icon-sm--danger" (click)="removeEntityFromLocation(a.id, 'asset')" title="Remove">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Pending additions (not yet saved) -->
+            @if (modalPendingAdditions().length > 0) {
+              <div class="modal-entity-list modal-entity-list--pending">
+                @for (p of modalPendingAdditions(); track p.id) {
+                  <div class="modal-entity-row modal-entity-row--pending">
+                    <i [class]="pendingAdditionIcon(p) + ' modal-entity-icon ' + (p.type === 'character' ? 'modal-entity-icon--char' : 'modal-entity-icon--asset')"></i>
+                    <span class="modal-entity-name">{{ p.name }}</span>
+                    <span class="modal-entity-pending-badge">pending</span>
+                    <button class="btn-icon-sm" (click)="removeModalPendingAddition(p.id)" title="Undo">
+                      <i class="fa-solid fa-xmark"></i>
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+
+            <!-- Add entity row -->
+            <div class="modal-entity-add-row">
+              <select class="form-input modal-entity-type-select"
+                      [value]="modalEntityType()"
+                      (change)="modalEntityType.set($any($event.target).value); modalEntityId.set('')">
+                <option value="character">Character</option>
+                <option value="asset">Asset</option>
+              </select>
+              <select class="form-input modal-entity-select"
+                      [value]="modalEntityId()"
+                      (change)="modalEntityId.set($any($event.target).value)">
+                <option value="">— Select —</option>
+                @for (opt of modalEntityOptions(); track opt.id) {
+                  <option [value]="opt.id">{{ opt.name }}</option>
+                }
+              </select>
+              <button class="btn btn-secondary btn-sm" type="button"
+                      [disabled]="!modalEntityId()"
+                      (click)="addModalEntity()">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+          </div>
+        }
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button class="btn btn-primary" (click)="save()">Save</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Add Map sub-modal ──────────────────────────────────────────────────── -->
+
+@if (showMapModal()) {
+  <div class="modal-backdrop" (click)="closeMapModal()">
+    <div class="modal modal-map-add" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Add Map</h3>
+        <button class="modal-close" (click)="closeMapModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row-modal">
+          <label class="form-label">Map Name *</label>
+          <input class="form-input" type="text" [value]="mapForm().name"
+                 (input)="mapForm.update(f => ({...f, name: $any($event.target).value}))"
+                 placeholder="e.g. Ground Floor" />
+        </div>
+        <div class="form-row-modal two-col">
+          <div>
+            <label class="form-label">Width (px)</label>
+            <input class="form-input" type="number" [value]="mapForm().imageWidth"
+                   (input)="mapForm.update(f => ({...f, imageWidth: +$any($event.target).value}))" />
+          </div>
+          <div>
+            <label class="form-label">Height (px)</label>
+            <input class="form-input" type="number" [value]="mapForm().imageHeight"
+                   (input)="mapForm.update(f => ({...f, imageHeight: +$any($event.target).value}))" />
+          </div>
+        </div>
+        <p class="hint">You can upload the map image after creating it.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeMapModal()">Cancel</button>
+        <button class="btn btn-primary" (click)="saveMap()">Create Map</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- ── Placements modal ───────────────────────────────────────────────────── -->
+
+@if (showPlacementsModal()) {
+  <div class="modal-backdrop" (click)="showPlacementsModal.set(false)">
+    <div class="modal modal-placements" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Placements — {{ currentMap()?.name }}</h3>
+        <button class="modal-close" (click)="showPlacementsModal.set(false)">✕</button>
+      </div>
+      <div class="modal-body">
+        @if (placementsForCurrentMap().length === 0) {
+          <p class="modal-maps-empty">No placements on this map yet.</p>
+        } @else {
+          <div class="placement-list">
+            @for (p of placementsForCurrentMap(); track p.id) {
+              <div class="placement-row">
+                <span class="placement-type-badge">{{ p.subjectType }}</span>
+                <span class="placement-name">{{ subjectLabel(p) }}</span>
+                <span class="placement-geo">{{ p.geometryType }}</span>
+                @if (p.isHidden) { <span class="hidden-badge">Hidden</span> }
+                @if (!store.isViewingSnapshot()) {
+                  <button class="btn btn-danger btn-sm" (click)="deletePlacement(p.id)">
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="showPlacementsModal.set(false)">Close</button>
+      </div>
+    </div>
+  </div>
+}

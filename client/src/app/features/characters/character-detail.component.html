@@ -267,6 +267,13 @@
             </select>
           </div>
           <div class="form-group">
+            <label>Location</label>
+            <select [formField]="f.locationId">
+              <option value="">— None —</option>
+              @for (loc of store.locations(); track loc.id) { <option [value]="loc.id">{{ loc.name }}</option> }
+            </select>
+          </div>
+          <div class="form-group">
             <label>Influence (0–100)</label>
             <input type="number" [formField]="f.influence" />
           </div>

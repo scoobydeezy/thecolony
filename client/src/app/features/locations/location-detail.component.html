@@ -1,0 +1,193 @@
+@if (location(); as loc) {
+  <div class="detail-page">
+
+    <div class="detail-header">
+      <div class="breadcrumb">
+        <a routerLink="/locations">Locations</a>
+        @if (parentLocation(); as parent) {
+          <span>/</span>
+          <a [routerLink]="['/locations', parent.id]">{{ parent.name }}</a>
+        }
+        <span>/</span>
+        <span>{{ loc.name }}</span>
+      </div>
+
+      @if (!isEditing()) {
+        <div class="header-title-row">
+          <h2>{{ loc.name }}</h2>
+          <span [class]="'state-badge ' + stateClass(loc.state)">{{ loc.state }}</span>
+          @if (!store.isViewingSnapshot()) {
+            <button class="btn btn-ghost btn-sm" (click)="startEdit()">
+              <i class="fa-solid fa-pen"></i> Edit
+            </button>
+          }
+        </div>
+        @if (loc.description) {
+          <p class="location-description">{{ loc.description }}</p>
+        }
+      } @else {
+        <div class="edit-form card">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Name</label>
+              <input type="text" [formField]="f.name" />
+            </div>
+            <div class="form-group">
+              <label>State</label>
+              <select [formField]="f.state">
+                @for (opt of stateOptions; track opt.value) {
+                  <option [value]="opt.value">{{ opt.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Description</label>
+            <textarea [formField]="f.description" rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Parent Location</label>
+            <select [formField]="f.parentLocationId">
+              <option value="">— None (top-level) —</option>
+              @for (opt of parentOptions(); track opt.id) {
+                <option [value]="opt.id">{{ opt.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-secondary" (click)="cancelEdit()">Cancel</button>
+            <button class="btn btn-primary" (click)="save()">Save</button>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="detail-grid">
+
+      <!-- Maps -->
+      <section class="detail-section card">
+        <div class="section-header">
+          <h3><i class="fa-solid fa-map"></i> Maps</h3>
+          @if (!store.isViewingSnapshot()) {
+            <button class="btn btn-ghost btn-sm" (click)="openAddMap()">+ Add Map</button>
+          }
+        </div>
+        @if (linkedMaps().length === 0) {
+          <p class="empty-section">No maps linked to this location.</p>
+        } @else {
+          <div class="map-list">
+            @for (map of linkedMaps(); track map.id) {
+              <a [routerLink]="['/maps', map.id]" class="map-entry">
+                <i class="fa-solid fa-map"></i>
+                <span>{{ map.name }}</span>
+                <span class="map-dims">{{ map.imageWidth }}×{{ map.imageHeight }}</span>
+              </a>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- Child Locations -->
+      <section class="detail-section card">
+        <div class="section-header">
+          <h3><i class="fa-solid fa-location-dot"></i> Sub-locations</h3>
+        </div>
+        @if (childLocations().length === 0) {
+          <p class="empty-section">No sub-locations.</p>
+        } @else {
+          <div class="entity-list">
+            @for (child of childLocations(); track child.id) {
+              <a [routerLink]="['/locations', child.id]" class="entity-row">
+                <span class="entity-name">{{ child.name }}</span>
+                <span [class]="'state-badge ' + stateClass(child.state)">{{ child.state }}</span>
+              </a>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- Characters present -->
+      <section class="detail-section card">
+        <div class="section-header">
+          <h3><i class="fa-solid fa-user"></i> Characters Present</h3>
+        </div>
+        @if (charactersHere().length === 0) {
+          <p class="empty-section">No characters currently linked to this location.</p>
+        } @else {
+          <div class="entity-list">
+            @for (char of charactersHere(); track char.id) {
+              <a [routerLink]="['/characters', char.id]" class="entity-row">
+                <span class="entity-name">{{ char.name }}</span>
+                <span class="entity-meta">{{ char.state }}</span>
+                @if (char.factionId) {
+                  <span class="entity-faction">{{ factionName(char.factionId) }}</span>
+                }
+              </a>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- Assets present -->
+      <section class="detail-section card">
+        <div class="section-header">
+          <h3><i class="fa-solid fa-landmark"></i> Assets Present</h3>
+        </div>
+        @if (assetsHere().length === 0) {
+          <p class="empty-section">No assets currently linked to this location.</p>
+        } @else {
+          <div class="entity-list">
+            @for (asset of assetsHere(); track asset.id) {
+              <div class="entity-row">
+                <span class="entity-name">{{ asset.name }}</span>
+                <span class="entity-meta">{{ asset.type }}</span>
+                @if (asset.controllingFactionId) {
+                  <span class="entity-faction">{{ factionName(asset.controllingFactionId) }}</span>
+                }
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+    </div>
+  </div>
+
+} @else {
+  <div class="empty-state card">
+    <p>Location not found.</p>
+    <a routerLink="/locations" class="btn btn-secondary">← Back to Locations</a>
+  </div>
+}
+
+@if (showMapModal()) {
+  <div class="modal-backdrop" (click)="closeMapModal()">
+    <div class="modal modal-add" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Add Map</h3>
+        <button class="modal-close" (click)="closeMapModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row-modal">
+          <label class="form-label">Map Name *</label>
+          <input class="form-input" type="text" [value]="mapForm().name" (input)="mapForm.update(f => ({...f, name: $any($event.target).value}))" placeholder="e.g. Ground Floor" />
+        </div>
+        <div class="form-row-modal two-col">
+          <div>
+            <label class="form-label">Width (px)</label>
+            <input class="form-input" type="number" [value]="mapForm().imageWidth" (input)="mapForm.update(f => ({...f, imageWidth: $any($event.target).value}))" />
+          </div>
+          <div>
+            <label class="form-label">Height (px)</label>
+            <input class="form-input" type="number" [value]="mapForm().imageHeight" (input)="mapForm.update(f => ({...f, imageHeight: $any($event.target).value}))" />
+          </div>
+        </div>
+        <p class="hint">You can upload the map image from the map view after creating it.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="closeMapModal()">Cancel</button>
+        <button class="btn btn-primary" (click)="saveMap()">Create Map</button>
+      </div>
+    </div>
+  </div>
+}

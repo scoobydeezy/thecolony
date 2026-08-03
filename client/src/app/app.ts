@@ -70,6 +70,9 @@ export class App implements OnInit {
     this.store.loadSessions(undefined);
     this.store.loadAssets(undefined);
     this.store.loadFactionGoals(undefined);
+    this.store.loadLocations(undefined);
+    this.store.loadColonyMaps(undefined);
+    this.store.loadMapPlacements(undefined);
   }
 
   stressClass(): string {

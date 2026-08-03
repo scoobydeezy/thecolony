@@ -61,6 +61,10 @@
           <div class="asset-header">
             <div class="asset-title">
               <span class="asset-name">{{ a.name }}</span>
+              @if (store.locations().some(l => l.linkedAssetId === a.id)) {
+                <i class="fa-solid fa-link asset-linked-icon"
+                   [title]="'Linked to: ' + (store.locations().find(l => l.linkedAssetId === a.id)?.name ?? '')"></i>
+              }
               @if (!store.isViewingSnapshot()) {
                 <button class="card-edit-btn" (click)="openEdit(a)" title="Edit">
                   <i class="fa-solid fa-pen"></i>
@@ -91,10 +95,10 @@
 
         <!-- Context column — location, controlling faction, actor -->
         <div class="asset-context">
-          @if (a.location) {
+          @if (a.locationId) {
             <span class="meta-item">
               <span class="meta-label">Location</span>
-              <span class="meta-value">{{ a.location }}</span>
+              <span class="meta-value">{{ store.locations().find(l => l.id === a.locationId)?.name ?? '—' }}</span>
             </span>
           }
           @if (a.controllingFactionId) {
@@ -161,7 +165,11 @@
 @if (showModal()) {
   <div class="modal-backdrop" (click)="closeModal()">
     <div class="modal modal-asset" (click)="$event.stopPropagation()">
-      <h3>{{ editForm().id ? 'Edit Asset' : 'Add Asset' }}</h3>
+      <div class="modal-header">
+        <h3>{{ editForm().id ? 'Edit Asset' : 'Add Asset' }}</h3>
+        <button class="modal-close" (click)="closeModal()">✕</button>
+      </div>
+      <div class="modal-body">
 
       <div class="grid-2">
         <div class="form-group">
@@ -170,7 +178,12 @@
         </div>
         <div class="form-group">
           <label>Location</label>
-          <input type="text" [formField]="f.location" placeholder="e.g. Harbor District">
+          <select [formField]="f.locationId">
+            <option value="">— None —</option>
+            @for (loc of store.locations(); track loc.id) {
+              <option [value]="loc.id">{{ loc.name }}</option>
+            }
+          </select>
         </div>
       </div>
 
@@ -253,7 +266,8 @@
         <textarea rows="3" [formField]="f.description" placeholder="Optional description..."></textarea>
       </div>
 
-      <div class="modal-actions">
+      </div><!-- /modal-body -->
+      <div class="modal-footer">
         <button class="btn btn-secondary" (click)="closeModal()">Cancel</button>
         <button class="btn btn-primary" (click)="save()" [disabled]="!editForm().name.trim()">Save</button>
       </div>

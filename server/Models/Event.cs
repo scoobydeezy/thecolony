@@ -9,6 +9,7 @@ public class Event
     public string Title { get; set; } = string.Empty;
     public string? Description { get; set; }
     public int SortOrder { get; set; }
+    public bool IsSynthetic { get; set; } = false;
     public ICollection<EventEffect> Effects { get; set; } = new List<EventEffect>();
     [JsonIgnore]
     public Session? Session { get; set; }

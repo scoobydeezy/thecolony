@@ -44,6 +44,14 @@ public class AssetsController(AppDbContext db, ICampaignContext campaign) : Cont
         if (id != asset.Id) return BadRequest();
         asset.CampaignId = await campaign.GetActiveIdAsync();
         db.Entry(asset).State = EntityState.Modified;
+
+        // Keep linked location's parentLocationId in sync with this asset's locationId.
+        var linkedLocation = await db.Locations.FirstOrDefaultAsync(l => l.LinkedAssetId == asset.Id);
+        if (linkedLocation is not null && linkedLocation.ParentLocationId != asset.LocationId)
+        {
+            linkedLocation.ParentLocationId = asset.LocationId;
+        }
+
         await db.SaveChangesAsync();
         return Ok(asset);
     }

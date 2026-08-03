@@ -15,6 +15,7 @@ import {
   Campaign, AppSettings,
   Asset, AssetStatus, FactionGoal, GoalStatus, computeFactionInfluence, computeFactionPower,
   StressTrigger,
+  Location, LocationState, ColonyMap, MapPlacement, GeometryType,
 } from '../core/models/types';
 import { ApiService } from '../core/services/api.service';
 import { scoreRelationship, ScoringActor } from '../core/services/scoring.service';
@@ -30,6 +31,9 @@ interface AppState {
   sessions: Session[];
   assets: Asset[];
   factionGoals: FactionGoal[];
+  locations: Location[];
+  colonyMaps: ColonyMap[];
+  mapPlacements: MapPlacement[];
   loading: boolean;
   error: string | null;
   // 'baseline' | 'current' | sessionId
@@ -49,6 +53,9 @@ const initialState: AppState = {
   sessions: [],
   assets: [],
   factionGoals: [],
+  locations: [],
+  colonyMaps: [],
+  mapPlacements: [],
   loading: false,
   error: null,
   viewingContext: 'current',
@@ -120,7 +127,8 @@ function buildColonySnapshots(
   sessions: Session[],
   rules: RulesConfig | null,
   assets: Asset[] = [],
-  factionGoals: FactionGoal[] = []
+  factionGoals: FactionGoal[] = [],
+  locations: Location[] = []
 ): ColonySnapshot[] {
   if (!baseline || sessions.length === 0) return [];
 
@@ -143,6 +151,12 @@ function buildColonySnapshots(
   const goalParticipants: Record<string, Array<{ actorId: string; actorType: string; role: string; delta: number; sessionId: string }>> = {};
   // Stress trigger oneShot tracking — carries across sessions
   const firedStressTriggers: string[] = [];
+  // Location state — mutable across sessions
+  const locationStates: Record<string, LocationState> = {};
+  const characterLocations: Record<string, string | undefined> = {};
+  const assetLocations: Record<string, string | undefined> = {};
+  // Map geometry overrides — accumulated from synthetic mapPlacement effects
+  const placementOverrides: Record<string, { mapId: string; geometryType: GeometryType; geometryData: string } | 'removed'> = {};
   // Consecutive streak counters: factionId → property → count
   const consecutiveNeg: Record<string, Record<string, number>> = {};
   const consecutivePos: Record<string, Record<string, number>> = {};
@@ -151,6 +165,13 @@ function buildColonySnapshots(
     assetControl[a.id] = a.controllingFactionId;
     assetStatuses[a.id] = a.status;
     assetStatusActors[a.id] = a.statusActorFactionId;
+    assetLocations[a.id] = a.locationId;
+  }
+  for (const l of locations) {
+    locationStates[l.id] = l.state;
+  }
+  for (const c of characters) {
+    characterLocations[c.id] = c.locationId;
   }
   for (const g of factionGoals) {
     goalStatuses[g.id] = g.status;
@@ -217,6 +238,14 @@ function buildColonySnapshots(
             states[ef.targetId] = ef.value as CharacterState;
           } else if (ef.property === 'factionChange') {
             factionIds[ef.targetId] = ef.value || undefined;
+          } else if (ef.property === 'locationChange') {
+            characterLocations[ef.targetId] = ef.value || undefined;
+          } else if (ef.property === 'mapPlacement') {
+            if (ef.value) {
+              try { placementOverrides[ef.targetId] = JSON.parse(ef.value); } catch { /* ignore */ }
+            } else {
+              placementOverrides[ef.targetId] = 'removed';
+            }
           }
         } else if (ef.targetType === 'asset') {
           if (ef.property === 'controllingFactionId') {
@@ -226,6 +255,18 @@ function buildColonySnapshots(
             assetStatusActors[ef.targetId] = ef.actorFactionId || undefined;
           } else if (ef.property === 'stress') {
             stress = Math.max(0, Math.min(10, stress + ef.delta));
+          } else if (ef.property === 'locationChange') {
+            assetLocations[ef.targetId] = ef.value || undefined;
+          } else if (ef.property === 'mapPlacement') {
+            if (ef.value) {
+              try { placementOverrides[ef.targetId] = JSON.parse(ef.value); } catch { /* ignore */ }
+            } else {
+              placementOverrides[ef.targetId] = 'removed';
+            }
+          }
+        } else if (ef.targetType === 'location') {
+          if (ef.property === 'state' && ef.value) {
+            locationStates[ef.targetId] = ef.value as LocationState;
           }
         } else if (ef.targetType === 'goal') {
           if (ef.property === 'status' && ef.value) {
@@ -706,6 +747,10 @@ function buildColonySnapshots(
         Object.entries(goalParticipants).map(([k, v]) => [k, [...v]])
       ),
       firedStressTriggers: [...firedStressTriggers],
+      locationStates: { ...locationStates },
+      characterLocations: { ...characterLocations },
+      assetLocations: { ...assetLocations },
+      placementOverrides: { ...placementOverrides },
     };
   });
 }
@@ -765,7 +810,8 @@ export const AppStore = signalStore(
         [...store.sessions()].sort((a, b) => a.number - b.number),
         store.rules(),
         store.assets(),
-        store.factionGoals()
+        store.factionGoals(),
+        store.locations()
       )
     ),
 
@@ -839,6 +885,16 @@ export const AppStore = signalStore(
       return store.factionGoals().map(g => ({
         ...g,
         status: snap.goalStatuses[g.id] ?? g.status,
+      }));
+    }),
+
+    // Locations with state projected to the active snapshot
+    viewLocations: computed((): Location[] => {
+      const snap = store.activeSnapshot();
+      if (!snap) return store.locations();
+      return store.locations().map(l => ({
+        ...l,
+        state: snap.locationStates[l.id] ?? l.state,
       }));
     }),
 
@@ -1330,6 +1386,9 @@ export const AppStore = signalStore(
           api.getSessionLog().subscribe({ next: (sessionLog) => patchState(store, { sessionLog }) });
           api.getAssets().subscribe({ next: (assets) => patchState(store, { assets }) });
           api.getFactionGoals().subscribe({ next: (factionGoals) => patchState(store, { factionGoals }) });
+          api.getLocations().subscribe({ next: (locations) => patchState(store, { locations }) });
+          api.getColonyMaps().subscribe({ next: (colonyMaps) => patchState(store, { colonyMaps }) });
+          api.getMapPlacements().subscribe({ next: (mapPlacements) => patchState(store, { mapPlacements }) });
         },
         error: (err: Error) => patchState(store, { error: err.message })
       });
@@ -1375,6 +1434,7 @@ export const AppStore = signalStore(
 
     saveAsset(asset: Asset): void {
       const existing = store.assets().find(a => a.id === asset.id);
+      const isLinked = store.locations().some(l => l.linkedAssetId === asset.id);
       const obs$ = existing ? api.updateAsset(asset) : api.createAsset(asset);
       obs$.subscribe({
         next: (saved) => {
@@ -1382,6 +1442,7 @@ export const AppStore = signalStore(
             ? store.assets().map(a => a.id === saved.id ? saved : a)
             : [...store.assets(), saved];
           patchState(store, { assets: updated });
+          if (isLinked) api.getLocations().subscribe({ next: (locations) => patchState(store, { locations }) });
         },
         error: (err: Error) => patchState(store, { error: err.message })
       });
@@ -1424,6 +1485,121 @@ export const AppStore = signalStore(
     deleteFactionGoal(id: string): void {
       api.deleteFactionGoal(id).subscribe({
         next: () => patchState(store, { factionGoals: store.factionGoals().filter(g => g.id !== id) }),
+        error: (err: Error) => patchState(store, { error: err.message })
+      });
+    },
+
+    loadLocations: rxMethod<void>(
+      pipe(
+        switchMap(() =>
+          api.getLocations().pipe(
+            tapResponse({
+              next: (locations: Location[]) => patchState(store, { locations }),
+              error: (err: Error) => patchState(store, { error: err.message })
+            })
+          )
+        )
+      )
+    ),
+
+    saveLocation(location: Location): void {
+      const existing = store.locations().find(l => l.id === location.id);
+      const obs$ = existing ? api.updateLocation(location) : api.createLocation(location);
+      obs$.subscribe({
+        next: (saved) => {
+          const updated = existing
+            ? store.locations().map(l => l.id === saved.id ? saved : l)
+            : [...store.locations(), saved];
+          patchState(store, { locations: updated });
+          if (saved.linkedAssetId) api.getAssets().subscribe({ next: (assets) => patchState(store, { assets }) });
+        },
+        error: (err: Error) => patchState(store, { error: err.message })
+      });
+    },
+
+    deleteLocation(id: string): void {
+      api.deleteLocation(id).subscribe({
+        next: () => patchState(store, { locations: store.locations().filter(l => l.id !== id) }),
+        error: (err: Error) => patchState(store, { error: err.message })
+      });
+    },
+
+    loadColonyMaps: rxMethod<void>(
+      pipe(
+        switchMap(() =>
+          api.getColonyMaps().pipe(
+            tapResponse({
+              next: (colonyMaps: ColonyMap[]) => patchState(store, { colonyMaps }),
+              error: (err: Error) => patchState(store, { error: err.message })
+            })
+          )
+        )
+      )
+    ),
+
+    saveColonyMap(map: ColonyMap): void {
+      const existing = store.colonyMaps().find(m => m.id === map.id);
+      // When setting a map as hero, clear hero on all sibling maps for the same location first
+      const mapsToUpdate: ColonyMap[] = [];
+      if (map.isHero && map.locationId) {
+        store.colonyMaps()
+          .filter(m => m.locationId === map.locationId && m.id !== map.id && m.isHero)
+          .forEach(m => mapsToUpdate.push({ ...m, isHero: false }));
+      }
+      const obs$ = existing ? api.updateColonyMap(map) : api.createColonyMap(map);
+      obs$.subscribe({
+        next: (saved) => {
+          let updated = existing
+            ? store.colonyMaps().map(m => m.id === saved.id ? saved : m)
+            : [...store.colonyMaps(), saved];
+          // Apply sibling hero-clear patches to local state
+          for (const sibling of mapsToUpdate) {
+            updated = updated.map(m => m.id === sibling.id ? sibling : m);
+            api.updateColonyMap(sibling).subscribe();
+          }
+          patchState(store, { colonyMaps: updated });
+        },
+        error: (err: Error) => patchState(store, { error: err.message })
+      });
+    },
+
+    deleteColonyMap(id: string): void {
+      api.deleteColonyMap(id).subscribe({
+        next: () => patchState(store, { colonyMaps: store.colonyMaps().filter(m => m.id !== id) }),
+        error: (err: Error) => patchState(store, { error: err.message })
+      });
+    },
+
+    loadMapPlacements: rxMethod<void>(
+      pipe(
+        switchMap(() =>
+          api.getMapPlacements().pipe(
+            tapResponse({
+              next: (mapPlacements: MapPlacement[]) => patchState(store, { mapPlacements }),
+              error: (err: Error) => patchState(store, { error: err.message })
+            })
+          )
+        )
+      )
+    ),
+
+    saveMapPlacement(placement: MapPlacement): void {
+      const existing = store.mapPlacements().find(p => p.id === placement.id);
+      const obs$ = existing ? api.updateMapPlacement(placement) : api.createMapPlacement(placement);
+      obs$.subscribe({
+        next: (saved) => {
+          const updated = existing
+            ? store.mapPlacements().map(p => p.id === saved.id ? saved : p)
+            : [...store.mapPlacements(), saved];
+          patchState(store, { mapPlacements: updated });
+        },
+        error: (err: Error) => patchState(store, { error: err.message })
+      });
+    },
+
+    deleteMapPlacement(id: string): void {
+      api.deleteMapPlacement(id).subscribe({
+        next: () => patchState(store, { mapPlacements: store.mapPlacements().filter(p => p.id !== id) }),
         error: (err: Error) => patchState(store, { error: err.message })
       });
     },

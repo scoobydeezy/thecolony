@@ -20,7 +20,7 @@ interface AssetFormModel {
   status: AssetStatus;
   controllingFactionId: string;
   statusActorFactionId: string;
-  location: string;
+  locationId: string;
 }
 
 const emptyForm = (): AssetFormModel => ({
@@ -34,7 +34,7 @@ const emptyForm = (): AssetFormModel => ({
   status: 'Stable',
   controllingFactionId: '',
   statusActorFactionId: '',
-  location: '',
+  locationId: '',
 });
 
 const toFormModel = (a: Asset): AssetFormModel => ({
@@ -48,7 +48,7 @@ const toFormModel = (a: Asset): AssetFormModel => ({
   status: a.status,
   controllingFactionId: a.controllingFactionId ?? '',
   statusActorFactionId: a.statusActorFactionId ?? '',
-  location: a.location ?? '',
+  locationId: a.locationId ?? '',
 });
 
 const fromFormModel = (fm: AssetFormModel): Asset => ({
@@ -63,7 +63,7 @@ const fromFormModel = (fm: AssetFormModel): Asset => ({
   status: fm.status,
   controllingFactionId: fm.controllingFactionId || undefined,
   statusActorFactionId: fm.status !== 'Stable' ? (fm.statusActorFactionId || undefined) : undefined,
-  location: fm.location.trim() || undefined,
+  locationId: fm.locationId || undefined,
 });
 
 @Component({
@@ -178,12 +178,12 @@ export class AssetsComponent {
   exportCsv(): void {
     const header = [
       'Id', 'Name', 'Type', 'Role', 'Tier', 'Keystone',
-      'Status', 'ControllingFactionId', 'StatusActorFactionId', 'Location', 'Description',
+      'Status', 'ControllingFactionId', 'StatusActorFactionId', 'LocationId', 'Description',
     ];
     const rows = this.store.assets().map(a => [
       a.id, a.name, a.type, a.role, a.tier, a.keystone,
       a.status, a.controllingFactionId ?? '', a.statusActorFactionId ?? '',
-      a.location ?? '', a.description ?? '',
+      a.locationId ?? '', a.description ?? '',
     ]);
     downloadCsv([header, ...rows], 'assets.csv');
   }
@@ -230,7 +230,7 @@ export class AssetsComponent {
           keystone:             get(row, 'keystone').toLowerCase() === 'true',
           status:               oneOf(get(row, 'status'), validStatuses as AssetStatus[]) ?? 'Stable',
           controllingFactionId: get(row, 'controllingfactionid') || undefined,
-          location:             get(row, 'location') || undefined,
+          locationId:           get(row, 'locationid') || undefined,
           description:          get(row, 'description') || undefined,
         };
         this.store.saveAsset(asset);

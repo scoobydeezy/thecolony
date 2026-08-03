@@ -41,12 +41,22 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors();
 
-// Serve uploaded faction images
-var uploadsPath = Path.Combine(app.Environment.ContentRootPath, "uploads");
-Directory.CreateDirectory(uploadsPath);
+// Resolve the canonical uploads root from config (overridden per-environment via env var in docker-compose)
+var uploadsRaw = app.Configuration["UploadsPath"] ?? "../colony-uploads";
+var colonyUploadsPath = Path.IsPathRooted(uploadsRaw)
+    ? uploadsRaw
+    : Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, uploadsRaw));
+Directory.CreateDirectory(Path.Combine(colonyUploadsPath, "maps"));
+Directory.CreateDirectory(Path.Combine(colonyUploadsPath, "factions"));
 app.UseStaticFiles(new StaticFileOptions
 {
-    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(uploadsPath),
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(colonyUploadsPath),
+    RequestPath = "/colony-uploads"
+});
+// Legacy alias: existing faction image URLs stored in the DB use /uploads/factions/...
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(colonyUploadsPath),
     RequestPath = "/uploads"
 });
 

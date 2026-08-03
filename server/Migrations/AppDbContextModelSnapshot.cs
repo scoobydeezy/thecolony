@@ -51,7 +51,7 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<bool>("Keystone")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Location")
+                    b.Property<string>("LocationId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -163,6 +163,9 @@ namespace ColonyTracker.Api.Migrations
 
                     b.Property<int?>("Level")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("LocationId")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -316,6 +319,39 @@ namespace ColonyTracker.Api.Migrations
                     b.ToTable("CharacterRelationships");
                 });
 
+            modelBuilder.Entity("ColonyTracker.Api.Models.ColonyMap", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CampaignId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ImageHeight")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ImagePath")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ImageWidth")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsHero")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("LocationId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ColonyMaps");
+                });
+
             modelBuilder.Entity("ColonyTracker.Api.Models.ColonyState", b =>
                 {
                     b.Property<string>("Id")
@@ -380,6 +416,9 @@ namespace ColonyTracker.Api.Migrations
 
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsSynthetic")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("SessionId")
                         .IsRequired()
@@ -629,6 +668,75 @@ namespace ColonyTracker.Api.Migrations
                     b.ToTable("FactionGoals");
                 });
 
+            modelBuilder.Entity("ColonyTracker.Api.Models.Location", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CampaignId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LinkedAssetId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LocationType")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("MarkerColor")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ParentLocationId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("State")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Locations");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.MapPlacement", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("GeometryData")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("GeometryType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsHidden")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("MapId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SubjectId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SubjectType")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MapId");
+
+                    b.ToTable("MapPlacements");
+                });
+
             modelBuilder.Entity("ColonyTracker.Api.Models.RelationshipOverride", b =>
                 {
                     b.Property<string>("Id")
@@ -836,6 +944,15 @@ namespace ColonyTracker.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Event");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.MapPlacement", b =>
+                {
+                    b.HasOne("ColonyTracker.Api.Models.ColonyMap", null)
+                        .WithMany()
+                        .HasForeignKey("MapId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ColonyTracker.Api.Models.Event", b =>

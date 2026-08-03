@@ -7,7 +7,8 @@ import {
   RelationshipBreakdown, SessionLogEntry, Character,
   Session, CampaignEvent, Campaign, AppSettings,
   Asset, FactionGoal,
-  CharacterNarrativeProfile, CharacterDetail, CharacterRelationship
+  CharacterNarrativeProfile, CharacterDetail, CharacterRelationship,
+  Location, ColonyMap, MapPlacement, EventEffect,
 } from '../models/types';
 
 // The C# model stores value floats as truthValue/stabilityValue/agencyValue; map to/from ValueVector a/b/c.
@@ -311,5 +312,73 @@ export class ApiService {
   }
   deleteCharacterRelationship(characterId: string, relId: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/characters/${characterId}/relationships/${relId}`);
+  }
+
+  // Locations
+  getLocations(): Observable<Location[]> {
+    return this.http.get<Location[]>(`${this.base}/locations`);
+  }
+  createLocation(location: Omit<Location, 'id' | 'campaignId'>): Observable<Location> {
+    return this.http.post<Location>(`${this.base}/locations`, location);
+  }
+  updateLocation(location: Location): Observable<Location> {
+    return this.http.put<Location>(`${this.base}/locations/${location.id}`, location);
+  }
+  deleteLocation(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/locations/${id}`);
+  }
+
+  // Maps
+  getColonyMaps(): Observable<ColonyMap[]> {
+    return this.http.get<ColonyMap[]>(`${this.base}/maps`);
+  }
+  createColonyMap(map: Omit<ColonyMap, 'id' | 'campaignId'>): Observable<ColonyMap> {
+    return this.http.post<ColonyMap>(`${this.base}/maps`, map);
+  }
+  updateColonyMap(map: ColonyMap): Observable<ColonyMap> {
+    return this.http.put<ColonyMap>(`${this.base}/maps/${map.id}`, map);
+  }
+  deleteColonyMap(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/maps/${id}`);
+  }
+  uploadMapImage(file: File): Observable<{ path: string }> {
+    const fd = new FormData();
+    fd.append('file', file);
+    return this.http.post<{ path: string }>(`${this.base}/maps/upload`, fd);
+  }
+
+  // Map Placements
+  getMapPlacements(): Observable<MapPlacement[]> {
+    return this.http.get<MapPlacement[]>(`${this.base}/map-placements`);
+  }
+  createMapPlacement(placement: Omit<MapPlacement, 'id'>): Observable<MapPlacement> {
+    return this.http.post<MapPlacement>(`${this.base}/map-placements`, placement);
+  }
+  updateMapPlacement(placement: MapPlacement): Observable<MapPlacement> {
+    return this.http.put<MapPlacement>(`${this.base}/map-placements/${placement.id}`, placement);
+  }
+  deleteMapPlacement(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/map-placements/${id}`);
+  }
+
+  // Map Edits (synthetic EventEffects attached to the session's invisible MapEdits event)
+  upsertMapEdit(req: {
+    sessionId: string;
+    targetType: string;
+    targetId: string;
+    property: string;
+    value?: string | null;
+    secondaryTargetId?: string | null;
+  }): Observable<EventEffect> {
+    return this.http.post<EventEffect>(`${this.base}/map-edits`, req);
+  }
+
+  deleteMapEdit(params: {
+    sessionId: string;
+    targetType: string;
+    targetId: string;
+    property: string;
+  }): Observable<void> {
+    return this.http.delete<void>(`${this.base}/map-edits`, { params });
   }
 }

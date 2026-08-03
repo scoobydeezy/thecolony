@@ -1,3 +1,6 @@
+@use 'leaflet/dist/leaflet.css' as leaflet-core;
+@use 'leaflet-draw/dist/leaflet.draw.css' as leaflet-draw;
+
 :root {
   --bg-base: #0f172a;
   --bg-surface: #1e293b;
@@ -219,4 +222,103 @@ table {
 
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
 .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; }
+
+// ── Leaflet popup overrides ────────────────────────────────────────────────────
+
+.leaflet-popup-content-wrapper {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  color: var(--text-primary);
+  padding: 0.5rem;
+}
+
+.leaflet-popup-content {
+  margin: 0.6rem 0.85rem;
+  font-size: 0.82rem;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.5;
+
+  strong { color: var(--text-primary); font-size: 0.88rem; }
+
+  a { color: var(--accent); text-decoration: none; &:hover { text-decoration: underline; } }
+
+  ul { color: var(--text-secondary); }
+}
+
+.leaflet-popup-tip {
+  background: var(--bg-surface);
+}
+
+.leaflet-popup-close-button {
+  line-height: 1rem;
+  top: 0.1rem !important;
+  right: 0.1rem !important;
+  color: var(--text-muted) !important;
+  font-size: 1rem !important;
+  padding: 0.2rem 0.4rem !important;
+  &:hover { color: var(--text-primary) !important; }
+}
+
+.leaflet-edit-btn {
+  background: none;
+  border: none;
+  padding: 0 1rem 0 0.5em;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.75em;
+  vertical-align: middle;
+  &:hover { color: var(--accent); }
+}
 .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; }
+
+.main-content.is-snapshot {
+  box-shadow: inset 0 0 0 3px var(--accent);
+}
+
+// ── Leaflet-draw toolbar icon overrides ───────────────────────────────────────
+// Replace the spritesheet icons with Font Awesome for polygon, circlemarker,
+// and our custom multipoint tool.
+
+.leaflet-draw-draw-polygon,
+.leaflet-draw-draw-circlemarker,
+.leaflet-draw-draw-multipoint {
+  // Hide the background spritesheet icon
+  background-image: none !important;
+
+  &::before {
+    font-family: 'Font Awesome 6 Pro';
+    font-weight: 900;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    color: #444;
+  }
+}
+
+.leaflet-draw-draw-polygon::before    { content: '\f5ee'; } // fa-draw-polygon
+.leaflet-draw-draw-circlemarker::before { content: '\f601'; } // fa-location-crosshairs
+.leaflet-draw-draw-multipoint::before { content: '\f1e0'; } // fa-share-nodes
+
+// ── Leaflet map marker icons ───────────────────────────────────────────────────
+
+.leaflet-marker-poi {
+  color: inherit;
+  font-size: 20px;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.6));
+}
+
+.leaflet-marker-character {
+  color: inherit;
+  font-size: 16px;
+  text-shadow:
+     0    0   3px rgba(0, 0, 0, 0.5),
+    -1px -1px 0 rgba(255, 255, 255, 0.8),
+     1px -1px 0 rgba(255, 255, 255, 0.8),
+    -1px  1px 0 rgba(255, 255, 255, 0.8),
+     1px  1px 0 rgba(255, 255, 255, 0.8);
+}

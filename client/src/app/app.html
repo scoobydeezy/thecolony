@@ -13,10 +13,11 @@
       <li><a routerLink="/factions" routerLinkActive="active">Factions</a></li>
       <li><a routerLink="/characters" routerLinkActive="active">Characters</a></li>
       <li><a routerLink="/assets" routerLinkActive="active">Assets</a></li>
+      <li><a routerLink="/locations" routerLinkActive="active">Locations</a></li>
+      <li><a routerLink="/relationships" routerLinkActive="active">Relationships</a></li>
 
       <li class="nav-section-label">Campaign</li>
       <li><a routerLink="/sessions" routerLinkActive="active">Sessions</a></li>
-      <li><a routerLink="/relationships" routerLinkActive="active">Relationships</a></li>
       <li><a routerLink="/party" routerLinkActive="active">{{ partyName() }}</a></li>
 
     </ul>
@@ -106,7 +107,7 @@
       </button>
     </header>
 
-    <main class="main-content">
+    <main class="main-content" [class.is-snapshot]="store.isViewingSnapshot()">
       <router-outlet />
     </main>
   </div>

@@ -21,6 +21,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<CharacterNarrativeProfile> CharacterNarrativeProfiles => Set<CharacterNarrativeProfile>();
     public DbSet<CharacterDetail> CharacterDetails => Set<CharacterDetail>();
     public DbSet<CharacterRelationship> CharacterRelationships => Set<CharacterRelationship>();
+    public DbSet<Location> Locations => Set<Location>();
+    public DbSet<ColonyMap> ColonyMaps => Set<ColonyMap>();
+    public DbSet<MapPlacement> MapPlacements => Set<MapPlacement>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -49,5 +52,11 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         modelBuilder.Entity<CharacterNarrativeProfile>()
             .HasKey(p => p.CharacterId);
+
+        modelBuilder.Entity<ColonyMap>()
+            .HasMany<MapPlacement>()
+            .WithOne()
+            .HasForeignKey(p => p.MapId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

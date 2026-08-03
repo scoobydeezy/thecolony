@@ -105,6 +105,11 @@ export class CharactersComponent {
     return this.store.factions().find(f => f.id === id)?.name ?? id;
   }
 
+  locationName(id?: string): string {
+    if (!id) return '—';
+    return this.store.viewLocations().find(l => l.id === id)?.name ?? '—';
+  }
+
   driftClass(score: number): string {
     if (score >= 30) return 'drift high';
     if (score >= 10) return 'drift mid';

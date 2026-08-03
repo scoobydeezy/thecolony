@@ -4,7 +4,7 @@ import { AppStore } from '../../store/app.store';
 import {
   Session, CampaignEvent, EventEffect, ColonyImpact, CharacterState, DerivedEffect,
   FACTION_EFFECT_PROPS, CHARACTER_EFFECT_PROPS, COLONY_EFFECT_PROPS,
-  ASSET_EFFECT_PROPS, GOAL_EFFECT_PROPS, EffectPropDescriptor,
+  ASSET_EFFECT_PROPS, GOAL_EFFECT_PROPS, LOCATION_EFFECT_PROPS, EffectPropDescriptor,
 } from '../../core/models/types';
 
 // ── Session form model ────────────────────────────────────────────────────────
@@ -198,6 +198,7 @@ export class SessionsComponent {
     if (targetType === 'character') return CHARACTER_EFFECT_PROPS;
     if (targetType === 'asset') return ASSET_EFFECT_PROPS;
     if (targetType === 'goal') return GOAL_EFFECT_PROPS;
+    if (targetType === 'location') return LOCATION_EFFECT_PROPS;
     return FACTION_EFFECT_PROPS;
   }
 
@@ -208,7 +209,8 @@ export class SessionsComponent {
   isStringProperty(targetType: string, property: string | undefined): boolean {
     const d = this.descriptor(targetType, property);
     return d?.inputType === 'select' || d?.inputType === 'none'
-        || d?.inputType === 'faction-select' || d?.inputType === 'participate';
+        || d?.inputType === 'faction-select' || d?.inputType === 'participate'
+        || d?.inputType === 'location-select';
   }
 
   needsSecondaryTarget(property: string | undefined): boolean {
@@ -247,10 +249,11 @@ export class SessionsComponent {
           actorFactionId: undefined,
           value: d?.inputType === 'select' ? (d.selectOptions?.[0]?.value ?? '')
                : d?.inputType === 'faction-select' ? ''
+               : d?.inputType === 'location-select' ? ''
                : d?.inputType === 'participate' ? 'Helping'
                : undefined,
           delta: (d?.inputType === 'select' || d?.inputType === 'none'
-               || d?.inputType === 'faction-select') ? 0 : (effects[index].delta ?? 0),
+               || d?.inputType === 'faction-select' || d?.inputType === 'location-select') ? 0 : (effects[index].delta ?? 0),
         };
       }
       return { ...map, [eventId]: effects };
@@ -283,7 +286,7 @@ export class SessionsComponent {
       targetType: draft.targetType ?? 'faction',
       targetId: draft.targetId ?? '',
       property: draft.property ?? 'momentum',
-      delta: (d?.inputType === 'select' || d?.inputType === 'none') ? 0 : Number(draft.delta ?? 0),
+      delta: (d?.inputType === 'select' || d?.inputType === 'none' || d?.inputType === 'location-select') ? 0 : Number(draft.delta ?? 0),
       value: draft.value,
       secondaryTargetId: draft.secondaryTargetId,
       actorFactionId: draft.actorFactionId,
@@ -307,6 +310,9 @@ export class SessionsComponent {
     if (ef.property === 'state') return `→ ${ef.value ?? '?'}`;
     if (ef.property === 'factionChange') {
       return ef.value ? `→ ${this.factionName(ef.value)}` : '→ None';
+    }
+    if (ef.property === 'locationChange') {
+      return ef.value ? `→ ${this.locationName(ef.value)}` : '→ None';
     }
     if (ef.property === 'controllingFactionId') {
       return ef.value ? `→ ${this.factionName(ef.value)}` : '→ Uncontrolled';
@@ -352,7 +358,9 @@ export class SessionsComponent {
     const session = this.store.sessions().find(s => s.id === sessionId);
     if (!session) return;
 
-    const sorted = [...(session.events ?? [])].sort((a, b) => a.sortOrder - b.sortOrder);
+    const sorted = [...(session.events ?? [])]
+      .filter(e => !e.isSynthetic)
+      .sort((a, b) => a.sortOrder - b.sortOrder);
     const srcIdx = sorted.findIndex(e => e.id === srcId);
     const tgtIdx = sorted.findIndex(e => e.id === targetEventId);
     if (srcIdx === -1 || tgtIdx === -1) return;
@@ -374,11 +382,13 @@ export class SessionsComponent {
 
   // ── Computed helpers ─────────────────────────────────────────────────────
   sortedEvents(session: Session): CampaignEvent[] {
-    return [...(session.events ?? [])].sort((a, b) => a.sortOrder - b.sortOrder);
+    return [...(session.events ?? [])]
+      .filter(e => !e.isSynthetic)
+      .sort((a, b) => a.sortOrder - b.sortOrder);
   }
 
   sessionImpact(session: Session): ColonyImpact {
-    return computeImpact(session.events ?? []);
+    return computeImpact((session.events ?? []).filter(e => !e.isSynthetic));
   }
 
   momentumGained(impact: ColonyImpact): number {
@@ -405,6 +415,7 @@ export class SessionsComponent {
     if (ef.targetType === 'character') return this.characterName(ef.targetId);
     if (ef.targetType === 'asset') return this.assetName(ef.targetId);
     if (ef.targetType === 'goal') return this.goalName(ef.targetId);
+    if (ef.targetType === 'location') return this.locationName(ef.targetId);
     return ef.targetId;
   }
 
@@ -416,6 +427,11 @@ export class SessionsComponent {
   goalName(id: string): string {
     if (!id) return '—';
     return this.store.factionGoals().find(g => g.id === id)?.title ?? id;
+  }
+
+  locationName(id: string): string {
+    if (!id) return '—';
+    return this.store.locations().find(l => l.id === id)?.name ?? id;
   }
 
   actorName(id: string): string {
@@ -466,6 +482,7 @@ export class SessionsComponent {
   get allCharacters() { return this.store.characters(); }
   get allAssets() { return this.store.assets(); }
   get allGoals() { return this.store.factionGoals(); }
+  get allLocations() { return this.store.locations(); }
   get allActors() {
     return [
       { id: 'party', name: 'Party' },

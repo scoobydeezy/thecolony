@@ -95,7 +95,7 @@
                         }
                         <span class="effect-target">{{ targetName(ef) }}</span>
                         <span class="effect-prop">{{ ef.property }}</span>
-                        <span [class]="ef.property === 'state' || ef.property === 'factionChange' ? 'delta neutral' : deltaClass(ef.delta)">{{ effectLabel(ef) }}</span>
+                        <span [class]="ef.property === 'state' || ef.property === 'factionChange' || ef.property === 'locationChange' ? 'delta neutral' : deltaClass(ef.delta)">{{ effectLabel(ef) }}</span>
                         <button class="effect-del" (click)="deleteEffect(ev, ef.id)" title="Remove effect">✕</button>
                       </span>
                     }
@@ -115,6 +115,7 @@
                           <option value="character" [selected]="(draft.targetType ?? 'faction') === 'character'">Character</option>
                           <option value="asset"     [selected]="(draft.targetType ?? 'faction') === 'asset'">Asset</option>
                           <option value="goal"      [selected]="(draft.targetType ?? 'faction') === 'goal'">Goal</option>
+                          <option value="location"  [selected]="(draft.targetType ?? 'faction') === 'location'">Location</option>
                         </select>
 
                         <!-- Primary target -->
@@ -141,6 +142,14 @@
                               <option value="">— goal —</option>
                               @for (g of allGoals; track g.id) {
                                 <option [value]="g.id" [selected]="draft.targetId === g.id">{{ g.title }}</option>
+                              }
+                            </select>
+                          } @else if (draft.targetType === 'location') {
+                            <select [value]="draft.targetId ?? ''"
+                              (change)="updateInlineEffect(ev.id, $index, 'targetId', $any($event.target).value)">
+                              <option value="">— location —</option>
+                              @for (l of allLocations; track l.id) {
+                                <option [value]="l.id" [selected]="draft.targetId === l.id">{{ l.name }}</option>
                               }
                             </select>
                           } @else {
@@ -200,6 +209,15 @@
                               <option value="">— Uncontrolled —</option>
                               @for (f of activeFactions; track f.id) {
                                 <option [value]="f.id" [selected]="draft.value === f.id">{{ f.name }}</option>
+                              }
+                            </select>
+                          } @else if (d.inputType === 'location-select') {
+                            <!-- locationChange: location stored in value -->
+                            <select [value]="draft.value ?? ''"
+                              (change)="updateInlineEffect(ev.id, $index, 'value', $any($event.target).value)">
+                              <option value="">— None —</option>
+                              @for (l of allLocations; track l.id) {
+                                <option [value]="l.id" [selected]="draft.value === l.id">{{ l.name }}</option>
                               }
                             </select>
                           } @else if (d.inputType === 'participate') {

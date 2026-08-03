@@ -59,8 +59,8 @@
         <th>Tier</th>
         <th>Faction</th>
         <th>Social Class</th>
-        <th>Conviction</th>
-        <th>Pressure</th>
+        <th>Location</th>
+        <th>Influence</th>
         <th>Drift</th>
         <th></th>
       </tr>
@@ -100,8 +100,8 @@
           <td><span class="tier-chip" [class]="'tier-chip tier-chip--' + (c.narrativeTier ?? 'Minor').toLowerCase()">{{ c.narrativeTier ?? 'Minor' }}</span></td>
           <td>{{ factionName(c.factionId) }}</td>
           <td>{{ factionName(c.socialClassId) }}</td>
-          <td><span [class]="convictionClass(c.conviction)">{{ formatPct(c.conviction) }}</span></td>
-          <td><span [class]="pressureClass(effectivePressure(c, colonyStress()))">{{ formatPct(effectivePressure(c, colonyStress())) }}</span></td>
+          <td>{{ locationName(c.locationId) }}</td>
+          <td>{{ c.influence }}</td>
           <td><span [class]="driftClass(effectiveDriftScore(c))">{{ effectiveDriftScore(c) > 0 ? '+' : '' }}{{ effectiveDriftScore(c) | number:'1.0-1' }}</span></td>
           <td class="actions">
             <button class="btn-icon btn-icon--danger" (click)="delete(c)" title="Delete"

@@ -54,6 +54,7 @@ interface CharacterFormModel {
   summary: string;
   factionId: string;
   socialClassId: string;
+  locationId: string;
   beliefc: string;
   beliefa: string;
   beliefb: string;
@@ -71,7 +72,7 @@ const emptyFormModel = (): CharacterFormModel => ({
   ancestry: '', heritage: '', class: '', background: '', level: '',
   gender: '', pronouns: '', age: '', occupation: '', aliases: '',
   summary: '',
-  factionId: '', socialClassId: '',
+  factionId: '', socialClassId: '', locationId: '',
   beliefc: '', beliefa: '', beliefb: '',
   doubtDirection: '', conviction: '50', pressure: '0',
   influence: '0', impressionable: '50'
@@ -96,6 +97,7 @@ const toFormModel = (c: Character): CharacterFormModel => ({
   summary: c.summary ?? '',
   factionId: c.factionId ?? '',
   socialClassId: c.socialClassId ?? '',
+  locationId: c.locationId ?? '',
   beliefc: c.beliefc ?? '',
   beliefa: c.beliefa ?? '',
   beliefb: c.beliefb ?? '',
@@ -163,6 +165,7 @@ export class CharacterDetailComponent implements OnInit {
           ...current,
           factionId: fm.factionId || undefined,
           socialClassId: fm.socialClassId || undefined,
+          locationId: fm.locationId || undefined,
           influence: fm.influence !== '' ? +fm.influence : 0,
           impressionable: fm.impressionable !== '' ? +fm.impressionable : 50,
         };

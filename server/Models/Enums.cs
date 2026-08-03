@@ -18,3 +18,6 @@ public enum GoalConditionType { Achieve, Maintain }
 public enum GoalTargetEntityType { Faction, Character, Asset }
 public enum GoalPriority { Critical, Major, Minor }
 public enum GoalVisibility { Open, Known, Secret }
+public enum LocationState { Active, Abandoned, Ruined, Unknown }
+public enum GeometryType { Point, Polygon, MultiPoint }
+public enum PlacementSubjectType { Location, Character, Asset }
