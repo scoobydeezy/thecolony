@@ -11,13 +11,13 @@ select {
   border-radius: 6px;
   padding: 0.35rem 0.5rem;
   color: var(--text-primary);
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   outline: none;
   &:focus { border-color: var(--accent); }
 }
 
 .or-label {
-  font-size: 0.7rem;
+  font-size: var(--text-size-label);
   font-weight: 700;
   color: var(--text-muted);
   letter-spacing: 0.05em;
@@ -30,7 +30,7 @@ select {
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   padding: 0.2rem 0.35rem;
   border-radius: 4px;
   line-height: 1;

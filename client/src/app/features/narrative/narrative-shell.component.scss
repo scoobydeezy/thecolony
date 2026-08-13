@@ -1,0 +1,89 @@
+    .narrative-shell {
+      display: flex;
+      flex-direction: column;
+
+      &.flow-mode,
+      &.events-mode {
+        height: calc(100vh - 120px);
+        min-height: 0;
+
+        app-narrative-flow,
+        app-narrative-events-cards {
+          flex: 1;
+          min-height: 0;
+          display: flex;
+          flex-direction: column;
+        }
+      }
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      flex-shrink: 0;
+      gap: 1rem;
+      flex-wrap: wrap;
+
+      .toolbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+    }
+
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+      flex-shrink: 0;
+    }
+
+    .view-toggle {
+      display: flex;
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+
+      button {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: none;
+        border: none;
+        padding: 0.45rem 1rem;
+        font-size: var(--text-size-body);
+        color: var(--text-secondary);
+        cursor: pointer;
+        border-right: 1px solid var(--border);
+        transition: background 0.15s, color 0.15s;
+
+        &:last-child { border-right: none; }
+        &:hover { background: var(--bg-hover); color: var(--text-primary); }
+        &.active { background: var(--bg-active); color: var(--accent); font-weight: 600; }
+      }
+    }
+
+    .search-input {
+      flex: 1;
+      min-width: 160px;
+      padding: 0.4rem 0.65rem;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background: var(--surface-1);
+      color: var(--text-primary);
+      font-size: var(--text-size-body);
+    }
+
+    .filter-select {
+      padding: 0.4rem 0.55rem;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background: var(--surface-1);
+      color: var(--text-primary);
+      font-size: var(--text-size-meta);
+    }

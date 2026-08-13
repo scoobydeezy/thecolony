@@ -6,7 +6,7 @@
 }
 
 .section-title {
-  font-size: 0.875rem;
+  font-size: var(--text-size-section);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -15,13 +15,13 @@
 }
 
 .help-text {
-  font-size: 0.85rem;
+  font-size: var(--text-size-body);
   color: var(--text-muted);
   margin-bottom: 1rem;
 }
 
 .separator {
-  font-size: 0.72rem;
+  font-size: var(--text-size-label);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-muted);
@@ -45,7 +45,7 @@
 }
 
 .member-link {
-  font-size: 0.875rem;
+  font-size: var(--text-size-section);
   color: var(--color-text, #e2e8f0);
   font-weight: 600;
   text-decoration: none;
@@ -58,7 +58,7 @@
 
 .member-subtitle {
   display: block;
-  font-size: 0.7rem;
+  font-size: var(--text-size-label);
   color: var(--color-text-muted, #94a3b8);
   font-weight: 400;
 }
@@ -89,7 +89,7 @@
 }
 
 .belief-conflict-hint {
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   color: #f87171;
   margin: -0.5rem 0 0.75rem;
 }
@@ -100,7 +100,7 @@
 
 .score {
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: var(--text-size-section);
   &.pos-high { color: var(--color-success); }
   &.pos-mid  { color: #86efac; }
   &.neutral  { color: var(--text-muted); }
@@ -108,8 +108,8 @@
   &.neg-high { color: var(--color-danger); }
 }
 
-.pos { color: var(--color-success); font-size: 0.8rem; }
-.neg { color: var(--color-danger);  font-size: 0.8rem; }
+.pos { color: var(--color-success); font-size: var(--text-size-meta); }
+.neg { color: var(--color-danger);  font-size: var(--text-size-meta); }
 
 .save-bar {
   display: flex;
@@ -119,6 +119,6 @@
 
 .saved-msg {
   color: var(--color-success);
-  font-size: 0.875rem;
+  font-size: var(--text-size-section);
   font-weight: 600;
 }

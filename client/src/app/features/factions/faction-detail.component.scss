@@ -8,7 +8,7 @@
 }
 
 .back-link {
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   text-decoration: none;
   &:hover { color: #60a5fa; text-decoration: underline; }
@@ -72,13 +72,13 @@
 }
 
 .header-represents {
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   color: var(--text-secondary);
   margin: 0;
 }
 
 .header-motto {
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   color: var(--text-muted);
   font-style: italic;
   margin: 0;
@@ -86,7 +86,7 @@
 }
 
 .header-summary {
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   color: var(--text-secondary);
   margin: 0;
 }
@@ -129,7 +129,7 @@
 }
 
 .modal-section-title {
-  font-size: var(--font-size-xs);
+  font-size: var(--text-size-label);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -163,13 +163,13 @@
 }
 
 .color-value {
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   color: var(--text-secondary);
   font-family: monospace;
 }
 
 .upload-label {
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   font-weight: 500;
 }
@@ -177,7 +177,7 @@
 // ── Chips ──────────────────────────────────────────────────────────────────
 
 .type-chip {
-  font-size: var(--font-size-xs);
+  font-size: var(--text-size-badge);
   font-weight: 600;
   padding: 0.15rem 0.5rem;
   border-radius: 99px;
@@ -194,7 +194,7 @@
 }
 
 .inactive-chip {
-  font-size: var(--font-size-xs);
+  font-size: var(--text-size-badge);
   font-weight: 600;
   padding: 0.15rem 0.5rem;
   border-radius: 99px;
@@ -249,7 +249,7 @@
   cursor: pointer;
   padding: 0.2rem 0.35rem;
   border-radius: 4px;
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   line-height: 1;
   opacity: 0;
   transition: opacity 0.1s, color 0.1s, background 0.1s;
@@ -306,7 +306,7 @@
   gap: 0.25rem;
 
   label {
-    font-size: 0.8rem;
+    font-size: var(--text-size-meta);
     font-weight: 500;
     color: var(--text-secondary);
   }
@@ -316,7 +316,7 @@
     border: 1px solid var(--border);
     border-radius: 6px;
     padding: 0.4rem 0.6rem;
-    font-size: 0.875rem;
+    font-size: var(--text-size-body);
     color: var(--text-primary);
     width: 100%;
 
@@ -325,13 +325,13 @@
 }
 
 .range-hint {
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   font-weight: 400;
 }
 
 .field-error {
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   color: var(--color-danger, #f87171);
   margin: 0;
 }
@@ -361,7 +361,7 @@
 }
 
 .belief-conflict-hint {
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   color: var(--color-danger, #f87171);
   margin: 0;
 }
@@ -376,7 +376,7 @@
 // ── Read-mode detail elements ──────────────────────────────────────────────
 
 .section-title {
-  font-size: 0.9rem;
+  font-size: var(--text-size-section);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -402,17 +402,17 @@
 
 .detail-label {
   display: block;
-  font-size: var(--font-size-xs);
+  font-size: var(--text-size-label);
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
   margin-bottom: 0.2rem;
 }
 
 .detail-text {
   margin: 0;
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   color: var(--text-primary);
   line-height: 1.6;
 }
@@ -437,7 +437,7 @@
   gap: 0.1rem;
 
   span:not(.detail-label) {
-    font-size: 0.875rem;
+    font-size: var(--text-size-body);
     color: var(--text-primary);
   }
 }
@@ -494,14 +494,14 @@
 }
 
 .influence-factor-label {
-  font-size: var(--font-size-xs);
+  font-size: var(--text-size-label);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
 }
 
 .influence-factor-value {
-  font-size: 0.9rem;
+  font-size: var(--text-size-title);
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -541,15 +541,15 @@
 }
 
 .belief-label {
-  font-size: 0.65rem;
+  font-size: var(--text-size-label);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
   flex-shrink: 0;
 }
 
 .belief-val {
-  font-size: var(--font-size-xs);
+  font-size: var(--text-size-meta);
   font-weight: 600;
   color: var(--text-primary);
 
@@ -578,7 +578,7 @@
 }
 
 .alignment-link {
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   color: var(--accent);
   text-decoration: none;
   line-height: 1.6;
@@ -605,7 +605,7 @@
 }
 
 .section-stat {
-  font-size: var(--font-size-xs);
+  font-size: var(--text-size-label);
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
 }
@@ -627,7 +627,7 @@
 // ── Goals ──────────────────────────────────────────────────────────────────
 
 .empty-state {
-  font-size: 0.85rem;
+  font-size: var(--text-size-body);
   color: var(--text-muted);
   margin: 0;
 }
@@ -648,7 +648,7 @@
 }
 
 .goal-priority-icon {
-  font-size: 0.85rem;
+  font-size: var(--text-size-body);
 }
 
 .goal-content {
@@ -672,7 +672,7 @@
 }
 
 .goal-name {
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -692,7 +692,7 @@
   cursor: pointer;
   padding: 0.2rem 0.3rem;
   border-radius: 4px;
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   line-height: 1;
   opacity: 0;
   transition: opacity 0.1s, color 0.1s, background 0.1s;
@@ -708,7 +708,7 @@
 }
 
 .goal-status-prefix {
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   font-weight: 600;
   flex-shrink: 0;
 }
@@ -719,7 +719,7 @@
   gap: 0.4rem;
   padding: 0.35rem 0.75rem;
   border-radius: 99px;
-  font-size: 0.7rem;
+  font-size: var(--text-size-label);
   font-weight: 700;
   letter-spacing: 0.06em;
   white-space: nowrap;
@@ -733,22 +733,22 @@
 }
 
 .target-item {
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
 
   strong { color: var(--text-secondary); font-weight: 500; }
 }
 
 .meta-label {
-  font-size: var(--font-size-xs);
+  font-size: var(--text-size-label);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
   flex-shrink: 0;
 }
 
 .goal-resolved-header {
-  font-size: var(--font-size-xs);
+  font-size: var(--text-size-label);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -792,7 +792,7 @@
     width: 100%;
     text-align: center;
     line-height: 2.25rem;
-    font-size: 0.8rem;
+    font-size: var(--text-size-meta);
   }
 
   &--inactive {
@@ -818,7 +818,7 @@
 }
 
 .asset-type-icon {
-  font-size: 0.9rem;
+  font-size: var(--text-size-section);
   color: var(--text-muted);
   flex-shrink: 0;
   width: 1.1rem;
@@ -836,10 +836,10 @@
 }
 
 
-.asset-name { font-size: 0.875rem; font-weight: 500; color: var(--text-primary); }
+.asset-name { font-size: var(--text-size-body); font-weight: 500; color: var(--text-primary); }
 
 .asset-actor-label {
-  font-size: 0.7rem;
+  font-size: var(--text-size-label);
   color: var(--text-muted);
   font-style: italic;
 }
@@ -850,7 +850,7 @@
   flex-shrink: 0;
 
   i {
-    font-size: 0.75rem;
+    font-size: var(--text-size-meta);
     color: var(--text-muted);
     &.fa-solid { color: var(--text-secondary); }
   }
@@ -869,7 +869,7 @@
 }
 
 .additional-members-label {
-  font-size: var(--font-size-xs);
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
 }
 
@@ -884,7 +884,7 @@
 }
 
 .adj-btn {
-  font-size: var(--font-size-xs);
+  font-size: var(--text-size-label);
   padding: 0.15rem 0.45rem;
   border-radius: 4px;
   border: 1px solid var(--border);
@@ -902,7 +902,7 @@
 }
 
 .members-subsection-label {
-  font-size: var(--font-size-xs);
+  font-size: var(--text-size-label);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -920,10 +920,10 @@
   flex-wrap: wrap;
 }
 
-.char-name { font-size: 0.875rem; font-weight: 500; color: var(--text-primary); }
+.char-name { font-size: var(--text-size-body); font-weight: 500; color: var(--text-primary); }
 
 .char-type-chip {
-  font-size: var(--font-size-xs);
+  font-size: var(--text-size-badge);
   padding: 0.1rem 0.4rem;
   border-radius: 99px;
   background: color-mix(in srgb, var(--text-muted) 12%, transparent);
@@ -934,17 +934,17 @@
   &.faction-label { background: color-mix(in srgb, #8b5cf6 12%, transparent); color: #a78bfa; }
 }
 
-.char-meta { font-size: 0.75rem; color: var(--text-muted); }
+.char-meta { font-size: var(--text-size-meta); color: var(--text-muted); }
 
 .char-summary {
   margin: 0.2rem 0 0 0;
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   color: var(--text-secondary);
   line-height: 1.4;
 }
 
 .char-drift-score {
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   padding: 0.1rem 0.35rem;
   border-radius: 99px;
 
@@ -954,10 +954,10 @@
   &.drift-none { display: none; }
 }
 
-.char-misfit-badge { font-size: var(--font-size-xs); color: #f59e0b; font-weight: 600; }
+.char-misfit-badge { font-size: var(--text-size-badge); color: #f59e0b; font-weight: 600; }
 
 .state-icon {
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   &--dead      { color: #6b7280; }
   &--missing   { color: #f59e0b; }
   &--forgotten { color: #6b7280; }
@@ -966,7 +966,7 @@
 // ── Badge styles ───────────────────────────────────────────────────────────
 
 .badge {
-  font-size: 0.68rem;
+  font-size: var(--text-size-badge);
   font-weight: 600;
   padding: 0.1rem 0.45rem;
   border-radius: 99px;
@@ -995,7 +995,7 @@
 .status-damaged   { color: #fb923c; }
 .status-destroyed { color: #f87171; }
 
-.status-badge { font-size: var(--font-size-xs); font-weight: 600; text-transform: capitalize; }
+.status-badge { font-size: var(--text-size-badge); font-weight: 600; text-transform: capitalize; }
 
 // ── Goal modal ─────────────────────────────────────────────────────────────
 
@@ -1065,7 +1065,7 @@
 .form-row { display: flex; flex-direction: column; gap: 0.3rem; }
 
 .form-label {
-  font-size: var(--font-size-xs);
+  font-size: var(--text-size-label);
   font-weight: 500;
   color: var(--text-secondary);
 }
@@ -1075,7 +1075,7 @@
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 0.4rem 0.6rem;
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   color: var(--text-primary);
   width: 100%;
   &:focus { outline: none; border-color: var(--accent); }
@@ -1094,7 +1094,7 @@
 }
 
 .form-hint {
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   margin: 0;
   line-height: 1.4;
@@ -1147,7 +1147,7 @@
   border-radius: 6px;
   color: var(--text-muted);
   cursor: pointer;
-  font-size: 0.65rem;
+  font-size: var(--text-size-badge);
   transition: border-color 0.15s, color 0.15s, background 0.15s;
 
   svg { color: var(--text-muted); transition: color 0.15s; }

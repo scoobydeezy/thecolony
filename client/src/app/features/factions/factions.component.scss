@@ -9,7 +9,7 @@
   margin-bottom: 1.5rem;
 
   .section-title {
-    font-size: 0.85rem;
+    font-size: var(--text-size-section);
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -47,7 +47,7 @@
     background: none;
     border: none;
     padding: 0.5rem 1rem;
-    font-size: 0.85rem;
+    font-size: var(--text-size-body);
     color: var(--text-secondary);
     cursor: pointer;
     transition: background 0.15s, color 0.15s;
@@ -97,14 +97,14 @@
   margin-bottom: 0.75rem;
 
   h3 {
-    font-size: 1rem;
-    font-weight: 700;
+    font-size: var(--text-size-title);
+    font-weight: 600;
     color: var(--text-primary);
   }
 
   .represents {
-    font-size: 0.8rem;
-    color: var(--text-muted);
+    font-size: var(--text-size-body);
+    color: var(--text-secondary);
     margin-top: 0.2rem;
   }
 }
@@ -141,7 +141,7 @@
 }
 
 .type-chip {
-  font-size: 0.65rem;
+  font-size: var(--text-size-badge);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   padding: 0.15rem 0.45rem;
@@ -163,9 +163,9 @@
 }
 
 .fact-group-label {
-  font-size: 0.62rem;
+  font-size: var(--text-size-label);
   text-transform: uppercase;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
   min-width: 3.5rem;
   flex-shrink: 0;
@@ -187,15 +187,15 @@
 }
 
 .belief-label {
-  font-size: 0.65rem;
+  font-size: var(--text-size-label);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
 }
 
 
 .belief-val {
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   font-weight: 600;
   color: var(--text-primary);
 
@@ -208,7 +208,7 @@
 }
 
 .core-tenet {
-  font-size: 0.8rem;
+  font-size: var(--text-size-body);
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 0.5rem;
@@ -230,20 +230,20 @@
 }
 
 .belief-conflict-hint {
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   color: #f87171;
   margin: -0.5rem 0 0.75rem;
 }
 
 .single-sentence {
-  font-size: 0.825rem;
+  font-size: var(--text-size-body);
   color: var(--text-secondary);
   font-style: italic;
   margin-bottom: 1.5rem;
 }
 
 .notes {
-  font-size: 0.8rem;
+  font-size: var(--text-size-body);
   color: var(--text-muted);
   margin-bottom: 0.75rem;
   background: var(--bg-base);
@@ -259,22 +259,22 @@
 }
 
 .card-stat-label {
-  font-size: 0.65rem;
+  font-size: var(--text-size-label);
   text-transform: uppercase;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
 }
 
 .card-stat-value {
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: var(--text-size-title);
+  font-weight: 600;
   color: var(--text-primary);
 
   &.card-stat-power { color: var(--accent); }
 }
 
 .card-stat-total {
-  font-size: 0.85rem;
+  font-size: var(--text-size-body);
   font-weight: 400;
   color: var(--text-muted);
 }
@@ -301,20 +301,20 @@
 }
 
 .field-error {
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   color: #f87171;
   margin-top: 0.25rem;
 }
 
 .range-hint {
-  font-size: 0.7rem;
+  font-size: var(--text-size-label);
   color: var(--text-muted);
   font-weight: 400;
   margin-left: 0.25rem;
 }
 
 .separator {
-  font-size: 0.72rem;
+  font-size: var(--text-size-meta);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-muted);
@@ -389,7 +389,7 @@
 }
 
 .ternary-hint {
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   text-align: center;
 }
@@ -434,9 +434,9 @@
 }
 
 .detail-influence-label {
-  font-size: 0.65rem;
+  font-size: var(--text-size-label);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
   margin: 0.2rem 0 0.75rem;
 }
@@ -457,14 +457,14 @@
 }
 
 .detail-influence-factor-label {
-  font-size: 0.6rem;
+  font-size: var(--text-size-label);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-muted);
 }
 
 .detail-influence-factor-value {
-  font-size: 0.95rem;
+  font-size: var(--text-size-title);
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -508,14 +508,14 @@
 
   h3 {
     font-size: 1.25rem;
-    font-weight: 700;
+    font-weight: 600;
     color: var(--text-primary);
     margin: 0;
   }
 }
 
 .inactive-chip {
-  font-size: 0.65rem;
+  font-size: var(--text-size-badge);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   padding: 0.15rem 0.45rem;
@@ -526,13 +526,13 @@
 }
 
 .detail-represents {
-  font-size: 0.85rem;
-  color: var(--text-muted);
+  font-size: var(--text-size-body);
+  color: var(--text-secondary);
   margin: 0 0 0.35rem;
 }
 
 .detail-single-sentence {
-  font-size: 0.9rem;
+  font-size: var(--text-size-body);
   font-style: italic;
   color: var(--text-secondary);
   margin: 0;
@@ -579,7 +579,7 @@
 }
 
 .detail-text {
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   color: var(--text-secondary);
   margin: 0 0 0.25rem;
   line-height: 1.5;
@@ -589,7 +589,7 @@
   display: flex;
   gap: 0.5rem;
   align-items: baseline;
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   padding: 0.2rem 0;
   border-bottom: 1px solid var(--border);
 
@@ -597,7 +597,7 @@
 }
 
 .detail-field-label {
-  font-size: 0.72rem;
+  font-size: var(--text-size-label);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-muted);
@@ -607,7 +607,7 @@
 
 .detail-field-value {
   color: var(--text-primary);
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
 }
 
 .detail-beliefs-row {
@@ -645,7 +645,7 @@
 }
 
 .asset-type-badge {
-  font-size: 0.6rem;
+  font-size: var(--text-size-badge);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   padding: 0.1rem 0.4rem;
@@ -655,7 +655,7 @@
 }
 
 .status-badge {
-  font-size: 0.6rem;
+  font-size: var(--text-size-badge);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -683,7 +683,7 @@
 }
 
 .no-members {
-  font-size: 0.85rem;
+  font-size: var(--text-size-body);
   color: var(--text-muted);
   font-style: italic;
 }
@@ -703,13 +703,13 @@
 }
 
 .char-name {
-  font-size: 0.9rem;
+  font-size: var(--text-size-body);
   font-weight: 600;
   color: var(--text-primary);
 }
 
 .char-type-chip {
-  font-size: 0.6rem;
+  font-size: var(--text-size-badge);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   padding: 0.1rem 0.4rem;
@@ -723,23 +723,23 @@
 }
 
 .char-meta {
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
 
   &::before { content: '·'; margin-right: 0.35rem; }
 }
 
 .char-summary {
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   color: var(--text-secondary);
   margin: 0.25rem 0 0;
   line-height: 1.45;
 }
 
 .members-subsection-label {
-  font-size: 0.65rem;
+  font-size: var(--text-size-label);
   text-transform: uppercase;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
   margin: 0.5rem 0 0.25rem;
 
@@ -752,7 +752,7 @@
 }
 
 .char-drift-score {
-  font-size: 0.72rem;
+  font-size: var(--text-size-meta);
   font-weight: 600;
   padding: 0.1rem 0.35rem;
   border-radius: 3px;
@@ -765,13 +765,13 @@
 }
 
 .char-misfit-badge {
-  font-size: 0.68rem;
+  font-size: var(--text-size-label);
   color: #f87171;
   white-space: nowrap;
 }
 
 .state-icon {
-  font-size: 0.85rem;
+  font-size: var(--text-size-body);
   margin-right: 0.35rem;
   &--dead      { color: #ef4444; }
   &--missing   { color: #f59e0b; }
@@ -801,14 +801,14 @@
 }
 
 .card-goals-label {
-  font-size: 0.65rem;
+  font-size: var(--text-size-label);
   text-transform: uppercase;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
 }
 
 .card-goals-count {
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   font-weight: 700;
   color: var(--accent);
 }
@@ -851,7 +851,7 @@
 }
 
 .goal-name {
-  font-size: 0.9rem;
+  font-size: var(--text-size-body);
   font-weight: 600;
   color: var(--text-primary);
 }
@@ -863,7 +863,7 @@
 }
 
 .badge {
-  font-size: 0.68rem;
+  font-size: var(--text-size-badge);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -904,7 +904,7 @@
 }
 
 .progress-label {
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   min-width: 2.5rem;
   text-align: right;
@@ -917,20 +917,20 @@
 }
 
 .target-item {
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
 
   .meta-label {
     font-weight: 600;
     text-transform: uppercase;
-    font-size: 0.65rem;
-    letter-spacing: 0.05em;
+    font-size: var(--text-size-label);
+    letter-spacing: 0.06em;
     margin-right: 0.3rem;
   }
 }
 
 .goal-description {
-  font-size: 0.85rem;
+  font-size: var(--text-size-body);
   color: var(--text-muted);
   margin: 0.25rem 0 0;
 }
@@ -970,7 +970,7 @@
 
 .form-label {
   display: block;
-  font-size: 0.75rem;
+  font-size: var(--text-size-label);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -985,7 +985,7 @@
   border-radius: 6px;
   padding: 0.45rem 0.65rem;
   color: var(--text-primary);
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   box-sizing: border-box;
 
   &:focus {
@@ -1012,7 +1012,7 @@
 
 .progress-readout {
   display: block;
-  font-size: 0.85rem;
+  font-size: var(--text-size-body);
   color: var(--text-muted);
   margin-top: 0.25rem;
 }

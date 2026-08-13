@@ -1,0 +1,308 @@
+// ── Card shell ────────────────────────────────────────────────────────────
+
+.ev-card {
+  width: var(--card-w, 400px);
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 1rem 0.75rem;
+  position: relative;
+  min-height: 440px;
+  box-sizing: border-box;
+}
+
+// ── Header ────────────────────────────────────────────────────────────────
+
+.ev-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.ev-header-main {
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.ev-title {
+  font-weight: 600;
+  font-size: var(--text-size-title);
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.ev-status {
+  font-size: var(--text-size-badge);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 3px;
+  padding: 0.12rem 0.4rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &--planned   { background: rgba(148,163,184,0.15); color: #94a3b8; }
+  &--available { background: rgba(34,197,94,0.12);   color: #22c55e; }
+  &--occurred  { background: rgba(99,102,241,0.12);  color: #6366f1; }
+  &--bypassed  { background: rgba(245,158,11,0.12);  color: #f59e0b; }
+  &--obsolete  { background: rgba(107,114,128,0.12); color: #6b7280; }
+}
+
+.ev-edit-btn {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: var(--text-size-meta);
+  cursor: pointer;
+  padding: 0.1rem 0.25rem;
+  border-radius: 3px;
+  line-height: 1;
+  transition: color 0.1s;
+
+  &:hover { color: var(--text-primary); }
+}
+
+// ── Body text ─────────────────────────────────────────────────────────────
+
+.ev-summary {
+  font-size: var(--text-size-body);
+  color: var(--text-secondary);
+  margin: 0 0 1rem;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ev-field {
+  margin-bottom: 1rem;
+}
+
+.ev-field-label {
+  display: block;
+  font-size: var(--text-size-label);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 0.1rem;
+}
+
+.ev-field-value {
+  margin: 0;
+  font-size: var(--text-size-meta);
+  color: var(--text-secondary);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// ── Divider ───────────────────────────────────────────────────────────────
+
+.ev-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 1rem 0;
+}
+
+// ── Metadata two-column ───────────────────────────────────────────────────
+
+.ev-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 0.75rem;
+  flex: 1;
+}
+
+.ev-meta-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ev-meta-header {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-bottom: 0.3rem;
+
+  &--assets { margin-top: 0.6rem; }
+}
+
+.ev-meta-icon {
+  font-size: var(--text-size-label);
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  width: 12px;
+  text-align: center;
+}
+
+.ev-meta-label {
+  font-size: var(--text-size-label);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  font-weight: 600;
+  flex: 1;
+}
+
+.ev-meta-add {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: var(--text-size-badge);
+  cursor: pointer;
+  padding: 0.1rem 0.2rem;
+  border-radius: 3px;
+  line-height: 1;
+  flex-shrink: 0;
+  transition: color 0.1s;
+
+  &:hover { color: var(--accent); }
+}
+
+// Thread rows
+
+.ev-thread-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 1.4rem;
+}
+
+.ev-thread-name {
+  font-size: var(--text-size-meta);
+  color: var(--text-primary);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Actor avatars
+
+.ev-avatars {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  margin-bottom: 0.1rem;
+}
+
+.ev-avatar {
+  position: relative;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+
+.ev-avatar-initials {
+  font-size: var(--text-size-badge);
+  font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.ev-avatar-del {
+  position: absolute;
+  inset: -2px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.6);
+  border: none;
+  color: #fff;
+  font-size: var(--text-size-badge);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+// Asset rows
+
+.ev-asset-row {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  min-height: 1.3rem;
+}
+
+.ev-asset-name {
+  font-size: var(--text-size-meta);
+  color: var(--text-primary);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ── Connection footer ─────────────────────────────────────────────────────
+
+.ev-footer {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+  min-height: 2rem;
+}
+
+.ev-footer-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+
+  &--out { align-items: flex-end; text-align: right; }
+}
+
+.ev-conn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  max-width: 100%;
+}
+
+.ev-conn-arrow {
+  font-size: var(--text-size-body);
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.ev-conn-title {
+  font-size: var(--text-size-body);
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  // button reset
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: inherit;
+  cursor: pointer;
+  font-family: inherit;
+  &:hover { color: var(--text-primary); text-decoration: none; }
+}
+
+// ── Variant hint ──────────────────────────────────────────────────────────
+
+.variant-hint {
+  font-size: var(--text-size-meta);
+  color: var(--text-muted);
+  margin: 0 0 0.75rem;
+}

@@ -1,0 +1,43 @@
+    :host {
+      position: absolute;
+      bottom: 1.25rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 30;
+      pointer-events: none;
+    }
+
+    .breadcrumb-bar {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+      background: color-mix(in srgb, var(--bg-surface) 90%, transparent);
+      backdrop-filter: blur(6px);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.3rem 0.75rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      pointer-events: all;
+      white-space: nowrap;
+    }
+
+    .bc-segment {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.1rem 0.3rem;
+    }
+
+    .bc-set-name {
+      font-size: var(--text-size-label);
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      color: var(--accent);
+    }
+
+    .bc-sep {
+      font-size: 0.55rem;
+      color: var(--text-muted);
+      padding: 0 0.1rem;
+    }
+  

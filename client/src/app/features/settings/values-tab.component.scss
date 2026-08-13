@@ -32,7 +32,7 @@
     background: none;
     border: none;
     padding: 0.2rem 0.65rem;
-    font-size: 0.75rem;
+    font-size: var(--text-size-meta);
     color: var(--text-secondary);
     cursor: pointer;
     transition: background 0.15s, color 0.15s;
@@ -51,7 +51,7 @@
   padding: 0.2rem 0.5rem;
   color: var(--text-muted);
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   line-height: 1;
   transition: color 0.15s, border-color 0.15s;
 
@@ -59,7 +59,7 @@
 }
 
 .label-section-title {
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -73,7 +73,7 @@
   .axis-header & { margin-bottom: 0; }
 
   .axis-note {
-    font-size: 0.72rem;
+    font-size: var(--text-size-meta);
     font-weight: 400;
     text-transform: none;
     letter-spacing: 0;
@@ -82,7 +82,7 @@
 }
 
 .axis-alignment-caption {
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   margin-top: 0.6rem;
   margin-bottom: 0;
@@ -93,7 +93,7 @@
 }
 
 .label-section-desc {
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   margin-bottom: 0.75rem;
   line-height: 1.4;
@@ -117,7 +117,7 @@
     border-radius: 6px;
     padding: 0.35rem 0.6rem;
     color: var(--text-primary);
-    font-size: 0.875rem;
+    font-size: var(--text-size-body);
     outline: none;
 
     &:focus { border-color: var(--accent); }
@@ -127,7 +127,7 @@
 .label-key {
   width: 180px;
   flex-shrink: 0;
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   font-weight: 500;
   text-align: right;
   padding-right: 0.25rem;
@@ -151,7 +151,7 @@
   border: 1px solid var(--border);
   border-radius: 6px;
   padding: 0.5rem 0.75rem;
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   color: var(--accent);
   white-space: nowrap;
   overflow-x: auto;
@@ -164,7 +164,7 @@
   border-radius: 6px;
   padding: 0.35rem 0.5rem;
   color: var(--text-primary);
-  font-size: 0.9rem;
+  font-size: var(--text-size-body);
   text-align: center;
   outline: none;
   &:focus { border-color: var(--accent); }
@@ -181,6 +181,6 @@
 
 .saved-msg {
   color: var(--color-success);
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   font-weight: 600;
 }

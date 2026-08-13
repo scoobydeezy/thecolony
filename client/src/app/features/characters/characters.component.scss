@@ -1,26 +1,31 @@
-.filter-bar {
+.toolbar {
   display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap;
 
-  label {
+  .filter-bar {
     display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    font-size: 0.75rem;
-    color: var(--color-text-muted, #94a3b8);
-    font-weight: 500;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    flex: 1;
+
+    select {
+      padding: 0.35rem 0.6rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--bg-surface);
+      color: var(--text-primary);
+      font-size: var(--text-size-body);
+    }
   }
 
-  select {
-    padding: 0.35rem 0.6rem;
-    border-radius: 6px;
-    border: 1px solid var(--border-color, #334155);
-    background: var(--bg-card, #1e293b);
-    color: var(--color-text, #e2e8f0);
-    font-size: 0.85rem;
-    min-width: 140px;
+  .toolbar-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
   }
 }
 
@@ -39,7 +44,7 @@
   position: relative;
   z-index: 1;
   display: block;
-  font-size: 0.7rem;
+  font-size: var(--text-size-label);
   color: var(--color-text-muted, #94a3b8);
   font-weight: 400;
 }
@@ -47,7 +52,7 @@
 .tier-chip {
   padding: 2px 8px;
   border-radius: 4px;
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   font-weight: 600;
   background: #1e293b;
   color: #94a3b8;
@@ -113,7 +118,7 @@ tr.row--inactive {
 }
 
 .state-icon {
-  font-size: 0.85rem;
+  font-size: var(--text-size-body);
   &--dead      { color: #ef4444; }
   &--missing   { color: #f59e0b; }
   &--forgotten { color: #6366f1; }
@@ -157,7 +162,7 @@ tr.row--inactive {
   border: 1px solid transparent;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   opacity: 0;
   transition: opacity 0.1s, color 0.1s, background 0.1s, border-color 0.1s;
 
@@ -222,7 +227,7 @@ tr:hover .btn-icon {
 
 .form-label {
   display: block;
-  font-size: 0.75rem;
+  font-size: var(--text-size-label);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -237,7 +242,7 @@ tr:hover .btn-icon {
   border-radius: 6px;
   padding: 0.45rem 0.65rem;
   color: var(--text-primary);
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   box-sizing: border-box;
 
   &:focus {
@@ -247,7 +252,7 @@ tr:hover .btn-icon {
 }
 
 .field-error {
-  font-size: 0.75rem;
+  font-size: var(--text-size-label);
   color: #f87171;
   margin-top: 0.25rem;
 }

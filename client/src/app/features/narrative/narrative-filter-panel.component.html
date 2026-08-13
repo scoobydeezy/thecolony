@@ -1,0 +1,107 @@
+<div class="filter-panel">
+
+  <!-- Header row -->
+  <div class="filter-header">
+    <span class="filter-title">{{ filterSvc.viewMode() === 'focus' ? 'Focus' : 'Filter' }}</span>
+
+    <div class="filter-controls">
+      <button class="filter-toggle-btn"
+              [class.active]="filterSvc.matchMode() === 'all'"
+              title="Match any or all selected filters"
+              (click)="filterSvc.toggleMatchMode()">
+        <i class="fa-solid fa-bracket-curly"></i>
+        {{ filterSvc.matchMode() }}
+        <i class="fa-solid fa-bracket-curly-right"></i>
+      </button>
+
+      <button class="filter-toggle-btn"
+              [class.active]="filterSvc.viewMode() === 'condense'"
+              title="Focus dims unmatched events; Filter shows only matches in a line"
+              (click)="filterSvc.toggleViewMode()">
+        @if (filterSvc.viewMode() === 'focus') {
+          <i class="fa-solid fa-split"></i>
+        } @else {
+          <i class="fa-solid fa-merge"></i>
+        }
+      </button>
+
+      <button class="filter-reset-btn"
+              [disabled]="!filterSvc.isActive()"
+              title="Reset all filters"
+              (click)="filterSvc.reset()">
+        <i class="fa-solid fa-circle-xmark"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter rows -->
+  <div class="filter-body">
+
+    <!-- Row 1: Threads + Characters -->
+    <div class="filter-row">
+
+      <!-- Threads -->
+      <div class="filter-col">
+        <select class="filter-select" (change)="onThreadChange($event)">
+          <option value="">Threads…</option>
+          @for (t of threads(); track t.id) {
+            <option [value]="t.id" [disabled]="isThreadSelected(t.id)">{{ t.title }}</option>
+          }
+        </select>
+        @if (filterSvc.threadIds().length > 0) {
+          <div class="filter-chips">
+            @for (id of filterSvc.threadIds(); track id) {
+              <span class="filter-chip" (click)="toggleThread(id)">
+                {{ threadName(id) }}<i class="fa-solid fa-xmark chip-remove"></i>
+              </span>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Characters -->
+      <div class="filter-col">
+        <select class="filter-select" (change)="onCharacterChange($event)">
+          <option value="">Characters…</option>
+          @for (c of characters(); track c.id) {
+            <option [value]="c.id" [disabled]="isCharacterSelected(c.id)">{{ c.name }}</option>
+          }
+        </select>
+        @if (filterSvc.characterIds().length > 0) {
+          <div class="filter-chips">
+            @for (id of filterSvc.characterIds(); track id) {
+              <span class="filter-chip" (click)="toggleCharacter(id)">
+                {{ characterName(id) }}<i class="fa-solid fa-xmark chip-remove"></i>
+              </span>
+            }
+          </div>
+        }
+      </div>
+
+    </div>
+
+    <!-- Row 2: Assets -->
+    <div class="filter-row">
+
+      <div class="filter-col">
+        <select class="filter-select" (change)="onAssetChange($event)">
+          <option value="">Assets…</option>
+          @for (a of assets(); track a.id) {
+            <option [value]="a.id" [disabled]="isAssetSelected(a.id)">{{ a.name }}</option>
+          }
+        </select>
+        @if (filterSvc.assetIds().length > 0) {
+          <div class="filter-chips">
+            @for (id of filterSvc.assetIds(); track id) {
+              <span class="filter-chip" (click)="toggleAsset(id)">
+                {{ assetName(id) }}<i class="fa-solid fa-xmark chip-remove"></i>
+              </span>
+            }
+          </div>
+        }
+      </div>
+
+    </div>
+
+  </div>
+</div>

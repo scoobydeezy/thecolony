@@ -4,17 +4,17 @@
 </div>
 
 <div class="toolbar">
-  <button class="btn btn-primary" (click)="openAddSession()">+ New Session</button>
-  <div class="toolbar-right">
-    <button class="btn btn-secondary" (click)="exportSessions()" title="Download all sessions as JSON backup">Export <i class="fa-solid fa-right-from-bracket"></i></button>
+  <div class="toolbar-actions">
     <label class="btn btn-secondary" title="Restore sessions from a JSON backup">
       <i class="fa-solid fa-right-to-bracket"></i> Import
       <input type="file" accept=".json" (change)="onImportFile($event)" style="display:none" />
     </label>
-    @if (importError()) {
-      <span class="import-error">{{ importError() }}</span>
-    }
+    <button class="btn btn-secondary" (click)="exportSessions()" title="Download all sessions as JSON backup">Export <i class="fa-solid fa-right-from-bracket"></i></button>
+    <button class="btn btn-primary" (click)="openAddSession()">+ New Session</button>
   </div>
+  @if (importError()) {
+    <span class="import-error">{{ importError() }}</span>
+  }
 </div>
 
 @if (store.sortedSessions().length === 0) {
@@ -41,6 +41,11 @@
             }
           </div>
           <div class="session-actions">
+            <button class="btn-icon" title="Narrative context"
+                    [class.narrative-active]="store.narrativeFocusEntity()?.id === session.id"
+                    (click)="store.setNarrativeFocus({ type: 'Session', id: session.id, name: 'Session ' + session.number + ': ' + session.title }); store.openNarrativeInspector()">
+              <i class="fa-solid fa-diagram-project"></i>
+            </button>
             <button class="btn btn-secondary btn-sm" (click)="openEditSession(session)">Edit</button>
           </div>
         </div>

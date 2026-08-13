@@ -732,6 +732,7 @@ export class FactionDetailComponent implements OnInit, OnDestroy {
         this.iconBust.set(null);
         this.glyphBust.set(null);
         this.closeCard();
+        this.store.setNarrativeFocus({ type: 'Faction', id: found.id, name: found.name });
       } else {
         this.router.navigate(['/factions']);
       }

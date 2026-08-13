@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
   Faction, ColonyState, RelationshipOverride, RulesConfig,
@@ -215,6 +215,10 @@ export class ApiService {
     return this.http.put<void>(`${this.base}/events/reorder`, orderedIds);
   }
 
+  reorderNarrativeEvents(orderedIds: string[]): Observable<void> {
+    return this.http.put<void>(`${this.base}/narrative/events/reorder`, orderedIds);
+  }
+
   // Assets
   getAssets(): Observable<Asset[]> {
     return this.http.get<Asset[]>(`${this.base}/assets`);
@@ -380,5 +384,19 @@ export class ApiService {
     property: string;
   }): Observable<void> {
     return this.http.delete<void>(`${this.base}/map-edits`, { params });
+  }
+
+  // Generic promise-based helpers for use in async store methods
+  get<T>(path: string): Promise<T> {
+    return firstValueFrom(this.http.get<T>(`${this.base}/${path}`));
+  }
+  post<T>(path: string, body: unknown): Promise<T> {
+    return firstValueFrom(this.http.post<T>(`${this.base}/${path}`, body));
+  }
+  put<T>(path: string, body: unknown): Promise<T> {
+    return firstValueFrom(this.http.put<T>(`${this.base}/${path}`, body));
+  }
+  delete(path: string): Promise<void> {
+    return firstValueFrom(this.http.delete<void>(`${this.base}/${path}`));
   }
 }

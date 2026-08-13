@@ -1,0 +1,77 @@
+<div class="narrative-shell" [class.flow-mode]="tab() === 'flow'" [class.events-mode]="tab() === 'events'" [class.threads-mode]="tab() === 'threads'">
+
+  <div class="page-header">
+    <h2>Narrative</h2>
+    <p>Threads and events that weave through the campaign.</p>
+  </div>
+
+  <div class="toolbar">
+    <div class="view-toggle">
+      <button [class.active]="tab() === 'flow'" (click)="tab.set('flow')">
+        <i class="fa-solid fa-diagram-project"></i> Flow
+      </button>
+      <button [class.active]="tab() === 'events'" (click)="tab.set('events')">
+        Events
+      </button>
+      <button [class.active]="tab() === 'threads'" (click)="tab.set('threads')">
+        Threads
+      </button>
+    </div>
+
+    @if (tab() === 'threads') {
+      <div class="toolbar-actions">
+        <button class="btn btn-primary" (click)="addThread()">+ Add Thread</button>
+      </div>
+    }
+    @if (tab() === 'events') {
+      <div class="toolbar-actions">
+        <button class="btn btn-primary" (click)="addEvent()">+ Add Event</button>
+      </div>
+    }
+  </div>
+
+  @if (tab() === 'threads') {
+    <app-narrative-threads-list />
+  }
+  @if (tab() === 'events') {
+    <div class="filter-bar">
+      <input class="search-input" type="search" placeholder="Search events…"
+             [value]="search()" (input)="search.set($any($event.target).value)" />
+
+      <select class="filter-select" [value]="filterStatus()"
+              (change)="filterStatus.set($any($event.target).value)">
+        <option value="all">All Statuses</option>
+        @for (o of statusOptions; track o.value) {
+          <option [value]="o.value">{{ o.label }}</option>
+        }
+      </select>
+
+      <select class="filter-select" [value]="filterThread()"
+              (change)="filterThread.set($any($event.target).value)">
+        <option value="all">All Threads</option>
+        @for (t of store.narrativeThreads(); track t.id) {
+          <option [value]="t.id">{{ t.title }}</option>
+        }
+      </select>
+    </div>
+
+    <app-narrative-events-cards
+      [search]="search()"
+      [filterStatus]="filterStatus()"
+      [filterThread]="filterThread()"
+      (addEventAt)="requestAddAt($event)"
+      (editEvent)="openEdit($event)" />
+  }
+  @if (tab() === 'flow') {
+    <app-narrative-flow />
+  }
+
+</div>
+
+<!-- ── Event editor modal (shared by Events tab and triggered by cards) ── -->
+
+@if (editingEvent(); as ev) {
+  <app-narrative-event-editor
+    [event]="ev"
+    (closed)="editingEvent.set(null)" />
+}

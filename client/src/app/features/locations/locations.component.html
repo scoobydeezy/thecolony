@@ -321,6 +321,12 @@
 
     <!-- Actions -->
     <div class="loc-actions">
+      <button class="btn-icon" title="Narrative context"
+              [class.narrative-active]="store.narrativeFocusEntity()?.id === loc.id"
+              (click)="store.setNarrativeFocus({ type: 'Location', id: loc.id, name: loc.name }); store.openNarrativeInspector()">
+        <i class="fa-solid fa-diagram-project"></i>
+      </button>
+      <div class="loc-actions-divider"></div>
       <button class="btn-icon btn-icon--edit" (click)="openEdit(loc)" title="Edit"
               [style.visibility]="store.isViewingSnapshot() ? 'hidden' : 'visible'">
         <i class="fa-solid fa-pen"></i>

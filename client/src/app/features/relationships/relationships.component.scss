@@ -1,3 +1,17 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+
+  .toolbar-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-left: auto;
+  }
+}
+
 // ── Tuners ───────────────────────────────────────────────────────────────────
 
 .tuner-row {
@@ -18,7 +32,7 @@
 }
 
 .tuner-header {
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -97,7 +111,7 @@
 }
 
 .tuner-label {
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   color: var(--text-secondary);
   min-width: 160px;
   flex-shrink: 0;
@@ -117,7 +131,7 @@
 }
 
 .tuner-val {
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   font-weight: 600;
   color: var(--text-primary);
   min-width: 3rem;
@@ -148,7 +162,7 @@
 }
 
 .tuner-snapshot-note {
-  font-size: 0.72rem;
+  font-size: var(--text-size-label);
   color: var(--text-muted);
   margin-top: 0.4rem;
   font-style: italic;
@@ -168,7 +182,7 @@
   margin-bottom: 1rem;
 
   th {
-    font-size: 0.78rem;
+    font-size: var(--text-size-meta);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--text-muted);
@@ -191,7 +205,7 @@
   border: 1px solid var(--border);
   background: var(--bg-base);
   color: var(--text-primary);
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   text-align: right;
 }
 
@@ -219,7 +233,7 @@
 
 .corner-cell {
   background: var(--bg-base);
-  font-size: 0.7rem;
+  font-size: var(--text-size-label);
   color: var(--text-muted);
   min-width: 120px;
   padding: 0.5rem 0.75rem;
@@ -238,7 +252,7 @@
   min-width: 100px;
 
   .col-label {
-    font-size: 0.75rem;
+    font-size: var(--text-size-meta);
     font-weight: 600;
     color: var(--text-secondary);
     text-align: center;
@@ -255,7 +269,7 @@
 
 .row-header {
   background: var(--bg-base);
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   font-weight: 600;
   color: var(--text-secondary);
   padding: 0.5rem 0.75rem;
@@ -277,12 +291,12 @@
   }
 
   .cell-score {
-    font-size: 0.95rem;
+    font-size: var(--text-size-section);
     font-weight: 700;
   }
 
   .cell-label {
-    font-size: 0.65rem;
+    font-size: var(--text-size-badge);
     text-transform: uppercase;
     letter-spacing: 0.05em;
     opacity: 0.85;
@@ -322,7 +336,7 @@
   padding: 0.75rem 1rem;
 
   .legend-title {
-    font-size: 0.78rem;
+    font-size: var(--text-size-meta);
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -337,7 +351,7 @@
 }
 
 .section-title {
-  font-size: 0.875rem;
+  font-size: var(--text-size-section);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -346,7 +360,7 @@
 
 .empty-msg {
   color: var(--text-muted);
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   padding: 1rem 0;
 }
 
@@ -379,7 +393,7 @@
   margin-bottom: 1rem;
 
   h4 {
-    font-size: 0.78rem;
+    font-size: var(--text-size-meta);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--text-muted);
@@ -396,12 +410,12 @@
 
 .contrib-label {
   color: var(--text-secondary);
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
 }
 
 .contrib-val {
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
 }
 
 .breakdown-totals {
@@ -416,7 +430,7 @@
   justify-content: space-between;
   padding: 0.4rem 0;
   color: var(--text-secondary);
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
 
   &.bump strong { color: var(--accent); }
   &.final {

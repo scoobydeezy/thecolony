@@ -83,7 +83,7 @@ $transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   border-bottom: 2px solid transparent;
   cursor: pointer;
   padding: 0.7rem 1rem;
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   font-weight: 500;
   color: var(--text-muted);
   transition: color 0.12s, border-color 0.12s;
@@ -118,13 +118,13 @@ $transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: center;
 
   .placeholder-label {
-    font-size: 0.875rem;
+    font-size: var(--text-size-body);
     font-weight: 600;
     color: var(--text-secondary);
   }
 
   .placeholder-desc {
-    font-size: 0.82rem;
+    font-size: var(--text-size-body);
     color: var(--text-muted);
     max-width: 320px;
     line-height: 1.5;

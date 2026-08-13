@@ -478,6 +478,95 @@ namespace ColonyTracker.Api.Migrations
                     b.ToTable("EventEffects");
                 });
 
+            modelBuilder.Entity("ColonyTracker.Api.Models.EventOverrideConnection", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EventOverrideId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Label")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TargetNarrativeEventId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Visibility")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventOverrideId");
+
+                    b.ToTable("EventOverrideConnections");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.EventOverrideEntityLink", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EntityId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("EntityType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("EventOverrideId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Role")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Visibility")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventOverrideId");
+
+                    b.ToTable("EventOverrideEntityLinks");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.EventOverridePath", b =>
+                {
+                    b.Property<string>("EventOverrideId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PathId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("EventOverrideId", "PathId");
+
+                    b.HasIndex("PathId");
+
+                    b.ToTable("EventOverridePaths");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.EventOverrideThread", b =>
+                {
+                    b.Property<string>("EventOverrideId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NarrativeThreadId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("EventOverrideId", "NarrativeThreadId");
+
+                    b.ToTable("EventOverrideThreads");
+                });
+
             modelBuilder.Entity("ColonyTracker.Api.Models.Faction", b =>
                 {
                     b.Property<string>("Id")
@@ -737,6 +826,316 @@ namespace ColonyTracker.Api.Migrations
                     b.ToTable("MapPlacements");
                 });
 
+            modelBuilder.Entity("ColonyTracker.Api.Models.NarrativeEntityLink", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CampaignId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EntityId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("EntityType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OwnerId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("OwnerType")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Role")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Visibility")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NarrativeEntityLinks");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.NarrativeEvent", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CampaignId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NarrativeFunction")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Summary")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Visibility")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NarrativeEvents");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.NarrativeEventConnection", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CampaignId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Label")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SourceNarrativeEventId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TargetNarrativeEventId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Visibility")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NarrativeEventConnections");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.NarrativeEventOverride", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NarrativeEventId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("OverridesAssets")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("OverridesConnections")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("OverridesDescription")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("OverridesSummary")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("OverridesThreads")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Summary")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NarrativeEventOverrides");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.NarrativeEventPlacement", b =>
+                {
+                    b.Property<string>("NarrativeEventId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<double?>("Height")
+                        .HasColumnType("REAL");
+
+                    b.Property<double?>("Width")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("X")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("Y")
+                        .HasColumnType("REAL");
+
+                    b.HasKey("NarrativeEventId");
+
+                    b.ToTable("NarrativeEventPlacements");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.NarrativeEventRealization", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NarrativeEventId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Notes")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SessionEventId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NarrativeEventRealizations");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.NarrativeEventVariantParticipation", b =>
+                {
+                    b.Property<string>("NarrativeEventId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PathSetId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("NarrativeEventId", "PathSetId");
+
+                    b.HasIndex("PathSetId");
+
+                    b.ToTable("NarrativeEventVariantParticipations");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.NarrativePath", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("PathSetId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PathSetId");
+
+                    b.ToTable("NarrativePaths");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.NarrativeThread", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CampaignId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("State")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Summary")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NarrativeThreads");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.NarrativeThreadEvent", b =>
+                {
+                    b.Property<string>("NarrativeThreadId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NarrativeEventId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("NarrativeThreadId", "NarrativeEventId");
+
+                    b.ToTable("NarrativeThreadEvents");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.PathEventScope", b =>
+                {
+                    b.Property<string>("PathId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NarrativeEventId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("PathId", "NarrativeEventId");
+
+                    b.ToTable("PathEventScopes");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.PathSet", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CampaignId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ConvergenceEventId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("OriginEventId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PathSets");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.PathSetContext", b =>
+                {
+                    b.Property<string>("PathSetId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RequiredPathId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("PathSetId", "RequiredPathId");
+
+                    b.ToTable("PathSetContexts");
+                });
+
             modelBuilder.Entity("ColonyTracker.Api.Models.RelationshipOverride", b =>
                 {
                     b.Property<string>("Id")
@@ -946,11 +1345,89 @@ namespace ColonyTracker.Api.Migrations
                     b.Navigation("Event");
                 });
 
+            modelBuilder.Entity("ColonyTracker.Api.Models.EventOverrideConnection", b =>
+                {
+                    b.HasOne("ColonyTracker.Api.Models.NarrativeEventOverride", null)
+                        .WithMany()
+                        .HasForeignKey("EventOverrideId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.EventOverrideEntityLink", b =>
+                {
+                    b.HasOne("ColonyTracker.Api.Models.NarrativeEventOverride", null)
+                        .WithMany()
+                        .HasForeignKey("EventOverrideId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.EventOverridePath", b =>
+                {
+                    b.HasOne("ColonyTracker.Api.Models.NarrativeEventOverride", null)
+                        .WithMany()
+                        .HasForeignKey("EventOverrideId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ColonyTracker.Api.Models.NarrativePath", null)
+                        .WithMany()
+                        .HasForeignKey("PathId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.EventOverrideThread", b =>
+                {
+                    b.HasOne("ColonyTracker.Api.Models.NarrativeEventOverride", null)
+                        .WithMany()
+                        .HasForeignKey("EventOverrideId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("ColonyTracker.Api.Models.MapPlacement", b =>
                 {
                     b.HasOne("ColonyTracker.Api.Models.ColonyMap", null)
                         .WithMany()
                         .HasForeignKey("MapId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.NarrativeEventVariantParticipation", b =>
+                {
+                    b.HasOne("ColonyTracker.Api.Models.PathSet", null)
+                        .WithMany()
+                        .HasForeignKey("PathSetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.NarrativePath", b =>
+                {
+                    b.HasOne("ColonyTracker.Api.Models.PathSet", null)
+                        .WithMany()
+                        .HasForeignKey("PathSetId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.PathEventScope", b =>
+                {
+                    b.HasOne("ColonyTracker.Api.Models.NarrativePath", null)
+                        .WithMany()
+                        .HasForeignKey("PathId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.PathSetContext", b =>
+                {
+                    b.HasOne("ColonyTracker.Api.Models.PathSet", null)
+                        .WithMany()
+                        .HasForeignKey("PathSetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

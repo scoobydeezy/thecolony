@@ -1,4 +1,4 @@
-<div class="app-shell">
+<div class="app-shell" [class.inspector-open]="store.narrativeInspectorOpen()">
   <nav class="sidebar">
     <div class="sidebar-header">
       <h1 class="app-title">{{ store.activeCampaign()?.name ?? 'The Colony' }}</h1>
@@ -17,6 +17,7 @@
       <li><a routerLink="/relationships" routerLinkActive="active">Relationships</a></li>
 
       <li class="nav-section-label">Campaign</li>
+      <li><a routerLink="/narrative" routerLinkActive="active">Narrative</a></li>
       <li><a routerLink="/sessions" routerLinkActive="active">Sessions</a></li>
       <li><a routerLink="/party" routerLinkActive="active">{{ partyName() }}</a></li>
 
@@ -102,6 +103,13 @@
         <span class="snapshot">Read-only Session Snapshot</span>
       }
       <div class="top-bar-spacer"></div>
+      <button class="narrative-toggle-btn" type="button"
+              [class.active]="store.narrativeInspectorOpen()"
+              title="Toggle Narrative Inspector"
+              aria-label="Toggle Narrative Inspector"
+              (click)="store.toggleNarrativeInspector()">
+        <i class="fa-solid fa-diagram-project"></i>
+      </button>
       <button class="settings-btn" (click)="openSettings()" type="button" aria-label="Open settings" title="Settings">
         <i class="fa-solid fa-gear"></i>
       </button>
@@ -111,6 +119,12 @@
       <router-outlet />
     </main>
   </div>
+
+  @if (store.narrativeInspectorOpen()) {
+    <aside class="narrative-inspector-rail">
+      <app-narrative-inspector />
+    </aside>
+  }
 </div>
 
 <app-settings-drawer [open]="settingsOpen()" (closed)="closeSettings()" />

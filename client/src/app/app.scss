@@ -26,7 +26,7 @@
   }
 
   .app-subtitle {
-    font-size: 0.72rem;
+    font-size: var(--text-size-label);
     color: var(--text-muted);
     margin-top: 0.15rem;
     text-transform: uppercase;
@@ -42,7 +42,7 @@
   li a {
     display: block;
     padding: 0.45rem 1rem;
-    font-size: 0.875rem;
+    font-size: var(--text-size-body);
     color: var(--text-secondary);
     text-decoration: none;
     border-radius: 0;
@@ -64,7 +64,7 @@
 }
 
 .nav-section-label {
-  font-size: 0.62rem;
+  font-size: var(--text-size-label);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--text-muted);
@@ -83,7 +83,7 @@
 }
 
 .campaign-section-label {
-  font-size: 0.62rem;
+  font-size: var(--text-size-label);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--text-muted);
@@ -127,14 +127,14 @@
   flex-shrink: 0;
 
   .stress-label {
-    font-size: 0.72rem;
+    font-size: var(--text-size-label);
     text-transform: uppercase;
     letter-spacing: 0.07em;
     color: var(--text-muted);
   }
 
   .stress-value {
-    font-size: 0.85rem;
+    font-size: var(--text-size-body);
     font-weight: 700;
 
     &.stress-low  { color: var(--color-success); }
@@ -161,7 +161,7 @@
 }
 
 .top-bar-title {
-  font-size: 0.72rem;
+  font-size: var(--text-size-label);
   color: var(--text-muted);
   margin-top: 0.15rem;
   text-transform: uppercase;
@@ -184,7 +184,7 @@
   gap: 0.4rem;
   width: 200px;
   padding: 0.25rem 0.65rem;
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   font-weight: 500;
   color: var(--text-secondary);
   background: var(--bg-hover);
@@ -206,7 +206,7 @@
   }
 
   .view-caret {
-    font-size: 0.65rem;
+    font-size: var(--text-size-badge);
     opacity: 0.7;
     flex-shrink: 0;
   }
@@ -230,7 +230,7 @@
     width: 100%;
     text-align: left;
     padding: 0.4rem 0.9rem;
-    font-size: 0.8rem;
+    font-size: var(--text-size-meta);
     color: var(--text-secondary);
     background: none;
     border: none;
@@ -267,7 +267,7 @@
   color: var(--text-muted);
   transition: color 0.12s, background 0.12s, border-color 0.12s;
 
-  font-size: 0.7rem;
+  font-size: var(--text-size-meta);
 
   &:hover:not(:disabled) {
     color: var(--text-primary);
@@ -282,7 +282,7 @@
 }
 
 .snapshot {
-  font-size: 0.72rem;
+  font-size: var(--text-size-label);
   font-weight: 600;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -297,6 +297,44 @@
 
 .top-bar-spacer {
   flex: 1;
+}
+
+.narrative-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: var(--text-size-body);
+  transition: color 0.12s, background 0.12s, border-color 0.12s;
+  flex-shrink: 0;
+
+  &:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+    border-color: var(--border);
+  }
+
+  &.active {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    border-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+}
+
+.narrative-inspector-rail {
+  width: 280px;
+  flex-shrink: 0;
+  background: var(--bg-surface);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .settings-btn {

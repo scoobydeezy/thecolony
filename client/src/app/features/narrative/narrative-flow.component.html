@@ -1,0 +1,201 @@
+<div class="flow-shell">
+
+  <!-- ── Canvas ───────────────────────────────────────────────────────────── -->
+  <div class="flow-canvas" #canvasWrap
+       [class.connection-mode]="connSvc.connectionModeActive() || !!connSvc.pendingEdge()"
+       [class.erase-mode]="eraseModeActive()"
+       [class.condense-mode]="isCondenseMode()"
+       (click)="closeContextMenu()"
+       (mousemove)="onCanvasMouseMove($event)"
+       (pointerup)="onCanvasPointerUp()">
+
+    <!-- Toolbar + filter panel stack (screen-space, top-center) -->
+    <div class="toolbar-stack">
+      <app-narrative-flow-toolbar
+        [eraseModeActive]="eraseModeActive()"
+        [snapActive]="snapActive()"
+        [canUndo]="canUndo()"
+        [canRedo]="canRedo()"
+        (fitView)="fitView()"
+        (addEvent)="openAddEvent()"
+        (eraseToggle)="toggleEraseMode()"
+        (snapToggle)="toggleSnap()"
+        (undoAction)="undo()"
+        (redoAction)="redo()"
+        (filterToggle)="showFilterPanel.set(!showFilterPanel())"
+        (searchChange)="onSearchChange($event)" />
+
+      @if (showFilterPanel()) {
+        <app-narrative-filter-panel />
+      }
+    </div>
+
+    <!-- Breadcrumb (screen-space, bottom-center) -->
+    <app-narrative-flow-breadcrumb />
+
+    <!-- Focus overlay -->
+    <app-narrative-focus-overlay />
+
+    <!-- Edge overflow indicators -->
+    @if (overflow().top)    { <div class="overflow-indicator overflow-indicator--top"></div> }
+    @if (overflow().right)  { <div class="overflow-indicator overflow-indicator--right"></div> }
+    @if (overflow().bottom) { <div class="overflow-indicator overflow-indicator--bottom"></div> }
+    @if (overflow().left)   { <div class="overflow-indicator overflow-indicator--left"></div> }
+
+    @if (store.narrativeEvents().length === 0) {
+      <div class="empty-canvas">
+        <i class="fa-solid fa-diagram-project"></i>
+        <p>No narrative events to display.</p>
+        <p class="hint">Click <strong>+ Event</strong> to add one.</p>
+      </div>
+    }
+
+    <!-- SVG edge layer -->
+    <svg class="edge-svg" #edgeSvg>
+      @for (edge of edgePaths(); track edge.id) {
+        <g class="edge-group" [class.edge-group--erasable]="eraseModeActive()"
+           (click)="onEdgeClick($event, edge.id)">
+          <path class="edge-path" [attr.d]="edge.d" />
+          <path class="edge-path-hit" [attr.d]="edge.d" />
+        </g>
+      }
+
+      <!-- Rubber-band edge while drawing a connection -->
+      @if (connSvc.rubberBandPath()) {
+        <path class="edge-path edge-path--pending"
+              [attr.d]="connSvc.rubberBandPath()"
+              stroke-dasharray="6 4" />
+      }
+    </svg>
+
+    <!-- Node scene (pans + zooms) -->
+    <div class="node-scene" #scene>
+
+      <!-- Per-event Crowns for PathSet origin events (scene-space) -->
+      @for (cp of crownPositions(); track cp.originEventId) {
+        <div class="crown-anchor"
+             [style.left.px]="cp.x"
+             [style.top.px]="cp.y"
+             [style.opacity]="cp.opacity">
+          <app-narrative-flow-crown
+            [originEventId]="cp.originEventId" />
+        </div>
+      }
+
+      <!-- Event nodes -->
+      @for (node of nodeGroups(); track node.canonicalId) {
+        <div class="event-node-group"
+             [style.left.px]="node.x"
+             [style.top.px]="node.y"
+             [style.opacity]="node.opacity"
+             [style.--status-color]="statusColor(node.ev.status)"
+             [attr.data-event-id]="node.canonicalId"
+             (mouseenter)="hoveredEventId.set(node.canonicalId)"
+             (mouseleave)="hoveredEventId() === node.canonicalId && hoveredEventId.set(null)"
+             (mousedown)="!connSvc.connectionModeActive() && !connSvc.pendingEdge() && initNodeDrag($any($event.currentTarget), node.canonicalId)"
+             (pointerdown)="onNodePointerDown($event, node.canonicalId)"
+             (pointerup)="onNodePointerUp($event, node.canonicalId)">
+
+          <!-- Peek cards (rendered first so they sit behind the main card) -->
+          @for (i of stackPeeks(node.stackDepth); track i) {
+            <div class="event-node-peek"
+                 [style.--peek-offset.px]="(i + 1) * 5"></div>
+          }
+
+          <!-- Main card -->
+          <div class="event-node" [class.search-highlight]="node.searchHighlight">
+
+            <div class="event-node-header">
+              <span class="event-node-title">{{ node.ev.title }}</span>
+            </div>
+
+            @if (node.ev.narrativeFunction) {
+              <div class="event-node-function">{{ node.ev.narrativeFunction }}</div>
+            }
+
+            @if (node.ev.summary) {
+              <div class="event-node-summary">{{ node.ev.summary }}</div>
+            }
+
+            <!-- Entity summary footer -->
+            @let threadCount = eventThreadCount()(node.canonicalId);
+            @let actorCount  = eventActorCount()(node.canonicalId);
+            @let assetCount  = eventAssetCount()(node.canonicalId);
+            @if (threadCount > 0 || actorCount > 0 || assetCount > 0) {
+              <div class="event-node-entity-row">
+                @if (threadCount > 0) {
+                  <span class="entity-chip">
+                    <i class="fa-solid fa-reel"></i> {{ threadCount }}
+                  </span>
+                }
+                @if (actorCount > 0) {
+                  <span class="entity-chip">
+                    <i class="fa-solid fa-user"></i> {{ actorCount }}
+                  </span>
+                }
+                @if (assetCount > 0) {
+                  <span class="entity-chip">
+                    <i class="fa-solid fa-star"></i> {{ assetCount }}
+                  </span>
+                }
+              </div>
+            }
+
+            <!-- Connection handle — right-center edge, shown on hover -->
+            @if (hoveredEventId() === node.canonicalId && !eraseModeActive()) {
+              <button class="connect-handle"
+                      title="Draw connection"
+                      (mousedown)="$event.stopPropagation()"
+                      (click)="$event.stopPropagation(); startConnectFromNode($event, node.canonicalId)">
+                <i class="fa-solid fa-circle-plus"></i>
+              </button>
+            }
+
+            <!-- Edit button (top-right of card, shown on hover) -->
+            @if (hoveredEventId() === node.canonicalId) {
+              <button class="node-edit-btn"
+                      title="Edit event"
+                      (mousedown)="$event.stopPropagation()"
+                      (click)="$event.stopPropagation(); openEventEditor(store.narrativeEventById()(node.canonicalId)!)">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+            }
+
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Context menu -->
+    @if (contextMenu(); as ctx) {
+      <div class="node-context-menu" [style.left.px]="ctx.x" [style.top.px]="ctx.y"
+           (click)="$event.stopPropagation()">
+
+        <div class="ctx-label">Set PathSet origin…</div>
+        @if (store.pathSets().length === 0) {
+          <div class="ctx-item ctx-item--disabled">No path sets defined</div>
+        } @else {
+          @for (entry of pathSetsForEvent(ctx.eventId); track entry.id) {
+            <button class="ctx-item" [class.ctx-item--active]="entry.isOrigin"
+                    (click)="setPathSetOrigin(entry.id, ctx.eventId)">
+              {{ entry.name }}
+              @if (entry.isOrigin) { <i class="fa-solid fa-check ctx-check"></i> }
+            </button>
+          }
+        }
+
+        <div class="ctx-divider"></div>
+        <button class="ctx-item ctx-item--cancel" (click)="closeContextMenu()">Cancel</button>
+      </div>
+    }
+
+  </div>
+</div>
+
+<!-- ── Event editor modal ────────────────────────────────────────────────── -->
+
+@if (editingEvent(); as ev) {
+  <app-narrative-event-editor
+    [event]="ev"
+    (closed)="closeEventEditor()" />
+}

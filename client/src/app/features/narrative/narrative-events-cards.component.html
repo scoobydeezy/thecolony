@@ -1,0 +1,131 @@
+<div class="cards-root">
+
+  @if (trackItems().length === 0 && dragState() === null) {
+    <div class="empty-state">
+      <p>No events match the current filters.</p>
+    </div>
+  } @else {
+
+    <div class="track-outer"
+         (mousemove)="dragState() !== null ? updateSlot($event.clientX) : null"
+         (mouseleave)="dragState() !== null ? slotIndex.set(null) : null">
+
+      <!-- ── Path rows (one per PathSet, above the track) ──────────────── -->
+      @if (pathRows().length > 0) {
+        <div class="path-rows-area">
+
+          @for (row of pathRows(); track trackByPathRow($index, row)) {
+            <div class="path-row"
+                 [style.margin-left.px]="rowLeft(row)"
+                 [style.width.px]="rowWidth(row)">
+
+              <!-- Origin card column: dot centered in card width + connector line to bar -->
+              <div class="path-dot-col">
+                <div class="path-dot">
+                  <i class="fa-solid fa-split"></i>
+                </div>
+                <div class="path-dot-connector"></div>
+              </div>
+
+              <!-- Horizontal bar with active path selector -->
+              <div class="path-bar">
+                <span class="path-set-name">{{ row.pathSetName }}</span>
+
+                <div class="path-selector-wrapper">
+                  <i class="fa-solid fa-shoe-prints"></i>
+                  <select class="path-selector-select"
+                          [disabled]="pathCtx.editingLocked()"
+                          [title]="pathCtx.editingLocked() ? 'Save or cancel your edits to switch paths' : ''"
+                          [value]="selectedPathIdFor(row.pathSetId)"
+                          (change)="selectPath(row.pathSetId, $any($event.target).value, $event)">
+                    @for (p of row.paths; track p.id) {
+                      <option [value]="p.id">{{ p.name }}</option>
+                    }
+                  </select>
+                </div>
+
+              </div><!-- /path-bar -->
+
+            </div><!-- /path-row -->
+          }
+
+        </div><!-- /path-rows-area -->
+      }
+
+      <!-- ── Event track ─────────────────────────────────────────────────── -->
+      <div class="track" #track>
+
+        <!-- Slot before index 0 — only in DOM when it is the active slot -->
+        @if (dragState() !== null && slotIndex() === 0) {
+          <div class="slot slot--active"
+               (click)="commitSlot(0); $event.stopPropagation()">
+            <button class="slot-btn"><i class="fa-solid fa-plus"></i></button>
+          </div>
+        }
+
+        @for (item of trackItems(); track trackByItem($index, item); let i = $index) {
+
+          <!-- ── Event card ───────────────────────────────────────────────── -->
+          <div class="card-outer"
+               [class.is-dragging]="isDragging(item.event.id)"
+               (mouseenter)="hoveredCardId.set(item.event.id)"
+               (mouseleave)="hoveredCardId.set(null)">
+
+            @if (hasOverride(item.event.id, item.activeBranchPathId)) {
+              <div class="variant-ghost"></div>
+            }
+
+            <app-narrative-event-card
+              [event]="item.event"
+              [activePathId]="item.activeBranchPathId"
+              (edit)="editEvent.emit(item.event)"
+              (scrollTo)="scrollToEvent($event)" />
+
+            <!-- Ordering controls beneath each card -->
+            <div class="card-order-bar">
+              <button class="order-btn" title="Move left"
+                      [disabled]="cardIndexOf(item.event.id) === 0"
+                      (click)="moveLeft(item.event); $event.stopPropagation()">
+                <i class="fa-solid fa-hand-back-point-left"></i>
+              </button>
+              <button class="order-btn order-btn--pickup" title="Pick up to reposition"
+                      (click)="startMoving(item.event, $event)">
+                <i class="fa-solid fa-hand"></i>
+              </button>
+              <button class="order-btn" title="Move right"
+                      [disabled]="cardIndexOf(item.event.id) === cardItems().length - 1"
+                      (click)="moveRight(item.event); $event.stopPropagation()">
+                <i class="fa-solid fa-hand-point-right"></i>
+              </button>
+            </div>
+
+          </div>
+
+          <!-- Slot after this card — only in DOM when it is the active slot -->
+          @if (dragState() !== null && slotIndex() === cardIndexOf(item.event.id) + 1) {
+            <div class="slot slot--active"
+                 (click)="commitSlot(cardIndexOf(item.event.id) + 1); $event.stopPropagation()">
+              <button class="slot-btn"><i class="fa-solid fa-plus"></i></button>
+            </div>
+          }
+
+        }
+
+      </div><!-- /track -->
+    </div><!-- /track-outer -->
+  }
+
+  <!-- Ghost follows cursor while in drag/add mode -->
+  @if (dragState() !== null) {
+    <div class="drag-ghost" [style.left.px]="ghostX()" [style.top.px]="ghostY()">
+      @if (dragState()!.mode === 'moving') {
+        <i class="fa-solid fa-hand"></i><span>Drop to reorder</span>
+      } @else {
+        <i class="fa-solid fa-plus"></i><span>Choose slot</span>
+      }
+    </div>
+    <!-- Backdrop: clicking outside the track area commits at current slot, Escape cancels -->
+    <div class="drag-backdrop" (click)="commitOnBackdrop()"></div>
+  }
+
+</div>

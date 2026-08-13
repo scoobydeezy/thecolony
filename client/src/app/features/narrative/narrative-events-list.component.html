@@ -1,0 +1,143 @@
+<div class="list-detail-layout" [class.has-detail]="selectedEvent()">
+
+  <!-- ── Left: list ──────────────────────────────────────────────────────── -->
+  <div class="list-pane">
+
+    <div class="toolbar">
+      <input class="search-input" type="search" placeholder="Search events…"
+             [value]="search()" (input)="search.set($any($event.target).value)" />
+
+      <select class="filter-select" [value]="filterStatus()"
+              (change)="filterStatus.set($any($event.target).value)">
+        <option value="all">All Statuses</option>
+        @for (o of statusOptions; track o.value) {
+          <option [value]="o.value">{{ o.label }}</option>
+        }
+      </select>
+
+      <select class="filter-select" [value]="filterThread()"
+              (change)="filterThread.set($any($event.target).value)">
+        <option value="all">All Threads</option>
+        @for (t of store.narrativeThreads(); track t.id) {
+          <option [value]="t.id">{{ t.title }}</option>
+        }
+      </select>
+
+      <button class="btn btn-primary btn-sm toolbar-right" (click)="openAdd()">+ Add Event</button>
+    </div>
+
+    @if (filteredEvents().length === 0) {
+      <div class="empty-state card">
+        <p>No narrative events match the current filters.</p>
+      </div>
+    } @else {
+      <div class="event-list">
+        @for (ev of filteredEvents(); track ev.id) {
+          <div class="event-row card" [class.selected]="selectedId() === ev.id"
+               (click)="select(ev.id)">
+            <div class="event-row-main">
+              <span class="event-title">{{ ev.title }}</span>
+              <div class="event-chips">
+                <span [class]="'status-chip ' + statusClass(ev.status)">{{ ev.status }}</span>
+              </div>
+              @if (ev.summary) {
+                <p class="event-summary">{{ ev.summary }}</p>
+              }
+            </div>
+            <div class="event-row-actions">
+              <button class="btn-icon" title="Edit" (click)="openEdit(ev); $event.stopPropagation()">
+                <i class="fa-solid fa-pen"></i>
+              </button>
+              <button class="btn-icon btn-icon--danger" title="Delete" (click)="delete(ev.id); $event.stopPropagation()">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- ── Right: detail panel ────────────────────────────────────────────── -->
+  @if (selectedEvent(); as ev) {
+    <div class="detail-pane">
+      <app-narrative-event-detail [event]="ev"
+        (edit)="openEdit(ev)"
+        (close)="selectedId.set(null)" />
+    </div>
+  }
+
+</div>
+
+<!-- ── Add / Edit Modal ──────────────────────────────────────────────────── -->
+
+@if (showModal()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal modal-event" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <h3>{{ editModel().id ? 'Edit Event' : 'Add Event' }}</h3>
+        <button class="modal-close" (click)="closeModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="form-group">
+          <label>Title *</label>
+          <input type="text" [formField]="f.title" placeholder="Event title" />
+          @if (f.title().invalid() && f.title().touched()) {
+            <p class="field-error">Title is required</p>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Summary</label>
+          <textarea rows="2" [formField]="f.summary" placeholder="Brief summary (optional)"></textarea>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label>Status</label>
+            <select [formField]="f.status">
+              @for (o of statusOptions; track o.value) {
+                <option [value]="o.value">{{ o.label }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Visibility</label>
+            <select [formField]="f.visibility">
+              @for (o of visibilityOptions; track o.value) {
+                <option [value]="o.value">{{ o.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Narrative Function</label>
+          <input type="text" [formField]="f.narrativeFunction"
+                 placeholder="Role this event plays in the story" />
+        </div>
+
+        <div class="form-group">
+          <label>Description</label>
+          <textarea rows="3" [formField]="f.description"
+                    placeholder="Longer description or GM notes (optional)"></textarea>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        @if (editModel().id) {
+          <button class="btn btn-danger modal-delete" (click)="delete(editModel().id); closeModal()">
+            Delete
+          </button>
+        }
+        <button class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button class="btn btn-primary" (click)="save()" [disabled]="f().invalid()">Save</button>
+      </div>
+
+    </div>
+  </div>
+}

@@ -1,0 +1,124 @@
+<div class="ev-card card"
+     (mouseenter)="hovered.set(true)"
+     (mouseleave)="hovered.set(false)">
+
+  <!-- ── Header ─────────────────────────────────────────────────────── -->
+  <div class="ev-header">
+    <div class="ev-header-main">
+      <span class="ev-title">{{ effectiveEvent().title }}</span>
+      <span class="ev-status ev-status--{{ effectiveEvent().status | lowercase }}">
+        {{ effectiveEvent().status }}
+      </span>
+    </div>
+    @if (hovered()) {
+      <button class="ev-edit-btn" title="Edit event" (click)="edit.emit(); $event.stopPropagation()">
+        <i class="fa-solid fa-pen"></i>
+      </button>
+    }
+  </div>
+
+  <!-- ── Body text ──────────────────────────────────────────────────── -->
+  @if (effectiveEvent().summary) {
+    <p class="ev-summary">{{ effectiveEvent().summary }}</p>
+  }
+
+  @if (effectiveEvent().narrativeFunction) {
+    <div class="ev-field">
+      <span class="ev-field-label">Narrative Role</span>
+      <p class="ev-field-value">{{ effectiveEvent().narrativeFunction }}</p>
+    </div>
+  }
+
+  @if (effectiveEvent().description) {
+    <div class="ev-field">
+      <p class="ev-field-value">{{ effectiveEvent().description }}</p>
+    </div>
+  }
+
+  <!-- ── Metadata divider ───────────────────────────────────────────── -->
+  <div class="ev-divider"></div>
+
+  <!-- ── Two-column metadata ────────────────────────────────────────── -->
+  <div class="ev-meta">
+
+    <!-- Left: Threads -->
+    <div class="ev-meta-col ev-meta-col--threads">
+      <div class="ev-meta-header">
+        <i class="fa-solid fa-reel ev-meta-icon"></i>
+        <span class="ev-meta-label">Threads</span>
+      </div>
+      @for (t of threads(); track t.id) {
+        <div class="ev-thread-row">
+          <span class="ev-thread-name">{{ t.title }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Right: Actors + Assets -->
+    <div class="ev-meta-col ev-meta-col--right">
+
+      <!-- Actors -->
+      <div class="ev-meta-header">
+        <i class="fa-solid fa-user ev-meta-icon"></i>
+        <span class="ev-meta-label">Actors</span>
+      </div>
+      <div class="ev-avatars">
+        @for (link of characterLinks(); track link.id) {
+          <div class="ev-avatar" [title]="entityName(link)">
+            <span class="ev-avatar-initials">{{ characterInitials(link) }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- Assets -->
+      <div class="ev-meta-header ev-meta-header--assets">
+        <i class="fa-solid fa-star ev-meta-icon"></i>
+        <span class="ev-meta-label">Assets</span>
+      </div>
+      @for (link of assetLinks(); track link.id) {
+        <div class="ev-asset-row">
+          <span class="ev-asset-name">{{ entityName(link) }}</span>
+        </div>
+      }
+    </div>
+
+  </div><!-- /ev-meta -->
+
+  <!-- ── Footer divider ─────────────────────────────────────────────── -->
+  <div class="ev-divider"></div>
+
+  <!-- ── Connection footer ──────────────────────────────────────────── -->
+  <div class="ev-footer">
+
+    <!-- Incoming (bottom-left) -->
+    <div class="ev-footer-col ev-footer-col--in">
+      @for (c of incomingConns(); track c.id; let last = $last) {
+        <div class="ev-conn ev-conn--in">
+          <i class="fa-solid fa-arrow-left-long-to-line ev-conn-arrow"
+             [style.visibility]="last ? 'visible' : 'hidden'"></i>
+          <button class="ev-conn-title"
+                  (click)="scrollTo.emit(c.sourceNarrativeEventId); $event.stopPropagation()">
+            {{ connEventTitle(c.id, c.sourceNarrativeEventId) }}
+          </button>
+        </div>
+      }
+    </div>
+
+    <!-- Outgoing (bottom-right) -->
+    <div class="ev-footer-col ev-footer-col--out">
+      @for (c of outgoingConns(); track c.id; let last = $last) {
+        <div class="ev-conn ev-conn--out">
+          <button class="ev-conn-title"
+                  (click)="scrollTo.emit(c.targetNarrativeEventId); $event.stopPropagation()">
+            {{ connEventTitle(c.id, c.targetNarrativeEventId) }}
+          </button>
+          <i class="fa-solid fa-arrow-right-long-to-line ev-conn-arrow"
+             [style.visibility]="last ? 'visible' : 'hidden'"></i>
+        </div>
+      }
+    </div>
+
+  </div>
+
+</div>
+

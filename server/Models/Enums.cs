@@ -21,3 +21,7 @@ public enum GoalVisibility { Open, Known, Secret }
 public enum LocationState { Active, Abandoned, Ruined, Unknown }
 public enum GeometryType { Point, Polygon, MultiPoint }
 public enum PlacementSubjectType { Location, Character, Asset }
+public enum NarrativeThreadState  { Open, Resolved }
+public enum NarrativeEventStatus  { Planned, Available, Occurred, Bypassed, Obsolete }
+public enum NarrativeOwnerType    { Thread, Event }
+public enum NarrativeEntityType   { Faction, Character, Asset, Location, Session, SessionEvent }

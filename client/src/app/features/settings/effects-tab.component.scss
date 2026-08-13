@@ -3,7 +3,7 @@
 }
 
 .section-title {
-  font-size: 0.875rem;
+  font-size: var(--text-size-section);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -12,7 +12,7 @@
 }
 
 .help-text {
-  font-size: 0.85rem;
+  font-size: var(--text-size-body);
   color: var(--text-muted);
   margin-bottom: 1.25rem;
   line-height: 1.5;
@@ -52,7 +52,7 @@
   border-radius: 6px;
   padding: 0.35rem 0.6rem;
   color: var(--text-primary);
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   font-weight: 600;
   outline: none;
   &:focus { border-color: var(--accent); }
@@ -64,7 +64,7 @@
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   padding: 0.25rem 0.4rem;
   border-radius: 4px;
   line-height: 1;
@@ -72,7 +72,7 @@
 }
 
 .section-label {
-  font-size: 0.7rem;
+  font-size: var(--text-size-label);
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: var(--text-muted);
@@ -94,7 +94,7 @@
   gap: 0.3rem;
 
   label {
-    font-size: 0.75rem;
+    font-size: var(--text-size-label);
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -106,7 +106,7 @@
     border-radius: 6px;
     padding: 0.35rem 0.5rem;
     color: var(--text-primary);
-    font-size: 0.875rem;
+    font-size: var(--text-size-body);
     outline: none;
     &:focus { border-color: var(--accent); }
   }
@@ -125,7 +125,7 @@
 }
 
 .any-label {
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   font-style: italic;
 }
@@ -137,20 +137,20 @@
   border-radius: 6px;
   color: var(--text-muted);
   cursor: pointer;
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   padding: 0.25rem 0.5rem;
   &:hover { border-color: var(--accent); color: var(--accent); }
 }
 
 .rule-preview {
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   font-style: italic;
   margin: 0;
 }
 
 .empty-msg {
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   color: var(--text-muted);
   font-style: italic;
   padding: 0.75rem 0;
@@ -170,6 +170,6 @@
 
 .saved-msg {
   color: var(--color-success);
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   font-weight: 600;
 }

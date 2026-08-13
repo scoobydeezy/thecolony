@@ -46,5 +46,9 @@ export const routes: Routes = [
     path: 'locations',
     loadComponent: () => import('./features/locations/locations.component').then(m => m.LocationsComponent)
   },
+  {
+    path: 'narrative',
+    loadComponent: () => import('./features/narrative/narrative-shell.component').then(m => m.NarrativeShellComponent)
+  },
   { path: '**', redirectTo: '/dashboard' }
 ];

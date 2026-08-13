@@ -28,12 +28,12 @@
   border: 1px solid var(--border);
   background: var(--bg-surface);
   color: var(--text-secondary);
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   font-weight: 500;
   cursor: pointer;
   transition: background 0.15s, color 0.15s, border-color 0.15s, opacity 0.15s;
 
-  i { font-size: 0.72rem; }
+  i { font-size: var(--text-size-meta); }
 
   &:hover {
     background: var(--bg-hover);
@@ -60,7 +60,7 @@
     background: none;
     border: none;
     padding: 0.45rem 1rem;
-    font-size: 0.85rem;
+    font-size: var(--text-size-body);
     color: var(--text-secondary);
     cursor: pointer;
     border-right: 1px solid var(--border);
@@ -209,7 +209,7 @@ $tree-arm-top: 1.34rem;
 
 .loc-name {
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: var(--text-size-title);
   color: var(--text-primary);
 }
 
@@ -220,7 +220,7 @@ $tree-arm-top: 1.34rem;
   cursor: pointer;
   padding: 0.2rem 0.35rem;
   border-radius: 4px;
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   line-height: 1;
   opacity: 0;
   transition: opacity 0.1s, color 0.1s, background 0.1s;
@@ -236,13 +236,13 @@ $tree-arm-top: 1.34rem;
 }
 
 .loc-icon {
-  font-size: 0.72rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
 }
 
 .loc-desc {
-  font-size: 0.82rem;
-  color: var(--text-muted);
+  font-size: var(--text-size-body);
+  color: var(--text-secondary);
   margin: 0;
   line-height: 1.4;
 }
@@ -263,7 +263,7 @@ $tree-arm-top: 1.34rem;
 }
 
 .loc-map-link {
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   color: var(--accent);
   background: none;
   border: none;
@@ -276,13 +276,13 @@ $tree-arm-top: 1.34rem;
 }
 
 .loc-map-hero-icon {
-  font-size: 0.7rem;
+  font-size: var(--text-size-label);
   color: var(--accent);
   opacity: 0.75;
 }
 
 .loc-placed-count {
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   margin-top: 0.1rem;
 }
@@ -291,7 +291,7 @@ $tree-arm-top: 1.34rem;
 
 .state-badge {
   display: inline-block;
-  font-size: 0.68rem;
+  font-size: var(--text-size-badge);
   font-weight: 600;
   padding: 0.15rem 0.5rem;
   border-radius: 4px;
@@ -343,15 +343,15 @@ $tree-arm-top: 1.34rem;
 }
 
 .loc-section-label {
-  font-size: 0.68rem;
+  font-size: var(--text-size-label);
   font-weight: 700;
-  letter-spacing: 0.07em;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
   text-transform: uppercase;
 }
 
 .loc-section-count {
-  font-size: 0.72rem;
+  font-size: var(--text-size-meta);
   color: var(--text-secondary);
   background: var(--bg-hover);
   border-radius: 10px;
@@ -361,14 +361,14 @@ $tree-arm-top: 1.34rem;
 }
 
 .loc-section-caret {
-  font-size: 0.72rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   width: 0.75rem;
   flex-shrink: 0;
 }
 
 .loc-section-empty {
-  font-size: 0.8rem;
+  font-size: var(--text-size-body);
   color: var(--text-muted);
   margin: 0;
 }
@@ -380,7 +380,7 @@ $tree-arm-top: 1.34rem;
   flex-wrap: wrap;
   align-items: center;
   gap: .5rem;
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   line-height: 1.5;
 }
 
@@ -409,7 +409,7 @@ $tree-arm-top: 1.34rem;
   background: none;
   border: none;
   padding: 0 0.15rem 0 0;
-  font-size: 0.85rem;
+  font-size: var(--text-size-body);
   color: #f87171;
   cursor: pointer;
   line-height: 1;
@@ -421,7 +421,7 @@ $tree-arm-top: 1.34rem;
   background: none;
   border: none;
   padding: 0 0.15rem;
-  font-size: 0.85rem;
+  font-size: var(--text-size-body);
   color: var(--accent);
   cursor: pointer;
   line-height: 1;
@@ -462,7 +462,7 @@ $tree-arm-top: 1.34rem;
     justify-content: center;
     cursor: pointer;
     border-style: dashed;
-    font-size: 0.7rem;
+    font-size: var(--text-size-label);
     color: var(--text-muted);
     transition: background 0.15s, color 0.15s, border-color 0.15s;
     &:hover { background: var(--bg-active); color: var(--accent); border-color: var(--accent); }
@@ -476,7 +476,7 @@ $tree-arm-top: 1.34rem;
   background: rgba(0, 0, 0, 0.55);
   border: none;
   color: #fff;
-  font-size: 0.85rem;
+  font-size: var(--text-size-body);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -512,7 +512,7 @@ $tree-arm-top: 1.34rem;
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   opacity: 0;
   transition: opacity 0.1s, color 0.1s, background 0.1s;
 
@@ -528,6 +528,12 @@ $tree-arm-top: 1.34rem;
 }
 
 .loc-card:hover .btn-icon { opacity: 1; }
+
+.btn-icon.narrative-active,
+.btn-icon.narrative-active:hover {
+  opacity: 1;
+  color: var(--accent);
+}
 
 // ── Map view ──────────────────────────────────────────────────────────────────
 
@@ -561,13 +567,13 @@ $tree-arm-top: 1.34rem;
 }
 
 .map-breadcrumb-icon {
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   flex-shrink: 0;
 }
 
 .map-breadcrumb-sep {
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   flex-shrink: 0;
 }
@@ -576,7 +582,7 @@ $tree-arm-top: 1.34rem;
   background: none;
   border: none;
   padding: 0;
-  font-size: 0.85rem;
+  font-size: var(--text-size-body);
   color: var(--accent);
   cursor: pointer;
   white-space: nowrap;
@@ -587,7 +593,7 @@ $tree-arm-top: 1.34rem;
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.85rem;
+  font-size: var(--text-size-section);
   font-weight: 600;
   color: var(--text-primary);
   white-space: nowrap;
@@ -597,7 +603,7 @@ $tree-arm-top: 1.34rem;
   background: none;
   border: none;
   padding: 0.1rem 0.25rem;
-  font-size: 0.7rem;
+  font-size: var(--text-size-label);
   color: var(--text-muted);
   cursor: pointer;
   border-radius: 4px;
@@ -616,7 +622,7 @@ $tree-arm-top: 1.34rem;
   background: none;
   border: none;
   padding: 0;
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   color: var(--accent);
   cursor: pointer;
   white-space: nowrap;
@@ -624,13 +630,13 @@ $tree-arm-top: 1.34rem;
 }
 
 .map-stat {
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   white-space: nowrap;
 }
 
 .map-stat-sep {
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   color: var(--border);
 }
 
@@ -671,7 +677,7 @@ $tree-arm-top: 1.34rem;
 }
 
 .placement-panel-title {
-  font-size: 0.8rem;
+  font-size: var(--text-size-label);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -682,7 +688,7 @@ $tree-arm-top: 1.34rem;
   background: none;
   border: none;
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: var(--text-size-body);
   cursor: pointer;
   padding: 0.1rem 0.25rem;
   &:hover { color: var(--text-primary); }
@@ -695,10 +701,10 @@ $tree-arm-top: 1.34rem;
 }
 
 .form-label-sm {
-  font-size: 0.7rem;
+  font-size: var(--text-size-label);
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
 }
 
@@ -709,7 +715,7 @@ $tree-arm-top: 1.34rem;
   border-radius: 5px;
   padding: 0.3rem 0.5rem;
   color: var(--text-primary);
-  font-size: 0.82rem;
+  font-size: var(--text-size-body);
   &:focus { outline: none; border-color: var(--accent); }
 }
 
@@ -734,13 +740,13 @@ $tree-arm-top: 1.34rem;
   gap: 0.5rem;
   padding: 0.3rem 0;
   border-bottom: 1px solid var(--border);
-  font-size: 0.82rem;
+  font-size: var(--text-size-body);
 
   &:last-child { border-bottom: none; }
 }
 
 .placement-type-badge {
-  font-size: 0.65rem;
+  font-size: var(--text-size-badge);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -762,13 +768,13 @@ $tree-arm-top: 1.34rem;
 }
 
 .placement-geo {
-  font-size: 0.7rem;
+  font-size: var(--text-size-label);
   color: var(--text-muted);
   flex-shrink: 0;
 }
 
 .hidden-badge {
-  font-size: 0.65rem;
+  font-size: var(--text-size-badge);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -826,7 +832,7 @@ $tree-arm-top: 1.34rem;
 
 .form-label {
   display: block;
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -841,7 +847,7 @@ $tree-arm-top: 1.34rem;
   border-radius: 6px;
   padding: 0.45rem 0.65rem;
   color: var(--text-primary);
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   box-sizing: border-box;
 
   &:focus { outline: none; border-color: var(--accent); }
@@ -860,7 +866,7 @@ $tree-arm-top: 1.34rem;
 }
 
 .hint {
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   margin: 0.5rem 0 0;
 }
@@ -897,7 +903,7 @@ $tree-arm-top: 1.34rem;
 }
 
 .modal-maps-empty {
-  font-size: 0.82rem;
+  font-size: var(--text-size-body);
   color: var(--text-muted);
   margin: 0;
 }
@@ -920,7 +926,7 @@ $tree-arm-top: 1.34rem;
 
 .modal-map-name {
   flex: 1;
-  font-size: 0.85rem;
+  font-size: var(--text-size-body);
   color: var(--accent);
   background: none;
   border: none;
@@ -938,7 +944,7 @@ $tree-arm-top: 1.34rem;
 }
 
 .modal-map-dims {
-  font-size: 0.72rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   white-space: nowrap;
   flex-shrink: 0;
@@ -954,7 +960,7 @@ $tree-arm-top: 1.34rem;
   border: 1px solid var(--border);
   border-radius: 5px;
   cursor: pointer;
-  font-size: 0.7rem;
+  font-size: var(--text-size-label);
   color: var(--text-muted);
   flex-shrink: 0;
   transition: color 0.1s, background 0.1s, border-color 0.1s;
@@ -1004,14 +1010,14 @@ $tree-arm-top: 1.34rem;
   border: none;
   padding: 0.3em 0.5em;
   border-radius: 4px;
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   color: var(--text-primary);
   cursor: pointer;
   &:hover { background: var(--bg-hover); }
 }
 
 .loc-assign-empty {
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   padding: 0.3em 0.5em;
 }
@@ -1047,7 +1053,7 @@ $tree-arm-top: 1.34rem;
 }
 
 .modal-entity-icon {
-  font-size: 0.72rem;
+  font-size: var(--text-size-meta);
   flex-shrink: 0;
 
   &--char  { color: #f472b6; }
@@ -1056,7 +1062,7 @@ $tree-arm-top: 1.34rem;
 
 .modal-entity-name {
   flex: 1;
-  font-size: 0.82rem;
+  font-size: var(--text-size-body);
   color: var(--text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1064,7 +1070,7 @@ $tree-arm-top: 1.34rem;
 }
 
 .modal-entity-pending-badge {
-  font-size: 0.65rem;
+  font-size: var(--text-size-badge);
   color: var(--text-muted);
   border: 1px solid var(--border);
   border-radius: 3px;

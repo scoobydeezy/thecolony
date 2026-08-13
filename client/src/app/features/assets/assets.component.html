@@ -144,8 +144,13 @@
         </div>
 
         <!-- Actions column -->
-        @if (!store.isViewingSnapshot()) {
-          <div class="asset-actions">
+        <div class="asset-actions">
+          <button class="btn-icon" title="Narrative context"
+                  [class.narrative-active]="store.narrativeFocusEntity()?.id === a.id"
+                  (click)="store.setNarrativeFocus({ type: 'Asset', id: a.id, name: a.name }); store.openNarrativeInspector()">
+            <i class="fa-solid fa-diagram-project"></i>
+          </button>
+          @if (!store.isViewingSnapshot()) {
             <button class="btn-icon btn-icon--edit" (click)="openEdit(a)" title="Edit">
               <i class="fa-solid fa-pen"></i>
             </button>
@@ -153,8 +158,8 @@
             <button class="btn-icon btn-icon--danger" (click)="delete(a.id)" title="Delete">
               <i class="fa-solid fa-trash"></i>
             </button>
-          </div>
-        }
+          }
+        </div>
 
       </div>
     }

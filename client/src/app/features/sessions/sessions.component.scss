@@ -1,27 +1,25 @@
 .toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-}
 
-.toolbar-right {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-left: auto;
-  flex-wrap: wrap;
+  .toolbar-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-left: auto;
+  }
 }
 
 .import-error {
   color: var(--color-danger, #c0392b);
-  font-size: 0.85rem;
+  font-size: var(--text-size-body);
 }
 
 .import-warn {
   color: var(--text-muted);
-  font-size: 0.9rem;
+  font-size: var(--text-size-body);
   margin-top: 0.5rem;
 }
 
@@ -81,7 +79,7 @@
 }
 
 .meta-chip {
-  font-size: 0.72rem;
+  font-size: var(--text-size-label);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-muted);
@@ -91,7 +89,7 @@
 }
 
 .session-summary {
-  font-size: 0.85rem;
+  font-size: var(--text-size-body);
   color: var(--text-secondary);
   margin: 0;
 }
@@ -156,7 +154,7 @@
 }
 
 .event-desc {
-  font-size: 0.82rem;
+  font-size: var(--text-size-body);
   color: var(--text-secondary);
 }
 
@@ -173,7 +171,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: 3px;
@@ -186,7 +184,7 @@
 }
 
 .effect-repeat-icon {
-  font-size: 0.55rem;
+  font-size: var(--text-size-badge);
   color: #f59e0b;
 }
 
@@ -202,7 +200,7 @@
 }
 
 .derived-bar-icon {
-  font-size: 0.65rem;
+  font-size: var(--text-size-badge);
   color: #6366f1;
   flex-shrink: 0;
   margin-left: .9rem;
@@ -219,7 +217,7 @@
 }
 
 .derived-reason {
-  font-size: 0.7rem;
+  font-size: var(--text-size-label);
   color: var(--text-muted);
   font-style: italic;
   border-left: 2px solid var(--border);
@@ -234,7 +232,7 @@
   border: none;
   cursor: pointer;
   color: var(--text-muted);
-  font-size: 0.7rem;
+  font-size: var(--text-size-label);
   padding: 0;
   line-height: 1;
   &:hover { color: var(--color-danger); }
@@ -256,7 +254,7 @@
   flex-wrap: wrap;
 
   select, input {
-    font-size: 0.82rem;
+    font-size: var(--text-size-body);
     padding: 0.25rem 0.4rem;
     border-radius: 4px;
     border: 1px solid var(--border);
@@ -338,7 +336,7 @@
 
 .delta {
   font-weight: 700;
-  font-size: 0.82rem;
+  font-size: var(--text-size-body);
   &.pos     { color: var(--color-success); }
   &.neg     { color: var(--color-danger);  }
   &.neutral { color: var(--text-muted);    }
@@ -353,7 +351,7 @@
 }
 
 .optional {
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   font-weight: 400;
 }
@@ -365,7 +363,7 @@
 // ── Extra button size ─────────────────────────────────────────────────────
 
 .btn-xs {
-  font-size: 0.72rem;
+  font-size: var(--text-size-label);
   padding: 0.15rem 0.45rem;
   border-radius: 3px;
 }

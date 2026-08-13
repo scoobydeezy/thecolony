@@ -1,0 +1,20 @@
+@if (pathSet()) {
+  <div class="crown-card" (mousedown)="$event.stopPropagation()" (click)="$event.stopPropagation()">
+
+    <span class="crown-set-name">{{ pathSet()!.name }}</span>
+
+    <div class="path-selection-wrapper">
+      <i class="fa-solid fa-shoe-prints"></i>
+      <select class="crown-path-select"
+              [disabled]="isLocked()"
+              [title]="isLocked() ? 'Save or cancel your edits to switch paths' : ''"
+              [value]="selectedPathId() ?? ''"
+              (change)="onPathChange($event)">
+        @for (p of paths(); track p.id) {
+          <option [value]="p.id">{{ p.name }}</option>
+        }
+      </select>
+    </div>
+
+  </div>
+}

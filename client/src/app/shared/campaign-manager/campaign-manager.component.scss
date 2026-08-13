@@ -86,7 +86,7 @@ $transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .content-desc {
-  font-size: 0.82rem;
+  font-size: var(--text-size-body);
   color: var(--text-muted);
   line-height: 1.5;
 }
@@ -102,7 +102,7 @@ $transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .field-label {
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   font-weight: 600;
   color: var(--text-secondary);
 
@@ -114,7 +114,7 @@ $transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
 .field-input {
   padding: 0.45rem 0.75rem;
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   color: var(--text-primary);
   background: var(--bg-input, var(--bg-hover));
   border: 1px solid var(--border);
@@ -181,7 +181,7 @@ $transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 5px;
   cursor: pointer;
   color: var(--text-muted);
-  font-size: 0.72rem;
+  font-size: var(--text-size-meta);
   transition: color 0.12s, background 0.12s, border-color 0.12s;
 
   &:hover:not(:disabled) {
@@ -217,7 +217,7 @@ $transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .campaign-list-name {
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   font-weight: 600;
   color: var(--text-primary);
   overflow: hidden;
@@ -226,7 +226,7 @@ $transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .campaign-list-desc {
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -235,7 +235,7 @@ $transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
 .active-chip {
   display: inline-block;
-  font-size: 0.65rem;
+  font-size: var(--text-size-badge);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -265,7 +265,7 @@ $transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .delete-warning {
-  font-size: 0.82rem;
+  font-size: var(--text-size-body);
   color: var(--text-secondary);
   line-height: 1.5;
 }
@@ -276,7 +276,7 @@ $transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .empty-state {
-  font-size: 0.82rem;
+  font-size: var(--text-size-body);
   color: var(--text-muted);
   text-align: center;
   padding: 2rem 0;
@@ -303,7 +303,7 @@ $transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   align-items: baseline;
   gap: 0.6rem;
   cursor: pointer;
-  font-size: 0.82rem;
+  font-size: var(--text-size-body);
 
   input[type='checkbox'] { flex-shrink: 0; cursor: pointer; }
 
@@ -320,12 +320,12 @@ $transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .checkbox-hint {
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
 }
 
 .import-warning {
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   color: var(--color-warn);
   line-height: 1.5;
   padding: 0.5rem 0.75rem;
@@ -344,7 +344,7 @@ $transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .import-done-msg {
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   color: var(--color-success);
   line-height: 1.5;
 }
@@ -356,7 +356,7 @@ $transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   justify-content: center;
   gap: 0.35rem;
   padding: 0.45rem 0.9rem;
-  font-size: 0.82rem;
+  font-size: var(--text-size-body);
   font-weight: 500;
   border-radius: 6px;
   border: 1px solid transparent;
@@ -366,7 +366,7 @@ $transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:disabled { opacity: 0.45; cursor: default; pointer-events: none; }
 
-  &.btn-sm { padding: 0.3rem 0.65rem; font-size: 0.78rem; }
+  &.btn-sm { padding: 0.3rem 0.65rem; font-size: var(--text-size-meta); }
 
   &.btn-primary {
     background: var(--accent);

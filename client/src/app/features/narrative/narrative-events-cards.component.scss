@@ -1,0 +1,323 @@
+// ── Layout variables ──────────────────────────────────────────────────────
+
+$card-w:    400px;
+$track-gap: 1.5rem;  // must match .track gap
+$track-pad: 0.5rem;  // must match .track padding-left
+$dot-size:  50px;
+$row-h:     72px;
+$bar-h:     68px;
+
+// ── Root ──────────────────────────────────────────────────────────────────
+
+.cards-root {
+  --card-w: #{$card-w};
+  display: flex;
+  flex-direction: column;
+  flex: 1;           // fill remaining height from shell
+  min-height: 0;
+  position: relative;
+}
+
+// ── Outer scroll container ────────────────────────────────────────────────
+
+.track-outer {
+  overflow-x: auto;
+  overflow-y: auto;        // allows vertical fill without clipping
+  flex: 1;                 // stretches to bottom of page
+  min-height: 0;
+  position: relative;
+  z-index: 2;             // above the drag-backdrop so slots receive clicks
+
+  &::-webkit-scrollbar        { height: 6px; }
+  &::-webkit-scrollbar-track  { background: transparent; }
+  &::-webkit-scrollbar-thumb  { background: var(--border); border-radius: 3px; }
+}
+
+// ── Path rows area — sits above the track, shares the same scroll container ─
+
+.path-rows-area {
+  position: relative;
+  width: max-content;
+  min-width: 100%;
+  height: auto;   // grows with stacked rows
+  padding: 0.4rem 0 0.35rem;
+}
+
+// Individual path row — inline-block so margin-left offsets it and width sets its span
+.path-row {
+  display: flex;
+  align-items: center;
+  gap: $track-gap;
+  height: $row-h;
+  margin-bottom: 0.3rem;
+  min-width: 0;
+}
+
+// Fixed-width column aligned to the origin card.
+// Width = card width so the dot sits in the centre and the connector
+// fills the right half, meeting the path-bar flush.
+.path-dot-col {
+  flex-shrink: 0;
+  width: $card-w;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+// Round dot centred in the column
+.path-dot {
+  flex-shrink: 0;
+  width: $dot-size;
+  height: $dot-size;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--accent) 14%, var(--bg-surface));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--bg-base);
+  position: relative;
+  z-index: 2;
+}
+
+// Horizontal line from the right edge of the dot to the right edge of the column
+.path-dot-connector {
+  position: absolute;
+  right: -$track-gap;
+  top: 50%;
+  transform: translateY(-50%);
+  // Spans from dot's right edge across the gap to the bar's left edge
+  width: calc(50% - #{$dot-size} / 2 + #{$track-gap});
+  height: 1.5px;
+  background: color-mix(in srgb, var(--accent) 14%, var(--bg-surface));
+}
+
+// Horizontal bar that spans from origin dot column to right edge
+.path-bar {
+  flex: 1;
+  min-width: 0;
+  height: $bar-h;
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg-surface));
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1rem;
+  gap: 0.5rem;
+  overflow: visible;
+  position: relative;
+}
+
+.path-set-name {
+  font-size: var(--text-size-badge);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.path-selector-wrapper {
+  display: flex;
+  align-items: center;
+
+  i {
+    font-size: var(--text-size-meta);
+    color: var(--text-primary);
+  }
+}
+
+// Native path selector
+.path-selector-select {
+  align-self: flex-start;
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg-surface));
+  border: none;
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: var(--text-size-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  padding: 0.15rem 0.4rem;
+  cursor: pointer;
+  max-width: 220px;
+
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+  &:focus { outline: none; border-color: var(--accent); }
+}
+
+// ── Track: horizontal flex row ────────────────────────────────────────────
+
+.track {
+  display: flex;
+  align-items: flex-start;
+  gap: $track-gap;
+  padding: 0.75rem 0.5rem 2.5rem;  // extra bottom padding keeps order-bar clear
+  width: max-content;
+  min-width: 100%;
+}
+
+// ── Card outer wrapper ────────────────────────────────────────────────────
+
+.card-outer {
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &.is-dragging {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+// Variant ghost (dashed card shadow behind)
+.variant-ghost {
+  position: absolute;
+  width: var(--card-w, 400px);
+  top: 6px;
+  left: 6px;
+  bottom: -6px;
+  border-radius: 8px;
+  border: 1px dashed var(--border);
+  background: var(--surface-1);
+  z-index: 0;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+app-narrative-event-card {
+  position: relative;
+  z-index: 1;
+  display: block;
+}
+
+// ── Ordering controls beneath each card ──────────────────────────────────
+
+.card-order-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4rem;
+  padding: 0.6rem 0 0;
+  width: $card-w;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.card-outer:hover .card-order-bar {
+  opacity: 1;
+}
+
+.order-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: var(--text-size-title);
+  cursor: pointer;
+  padding: 0.2rem 0.3rem;
+  line-height: 1;
+  transition: color 0.12s;
+
+  &:hover:not(:disabled) { color: var(--text-primary); }
+  &:disabled { opacity: 0.2; cursor: default; }
+
+  &--pickup {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    &:hover { color: var(--accent); }
+  }
+}
+
+// ── Insertion slots ───────────────────────────────────────────────────────
+
+.slot {
+  flex-shrink: 0;
+  width: 60px;
+  min-height: 360px;
+  box-sizing: border-box;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+
+  &--active {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+
+    .slot-btn {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+  }
+
+  &:hover {
+    border-color: var(--accent);
+    .slot-btn { background: var(--accent); border-color: var(--accent); color: #fff; }
+  }
+}
+
+.slot-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+  color: var(--text-muted);
+  font-size: var(--text-size-badge);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transition: all 0.12s;
+  padding: 0;
+}
+
+// ── Drag ghost ────────────────────────────────────────────────────────────
+
+.drag-ghost {
+  position: fixed;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--surface-2);
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  padding: 0.35rem 0.65rem;
+  font-size: var(--text-size-meta);
+  color: var(--accent);
+  pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+  white-space: nowrap;
+}
+
+.drag-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  cursor: crosshair;
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 2rem;
+  color: var(--text-muted);
+  text-align: center;
+
+  p { margin: 0; font-size: var(--text-size-body); }
+}

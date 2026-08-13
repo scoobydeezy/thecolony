@@ -1,0 +1,418 @@
+<div class="detail-card card" [class.card-mode]="cardMode()">
+
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
+
+  <div class="detail-header">
+    <div class="detail-header-main">
+      <h3 class="detail-title">{{ effectiveEvent().title }}</h3>
+      <span class="status-badge status-badge--{{ effectiveEvent().status | lowercase }}">
+        {{ effectiveEvent().status }}
+      </span>
+      @if (currentPathId() !== null && overrideHasChanges()) {
+        <span class="status-badge status-badge--override">path override</span>
+      }
+    </div>
+
+    <!-- Panel mode: edit + close buttons in header -->
+    @if (!cardMode()) {
+      <div class="detail-header-actions">
+        <button class="btn-icon" title="Edit base" (click)="edit.emit()">
+          <i class="fa-solid fa-pen"></i>
+        </button>
+        <button class="btn-icon" title="Close" (click)="close.emit()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- ── Summary / fields ─────────────────────────────────────────────────── -->
+
+  @if (effectiveEvent().summary) {
+    <p class="detail-summary">{{ effectiveEvent().summary }}</p>
+  }
+
+  @if (effectiveEvent().narrativeFunction) {
+    <div class="detail-field">
+      <span class="field-label">Narrative Role</span>
+      <p class="field-value">{{ effectiveEvent().narrativeFunction }}</p>
+    </div>
+  }
+
+  @if (effectiveEvent().description) {
+    <div class="detail-field">
+      <p class="field-value">{{ effectiveEvent().description }}</p>
+    </div>
+  }
+
+  <!-- ── Panel mode only: path strip ──────────────────────────────────────── -->
+
+  @if (!cardMode() && store.narrativePaths().length > 0) {
+    <div class="path-strip">
+      <button class="path-strip-item"
+              [class.active]="_internalPathId() === null"
+              (click)="_internalPathId.set(null); showOverrideModal.set(false)">
+        Base
+      </button>
+      @for (p of store.narrativePaths(); track p.id) {
+        <span class="path-strip-sep"><i class="fa-solid fa-code-branch"></i></span>
+        <button class="path-strip-item"
+                [class.active]="_internalPathId() === p.id"
+                [class.has-override]="pathHasOverride(event().id, p.id) !== undefined"
+                (click)="_internalPathId.set(p.id); showOverrideModal.set(false)">
+          {{ p.name }}
+          @if (pathHasOverride(event().id, p.id)) {
+            <span class="strip-override-dot"></span>
+          }
+        </button>
+      }
+    </div>
+
+    @if (_internalPathId() !== null) {
+      <div class="variant-actions">
+        <button class="btn btn-secondary btn-sm" (click)="openOverrideEdit()">
+          <i class="fa-solid fa-pen"></i>
+          {{ overrideHasChanges() ? 'Edit path override' : 'Add path override' }}
+        </button>
+        @if (overrideHasChanges()) {
+          <button class="btn btn-sm" style="color:var(--text-muted)" (click)="revertOverride()">
+            Revert to base
+          </button>
+        }
+      </div>
+    }
+  }
+
+  <!-- ── Card mode: override badge + edit button ───────────────────────────── -->
+
+  @if (cardMode() && currentPathId() !== null) {
+    <div class="card-variant-bar">
+      @if (overrideHasChanges()) {
+        <span class="variant-indicator">
+          <i class="fa-solid fa-code-branch"></i> Path override active
+        </span>
+      }
+      <button class="btn btn-secondary btn-xs" (click)="openOverrideEdit()">
+        {{ overrideHasChanges() ? 'Edit override' : 'Add override' }}
+      </button>
+      @if (overrideHasChanges()) {
+        <button class="btn btn-xs" style="color:var(--text-muted)" (click)="revertOverride()">
+          Revert
+        </button>
+      }
+    </div>
+  }
+
+  <!-- ── Threads ───────────────────────────────────────────────────────────── -->
+
+  <div class="detail-section">
+    <div class="section-header">
+      <i class="fa-solid fa-scroll section-icon"></i>
+      <span class="section-title">Threads</span>
+      <button class="btn-icon btn-icon--sm" title="Link to thread"
+              (click)="showThreadForm.set(!showThreadForm())">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+    </div>
+
+    @if (showThreadForm()) {
+      <div class="add-link-form">
+        <select class="form-select-sm flex-1" [value]="newThreadId()"
+                (change)="newThreadId.set($any($event.target).value)">
+          <option value="">— Select thread —</option>
+          @for (t of availableThreads(); track t.id) {
+            <option [value]="t.id">{{ t.title }}</option>
+          }
+        </select>
+        <button class="btn btn-primary btn-xs" [disabled]="!newThreadId()" (click)="addThread()">Add</button>
+        <button class="btn btn-secondary btn-xs" (click)="showThreadForm.set(false)">✕</button>
+      </div>
+    }
+
+    @if (threads().length === 0 && !showThreadForm()) {
+      <p class="empty-sub">No threads.</p>
+    } @else {
+      <div class="thread-chips">
+        @for (t of threads(); track t.id) {
+          <div class="thread-chip">
+            <span>{{ t.title }}</span>
+            <button class="chip-del" (click)="removeThread(t.id)" title="Unlink">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- ── Actors (Characters) ───────────────────────────────────────────────── -->
+
+  <div class="detail-section">
+    <div class="section-header">
+      <i class="fa-solid fa-user section-icon"></i>
+      <span class="section-title">Actors</span>
+      <button class="btn-icon btn-icon--sm" title="Link character"
+              (click)="newLinkType.set('Character'); showLinkForm.set(!showLinkForm())">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+    </div>
+
+    @if (showLinkForm() && newLinkType() === 'Character') {
+      <div class="add-link-form">
+        <select class="form-select-sm flex-1" [value]="newLinkEntityId()"
+                (change)="newLinkEntityId.set($any($event.target).value)">
+          <option value="">— Select character —</option>
+          @for (opt of linkEntityOptions(); track opt.id) {
+            <option [value]="opt.id">{{ opt.name }}</option>
+          }
+        </select>
+        <button class="btn btn-primary btn-xs" [disabled]="!newLinkEntityId()" (click)="addLink()">Add</button>
+        <button class="btn btn-secondary btn-xs" (click)="showLinkForm.set(false)">✕</button>
+      </div>
+    }
+
+    @if (characterLinks().length === 0 && !(showLinkForm() && newLinkType() === 'Character')) {
+      <p class="empty-sub">No actors.</p>
+    } @else {
+      <div class="avatar-row">
+        @for (link of characterLinks(); track link.id) {
+          <div class="avatar" [title]="entityName(link)">
+            <span class="avatar-initials">{{ characterInitials(link) }}</span>
+            <button class="avatar-del" (click)="removeLink(link.id)">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- ── Assets ────────────────────────────────────────────────────────────── -->
+
+  <div class="detail-section">
+    <div class="section-header">
+      <i class="fa-solid fa-pencil section-icon"></i>
+      <span class="section-title">Assets</span>
+      <button class="btn-icon btn-icon--sm" title="Link asset"
+              (click)="newLinkType.set('Asset'); showLinkForm.set(!showLinkForm())">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+    </div>
+
+    @if (showLinkForm() && newLinkType() === 'Asset') {
+      <div class="add-link-form">
+        <select class="form-select-sm flex-1" [value]="newLinkEntityId()"
+                (change)="newLinkEntityId.set($any($event.target).value)">
+          <option value="">— Select asset —</option>
+          @for (opt of linkEntityOptions(); track opt.id) {
+            <option [value]="opt.id">{{ opt.name }}</option>
+          }
+        </select>
+        <button class="btn btn-primary btn-xs" [disabled]="!newLinkEntityId()" (click)="addLink()">Add</button>
+        <button class="btn btn-secondary btn-xs" (click)="showLinkForm.set(false)">✕</button>
+      </div>
+    }
+
+    @if (assetLinks().length === 0 && !(showLinkForm() && newLinkType() === 'Asset')) {
+      <p class="empty-sub">No assets.</p>
+    } @else {
+      <div class="asset-list">
+        @for (link of assetLinks(); track link.id) {
+          <div class="asset-row">
+            <span class="asset-name">{{ entityName(link) }}</span>
+            <button class="btn-icon btn-icon--danger btn-icon--xs" (click)="removeLink(link.id)">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- ── Other entity links (Faction / Location / Session) ────────────────── -->
+
+  @if (otherLinks().length > 0 || (showLinkForm() && newLinkType() !== 'Character' && newLinkType() !== 'Asset')) {
+    <div class="detail-section">
+      <div class="section-header">
+        <i class="fa-solid fa-link section-icon"></i>
+        <span class="section-title">Linked Entities</span>
+        <button class="btn-icon btn-icon--sm" title="Add link"
+                (click)="newLinkType.set('Faction'); showLinkForm.set(!showLinkForm())">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      </div>
+
+      @if (showLinkForm() && newLinkType() !== 'Character' && newLinkType() !== 'Asset') {
+        <div class="add-link-form">
+          <select class="form-select-sm" [value]="newLinkType()"
+                  (change)="newLinkType.set($any($event.target).value); newLinkEntityId.set('')">
+            @for (o of entityTypeOptions; track o.value) {
+              @if (o.value !== 'Character' && o.value !== 'Asset') {
+                <option [value]="o.value">{{ o.label }}</option>
+              }
+            }
+          </select>
+          <select class="form-select-sm flex-1" [value]="newLinkEntityId()"
+                  (change)="newLinkEntityId.set($any($event.target).value)">
+            <option value="">— Select —</option>
+            @for (opt of linkEntityOptions(); track opt.id) {
+              <option [value]="opt.id">{{ opt.name }}</option>
+            }
+          </select>
+          <button class="btn btn-primary btn-xs" [disabled]="!newLinkEntityId()" (click)="addLink()">Add</button>
+          <button class="btn btn-secondary btn-xs" (click)="showLinkForm.set(false)">✕</button>
+        </div>
+      }
+
+      @for (link of otherLinks(); track link.id) {
+        <div class="link-row">
+          <span class="link-type-badge">{{ link.entityType }}</span>
+          <span class="link-name">{{ entityName(link) }}</span>
+          @if (link.role) { <span class="link-role">{{ link.role }}</span> }
+          <button class="btn-icon btn-icon--danger link-del" (click)="removeLink(link.id)">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- ── Connections ───────────────────────────────────────────────────────── -->
+
+  <div class="detail-section connections-section">
+    <div class="section-header">
+      <i class="fa-solid fa-arrow-right-arrow-left section-icon"></i>
+      <span class="section-title">Connections</span>
+      <button class="btn-icon btn-icon--sm" title="Add connection"
+              (click)="showConnectionForm.set(!showConnectionForm())">
+        <i class="fa-solid fa-plus"></i>
+      </button>
+    </div>
+
+    @if (showConnectionForm()) {
+      <div class="add-link-form">
+        <select class="form-select-sm" [value]="newConnDirection()"
+                (change)="newConnDirection.set($any($event.target).value)">
+          <option value="to">→ leads to</option>
+          <option value="from">← comes from</option>
+        </select>
+        <select class="form-select-sm flex-1" [value]="newConnTargetId()"
+                (change)="newConnTargetId.set($any($event.target).value)">
+          <option value="">— Select event —</option>
+          @for (e of connectionTargetOptions(); track e.id) {
+            <option [value]="e.id">{{ e.title }}</option>
+          }
+        </select>
+        <button class="btn btn-primary btn-xs" [disabled]="!newConnTargetId()" (click)="addConnection()">Add</button>
+        <button class="btn btn-secondary btn-xs" (click)="showConnectionForm.set(false)">✕</button>
+      </div>
+    }
+
+    <div class="conn-columns">
+      <div class="conn-col conn-col--in">
+        @if (incomingConns().length > 0) {
+          @for (c of incomingConns(); track c.id) {
+            <div class="conn-row">
+              <span class="conn-arrow conn-arrow--in">←</span>
+              <span class="conn-title">{{ connEventTitle(c) }}</span>
+              <button class="btn-icon btn-icon--danger btn-icon--xs" (click)="removeConnection(c.id)">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          }
+        }
+      </div>
+      <div class="conn-col conn-col--out">
+        @if (outgoingConns().length > 0) {
+          @for (c of outgoingConns(); track c.id) {
+            <div class="conn-row">
+              <span class="conn-title">{{ connEventTitle(c) }}</span>
+              <span class="conn-arrow conn-arrow--out">→</span>
+              <button class="btn-icon btn-icon--danger btn-icon--xs" (click)="removeConnection(c.id)">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          }
+        }
+      </div>
+    </div>
+    @if (incomingConns().length === 0 && outgoingConns().length === 0 && !showConnectionForm()) {
+      <p class="empty-sub">No connections.</p>
+    }
+  </div>
+
+  <!-- ── Realizations ──────────────────────────────────────────────────────── -->
+
+  @if (realizations().length > 0) {
+    <div class="detail-section">
+      <div class="section-header">
+        <i class="fa-solid fa-calendar-check section-icon"></i>
+        <span class="section-title">Session Realizations</span>
+      </div>
+      @for (r of realizations(); track r.id) {
+        <div class="link-row">
+          <span class="link-name">{{ realizationLabel(r) }}</span>
+          @if (r.notes) { <span class="link-role">{{ r.notes }}</span> }
+        </div>
+      }
+    </div>
+  }
+
+</div>
+
+<!-- ── Override editor modal ─────────────────────────────────────────────── -->
+
+@if (showOverrideModal()) {
+  <div class="modal-backdrop" (click)="closeOverrideModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Path Override — {{ event().title }}</h3>
+        <button class="modal-close" (click)="closeOverrideModal()">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <div class="override-prop">
+          <label class="override-toggle">
+            <input type="checkbox"
+                   [ngModel]="overrideDraft().overridesSummary ?? false"
+                   (ngModelChange)="overrideDraft.update(d => ({ ...d, overridesSummary: $event }))" />
+            Override Summary
+          </label>
+          @if (overrideDraft().overridesSummary) {
+            <textarea rows="2"
+                      [ngModel]="overrideDraft().summary ?? ''"
+                      (ngModelChange)="overrideDraft.update(d => ({ ...d, summary: $event || undefined }))"
+                      [placeholder]="event().summary ? 'Base: ' + event().summary : 'No base value'"></textarea>
+          } @else {
+            <p class="inherit-hint">Inherits: {{ event().summary || '(none)' }}</p>
+          }
+        </div>
+
+        <div class="override-prop">
+          <label class="override-toggle">
+            <input type="checkbox"
+                   [ngModel]="overrideDraft().overridesDescription ?? false"
+                   (ngModelChange)="overrideDraft.update(d => ({ ...d, overridesDescription: $event }))" />
+            Override Description
+          </label>
+          @if (overrideDraft().overridesDescription) {
+            <textarea rows="3"
+                      [ngModel]="overrideDraft().description ?? ''"
+                      (ngModelChange)="overrideDraft.update(d => ({ ...d, description: $event || undefined }))"
+                      [placeholder]="event().description ? 'Base: ' + event().description : 'No base value'"></textarea>
+          } @else {
+            <p class="inherit-hint">Inherits: {{ event().description || '(none)' }}</p>
+          }
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        @if (overrideHasChanges()) {
+          <button class="btn btn-danger modal-delete" (click)="revertOverride()">Revert to base</button>
+        }
+        <button class="btn btn-secondary" (click)="closeOverrideModal()">Cancel</button>
+        <button class="btn btn-primary" (click)="saveOverride()">Save override</button>
+      </div>
+    </div>
+  </div>
+}

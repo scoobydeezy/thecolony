@@ -26,7 +26,7 @@
   }
 
   .stat-label {
-    font-size: 0.78rem;
+    font-size: var(--text-size-meta);
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -45,7 +45,7 @@
 }
 
 .section-title {
-  font-size: 0.875rem;
+  font-size: var(--text-size-section);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.07em;
@@ -87,11 +87,11 @@
 
 .stress-max {
   color: var(--text-muted);
-  font-size: 0.9rem;
+  font-size: var(--text-size-body);
 }
 
 .session-summary {
-  font-size: 0.85rem;
+  font-size: var(--text-size-body);
   color: var(--text-secondary);
   font-style: italic;
   margin-top: 0.5rem;
@@ -111,7 +111,7 @@
 
 .party-label {
   display: block;
-  font-size: 0.7rem;
+  font-size: var(--text-size-label);
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -119,7 +119,7 @@
 }
 
 .party-value {
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   font-weight: 600;
   color: var(--text-primary);
 
@@ -133,7 +133,7 @@
 
 .score {
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: var(--text-size-body);
 
   &.pos-high { color: var(--color-success); }
   &.pos-mid  { color: #86efac; }
@@ -142,8 +142,8 @@
   &.neg-high { color: var(--color-danger); }
 }
 
-.pos { color: var(--color-success); font-size: 0.8rem; }
-.neg { color: var(--color-danger);  font-size: 0.8rem; }
+.pos { color: var(--color-success); font-size: var(--text-size-meta); }
+.neg { color: var(--color-danger);  font-size: var(--text-size-meta); }
 
 .char-link {
   color: var(--text-primary);
@@ -170,7 +170,7 @@
 
   .events-toggle {
     margin-left: auto;
-    font-size: 0.75rem;
+    font-size: var(--text-size-meta);
     color: var(--text-muted);
     border-left: 1px solid var(--border);
     padding-left: 1rem;
@@ -178,7 +178,7 @@
     display: flex;
     align-items: center;
 
-    i { font-size: 0.75rem; }
+    i { font-size: var(--text-size-meta); }
 
     &.active {
       color: var(--accent);
@@ -194,7 +194,7 @@
   border-bottom: 2px solid transparent;
   cursor: pointer;
   padding: 0.7rem 1.1rem;
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   font-weight: 500;
   color: var(--text-muted);
   transition: color 0.12s, border-color 0.12s;
@@ -235,7 +235,7 @@
 }
 
 .alert-label {
-  font-size: 0.72rem;
+  font-size: var(--text-size-label);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--text-muted);
@@ -249,19 +249,19 @@
 }
 
 .alert-meta {
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   color: var(--text-secondary);
 }
 
 .alerts-empty {
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: var(--text-size-body);
   font-style: italic;
 }
 
 // Faction Rankings
 .stress-note {
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   margin-top: 0.25rem;
 }
@@ -270,7 +270,7 @@
 
 .rank {
   color: var(--text-muted);
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   font-weight: 600;
   min-width: 1.5rem;
 }
@@ -279,7 +279,7 @@
 
 .momentum {
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: var(--text-size-body);
 
   &.pos     { color: var(--color-success); }
   &.neg     { color: var(--color-danger); }
@@ -291,5 +291,5 @@
   width: 1.5rem;
   padding: 0 0.25rem;
   color: var(--text-muted);
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
 }

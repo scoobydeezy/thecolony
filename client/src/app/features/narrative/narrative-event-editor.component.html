@@ -1,0 +1,403 @@
+<div class="editor-backdrop" (click)="onBackdropClick()">
+  <div class="editor-modal" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="editor-header">
+      <h3 class="editor-title">{{ event()?.title || 'Event' }}</h3>
+      <button class="editor-close" (click)="close()">✕</button>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="editor-tabs">
+      <button class="editor-tab" [class.active]="activeTab() === 'event'"
+              (click)="activeTab.set('event')">Event</button>
+      <button class="editor-tab" [class.active]="activeTab() === 'links'"
+              (click)="activeTab.set('links')">Links</button>
+      @if (showPathsTab()) {
+        <button class="editor-tab" [class.active]="activeTab() === 'paths'"
+                (click)="activeTab.set('paths')">Paths</button>
+      }
+      @if (showVariantsTab()) {
+        <button class="editor-tab editor-tab--right" [class.active]="activeTab() === 'variants'"
+                (click)="activeTab.set('variants')">Variants</button>
+      }
+    </div>
+
+    <!-- ── EVENT TAB ────────────────────────────────────────────────── -->
+    @if (activeTab() === 'event') {
+      <div class="editor-body">
+
+        <!-- SHARED section — always edits the base event -->
+        <div class="editor-section">
+          <div class="form-group">
+            <label class="form-label">Title <span class="required">*</span></label>
+            <input class="form-input" type="text"
+                   [ngModel]="baseTitle()"
+                   (ngModelChange)="baseTitle.set($event); markDirty()" />
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Status</label>
+              <select class="form-select"
+                      [ngModel]="baseStatus()"
+                      (ngModelChange)="baseStatus.set($event); markDirty()">
+                @for (o of statusOptions; track o.value) {
+                  <option [value]="o.value">{{ o.label }}</option>
+                }
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Visibility</label>
+              <select class="form-select"
+                      [ngModel]="baseVisibility()"
+                      (ngModelChange)="baseVisibility.set($event); markDirty()">
+                @for (o of visibilityOptions; track o.value) {
+                  <option [value]="o.value">{{ o.label }}</option>
+                }
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Narrative Role</label>
+            <input class="form-input" type="text"
+                   [ngModel]="baseNarrativeFunction()"
+                   (ngModelChange)="baseNarrativeFunction.set($event); markDirty()"
+                   placeholder="Role this event plays in the story" />
+          </div>
+        </div>
+
+        <!-- VARIANT section — edits path-specific overrides when in variant context,
+             otherwise edits base summary/description directly -->
+        <div class="editor-section">
+          @if (hasVariantContext()) {
+            <div class="section-title">
+              <i class="fa-solid fa-shoe-prints"></i> {{ variantContextLabel() }}
+            </div>
+          }
+
+          <!-- SUMMARY -->
+          <div class="form-group">
+            <div class="override-header">
+              <label class="form-label">Summary</label>
+              @if (hasVariantContext() && overrideDraft().overridesSummary) {
+                <button class="revert-btn" (click)="revertVariantField('summary')">
+                  Revert to base
+                </button>
+              }
+            </div>
+            <input class="form-input"
+                   type="text"
+                   [ngModel]="variantSummaryValue()"
+                   (ngModelChange)="onVariantSummaryChange($event)"
+                   [placeholder]="hasVariantContext() && !overrideDraft().overridesSummary
+                     ? 'Inherited: ' + (inheritedSummary() || '(none)')
+                     : 'Brief summary (optional)'" />
+            @if (hasVariantContext() && !overrideDraft().overridesSummary) {
+              <p class="inherit-hint">Editing this field will create a variant override for this path.</p>
+            }
+          </div>
+
+          <!-- DESCRIPTION -->
+          <div class="form-group">
+            <div class="override-header">
+              <label class="form-label">Description</label>
+              @if (hasVariantContext() && overrideDraft().overridesDescription) {
+                <button class="revert-btn" (click)="revertVariantField('description')">
+                  Revert to base
+                </button>
+              }
+            </div>
+            <textarea class="form-textarea"
+                      rows="3"
+                      [ngModel]="variantDescriptionValue()"
+                      (ngModelChange)="onVariantDescriptionChange($event)"
+                      [placeholder]="hasVariantContext() && !overrideDraft().overridesDescription
+                        ? 'Inherited: ' + (inheritedDescription() || '(none)')
+                        : 'Longer description or GM notes (optional)'">
+            </textarea>
+            @if (hasVariantContext() && !overrideDraft().overridesDescription) {
+              <p class="inherit-hint">Editing this field will create a variant override for this path.</p>
+            }
+          </div>
+
+        </div>
+
+        <!-- NEXUS section -->
+        <div class="editor-section">
+          <div class="section-title">NEXUS</div>
+
+          <label class="path-source-toggle">
+            <input type="checkbox"`
+                   [ngModel]="pathSourceEnabled()"
+                   (ngModelChange)="onPathSourceToggle($event)" />
+            <span>This is a Nexus Event.</span>
+          </label>
+          <p class="section-hint">
+            The outcome of this Event causes narrative divergence. One or more variant Paths spawn from this Nexus. Downstream Events can exist with multiple variants depending on which Path was taken.
+          </p>
+
+          @if (pathSourceEnabled() && existingPathSet()) {
+            <div class="path-source-summary">
+              <span class="ps-name">{{ existingPathSet()!.name }}</span>
+              <span class="ps-meta">{{ pathsForExistingSet().length }} Paths</span>
+              @if (existingPathSet()!.convergenceEventId) {
+                <span class="ps-meta">Converges at {{ convergenceEventTitle() }}</span>
+              }
+            </div>
+          }
+        </div>
+
+      </div>
+
+      <div class="editor-footer">
+        @if (event()?.id) {
+          <button class="btn-danger-sm" (click)="deleteEvent()">Delete</button>
+        }
+        <div class="footer-right">
+          <button class="btn-secondary" (click)="close()">Cancel</button>
+          <button class="btn-primary" [disabled]="!canSave()" (click)="save()">Save</button>
+        </div>
+      </div>
+    }
+
+    <!-- ── VARIANTS TAB ──────────────────────────────────────────────── -->
+    @if (activeTab() === 'variants') {
+      <div class="editor-body">
+        <p class="tab-intro">
+          Choose which Nexus Events create variants that apply to this Event.
+        </p>
+
+        @for (ps of applicablePathSets(); track ps.id) {
+          <div class="variant-row">
+            <div class="variant-row-info">
+              <span class="variant-ps-name">{{ ps.name }}</span>
+              <span class="variant-path-count">{{ pathsForSet(ps.id).length }} paths</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox"
+                     [ngModel]="participatesIn(ps.id)"
+                     (ngModelChange)="onVariantParticipationToggle(ps.id, $event)" />
+              <span class="toggle-track"></span>
+            </label>
+          </div>
+          @if (participatesIn(ps.id)) {
+            <p class="variant-row-hint">
+              This Event has alternate versions depending on the outcome of {{ ps.name }}.
+            </p>
+          } @else {
+            <p class="variant-row-hint muted">
+              This Event uses shared content across {{ ps.name }}.
+            </p>
+          }
+        }
+
+        @if (applicablePathSets().length === 0) {
+          <p class="empty-hint">No Path Sets found upstream of this Event.</p>
+        }
+      </div>
+
+      <div class="editor-footer">
+        <div class="footer-right">
+          <button class="btn-secondary" (click)="close()">Close</button>
+        </div>
+      </div>
+    }
+
+    <!-- ── LINKS TAB ─────────────────────────────────────────────────── -->
+    @if (activeTab() === 'links') {
+      <div class="editor-body">
+
+        <!-- Threads -->
+        <div class="editor-section">
+          <div class="links-section-header">
+            <div class="section-title">Threads</div>
+            <button class="btn-add-link" (click)="showAddThread.set(!showAddThread())">
+              <i class="fa-solid fa-plus"></i> Add
+            </button>
+          </div>
+
+          @if (showAddThread()) {
+            <div class="link-add-row">
+              <select class="form-select"
+                      [ngModel]="newThreadId()"
+                      (ngModelChange)="newThreadId.set($event)">
+                <option value="">— select thread —</option>
+                @for (t of availableThreads(); track t.id) {
+                  <option [value]="t.id">{{ t.title }}</option>
+                }
+              </select>
+              <button class="btn-primary btn-sm" [disabled]="!newThreadId()" (click)="addThread()">Add</button>
+              <button class="btn-secondary btn-sm" (click)="showAddThread.set(false); newThreadId.set('')">Cancel</button>
+            </div>
+          }
+
+          @for (t of linkedThreads(); track t.id) {
+            <div class="link-row">
+              <span class="link-row-name">{{ t.title }}</span>
+              <button class="icon-btn icon-btn--danger" title="Unlink" (click)="removeThread(t.id)">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          }
+          @if (linkedThreads().length === 0 && !showAddThread()) {
+            <p class="empty-hint">No threads linked.</p>
+          }
+        </div>
+
+        <!-- Actors -->
+        <div class="editor-section">
+          <div class="links-section-header">
+            <div class="section-title">Actors</div>
+            <button class="btn-add-link" (click)="showAddActor.set(!showAddActor())">
+              <i class="fa-solid fa-plus"></i> Add
+            </button>
+          </div>
+
+          @if (showAddActor()) {
+            <div class="link-add-row">
+              <select class="form-select"
+                      [ngModel]="newActorId()"
+                      (ngModelChange)="newActorId.set($event)">
+                <option value="">— select character —</option>
+                @for (c of availableActors(); track c.id) {
+                  <option [value]="c.id">{{ c.name }}</option>
+                }
+              </select>
+              <button class="btn-primary btn-sm" [disabled]="!newActorId()" (click)="addActor()">Add</button>
+              <button class="btn-secondary btn-sm" (click)="showAddActor.set(false); newActorId.set('')">Cancel</button>
+            </div>
+          }
+
+          @for (link of characterLinks(); track link.id) {
+            <div class="link-row">
+              <span class="link-row-name">{{ entityName(link) }}</span>
+              <button class="icon-btn icon-btn--danger" title="Remove" (click)="removeLink(link.id)">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          }
+          @if (characterLinks().length === 0 && !showAddActor()) {
+            <p class="empty-hint">No actors linked.</p>
+          }
+        </div>
+
+        <!-- Assets -->
+        <div class="editor-section">
+          <div class="links-section-header">
+            <div class="section-title">Assets</div>
+            <button class="btn-add-link" (click)="showAddAsset.set(!showAddAsset())">
+              <i class="fa-solid fa-plus"></i> Add
+            </button>
+          </div>
+
+          @if (showAddAsset()) {
+            <div class="link-add-row">
+              <select class="form-select"
+                      [ngModel]="newAssetId()"
+                      (ngModelChange)="newAssetId.set($event)">
+                <option value="">— select asset —</option>
+                @for (a of availableAssets(); track a.id) {
+                  <option [value]="a.id">{{ a.name }}</option>
+                }
+              </select>
+              <button class="btn-primary btn-sm" [disabled]="!newAssetId()" (click)="addAsset()">Add</button>
+              <button class="btn-secondary btn-sm" (click)="showAddAsset.set(false); newAssetId.set('')">Cancel</button>
+            </div>
+          }
+
+          @for (link of assetLinks(); track link.id) {
+            <div class="link-row">
+              <span class="link-row-name">{{ entityName(link) }}</span>
+              <button class="icon-btn icon-btn--danger" title="Remove" (click)="removeLink(link.id)">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          }
+          @if (assetLinks().length === 0 && !showAddAsset()) {
+            <p class="empty-hint">No assets linked.</p>
+          }
+        </div>
+
+      </div>
+
+      <div class="editor-footer">
+        <div class="footer-right">
+          <button class="btn-secondary" (click)="close()">Close</button>
+        </div>
+      </div>
+    }
+
+    <!-- ── PATHS TAB ─────────────────────────────────────────────────── -->
+    @if (activeTab() === 'paths') {
+      <div class="editor-body">
+
+        @if (!existingPathSet() && !pendingPathSource()) {
+          <p class="empty-hint">Enable "This Event originates a Path Set" on the Event tab first.</p>
+        } @else {
+
+          <!-- PathSet name -->
+          <div class="form-group">
+            <label class="form-label">Path Set Name <span class="required">*</span></label>
+            <input class="form-input" type="text"
+                   [ngModel]="pathSetName()"
+                   (ngModelChange)="pathSetName.set($event); markDirty()"
+                   placeholder="e.g. Outcome of the Reading" />
+          </div>
+
+          <!-- Convergence Event -->
+          <div class="form-group">
+            <label class="form-label">Convergence Event <span class="optional">(optional)</span></label>
+            <select class="form-select"
+                    [ngModel]="pathSetConvergenceId()"
+                    (ngModelChange)="pathSetConvergenceId.set($event); markDirty()">
+              <option value="">— None —</option>
+              @for (ev of store.narrativeEvents(); track ev.id) {
+                @if (ev.id !== event()?.id) {
+                  <option [value]="ev.id">{{ ev.title }}</option>
+                }
+              }
+            </select>
+            <p class="section-hint">The first shared Event outside this Path Set's scope.</p>
+          </div>
+
+          <!-- Paths list -->
+          <div class="section-title" style="margin-top:1rem">PATHS</div>
+
+          @for (p of editablePaths(); track p.id || p.tempId; let i = $index) {
+            <div class="path-edit-row">
+              <span class="path-edit-index">{{ i + 1 }}</span>
+              <input class="form-input path-edit-name" type="text"
+                     [ngModel]="p.name"
+                     (ngModelChange)="updatePathName(p.id || p.tempId!, $event); markDirty()"
+                     placeholder="Path name" />
+              <div class="path-edit-actions">
+                @if (i > 0) {
+                  <button class="icon-btn" title="Move up" (click)="movePathUp(i)">↑</button>
+                }
+                @if (i < editablePaths().length - 1) {
+                  <button class="icon-btn" title="Move down" (click)="movePathDown(i)">↓</button>
+                }
+                @if (editablePaths().length > 2) {
+                  <button class="icon-btn icon-btn--danger" title="Remove"
+                          (click)="removePath(p.id || p.tempId!)">✕</button>
+                }
+              </div>
+            </div>
+          }
+
+          <button class="btn-add-path" (click)="addPath()">+ Add Path</button>
+
+        }
+
+      </div>
+
+      <div class="editor-footer">
+        <div class="footer-right">
+          <button class="btn-secondary" (click)="close()">Cancel</button>
+          <button class="btn-primary" [disabled]="!canSavePathsTab()" (click)="savePathsTab()">Save</button>
+        </div>
+      </div>
+    }
+
+  </div>
+</div>

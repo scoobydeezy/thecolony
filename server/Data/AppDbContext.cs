@@ -25,6 +25,29 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<ColonyMap> ColonyMaps => Set<ColonyMap>();
     public DbSet<MapPlacement> MapPlacements => Set<MapPlacement>();
 
+    // ── Narrative path/scope model ────────────────────────────────────────────
+    public DbSet<PathSet> PathSets => Set<PathSet>();
+    public DbSet<NarrativePath> NarrativePaths => Set<NarrativePath>();
+    public DbSet<PathSetContext> PathSetContexts => Set<PathSetContext>();
+    public DbSet<PathEventScope> PathEventScopes => Set<PathEventScope>();
+    public DbSet<NarrativeEventVariantParticipation> NarrativeEventVariantParticipations => Set<NarrativeEventVariantParticipation>();
+
+    // ── Narrative event override model ────────────────────────────────────────
+    public DbSet<NarrativeEventOverride> NarrativeEventOverrides => Set<NarrativeEventOverride>();
+    public DbSet<EventOverridePath> EventOverridePaths => Set<EventOverridePath>();
+    public DbSet<EventOverrideConnection> EventOverrideConnections => Set<EventOverrideConnection>();
+    public DbSet<EventOverrideThread> EventOverrideThreads => Set<EventOverrideThread>();
+    public DbSet<EventOverrideEntityLink> EventOverrideEntityLinks => Set<EventOverrideEntityLink>();
+
+    // ── Narrative content ─────────────────────────────────────────────────────
+    public DbSet<NarrativeThread> NarrativeThreads => Set<NarrativeThread>();
+    public DbSet<NarrativeEvent> NarrativeEvents => Set<NarrativeEvent>();
+    public DbSet<NarrativeEventConnection> NarrativeEventConnections => Set<NarrativeEventConnection>();
+    public DbSet<NarrativeThreadEvent> NarrativeThreadEvents => Set<NarrativeThreadEvent>();
+    public DbSet<NarrativeEntityLink> NarrativeEntityLinks => Set<NarrativeEntityLink>();
+    public DbSet<NarrativeEventRealization> NarrativeEventRealizations => Set<NarrativeEventRealization>();
+    public DbSet<NarrativeEventPlacement> NarrativeEventPlacements => Set<NarrativeEventPlacement>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<AppSettings>().HasKey(x => x.Id);
@@ -34,7 +57,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .HasForeignKey(x => x.ActiveCampaignId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // ColonyState and RulesConfig are now per-campaign (Guid PK, not "singleton")
         modelBuilder.Entity<ColonyState>().HasKey(x => x.Id);
         modelBuilder.Entity<RulesConfig>().HasKey(x => x.Id);
 
@@ -58,5 +80,91 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             .WithOne()
             .HasForeignKey(p => p.MapId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // ── Narrative path/scope composites ───────────────────────────────────
+
+        modelBuilder.Entity<PathSetContext>()
+            .HasKey(x => new { x.PathSetId, x.RequiredPathId });
+
+        modelBuilder.Entity<PathEventScope>()
+            .HasKey(x => new { x.PathId, x.NarrativeEventId });
+
+        modelBuilder.Entity<NarrativeEventVariantParticipation>()
+            .HasKey(x => new { x.NarrativeEventId, x.PathSetId });
+
+        modelBuilder.Entity<NarrativeEventVariantParticipation>()
+            .HasOne<PathSet>()
+            .WithMany()
+            .HasForeignKey(p => p.PathSetId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // ── Narrative event override composites ───────────────────────────────
+
+        modelBuilder.Entity<EventOverridePath>()
+            .HasKey(x => new { x.EventOverrideId, x.PathId });
+
+        modelBuilder.Entity<EventOverrideThread>()
+            .HasKey(x => new { x.EventOverrideId, x.NarrativeThreadId });
+
+        // ── Cascade deletes ────────────────────────────────────────────────────
+
+        // Deleting a PathSet cascades to its Paths, which cascades to PathEventScope
+        // and EventOverridePath records referencing those Paths.
+        modelBuilder.Entity<NarrativePath>()
+            .HasOne<PathSet>()
+            .WithMany()
+            .HasForeignKey(p => p.PathSetId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<PathSetContext>()
+            .HasOne<PathSet>()
+            .WithMany()
+            .HasForeignKey(c => c.PathSetId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<PathEventScope>()
+            .HasOne<NarrativePath>()
+            .WithMany()
+            .HasForeignKey(s => s.PathId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<EventOverridePath>()
+            .HasOne<NarrativePath>()
+            .WithMany()
+            .HasForeignKey(op => op.PathId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // Deleting an override cascades to all four collection tables.
+        modelBuilder.Entity<EventOverridePath>()
+            .HasOne<NarrativeEventOverride>()
+            .WithMany()
+            .HasForeignKey(op => op.EventOverrideId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<EventOverrideConnection>()
+            .HasOne<NarrativeEventOverride>()
+            .WithMany()
+            .HasForeignKey(oc => oc.EventOverrideId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<EventOverrideThread>()
+            .HasOne<NarrativeEventOverride>()
+            .WithMany()
+            .HasForeignKey(ot => ot.EventOverrideId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<EventOverrideEntityLink>()
+            .HasOne<NarrativeEventOverride>()
+            .WithMany()
+            .HasForeignKey(ol => ol.EventOverrideId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // ── Legacy narrative join composites ──────────────────────────────────
+
+        modelBuilder.Entity<NarrativeThreadEvent>()
+            .HasKey(x => new { x.NarrativeThreadId, x.NarrativeEventId });
+
+        modelBuilder.Entity<NarrativeEventPlacement>()
+            .HasKey(x => x.NarrativeEventId);
     }
 }

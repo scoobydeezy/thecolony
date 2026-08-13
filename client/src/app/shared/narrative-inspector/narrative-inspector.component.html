@@ -1,0 +1,136 @@
+<div class="inspector">
+
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
+  <div class="inspector-header">
+    <div class="inspector-title-row">
+      <i class="fa-solid fa-diagram-project inspector-icon"></i>
+      <span class="inspector-title">Narrative</span>
+      <button class="inspector-nav-btn" title="Go to Narrative page" (click)="navigateToNarrative()">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+      </button>
+      <button class="inspector-close" title="Close" (click)="close()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    @if (focus(); as f) {
+      <div class="focus-pill">
+        <span class="focus-type">{{ f.type }}</span>
+        <span class="focus-name">{{ f.name }}</span>
+        <button class="focus-clear" title="Show all" (click)="clearFocus()">✕</button>
+      </div>
+    } @else {
+      <p class="focus-empty">Viewing all narrative</p>
+    }
+  </div>
+
+  <!-- ── Quick-add form ──────────────────────────────────────────────────── -->
+  @if (quickAddMode(); as mode) {
+    <div class="quick-add-form">
+      <input class="qa-input" type="text" [placeholder]="mode === 'thread' ? 'Thread title…' : 'Event title…'"
+             [value]="newTitle()" (input)="newTitle.set($any($event.target).value)"
+             (keydown.enter)="confirmQuickAdd()" (keydown.escape)="quickAddMode.set(null)" />
+      @if (mode === 'thread') {
+        <div class="qa-row">
+          <select class="qa-select" [value]="newState()"
+                  (change)="newState.set($any($event.target).value)">
+            @for (o of stateOptions; track o.value) {
+              <option [value]="o.value">{{ o.label }}</option>
+            }
+          </select>
+        </div>
+      }
+      <div class="qa-actions">
+        <button class="btn btn-secondary btn-xs" (click)="quickAddMode.set(null)">Cancel</button>
+        <button class="btn btn-primary btn-xs" [disabled]="!newTitle().trim()" (click)="confirmQuickAdd()">
+          Add {{ mode === 'thread' ? 'Thread' : 'Event' }}
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- ── Threads ─────────────────────────────────────────────────────────── -->
+  <div class="inspector-section">
+    <div class="section-header">
+      <span class="section-label">THREADS <span class="count">{{ threads().length }}</span></span>
+      @if (!quickAddMode()) {
+        <button class="section-add" title="Quick-add thread" (click)="openQuickAdd('thread')">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      }
+    </div>
+
+    @if (threads().length === 0) {
+      <p class="empty">No threads linked.</p>
+    }
+
+    @for (t of threads(); track t.id) {
+      <div class="thread-item">
+        <button class="thread-toggle" (click)="toggleThread(t.id)">
+          <i class="fa-solid" [class.fa-caret-down]="isThreadExpanded(t.id)" [class.fa-caret-right]="!isThreadExpanded(t.id)"></i>
+          <span class="thread-title">{{ t.title }}</span>
+          <span [class]="'state-dot ' + stateClass(t.state)" [title]="t.state"></span>
+        </button>
+
+        @if (isThreadExpanded(t.id)) {
+          <div class="entity-links">
+            @for (link of threadLinks(t.id); track link.id) {
+              <button class="entity-link-btn" (click)="navigateToEntity(link)"
+                      [title]="link.entityType + ': ' + entityName(link)">
+                <span class="entity-type-dot entity-type-dot--{{ link.entityType.toLowerCase() }}"></span>
+                <span class="entity-link-name">{{ entityName(link) }}</span>
+                @if (link.role) { <span class="entity-role">{{ link.role }}</span> }
+              </button>
+            }
+            @if (threadLinks(t.id).length === 0) {
+              <span class="no-links">No linked entities</span>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  <!-- ── Events ──────────────────────────────────────────────────────────── -->
+  <div class="inspector-section">
+    <div class="section-header">
+      <span class="section-label">EVENTS <span class="count">{{ events().length }}</span></span>
+      @if (!quickAddMode()) {
+        <button class="section-add" title="Quick-add event" (click)="openQuickAdd('event')">
+          <i class="fa-solid fa-plus"></i>
+        </button>
+      }
+    </div>
+
+    @if (events().length === 0) {
+      <p class="empty">No events linked.</p>
+    }
+
+    @for (e of events(); track e.id) {
+      <div class="thread-item">
+        <button class="thread-toggle" (click)="toggleEvent(e.id)">
+          <i class="fa-solid" [class.fa-caret-down]="isEventExpanded(e.id)" [class.fa-caret-right]="!isEventExpanded(e.id)"></i>
+          <span class="thread-title">{{ e.title }}</span>
+          <span class="status-dot status-event-{{ e.status.toLowerCase() }}" [title]="e.status"></span>
+        </button>
+
+        @if (isEventExpanded(e.id)) {
+          <div class="entity-links">
+            @for (link of eventLinks(e.id); track link.id) {
+              <button class="entity-link-btn" (click)="navigateToEntity(link)"
+                      [title]="link.entityType + ': ' + entityName(link)">
+                <span class="entity-type-dot entity-type-dot--{{ link.entityType.toLowerCase() }}"></span>
+                <span class="entity-link-name">{{ entityName(link) }}</span>
+                @if (link.role) { <span class="entity-role">{{ link.role }}</span> }
+              </button>
+            }
+            @if (eventLinks(e.id).length === 0) {
+              <span class="no-links">No linked entities</span>
+            }
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+</div>

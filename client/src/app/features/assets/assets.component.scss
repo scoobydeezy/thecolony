@@ -21,7 +21,7 @@
       background: none;
       border: none;
       padding: 0.5rem 1rem;
-      font-size: 0.85rem;
+      font-size: var(--text-size-body);
       color: var(--text-secondary);
       cursor: pointer;
       transition: background 0.15s, color 0.15s;
@@ -66,7 +66,7 @@ $asset-card-layout: $type-col-width 3fr 1.5fr 2fr $actions-width;
 .slot-col-header {
   flex: 1;
   max-width: 100px;
-  font-size: 0.65rem;
+  font-size: var(--text-size-label);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -149,11 +149,11 @@ $asset-card-layout: $type-col-width 3fr 1.5fr 2fr $actions-width;
 
 .asset-name {
   font-weight: 600;
-  font-size: 1rem;
+  font-size: var(--text-size-title);
 }
 
 .asset-linked-icon {
-  font-size: 0.72rem;
+  font-size: var(--text-size-label);
   color: var(--text-muted);
 }
 
@@ -167,7 +167,7 @@ $asset-card-layout: $type-col-width 3fr 1.5fr 2fr $actions-width;
   cursor: pointer;
   padding: 0.2rem 0.35rem;
   border-radius: 4px;
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   line-height: 1;
   opacity: 0;
   transition: opacity 0.1s, color 0.1s, background 0.1s;
@@ -195,7 +195,7 @@ $asset-card-layout: $type-col-width 3fr 1.5fr 2fr $actions-width;
   border: 1px solid transparent;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 0.75rem;
+  font-size: var(--text-size-meta);
   opacity: 0;
   flex-shrink: 0;
   transition: opacity 0.1s, color 0.1s, background 0.1s, border-color 0.1s;
@@ -219,6 +219,12 @@ $asset-card-layout: $type-col-width 3fr 1.5fr 2fr $actions-width;
 
 .asset-card:hover .btn-icon {
   opacity: 1;
+}
+
+.btn-icon.narrative-active,
+.btn-icon.narrative-active:hover {
+  opacity: 1;
+  color: var(--accent);
 }
 
 .asset-card:hover .asset-actions {
@@ -334,26 +340,26 @@ $asset-card-layout: $type-col-width 3fr 1.5fr 2fr $actions-width;
 }
 
 .meta-label {
-  font-size: 0.7rem;
+  font-size: var(--text-size-label);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
 }
 
 .meta-value {
-  font-size: 0.875rem;
+  font-size: var(--text-size-body);
   font-weight: 500;
 }
 
 .asset-description {
-  font-size: 0.85rem;
+  font-size: var(--text-size-body);
   color: var(--text-muted);
   margin: 0;
   margin-top: 0.4rem;
 }
 
 .separator {
-  font-size: 0.72rem;
+  font-size: var(--text-size-label);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--text-muted);
@@ -363,14 +369,14 @@ $asset-card-layout: $type-col-width 3fr 1.5fr 2fr $actions-width;
 }
 
 .role-hint {
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   margin: -0.25rem 0 1rem;
   line-height: 1.4;
 }
 
 .field-hint-inline {
-  font-size: 0.72rem;
+  font-size: var(--text-size-label);
   font-weight: 400;
   color: var(--text-muted);
   margin-left: 0.25rem;
@@ -423,7 +429,7 @@ $asset-card-layout: $type-col-width 3fr 1.5fr 2fr $actions-width;
 }
 
 .range-hint {
-  font-size: 0.7rem;
+  font-size: var(--text-size-label);
   color: var(--text-muted);
   font-weight: 400;
   margin-left: 0.25rem;
@@ -436,7 +442,7 @@ $asset-card-layout: $type-col-width 3fr 1.5fr 2fr $actions-width;
   margin-bottom: 1rem;
 
   > label {
-    font-size: 0.8rem;
+    font-size: var(--text-size-meta);
     font-weight: 500;
     color: var(--text-secondary);
   }
@@ -455,7 +461,7 @@ $asset-card-layout: $type-col-width 3fr 1.5fr 2fr $actions-width;
 
 .field-hint {
   flex: 1;
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   margin: 0;
   line-height: 1.4;
@@ -468,7 +474,7 @@ $asset-card-layout: $type-col-width 3fr 1.5fr 2fr $actions-width;
   margin-top: .2rem;
 
   i {
-    font-size: 0.8rem;
+    font-size: var(--text-size-meta);
     color: var(--text-muted);
 
     &.fa-solid { color: var(--text-secondary); }
@@ -506,7 +512,7 @@ $asset-card-layout: $type-col-width 3fr 1.5fr 2fr $actions-width;
 }
 
 .toggle-label-text {
-  font-size: 0.825rem;
+  font-size: var(--text-size-body);
   color: var(--text-secondary);
 }
 

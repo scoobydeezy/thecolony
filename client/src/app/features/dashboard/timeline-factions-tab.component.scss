@@ -10,7 +10,7 @@
     border: 1px solid var(--border);
     border-radius: 4px;
     padding: 0.3rem 0.6rem;
-    font-size: 0.82rem;
+    font-size: var(--text-size-body);
     cursor: pointer;
 
     &:focus { outline: none; border-color: var(--accent); }
@@ -21,7 +21,7 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  font-size: 0.8rem;
+  font-size: var(--text-size-meta);
   color: var(--text-secondary);
   cursor: pointer;
   user-select: none;
@@ -45,7 +45,7 @@
   border: 1px solid var(--border);
   border-radius: 4px;
   padding: 0.35rem 0.6rem;
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   line-height: 1.5;
   white-space: nowrap;
   transform: translate(8px, -50%);

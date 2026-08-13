@@ -1,0 +1,173 @@
+<!-- ── Filter bar ─────────────────────────────────────────────────────────── -->
+<div class="filter-bar">
+  <input class="search-input" type="search" placeholder="Search threads…"
+         [value]="search()" (input)="search.set($any($event.target).value)" />
+
+  <select class="filter-select" [value]="filterState()"
+          (change)="filterState.set($any($event.target).value)">
+    <option value="all">All States</option>
+    @for (o of stateOptions; track o.value) {
+      <option [value]="o.value">{{ o.label }}</option>
+    }
+  </select>
+</div>
+
+<!-- ── Thread cards ───────────────────────────────────────────────────────── -->
+
+@if (filteredThreads().length === 0) {
+  <div class="empty-state card">
+    <p>No threads match the current filters.</p>
+  </div>
+} @else {
+  <div class="thread-cards">
+    @for (t of filteredThreads(); track t.id) {
+      @let summary = summaryService.summaryFor(t.id);
+      <div class="thread-card card">
+
+        <!-- Card header -->
+        <div class="card-header">
+          <div class="card-title-row">
+            <span class="thread-title">{{ t.title }}</span>
+            <span [class]="'state-chip state-chip--' + t.state.toLowerCase()">{{ t.state }}</span>
+          </div>
+          <div class="card-actions">
+            <button class="btn-icon btn-icon--edit" title="Edit" (click)="openEdit(t)">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Summary text -->
+        @if (t.summary) {
+          <p class="thread-summary">{{ t.summary }}</p>
+        }
+
+        <!-- Derived stats row -->
+        @if (summary) {
+          <div class="stats-row">
+            @if (summary.eventIds.length > 0) {
+              <span class="stat">{{ summary.eventIds.length }} {{ summary.eventIds.length === 1 ? 'Event' : 'Events' }}</span>
+            }
+            @if (summary.characterIds.length > 0) {
+              <span class="stat">{{ summary.characterIds.length }} {{ summary.characterIds.length === 1 ? 'Character' : 'Characters' }}</span>
+            }
+            @if (summary.assetIds.length > 0) {
+              <span class="stat">{{ summary.assetIds.length }} {{ summary.assetIds.length === 1 ? 'Asset' : 'Assets' }}</span>
+            }
+            @if (summary.timelineLabel) {
+              <span class="stat stat--timeline">{{ summary.timelineLabel }}</span>
+            }
+          </div>
+
+          <!-- Accordion sections -->
+          <div class="accordions">
+
+            @if (summary.eventIds.length > 0) {
+              <div class="accordion">
+                <button class="accordion-toggle" (click)="toggleSection(t.id, 'events')">
+                  <i class="fa-solid" [class.fa-caret-down]="isSectionOpen(t.id, 'events')"
+                                     [class.fa-caret-right]="!isSectionOpen(t.id, 'events')"></i>
+                  <span>EVENTS</span>
+                </button>
+                @if (isSectionOpen(t.id, 'events')) {
+                  <ul class="accordion-list">
+                    @for (eid of summary.eventIds; track eid) {
+                      <li>{{ eventTitle(eid) }}</li>
+                    }
+                  </ul>
+                }
+              </div>
+            }
+
+            @if (summary.characterIds.length > 0) {
+              <div class="accordion">
+                <button class="accordion-toggle" (click)="toggleSection(t.id, 'characters')">
+                  <i class="fa-solid" [class.fa-caret-down]="isSectionOpen(t.id, 'characters')"
+                                     [class.fa-caret-right]="!isSectionOpen(t.id, 'characters')"></i>
+                  <span>CHARACTERS</span>
+                </button>
+                @if (isSectionOpen(t.id, 'characters')) {
+                  <ul class="accordion-list">
+                    @for (cid of summary.characterIds; track cid) {
+                      <li>{{ characterName(cid) }}</li>
+                    }
+                  </ul>
+                }
+              </div>
+            }
+
+            @if (summary.assetIds.length > 0) {
+              <div class="accordion">
+                <button class="accordion-toggle" (click)="toggleSection(t.id, 'assets')">
+                  <i class="fa-solid" [class.fa-caret-down]="isSectionOpen(t.id, 'assets')"
+                                     [class.fa-caret-right]="!isSectionOpen(t.id, 'assets')"></i>
+                  <span>ASSETS</span>
+                </button>
+                @if (isSectionOpen(t.id, 'assets')) {
+                  <ul class="accordion-list">
+                    @for (aid of summary.assetIds; track aid) {
+                      <li>{{ assetName(aid) }}</li>
+                    }
+                  </ul>
+                }
+              </div>
+            }
+
+          </div>
+        }
+
+      </div>
+    }
+  </div>
+}
+
+<!-- ── Add / Edit Modal ──────────────────────────────────────────────────── -->
+
+@if (showModal()) {
+  <div class="modal-backdrop" (click)="closeModal()">
+    <div class="modal modal-thread" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <h3>{{ editModel().id ? 'Edit Thread' : 'Add Thread' }}</h3>
+        <button class="modal-close" (click)="closeModal()">✕</button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="form-group">
+          <label>Title *</label>
+          <input type="text" [formField]="f.title" placeholder="Thread title" />
+          @if (f.title().invalid() && f.title().touched()) {
+            <p class="field-error">Title is required</p>
+          }
+        </div>
+
+        <div class="form-group">
+          <label>Summary</label>
+          <textarea rows="3" [formField]="f.summary" placeholder="Brief summary (optional)"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>State</label>
+          <select [formField]="f.state">
+            @for (o of stateOptions; track o.value) {
+              <option [value]="o.value">{{ o.label }}</option>
+            }
+          </select>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        @if (editModel().id) {
+          <button class="btn btn-danger modal-delete" (click)="delete(editModel().id); closeModal()">
+            Delete
+          </button>
+        }
+        <button class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button class="btn btn-primary" (click)="save()" [disabled]="f().invalid()">Save</button>
+      </div>
+
+    </div>
+  </div>
+}

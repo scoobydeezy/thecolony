@@ -1,0 +1,10 @@
+@if (focusSvc.mode() !== 'normal') {
+  <div class="focus-overlay focus-overlay--isolate">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="overlay-label">Isolating:</span>
+    <span class="overlay-value">{{ isolateLabel() }}</span>
+    <button class="overlay-exit" (click)="focusSvc.exitFocus()">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+  </div>
+}

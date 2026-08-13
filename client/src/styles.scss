@@ -22,6 +22,13 @@
 
   --font-size-xs: 0.78rem;
 
+  --text-size-title:   1rem;
+  --text-size-section: 0.875rem;
+  --text-size-body:    0.875rem;
+  --text-size-meta:    0.78rem;
+  --text-size-label:   0.68rem;
+  --text-size-badge:   0.65rem;
+
   --color-belief-statusquo: #60a5fa;
   --color-belief-dissent:   #f87171;
   --color-belief-neutral:   #94a3b8;
@@ -210,6 +217,39 @@ table {
 
   h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; }
 }
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+
+  h3 { margin: 0; font-size: 1.1rem; }
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  &:hover { color: var(--text-primary); }
+}
+
+.modal-body {
+  margin-bottom: 0.5rem;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.modal-delete { margin-right: auto; }
 
 .modal-actions {
   display: flex;

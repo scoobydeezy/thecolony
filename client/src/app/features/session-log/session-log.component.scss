@@ -36,7 +36,7 @@
 }
 
 .session-act {
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -49,7 +49,7 @@
 }
 
 .stress-change {
-  font-size: 0.78rem;
+  font-size: var(--text-size-meta);
   font-weight: 600;
   padding: 0.2rem 0.5rem;
   border-radius: 4px;
@@ -60,7 +60,7 @@
 
 .session-summary {
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: var(--text-size-body);
   margin-bottom: 0.75rem;
 }
 
@@ -76,7 +76,7 @@
 .detail-section {
   .detail-label {
     display: block;
-    font-size: 0.72rem;
+    font-size: var(--text-size-label);
     text-transform: uppercase;
     letter-spacing: 0.06em;
     color: var(--text-muted);
@@ -84,7 +84,7 @@
   }
 
   p {
-    font-size: 0.85rem;
+    font-size: var(--text-size-body);
     color: var(--text-secondary);
   }
 

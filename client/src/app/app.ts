@@ -3,11 +3,12 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AppStore } from './store/app.store';
 import { SettingsDrawerComponent } from './shared/settings-drawer/settings-drawer.component';
 import { CampaignManagerComponent, CampaignManagerMode } from './shared/campaign-manager/campaign-manager.component';
+import { NarrativeInspectorComponent } from './shared/narrative-inspector/narrative-inspector.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, SettingsDrawerComponent, CampaignManagerComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, SettingsDrawerComponent, CampaignManagerComponent, NarrativeInspectorComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })

@@ -1,0 +1,57 @@
+    :host {
+      position: absolute;
+      bottom: 0.75rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 40;
+      pointer-events: none;
+    }
+
+    .focus-overlay {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--bg-surface);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+      font-size: var(--text-size-meta);
+      pointer-events: all;
+      white-space: nowrap;
+
+      &--isolate { border-color: var(--accent); }
+    }
+
+    .overlay-label {
+      text-transform: uppercase;
+      font-size: var(--text-size-label);
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .overlay-value {
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .overlay-exit {
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: var(--text-size-label);
+      flex-shrink: 0;
+      transition: background 0.1s, color 0.1s;
+      margin-left: 0.25rem;
+
+      &:hover { background: var(--bg-hover); color: var(--text-primary); }
+    }
+  

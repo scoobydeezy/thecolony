@@ -1,0 +1,59 @@
+:host {
+  display: block;
+  width: 100%;
+  pointer-events: none;
+}
+
+.crown-card {
+  width: 100%;
+  box-sizing: border-box;
+  pointer-events: all;
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-surface));
+  border-radius: 8px;
+  padding: 0.65rem 0.65rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.crown-set-name {
+  font-size: var(--text-size-badge);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.path-selection-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+
+  i {
+    font-size: var(--text-size-meta);
+    color: var(--text-primary);
+    flex-shrink: 0;
+  }
+}
+
+.crown-path-select {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  padding: 0.15rem 0;
+  font-size: var(--text-size-label);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-primary);
+  cursor: pointer;
+
+  &:disabled { opacity: 0.55; cursor: not-allowed; }
+  &:focus { outline: none; }
+}

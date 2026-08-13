@@ -1,0 +1,79 @@
+<div class="flow-toolbar">
+
+  <!-- Snap to grid -->
+  <button class="tb-btn" title="Snap to grid"
+          [class.active]="snapActive()"
+          (click)="snapToggle.emit()">
+    <i class="fa-solid fa-magnet"></i>
+  </button>
+
+  <!-- Fit -->
+  <button class="tb-btn" title="Fit view"
+          (click)="fitView.emit()">
+    <i class="fa-solid fa-arrow-down-left-and-arrow-up-right-to-center"></i>
+  </button>
+
+  <div class="tb-divider"></div>
+
+  <!-- Undo -->
+  <button class="tb-btn" title="Undo (⌘Z)"
+          [disabled]="!canUndo()"
+          (click)="undoAction.emit()">
+    <i class="fa-solid fa-rotate-left"></i>
+  </button>
+
+  <!-- Redo -->
+  <button class="tb-btn" title="Redo (⌘⇧Z)"
+          [disabled]="!canRedo()"
+          (click)="redoAction.emit()">
+    <i class="fa-solid fa-rotate-right"></i>
+  </button>
+
+  <!-- Erase mode -->
+  <button class="tb-btn" title="Eraser — click an edge to delete it"
+          [class.active]="eraseModeActive()"
+          (click)="eraseToggle.emit()">
+    <i class="fa-solid fa-eraser"></i>
+  </button>
+
+  <div class="tb-divider"></div>
+
+  <!-- Search -->
+  <div class="tb-search-wrap">
+    <i class="fa-solid fa-search tb-search-icon"></i>
+    <input class="tb-search-input" type="text" placeholder="Search events…"
+           [value]="searchQuery()"
+           (input)="searchQuery.set($any($event.target).value); searchChange.emit($any($event.target).value)"
+           #searchInput />
+    @if (searchQuery()) {
+      <button class="tb-search-clear"
+              (click)="searchQuery.set(''); searchChange.emit('')">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    }
+  </div>
+
+  <!-- Filter / Focus -->
+  <button class="tb-btn" title="Filter / Focus"
+          [class.active]="filterSvc.isActive()"
+          (click)="filterToggle.emit()">
+    <i class="fa-solid fa-filter"></i>
+  </button>
+
+  <div class="tb-divider"></div>
+
+  <!-- Add Event -->
+  <button class="tb-btn tb-btn--primary" title="Add Event"
+          (click)="addEvent.emit()">
+    <i class="fa-solid fa-plus"></i>
+  </button>
+
+</div>
+
+<!-- Connect mode notice (screen-space, below toolbar) -->
+@if (connSvc.connectionModeActive() && connSvc.pendingEdge()) {
+  <div class="connect-notice">
+    <i class="fa-solid fa-link"></i>
+    Connect from: <strong>{{ pendingSourceTitle() }}</strong> — choose destination · Esc to cancel
+  </div>
+}

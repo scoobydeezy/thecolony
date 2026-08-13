@@ -1,0 +1,14 @@
+@if (pathCtx.breadcrumbSegments().length > 0) {
+  <div class="breadcrumb-bar">
+    @for (seg of pathCtx.breadcrumbSegments(); track seg.pathSetId; let last = $last) {
+      <span class="bc-segment">
+        <span class="bc-set-name">{{ seg.selectedPathName | uppercase }}</span>
+      </span>
+      @if (!last) {
+        <span class="bc-sep">
+          <i class="fa-solid fa-chevron-right"></i>
+        </span>
+      }
+    }
+  </div>
+}

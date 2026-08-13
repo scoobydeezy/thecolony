@@ -1141,3 +1141,175 @@ export function mostOpposedFactions(faction: Faction, others: Faction[], n = 3):
     .sort((a, b) => dot(faction.values, a.values) - dot(faction.values, b.values))
     .slice(0, n);
 }
+
+// ── Narrative Planning System ───────────────────────────────────────────────
+
+export type NarrativeThreadState  = 'Open' | 'Resolved';
+export type NarrativeEventStatus  = 'Planned' | 'Available' | 'Occurred' | 'Bypassed' | 'Obsolete';
+export type NarrativeOwnerType    = 'Thread' | 'Event';
+export type NarrativeEntityLinkType = 'Faction' | 'Character' | 'Asset' | 'Location' | 'Session' | 'SessionEvent';
+
+export interface PathSet {
+  id: string;
+  campaignId: string;
+  name: string;
+  originEventId?: string;
+  convergenceEventId?: string;
+}
+
+export interface NarrativePath {
+  id: string;
+  pathSetId: string;
+  name: string;
+  sortOrder: number;
+}
+
+export interface PathSetContext {
+  pathSetId: string;
+  requiredPathId: string;
+}
+
+export interface PathEventScope {
+  pathId: string;
+  narrativeEventId: string;
+}
+
+// Explicit record that this event may resolve differently across paths of a PathSet.
+// Separate from PathEventScope (scope) and NarrativeEventOverride (concrete patch).
+export interface NarrativeEventVariantParticipation {
+  narrativeEventId: string;
+  pathSetId: string;
+}
+
+export interface NarrativeEventOverride {
+  id: string;
+  narrativeEventId: string;
+  overridesSummary: boolean;
+  summary?: string;
+  overridesDescription: boolean;
+  description?: string;
+  overridesConnections: boolean;
+  overridesThreads: boolean;
+  overridesAssets: boolean;
+}
+
+export interface EventOverridePath {
+  eventOverrideId: string;
+  pathId: string;
+}
+
+export interface EventOverrideConnection {
+  id: string;
+  eventOverrideId: string;
+  targetNarrativeEventId: string;
+  label?: string;
+  visibility: NarrativeVisibility;
+}
+
+export interface EventOverrideThread {
+  eventOverrideId: string;
+  narrativeThreadId: string;
+  isPrimary: boolean;
+}
+
+export interface EventOverrideEntityLink {
+  id: string;
+  eventOverrideId: string;
+  entityType: NarrativeEntityLinkType;
+  entityId: string;
+  role?: string;
+  isPrimary: boolean;
+  visibility: NarrativeVisibility;
+}
+
+export interface EffectiveNarrativeEvent extends NarrativeEvent {
+  effectiveSummary?: string;
+  effectiveDescription?: string;
+  overrideId?: string;
+}
+
+export interface NarrativeThread {
+  id: string;
+  campaignId: string;
+  title: string;
+  summary?: string;
+  state: NarrativeThreadState;
+}
+
+export interface NarrativeEvent {
+  id: string;
+  campaignId: string;
+  title: string;
+  summary?: string;
+  description?: string;
+  narrativeFunction?: string;
+  status: NarrativeEventStatus;
+  visibility: NarrativeVisibility;
+  sortOrder: number;
+}
+
+export interface NarrativeEventConnection {
+  id: string;
+  campaignId: string;
+  sourceNarrativeEventId: string;
+  targetNarrativeEventId: string;
+  label?: string;
+  visibility: NarrativeVisibility;
+}
+
+export interface NarrativeThreadEvent {
+  narrativeThreadId: string;
+  narrativeEventId: string;
+  isPrimary: boolean;
+}
+
+export interface NarrativeEntityLink {
+  id: string;
+  campaignId: string;
+  ownerType: NarrativeOwnerType;
+  ownerId: string;
+  entityType: NarrativeEntityLinkType;
+  entityId: string;
+  role?: string;
+  notes?: string;
+  isPrimary: boolean;
+  visibility: NarrativeVisibility;
+}
+
+export interface NarrativeEventRealization {
+  id: string;
+  narrativeEventId: string;
+  sessionEventId: string;
+  notes?: string;
+}
+
+export interface NarrativeEventPlacement {
+  narrativeEventId: string;
+  x: number;
+  y: number;
+  width?: number;
+  height?: number;
+}
+
+export const NARRATIVE_THREAD_STATE_OPTIONS: { value: NarrativeThreadState; label: string }[] = [
+  { value: 'Open',     label: 'Open' },
+  { value: 'Resolved', label: 'Resolved' },
+];
+
+export const NARRATIVE_EVENT_STATUS_OPTIONS: { value: NarrativeEventStatus; label: string }[] = [
+  { value: 'Planned',   label: 'Planned' },
+  { value: 'Available', label: 'Available' },
+  { value: 'Occurred',  label: 'Occurred' },
+  { value: 'Bypassed',  label: 'Bypassed' },
+  { value: 'Obsolete',  label: 'Obsolete' },
+];
+
+
+export const NARRATIVE_ENTITY_LINK_TYPE_OPTIONS: { value: NarrativeEntityLinkType; label: string }[] = [
+  { value: 'Faction',      label: 'Faction' },
+  { value: 'Character',    label: 'Character' },
+  { value: 'Asset',        label: 'Asset' },
+  { value: 'Location',     label: 'Location' },
+  { value: 'Session',      label: 'Session' },
+  { value: 'SessionEvent', label: 'Session Event' },
+];

@@ -517,6 +517,7 @@ export class CharacterDetailComponent implements OnInit {
     if (found) {
       this.character.set({ ...found, values: { ...found.values } });
       this.loadNarrativeData(found.id);
+      this.store.setNarrativeFocus({ type: 'Character', id: found.id, name: found.name });
     } else {
       this.router.navigate(['/characters']);
     }
