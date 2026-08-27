@@ -5,12 +5,13 @@
        [class.connection-mode]="connSvc.connectionModeActive() || !!connSvc.pendingEdge()"
        [class.erase-mode]="eraseModeActive()"
        [class.condense-mode]="isCondenseMode()"
-       (click)="closeContextMenu()"
+       [class.placing-event]="!!ghostPos()"
+       (click)="onCanvasClick($event)"
        (mousemove)="onCanvasMouseMove($event)"
        (pointerup)="onCanvasPointerUp()">
 
     <!-- Toolbar + filter panel stack (screen-space, top-center) -->
-    <div class="toolbar-stack">
+    <div class="toolbar-stack" (click)="$event.stopPropagation()">
       <app-narrative-flow-toolbar
         [eraseModeActive]="eraseModeActive()"
         [snapActive]="snapActive()"
@@ -55,7 +56,23 @@
       @for (edge of edgePaths(); track edge.id) {
         <g class="edge-group" [class.edge-group--erasable]="eraseModeActive()"
            (click)="onEdgeClick($event, edge.id)">
-          <path class="edge-path" [attr.d]="edge.d" />
+          <title>{{ edge.threadTitle }}</title>
+          <path class="edge-path"
+                [attr.d]="edge.d"
+                [attr.stroke]="edge.color"
+                [attr.stroke-width]="edge.strokeWidth" />
+          @if (edge.tailSrc) {
+            <path class="edge-tail"
+                  [attr.d]="edge.tailSrc"
+                  [attr.stroke]="edge.color"
+                  [attr.stroke-width]="edge.strokeWidth * 0.7" />
+          }
+          @if (edge.tailTgt) {
+            <path class="edge-tail"
+                  [attr.d]="edge.tailTgt"
+                  [attr.stroke]="edge.color"
+                  [attr.stroke-width]="edge.strokeWidth * 0.7" />
+          }
           <path class="edge-path-hit" [attr.d]="edge.d" />
         </g>
       }
@@ -89,6 +106,7 @@
              [style.top.px]="node.y"
              [style.opacity]="node.opacity"
              [style.--status-color]="statusColor(node.ev.status)"
+             [style.z-index]="expandedNodeId() === node.canonicalId ? 50 : 10"
              [attr.data-event-id]="node.canonicalId"
              (mouseenter)="hoveredEventId.set(node.canonicalId)"
              (mouseleave)="hoveredEventId() === node.canonicalId && hoveredEventId.set(null)"
@@ -103,7 +121,9 @@
           }
 
           <!-- Main card -->
-          <div class="event-node" [class.search-highlight]="node.searchHighlight">
+          <div class="event-node" [class.search-highlight]="node.searchHighlight"
+               [class.is-expanded]="expandedNodeId() === node.canonicalId"
+               (click)="$event.stopPropagation(); toggleNodeExpanded(node.canonicalId)">
 
             <div class="event-node-header">
               <span class="event-node-title">{{ node.ev.title }}</span>
@@ -162,9 +182,65 @@
             }
 
           </div>
+
+          <!-- Detail panel — slides in below the node when expanded -->
+          @if (expandedNodeId() === node.canonicalId) {
+            @let detail = nodeDetail();
+            <div class="node-detail-panel" (mousedown)="$event.stopPropagation()" (click)="$event.stopPropagation()">
+              @if (detail) {
+                @if (detail.threads.length > 0) {
+                  <div class="ndp-section">
+                    <div class="ndp-label"><i class="fa-solid fa-reel"></i> Threads</div>
+                    @for (t of detail.threads; track t.id) {
+                      <div class="ndp-row">
+                        <span class="ndp-dot" [style.background]="t.color ?? 'var(--border)'"></span>
+                        <span class="ndp-name">{{ t.title }}</span>
+                        <span class="ndp-state">{{ t.state }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+                @if (detail.characters.length > 0) {
+                  <div class="ndp-section">
+                    <div class="ndp-label"><i class="fa-solid fa-user"></i> Characters</div>
+                    @for (c of detail.characters; track c.entityId) {
+                      <div class="ndp-row">
+                        <span class="ndp-name">{{ c.name }}</span>
+                        @if (c.role) { <span class="ndp-role">{{ c.role }}</span> }
+                      </div>
+                    }
+                  </div>
+                }
+                @if (detail.assets.length > 0) {
+                  <div class="ndp-section">
+                    <div class="ndp-label"><i class="fa-solid fa-star"></i> Assets</div>
+                    @for (a of detail.assets; track a.entityId) {
+                      <div class="ndp-row">
+                        <span class="ndp-name">{{ a.name }}</span>
+                        @if (a.role) { <span class="ndp-role">{{ a.role }}</span> }
+                      </div>
+                    }
+                  </div>
+                }
+              } @else {
+                <div class="ndp-empty">No threads, characters, or assets linked.</div>
+              }
+            </div>
+          }
+
         </div>
       }
     </div>
+
+    <!-- Ghost card shown while placing a new event -->
+    @if (ghostPos(); as gp) {
+      <div class="ghost-event-card"
+           [style.left.px]="gp.x"
+           [style.top.px]="gp.y">
+        <i class="fa-solid fa-diagram-project"></i>
+        <span>Click to place</span>
+      </div>
+    }
 
     <!-- Context menu -->
     @if (contextMenu(); as ctx) {
@@ -198,4 +274,34 @@
   <app-narrative-event-editor
     [event]="ev"
     (closed)="closeEventEditor()" />
+}
+
+<!-- ── Thread picker modal (fires after dragging a new connection) ────── -->
+
+@if (pendingConn()) {
+  <div class="modal-backdrop" (click)="cancelPendingConn()">
+    <div class="modal modal--sm" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Connect with Thread</h3>
+        <button class="modal-close" (click)="cancelPendingConn()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Thread</label>
+          <select [value]="pendingConnThreadId()"
+                  (change)="pendingConnThreadId.set($any($event.target).value)">
+            <option value="">— Select thread —</option>
+            @for (t of store.narrativeThreads(); track t.id) {
+              <option [value]="t.id">{{ t.title }}</option>
+            }
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="cancelPendingConn()">Cancel</button>
+        <button class="btn btn-primary" [disabled]="!pendingConnThreadId()"
+                (click)="commitPendingConn()">Connect</button>
+      </div>
+    </div>
+  </div>
 }

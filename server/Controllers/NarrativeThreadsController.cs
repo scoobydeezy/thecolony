@@ -72,6 +72,7 @@ public class NarrativeThreadsController(AppDbContext db, ICampaignContext campai
         existing.Title   = thread.Title;
         existing.Summary = thread.Summary;
         existing.State   = thread.State;
+        existing.Color   = thread.Color;
         await db.SaveChangesAsync();
         return Ok(existing);
     }

@@ -29,21 +29,22 @@
 
               <!-- Horizontal bar with active path selector -->
               <div class="path-bar">
-                <span class="path-set-name">{{ row.pathSetName }}</span>
+                <div class="path-bar-sticky">
+                  <span class="path-set-name">{{ row.pathSetName }}</span>
 
-                <div class="path-selector-wrapper">
-                  <i class="fa-solid fa-shoe-prints"></i>
-                  <select class="path-selector-select"
-                          [disabled]="pathCtx.editingLocked()"
-                          [title]="pathCtx.editingLocked() ? 'Save or cancel your edits to switch paths' : ''"
-                          [value]="selectedPathIdFor(row.pathSetId)"
-                          (change)="selectPath(row.pathSetId, $any($event.target).value, $event)">
-                    @for (p of row.paths; track p.id) {
-                      <option [value]="p.id">{{ p.name }}</option>
-                    }
-                  </select>
+                  <div class="path-selector-wrapper">
+                    <i class="fa-solid fa-shoe-prints"></i>
+                    <select class="path-selector-select"
+                            [disabled]="pathCtx.editingLocked()"
+                            [title]="pathCtx.editingLocked() ? 'Save or cancel your edits to switch paths' : ''"
+                            [value]="selectedPathIdFor(row.pathSetId)"
+                            (change)="selectPath(row.pathSetId, $any($event.target).value, $event)">
+                      @for (p of row.paths; track p.id) {
+                        <option [value]="p.id">{{ p.name }}</option>
+                      }
+                    </select>
+                  </div>
                 </div>
-
               </div><!-- /path-bar -->
 
             </div><!-- /path-row -->

@@ -62,9 +62,9 @@ export class NarrativeEventsListComponent {
       if (q  && !ev.title.toLowerCase().includes(q)) return false;
       if (st !== 'all' && ev.status !== st) return false;
       if (th !== 'all') {
-        const threadIds = this.store.narrativeThreadEvents()
-          .filter(te => te.narrativeEventId === ev.id)
-          .map(te => te.narrativeThreadId);
+        const threadIds = this.store.narrativeConnections()
+          .filter(c => c.sourceNarrativeEventId === ev.id || c.targetNarrativeEventId === ev.id)
+          .map(c => c.threadId);
         if (!threadIds.includes(th)) return false;
       }
       return true;

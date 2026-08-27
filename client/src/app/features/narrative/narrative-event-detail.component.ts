@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AppStore } from '../../store/app.store';
 import {
   NarrativeEvent, NarrativeEventOverride, NarrativeEntityLink, NarrativeEntityLinkType,
-  NarrativeEventConnection, NarrativeThreadEvent, EventOverrideEntityLink, EventOverrideConnection,
+  NarrativeEventConnection, EventOverrideEntityLink, EventOverrideConnection,
   NARRATIVE_ENTITY_LINK_TYPE_OPTIONS, NARRATIVE_VISIBILITY_OPTIONS, NARRATIVE_EVENT_STATUS_OPTIONS,
 } from '../../core/models/types';
 
@@ -57,7 +57,7 @@ export class NarrativeEventDetailComponent {
   overrideHasChanges = computed(() => {
     const o = this.activeOverride();
     if (!o) return false;
-    return o.overridesSummary || o.overridesDescription || o.overridesConnections || o.overridesThreads || o.overridesAssets;
+    return o.overridesSummary || o.overridesDescription || o.overridesConnections || o.overridesAssets;
   });
 
   // ── Override editor ────────────────────────────────────────────────────────
@@ -85,7 +85,6 @@ export class NarrativeEventDetailComponent {
       overridesDescription: draft.overridesDescription ?? false,
       description:          draft.description?.trim()  || undefined,
       overridesConnections: draft.overridesConnections ?? false,
-      overridesThreads:     draft.overridesThreads     ?? false,
       overridesAssets:      draft.overridesAssets      ?? false,
     };
     const saved = await this.store.saveEventOverride(override);
@@ -135,7 +134,7 @@ export class NarrativeEventDetailComponent {
       const saved = await this.store.saveEventOverride({
         id: '', narrativeEventId: this.event().id,
         overridesSummary: false, overridesDescription: false,
-        overridesConnections: false, overridesThreads: false, overridesAssets: false,
+        overridesConnections: false, overridesAssets: false,
       });
       await this.store.saveEventOverridePath({ eventOverrideId: saved.id, pathId });
       return saved.id;
@@ -201,50 +200,6 @@ export class NarrativeEventDetailComponent {
     }
   }
 
-  // ── Add thread ────────────────────────────────────────────────────────────
-
-  showThreadForm = signal(false);
-  newThreadId    = signal('');
-
-  availableThreads = computed(() => {
-    const linked = new Set(this.threads().map(t => t.id));
-    return this.store.narrativeThreads().filter(t => !linked.has(t.id));
-  });
-
-  async addThread(): Promise<void> {
-    const threadId = this.newThreadId();
-    if (!threadId) return;
-    const pathId = this.currentPathId();
-
-    if (pathId) {
-      const overrideId = await this.ensureOverride();
-      const override = this.activeOverride() ?? this.store.narrativeEventOverrides().find(o => o.id === overrideId)!;
-      await this.store.saveEventOverride({ ...override, id: overrideId, overridesThreads: true });
-      await this.store.saveOverrideThread({ eventOverrideId: overrideId, narrativeThreadId: threadId, isPrimary: false });
-    } else {
-      const te: NarrativeThreadEvent = {
-        narrativeThreadId: threadId,
-        narrativeEventId:  this.event().id,
-        isPrimary: false,
-      };
-      await this.store.saveThreadEvent(te);
-    }
-
-    this.showThreadForm.set(false);
-    this.newThreadId.set('');
-  }
-
-  async removeThread(threadId: string): Promise<void> {
-    const pathId = this.currentPathId();
-    if (pathId) {
-      const override = this.activeOverride();
-      if (!override) return;
-      await this.store.deleteOverrideThread(override.id, threadId);
-    } else {
-      await this.store.deleteThreadEvent(threadId, this.event().id);
-    }
-  }
-
   pathHasOverride(eventId: string, pathId: string): boolean {
     return this.store.overrideForEvent()(eventId, new Set([pathId])) !== undefined;
   }
@@ -254,7 +209,7 @@ export class NarrativeEventDetailComponent {
   showConnectionForm = signal(false);
   newConnDirection   = signal<'from' | 'to'>('to');
   newConnTargetId    = signal('');
-  newConnLabel       = signal('');
+  newConnThreadId    = signal('');
 
   connectionTargetOptions = computed(() => {
     const ev = this.event();
@@ -266,7 +221,8 @@ export class NarrativeEventDetailComponent {
 
   async addConnection(): Promise<void> {
     const targetId = this.newConnTargetId();
-    if (!targetId) return;
+    const threadId = this.newConnThreadId();
+    if (!targetId || !threadId) return;
     const ev = this.event();
     const pathId = this.currentPathId();
 
@@ -277,7 +233,7 @@ export class NarrativeEventDetailComponent {
       const conn: EventOverrideConnection = {
         id: '', eventOverrideId: overrideId,
         targetNarrativeEventId: targetId,
-        label: this.newConnLabel().trim() || undefined,
+        threadId,
         visibility: 'GMOnly',
       };
       await this.store.saveOverrideConnection(conn);
@@ -286,7 +242,7 @@ export class NarrativeEventDetailComponent {
         id: '', campaignId: '',
         sourceNarrativeEventId: this.newConnDirection() === 'from' ? targetId : ev.id,
         targetNarrativeEventId: this.newConnDirection() === 'from' ? ev.id    : targetId,
-        label: this.newConnLabel().trim() || undefined,
+        threadId,
         visibility: 'GMOnly',
       };
       await this.store.saveConnection(conn);
@@ -294,7 +250,7 @@ export class NarrativeEventDetailComponent {
 
     this.showConnectionForm.set(false);
     this.newConnTargetId.set('');
-    this.newConnLabel.set('');
+    this.newConnThreadId.set('');
   }
 
   async removeConnection(id: string): Promise<void> {

@@ -109,36 +109,15 @@
     <div class="section-header">
       <i class="fa-solid fa-scroll section-icon"></i>
       <span class="section-title">Threads</span>
-      <button class="btn-icon btn-icon--sm" title="Link to thread"
-              (click)="showThreadForm.set(!showThreadForm())">
-        <i class="fa-solid fa-plus"></i>
-      </button>
     </div>
 
-    @if (showThreadForm()) {
-      <div class="add-link-form">
-        <select class="form-select-sm flex-1" [value]="newThreadId()"
-                (change)="newThreadId.set($any($event.target).value)">
-          <option value="">— Select thread —</option>
-          @for (t of availableThreads(); track t.id) {
-            <option [value]="t.id">{{ t.title }}</option>
-          }
-        </select>
-        <button class="btn btn-primary btn-xs" [disabled]="!newThreadId()" (click)="addThread()">Add</button>
-        <button class="btn btn-secondary btn-xs" (click)="showThreadForm.set(false)">✕</button>
-      </div>
-    }
-
-    @if (threads().length === 0 && !showThreadForm()) {
-      <p class="empty-sub">No threads.</p>
+    @if (threads().length === 0) {
+      <p class="empty-sub">No threads — add a connection to associate this event with a thread.</p>
     } @else {
       <div class="thread-chips">
         @for (t of threads(); track t.id) {
           <div class="thread-chip">
             <span>{{ t.title }}</span>
-            <button class="chip-del" (click)="removeThread(t.id)" title="Unlink">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
           </div>
         }
       </div>

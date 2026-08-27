@@ -6,6 +6,6 @@ public class NarrativeEventConnection
     public string CampaignId { get; set; } = string.Empty;
     public string SourceNarrativeEventId { get; set; } = string.Empty;
     public string TargetNarrativeEventId { get; set; } = string.Empty;
-    public string? Label { get; set; }
+    public string ThreadId { get; set; } = string.Empty;
     public NarrativeVisibility Visibility { get; set; } = NarrativeVisibility.GMOnly;
 }

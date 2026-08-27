@@ -42,7 +42,7 @@ public class EventOverrideConnectionsController(AppDbContext db) : ControllerBas
         var existing = await db.EventOverrideConnections.FindAsync(id);
         if (existing is null) return NotFound();
         existing.TargetNarrativeEventId = conn.TargetNarrativeEventId;
-        existing.Label = conn.Label;
+        existing.ThreadId = conn.ThreadId;
         existing.Visibility = conn.Visibility;
         await db.SaveChangesAsync();
         return Ok(existing);

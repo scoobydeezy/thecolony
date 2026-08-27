@@ -20,12 +20,30 @@
 
     @if (tab() === 'threads') {
       <div class="toolbar-actions">
-        <button class="btn btn-primary" (click)="addThread()">+ Add Thread</button>
+        @if (!store.isViewingSnapshot()) {
+          <label class="btn btn-secondary">
+            <i class="fa-solid fa-right-to-bracket"></i> Import
+            <input type="file" accept=".json" style="display:none" (change)="importJson($event)">
+          </label>
+        }
+        <button class="btn btn-secondary" (click)="exportJson()">Export <i class="fa-solid fa-right-from-bracket"></i></button>
+        @if (!store.isViewingSnapshot()) {
+          <button class="btn btn-primary" (click)="addThread()">+ Add Thread</button>
+        }
       </div>
     }
     @if (tab() === 'events') {
       <div class="toolbar-actions">
-        <button class="btn btn-primary" (click)="addEvent()">+ Add Event</button>
+        @if (!store.isViewingSnapshot()) {
+          <label class="btn btn-secondary">
+            <i class="fa-solid fa-right-to-bracket"></i> Import
+            <input type="file" accept=".json" style="display:none" (change)="importJson($event)">
+          </label>
+        }
+        <button class="btn btn-secondary" (click)="exportJson()">Export <i class="fa-solid fa-right-from-bracket"></i></button>
+        @if (!store.isViewingSnapshot()) {
+          <button class="btn btn-primary" (click)="addEvent()">+ Add Event</button>
+        }
       </div>
     }
   </div>

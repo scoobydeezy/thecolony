@@ -20,9 +20,10 @@ public class NarrativeEventsController(AppDbContext db, ICampaignContext campaig
 
         if (threadId is not null)
         {
-            var linkedIds = await db.NarrativeThreadEvents
-                .Where(te => te.NarrativeThreadId == threadId)
-                .Select(te => te.NarrativeEventId)
+            var linkedIds = await db.NarrativeEventConnections
+                .Where(c => c.CampaignId == cid && c.ThreadId == threadId)
+                .SelectMany(c => new[] { c.SourceNarrativeEventId, c.TargetNarrativeEventId })
+                .Distinct()
                 .ToListAsync();
 
             return Ok(await db.NarrativeEvents

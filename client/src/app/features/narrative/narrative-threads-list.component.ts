@@ -13,12 +13,14 @@ interface ThreadFormModel {
   title: string;
   summary: string;
   state: string;
+  color: string;
 }
 
 const emptyThreadForm = (): ThreadFormModel => ({
   id: '', campaignId: '',
   title: '', summary: '',
   state: 'Open',
+  color: '',
 });
 
 @Component({
@@ -104,6 +106,7 @@ export class NarrativeThreadsListComponent {
       title:     t.title,
       summary:   t.summary ?? '',
       state:     t.state,
+      color:     t.color ?? '',
     });
     this.showModal.set(true);
   }
@@ -119,6 +122,7 @@ export class NarrativeThreadsListComponent {
       title:     m.title.trim(),
       summary:   m.summary.trim() || undefined,
       state:     m.state as NarrativeThreadState,
+      color:     m.color.trim() || undefined,
     };
     await this.store.saveThread(thread);
     this.showModal.set(false);

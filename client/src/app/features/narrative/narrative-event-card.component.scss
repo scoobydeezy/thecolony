@@ -72,7 +72,6 @@
 .ev-summary {
   font-size: var(--text-size-body);
   color: var(--text-secondary);
-  margin: 0 0 1rem;
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 4;
@@ -99,7 +98,6 @@
   color: var(--text-secondary);
   line-height: 1.4;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

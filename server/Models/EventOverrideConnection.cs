@@ -7,6 +7,6 @@ public class EventOverrideConnection
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string EventOverrideId { get; set; } = string.Empty;
     public string TargetNarrativeEventId { get; set; } = string.Empty;
-    public string? Label { get; set; }
+    public string ThreadId { get; set; } = string.Empty;
     public NarrativeVisibility Visibility { get; set; } = NarrativeVisibility.GMOnly;
 }

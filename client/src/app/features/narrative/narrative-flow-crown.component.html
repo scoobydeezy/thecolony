@@ -8,10 +8,9 @@
       <select class="crown-path-select"
               [disabled]="isLocked()"
               [title]="isLocked() ? 'Save or cancel your edits to switch paths' : ''"
-              [value]="selectedPathId() ?? ''"
               (change)="onPathChange($event)">
         @for (p of paths(); track p.id) {
-          <option [value]="p.id">{{ p.name }}</option>
+          <option [value]="p.id" [selected]="p.id === selectedPathId()">{{ p.name }}</option>
         }
       </select>
     </div>

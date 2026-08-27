@@ -27,13 +27,43 @@ import { NarrativeFilterPanelComponent } from './narrative-filter-panel.componen
 
 type HistoryEntry =
   | { type: 'move';  eventId: string;   before: NodePos; after: NodePos }
-  | { type: 'addConn';    connId: string; sourceId: string; targetId: string }
-  | { type: 'removeConn'; connId: string; sourceId: string; targetId: string };
+  | { type: 'addConn';    connId: string; sourceId: string; targetId: string; threadId: string; isOverrideConn: boolean }
+  | { type: 'removeConn'; connId: string; sourceId: string; targetId: string; threadId: string; isOverrideConn: boolean };
 
 // ─── View constants ───────────────────────────────────────────────────────────
 
 const SNAP_GRID     = 20;
 const CROWN_PEEK    = 50; // how many px of crown card stick up above the node top
+
+// ─── Edge rendering helpers ───────────────────────────────────────────────────
+
+/** Stable hue (0–360) derived from an arbitrary string ID. */
+function idHue(id: string): number {
+  let h = 0;
+  for (let i = 0; i < id.length; i++) h = (h * 31 + id.charCodeAt(i)) >>> 0;
+  return h % 360;
+}
+
+/** Stable fallback color when a thread has no explicit color set. */
+function threadFallbackColor(threadId: string): string {
+  return `hsl(${idHue(threadId)}, 60%, 55%)`;
+}
+
+/**
+ * Derive a small deterministic offset [-max, +max] from a string seed.
+ * Used to give each tail its own stable slight curve.
+ */
+function seedOffset(seed: string, max: number): number {
+  let v = 0;
+  for (let i = 0; i < seed.length; i++) v = (v * 37 + seed.charCodeAt(i)) >>> 0;
+  return ((v % (max * 2 + 1)) - max);
+}
+
+const PARALLEL_SPREAD = 14; // px between parallel edges at midpoint
+const TAIL_LEN        = 18; // px length of the hanging tail segment
+const TAIL_CURVE_MAX  = 8;  // max px of lateral curve in a tail
+const STROKE_MIN      = 1.5;
+const STROKE_MAX      = 4.5;
 
 @Component({
   selector: 'app-narrative-flow',
@@ -76,6 +106,38 @@ export class NarrativeFlowComponent implements AfterViewInit, OnDestroy {
 
   showFilterPanel = signal(false);
   eraseModeActive = signal(false);
+
+  // ── Ghost card placement (shown while placing a new event) ───────────────
+
+  /** Screen-space position of the ghost card, or null when not in placement mode. */
+  ghostPos = signal<{ x: number; y: number } | null>(null);
+
+  startPlacingEvent(): void {
+    this.ghostPos.set({ x: -9999, y: -9999 }); // off-screen until first mousemove
+  }
+
+  cancelPlacingEvent(): void {
+    this.ghostPos.set(null);
+  }
+
+  // ── Pending thread picker (shown after dragging a new connection) ──────────
+
+  pendingConn = signal<{ sourceId: string; targetId: string } | null>(null);
+  pendingConnThreadId = signal('');
+
+  async commitPendingConn(): Promise<void> {
+    const p = this.pendingConn();
+    const threadId = this.pendingConnThreadId();
+    if (!p || !threadId) return;
+    this.pendingConn.set(null);
+    this.pendingConnThreadId.set('');
+    await this.createConnection(p.sourceId, p.targetId, threadId);
+  }
+
+  cancelPendingConn(): void {
+    this.pendingConn.set(null);
+    this.pendingConnThreadId.set('');
+  }
   toggleEraseMode(): void {
     this.eraseModeActive.update(v => !v);
     if (this.eraseModeActive()) this.connSvc.disableConnectionMode();
@@ -125,13 +187,15 @@ export class NarrativeFlowComponent implements AfterViewInit, OnDestroy {
       this.store.savePlacements([{ narrativeEventId: entry.eventId, x: pos.x, y: pos.y }]);
       this.zone.run(() => this.redrawTick.update(n => n + 1));
     } else if (entry.type === 'addConn' && direction === 'undo') {
-      this.store.deleteConnection(entry.connId);
+      if (entry.isOverrideConn) this.store.deleteOverrideConnection(entry.connId);
+      else this.store.deleteConnection(entry.connId);
     } else if (entry.type === 'removeConn' && direction === 'undo') {
-      this.createConnection(entry.sourceId, entry.targetId);
+      this.createConnection(entry.sourceId, entry.targetId, entry.threadId);
     } else if (entry.type === 'addConn' && direction === 'redo') {
-      this.createConnection(entry.sourceId, entry.targetId);
+      this.createConnection(entry.sourceId, entry.targetId, entry.threadId);
     } else if (entry.type === 'removeConn' && direction === 'redo') {
-      this.store.deleteConnection(entry.connId);
+      if (entry.isOverrideConn) this.store.deleteOverrideConnection(entry.connId);
+      else this.store.deleteConnection(entry.connId);
     }
   }
 
@@ -174,6 +238,33 @@ export class NarrativeFlowComponent implements AfterViewInit, OnDestroy {
   private zoom!: d3zoom.ZoomBehavior<HTMLDivElement, unknown>;
   private currentTransform: d3zoom.ZoomTransform = d3zoom.zoomIdentity;
   private transformSig = signal<d3zoom.ZoomTransform>(d3zoom.zoomIdentity);
+  private transformSaveTimer: ReturnType<typeof setTimeout> | null = null;
+
+  private viewStateKey(): string {
+    const cid = this.store.activeCampaign()?.id ?? 'default';
+    return `flow-view-${cid}`;
+  }
+
+  private saveViewState(t: d3zoom.ZoomTransform): void {
+    if (this.transformSaveTimer) clearTimeout(this.transformSaveTimer);
+    this.transformSaveTimer = setTimeout(() => {
+      sessionStorage.setItem(this.viewStateKey(), JSON.stringify({ x: t.x, y: t.y, k: t.k }));
+    }, 300);
+  }
+
+  private restoreViewState(): boolean {
+    try {
+      const raw = sessionStorage.getItem(this.viewStateKey());
+      if (!raw) return false;
+      const { x, y, k } = JSON.parse(raw) as { x: number; y: number; k: number };
+      if (typeof x !== 'number' || typeof y !== 'number' || typeof k !== 'number') return false;
+      d3.select(this.canvasWrap.nativeElement)
+        .call((this.zoom as any).transform, d3zoom.zoomIdentity.translate(x, y).scale(k));
+      return true;
+    } catch {
+      return false;
+    }
+  }
 
   // ── Condense mode ─────────────────────────────────────────────────────────
 
@@ -243,6 +334,35 @@ export class NarrativeFlowComponent implements AfterViewInit, OnDestroy {
   // ── Node hover state (for connect handle) ─────────────────────────────────
 
   hoveredEventId = signal<string | null>(null);
+
+  // ── Node expanded state (detail panel) ───────────────────────────────────
+
+  expandedNodeId = signal<string | null>(null);
+
+  toggleNodeExpanded(canonicalId: string): void {
+    this.expandedNodeId.update(cur => cur === canonicalId ? null : canonicalId);
+  }
+
+  nodeDetail = computed(() => {
+    const id = this.expandedNodeId();
+    if (!id) return null;
+    const activePathIds = this.pathCtx.activePathIds();
+
+    const threadIds = new Set(this.store.effectiveThreadIdsForEvent()(id, activePathIds));
+    const threads   = this.store.narrativeThreads().filter(t => threadIds.has(t.id));
+
+    const links      = this.store.effectiveEntityLinksForEvent()(id, activePathIds);
+    const characters = links
+      .filter(l => l.entityType === 'Character')
+      .map(l => ({ entityId: l.entityId, name: this.store.characters().find(c => c.id === l.entityId)?.name ?? l.entityId, role: l.role }));
+    const assets = links
+      .filter(l => l.entityType === 'Asset')
+      .map(l => ({ entityId: l.entityId, name: this.store.assets().find(a => a.id === l.entityId)?.name ?? l.entityId, role: l.role }));
+
+    return threads.length > 0 || characters.length > 0 || assets.length > 0
+      ? { threads, characters, assets }
+      : null;
+  });
 
   // ── Crown positions (in world space, above each origin event) ────────────
 
@@ -338,21 +458,103 @@ export class NarrativeFlowComponent implements AfterViewInit, OnDestroy {
     const condense  = this.isCondenseMode();
     const condensed = this.condensedLayout();
     const conns     = this.store.effectiveConnectionsForGraph()(this.pathCtx.activePathIds());
+    const threads   = this.store.narrativeThreads();
 
-    return conns
-      .filter(c => !condense || (condensed?.has(c.sourceNarrativeEventId) && condensed?.has(c.targetNarrativeEventId)))
-      .map(c => {
-        const srcPos = this.posFor(c.sourceNarrativeEventId);
-        const tgtPos = this.posFor(c.targetNarrativeEventId);
+    // Build thread color & weight maps — weight uses the same effective connections
+    // so path-only threads count equally with base ones.
+    const threadColor  = new Map<string, string>();
+    const threadWeight = new Map<string, number>();
 
-        const x1 = srcPos.x + NODE_W;
-        const y1 = srcPos.y + NODE_H / 2;
-        const x2 = tgtPos.x;
-        const y2 = tgtPos.y + NODE_H / 2;
-        const cx = (x1 + x2) / 2;
+    for (const t of threads) {
+      threadColor.set(t.id, t.color ?? threadFallbackColor(t.id));
+    }
+    for (const t of threads) {
+      const evSet = new Set<string>();
+      for (const c of conns) {
+        if (c.threadId === t.id) {
+          evSet.add(c.sourceNarrativeEventId);
+          evSet.add(c.targetNarrativeEventId);
+        }
+      }
+      threadWeight.set(t.id, evSet.size);
+    }
 
-        return { id: c.id, d: `M${x1},${y1} C${cx},${y1} ${cx},${y2} ${x2},${y2}` };
-      });
+    // Map weight (event count) → stroke width [STROKE_MIN, STROKE_MAX]
+    const maxWeight = Math.max(2, ...Array.from(threadWeight.values()));
+    const strokeForThread = (threadId: string): number => {
+      const w = threadWeight.get(threadId) ?? 2;
+      const t = Math.min(1, (w - 1) / (maxWeight - 1 || 1));
+      return STROKE_MIN + t * (STROKE_MAX - STROKE_MIN);
+    };
+
+    const filtered = conns.filter(c =>
+      !condense || (condensed?.has(c.sourceNarrativeEventId) && condensed?.has(c.targetNarrativeEventId))
+    );
+
+    // Group by canonical node pair to assign parallel-edge fan index
+    const pairIndex  = new Map<string, number>();
+    const pairCount  = new Map<string, number>();
+    for (const c of filtered) {
+      const key = `${c.sourceNarrativeEventId}::${c.targetNarrativeEventId}`;
+      const idx = pairCount.get(key) ?? 0;
+      pairIndex.set(c.id, idx);
+      pairCount.set(key, idx + 1);
+    }
+
+    return filtered.map(c => {
+      const srcPos = this.posFor(c.sourceNarrativeEventId);
+      const tgtPos = this.posFor(c.targetNarrativeEventId);
+
+      const pairKey    = `${c.sourceNarrativeEventId}::${c.targetNarrativeEventId}`;
+      const totalEdges = pairCount.get(pairKey) ?? 1;
+      const idx        = pairIndex.get(c.id) ?? 0;
+
+      // Center fan around 0: offset = (idx - (total-1)/2) * PARALLEL_SPREAD
+      const fanOffset = (idx - (totalEdges - 1) / 2) * PARALLEL_SPREAD;
+
+      // Anchor points: right-center of src, left-center of tgt
+      const x1 = srcPos.x + NODE_W;
+      const y1 = srcPos.y + NODE_H / 2 + fanOffset;
+      const x2 = tgtPos.x;
+      const y2 = tgtPos.y + NODE_H / 2 + fanOffset;
+      const cx = (x1 + x2) / 2;
+
+      const mainPath = `M${x1},${y1} C${cx},${y1} ${cx},${y2} ${x2},${y2}`;
+
+      // Tails: short curved segments on the back side of terminus nodes.
+      // Source tail: hangs off the LEFT edge of the source node (thread start).
+      const srcCurve  = seedOffset(c.id + 'src', TAIL_CURVE_MAX);
+      const sax = srcPos.x;
+      const say = srcPos.y + NODE_H / 2 + fanOffset;
+      const tailSrc = `M${sax},${say} C${sax - TAIL_LEN * 0.4},${say} ${sax - TAIL_LEN * 0.7},${say + srcCurve} ${sax - TAIL_LEN},${say + srcCurve}`;
+
+      // Target tail: hangs off the RIGHT edge of the target node (thread end).
+      const tgtCurve  = seedOffset(c.id + 'tgt', TAIL_CURVE_MAX);
+      const tax = tgtPos.x + NODE_W;
+      const tay = tgtPos.y + NODE_H / 2 + fanOffset;
+      const tailTgt = `M${tax},${tay} C${tax + TAIL_LEN * 0.4},${tay} ${tax + TAIL_LEN * 0.7},${tay + tgtCurve} ${tax + TAIL_LEN},${tay + tgtCurve}`;
+
+      // Only show a tail at the source if this is the first connection leaving that node on this thread
+      // and at target if it's the last one arriving — detect by checking if node has other conns in filtered
+      const srcIsTerminus = !filtered.some(
+        o => o.id !== c.id && o.targetNarrativeEventId === c.sourceNarrativeEventId && o.threadId === c.threadId
+      );
+      const tgtIsTerminus = !filtered.some(
+        o => o.id !== c.id && o.sourceNarrativeEventId === c.targetNarrativeEventId && o.threadId === c.threadId
+      );
+
+      const thread = threads.find(t => t.id === c.threadId);
+
+      return {
+        id:          c.id,
+        d:           mainPath,
+        color:       threadColor.get(c.threadId) ?? 'var(--border)',
+        strokeWidth: strokeForThread(c.threadId),
+        tailSrc:     srcIsTerminus ? tailSrc : null,
+        tailTgt:     tgtIsTerminus ? tailTgt : null,
+        threadTitle: thread?.title ?? '',
+      };
+    });
   });
 
   // ── Lifecycle ──────────────────────────────────────────────────────────────
@@ -392,6 +594,7 @@ export class NarrativeFlowComponent implements AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {
     if (this.saveTimer) clearTimeout(this.saveTimer);
+    if (this.transformSaveTimer) clearTimeout(this.transformSaveTimer);
     this.flushSave();
   }
 
@@ -402,9 +605,10 @@ export class NarrativeFlowComponent implements AfterViewInit, OnDestroy {
     const meta = event.metaKey || event.ctrlKey;
 
     if (event.key === 'Escape') {
-      if (this.connSvc.pendingEdge()) { this.connSvc.cancelEdge(); return; }
-      if (this.connSvc.connectionModeActive()) { this.connSvc.disableConnectionMode(); return; }
-      if (this.eraseModeActive()) { this.eraseModeActive.set(false); return; }
+      if (this.ghostPos())                        { this.cancelPlacingEvent(); return; }
+      if (this.connSvc.pendingEdge())             { this.connSvc.cancelEdge(); return; }
+      if (this.connSvc.connectionModeActive())    { this.connSvc.disableConnectionMode(); return; }
+      if (this.eraseModeActive())                 { this.eraseModeActive.set(false); return; }
       return;
     }
 
@@ -465,10 +669,11 @@ export class NarrativeFlowComponent implements AfterViewInit, OnDestroy {
         scene.style.transform   = `translate(${t.x}px,${t.y}px) scale(${t.k})`;
         edgeSvg.style.transform = `translate(${t.x}px,${t.y}px) scale(${t.k})`;
         this.zone.run(() => this.transformSig.set(event.transform));
+        this.saveViewState(event.transform);
       });
 
     d3.select(wrap).call(this.zoom as any);
-    this.fitView();
+    if (!this.restoreViewState()) this.fitView();
   }
 
   fitView(): void {
@@ -570,32 +775,88 @@ export class NarrativeFlowComponent implements AfterViewInit, OnDestroy {
       event.stopPropagation();
       const pending = this.connSvc.commitEdge();
       if (pending && pending.sourceEventId !== canonicalId) {
-        this.createConnection(pending.sourceEventId, canonicalId);
+        if (this.store.narrativeThreads().length === 0) {
+          // No threads exist yet — create connection without thread (will be empty string)
+          this.createConnection(pending.sourceEventId, canonicalId, '');
+        } else if (this.store.narrativeThreads().length === 1) {
+          // Only one thread — use it automatically
+          this.createConnection(pending.sourceEventId, canonicalId, this.store.narrativeThreads()[0].id);
+        } else {
+          // Multiple threads — show picker
+          this.pendingConn.set({ sourceId: pending.sourceEventId, targetId: canonicalId });
+          this.pendingConnThreadId.set('');
+        }
       }
     }
   }
 
   onCanvasMouseMove(event: MouseEvent): void {
-    if (!this.connSvc.pendingEdge()) return;
     const rect = this.canvasWrap.nativeElement.getBoundingClientRect();
     const t    = this.currentTransform;
-    const sceneX = (event.clientX - rect.left - t.x) / t.k;
-    const sceneY = (event.clientY - rect.top  - t.y) / t.k;
-    this.connSvc.updateCursor(sceneX, sceneY);
+
+    if (this.ghostPos()) {
+      this.ghostPos.set({ x: event.clientX - rect.left, y: event.clientY - rect.top });
+    }
+
+    if (this.connSvc.pendingEdge()) {
+      const sceneX = (event.clientX - rect.left - t.x) / t.k;
+      const sceneY = (event.clientY - rect.top  - t.y) / t.k;
+      this.connSvc.updateCursor(sceneX, sceneY);
+    }
   }
 
   onCanvasPointerUp(): void {
     if (this.connSvc.pendingEdge()) this.connSvc.cancelEdge();
   }
 
+  onCanvasClick(event: MouseEvent): void {
+    this.closeContextMenu();
+    this.expandedNodeId.set(null);
+    if (!this.ghostPos()) return;
+    event.stopPropagation();
+
+    const rect = this.canvasWrap.nativeElement.getBoundingClientRect();
+    const t    = this.currentTransform;
+    const sceneX = this.snap((event.clientX - rect.left - t.x) / t.k);
+    const sceneY = this.snap((event.clientY - rect.top  - t.y) / t.k);
+
+    this.ghostPos.set(null);
+
+    const campaignId = this.store.narrativeEvents()[0]?.campaignId
+      ?? this.store.pathSets()[0]?.campaignId ?? '';
+    const newEvent: NarrativeEvent = {
+      id: '', campaignId,
+      title: '', summary: undefined, description: undefined,
+      narrativeFunction: undefined,
+      status: 'Planned', visibility: 'GMOnly', sortOrder: 0,
+    };
+    this.store.saveNarrativeEvent(newEvent).then(saved => {
+      this.locallyPositioned.add(saved.id);
+      this.livePos.set(saved.id, { x: sceneX, y: sceneY });
+      this.store.savePlacements([{ narrativeEventId: saved.id, x: sceneX, y: sceneY }]);
+      this.editingEvent.set(saved);
+    });
+  }
+
   onEdgeClick(event: MouseEvent, connectionId: string): void {
     event.stopPropagation();
     if (!this.eraseModeActive()) return;
-    const conn = this.store.narrativeConnections().find(c => c.id === connectionId);
-    if (conn) {
-      this.pushHistory({ type: 'removeConn', connId: connectionId, sourceId: conn.sourceNarrativeEventId, targetId: conn.targetNarrativeEventId });
+
+    // Edge IDs may belong to either the base connection table or an override connection table
+    const baseConn     = this.store.narrativeConnections().find(c => c.id === connectionId);
+    const overrideConn = this.store.eventOverrideConnections().find(c => c.id === connectionId);
+
+    if (baseConn) {
+      this.pushHistory({ type: 'removeConn', connId: connectionId, sourceId: baseConn.sourceNarrativeEventId, targetId: baseConn.targetNarrativeEventId, threadId: baseConn.threadId, isOverrideConn: false });
+      this.store.deleteConnection(connectionId);
+    } else if (overrideConn) {
+      // Resolve source event from the parent override record
+      const override = this.store.narrativeEventOverrides().find(o => o.id === overrideConn.eventOverrideId);
+      if (override) {
+        this.pushHistory({ type: 'removeConn', connId: connectionId, sourceId: override.narrativeEventId, targetId: overrideConn.targetNarrativeEventId, threadId: overrideConn.threadId, isOverrideConn: true });
+      }
+      this.store.deleteOverrideConnection(connectionId);
     }
-    this.store.deleteConnection(connectionId);
   }
 
   async setPathSetOrigin(pathSetId: string, eventId: string): Promise<void> {
@@ -614,16 +875,67 @@ export class NarrativeFlowComponent implements AfterViewInit, OnDestroy {
     }));
   }
 
-  private async createConnection(sourceId: string, targetId: string): Promise<void> {
-    const campaignId = this.store.narrativeEvents()[0]?.campaignId ?? '';
-    const saved = await this.store.saveConnection({
-      id: '', campaignId,
-      sourceNarrativeEventId: sourceId,
+  private async createConnection(sourceId: string, targetId: string, threadId: string): Promise<void> {
+    const activePathIds = this.pathCtx.activePathIds();
+    const campaignId    = this.store.narrativeEvents()[0]?.campaignId ?? '';
+
+    // Only route to a path override if the source event actually participates in a variant
+    // whose selected path is among the active path IDs. Events with no variant participation
+    // are always global and should always write base connections regardless of path context.
+    const sourceParticipatesInActivePath = this.store.variantParticipations()
+      .filter(vp => vp.narrativeEventId === sourceId)
+      .some(vp => {
+        const pathId = this.pathCtx.selectedPathIdFor(vp.pathSetId);
+        return pathId != null && activePathIds.has(pathId);
+      });
+
+    if (activePathIds.size === 0 || !sourceParticipatesInActivePath) {
+      // Base context — write a global base connection
+      const saved = await this.store.saveConnection({
+        id: '', campaignId,
+        sourceNarrativeEventId: sourceId,
+        targetNarrativeEventId: targetId,
+        threadId,
+        visibility: 'GMOnly',
+      });
+      if (saved) {
+        this.pushHistory({ type: 'addConn', connId: saved.id, sourceId, targetId, threadId, isOverrideConn: false });
+      }
+      return;
+    }
+
+    // Active path context — route to the connection override for this source event + path context.
+    // Find an existing override that is already bound to exactly these active paths.
+    const existingOverride = this.store.overrideForEvent()(sourceId, activePathIds);
+    let overrideId: string;
+
+    if (existingOverride) {
+      // Flip overridesConnections if it wasn't already set
+      if (!existingOverride.overridesConnections) {
+        await this.store.saveEventOverride({ ...existingOverride, overridesConnections: true });
+      }
+      overrideId = existingOverride.id;
+    } else {
+      // Create a fresh override bound to the current active path IDs
+      const saved = await this.store.saveEventOverride({
+        id: '', narrativeEventId: sourceId,
+        overridesSummary: false, overridesDescription: false,
+        overridesConnections: true, overridesAssets: false,
+      });
+      overrideId = saved.id;
+      for (const pathId of activePathIds) {
+        await this.store.saveEventOverridePath({ eventOverrideId: overrideId, pathId });
+      }
+    }
+
+    const saved = await this.store.saveOverrideConnection({
+      id: '', eventOverrideId: overrideId,
       targetNarrativeEventId: targetId,
+      threadId,
       visibility: 'GMOnly',
     });
     if (saved) {
-      this.pushHistory({ type: 'addConn', connId: saved.id, sourceId, targetId });
+      this.pushHistory({ type: 'addConn', connId: saved.id, sourceId, targetId, threadId, isOverrideConn: true });
     }
   }
 
@@ -649,19 +961,7 @@ export class NarrativeFlowComponent implements AfterViewInit, OnDestroy {
   editingEvent = signal<NarrativeEvent | null>(null);
 
   openAddEvent(): void {
-    const campaignId = this.store.narrativeEvents()[0]?.campaignId
-      ?? this.store.pathSets()[0]?.campaignId ?? '';
-    const newEvent: NarrativeEvent = {
-      id: '', campaignId,
-      title: '', summary: undefined, description: undefined,
-      narrativeFunction: undefined,
-      status: 'Planned', visibility: 'GMOnly', sortOrder: 0,
-    };
-    // Save a shell event first so the editor has a real ID to attach data to.
-    // We open it immediately after creation.
-    this.store.saveNarrativeEvent(newEvent).then(saved => {
-      this.editingEvent.set(saved);
-    });
+    this.startPlacingEvent();
   }
 
   openEventEditor(event: NarrativeEvent): void {

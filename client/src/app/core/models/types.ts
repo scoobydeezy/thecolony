@@ -1189,7 +1189,6 @@ export interface NarrativeEventOverride {
   overridesDescription: boolean;
   description?: string;
   overridesConnections: boolean;
-  overridesThreads: boolean;
   overridesAssets: boolean;
 }
 
@@ -1202,14 +1201,8 @@ export interface EventOverrideConnection {
   id: string;
   eventOverrideId: string;
   targetNarrativeEventId: string;
-  label?: string;
+  threadId: string;
   visibility: NarrativeVisibility;
-}
-
-export interface EventOverrideThread {
-  eventOverrideId: string;
-  narrativeThreadId: string;
-  isPrimary: boolean;
 }
 
 export interface EventOverrideEntityLink {
@@ -1234,6 +1227,7 @@ export interface NarrativeThread {
   title: string;
   summary?: string;
   state: NarrativeThreadState;
+  color?: string;
 }
 
 export interface NarrativeEvent {
@@ -1253,14 +1247,8 @@ export interface NarrativeEventConnection {
   campaignId: string;
   sourceNarrativeEventId: string;
   targetNarrativeEventId: string;
-  label?: string;
+  threadId: string;
   visibility: NarrativeVisibility;
-}
-
-export interface NarrativeThreadEvent {
-  narrativeThreadId: string;
-  narrativeEventId: string;
-  isPrimary: boolean;
 }
 
 export interface NarrativeEntityLink {

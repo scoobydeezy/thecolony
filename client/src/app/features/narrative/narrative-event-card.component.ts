@@ -43,7 +43,7 @@ export class NarrativeEventCardComponent {
   overrideHasChanges = computed(() => {
     const o = this.activeOverride();
     if (!o) return false;
-    return o.overridesSummary || o.overridesDescription || o.overridesConnections || o.overridesThreads || o.overridesAssets;
+    return o.overridesSummary || o.overridesDescription || o.overridesConnections || o.overridesAssets;
   });
 
   readonly isVariant = computed(() => this.activePathId() !== null && this.overrideHasChanges());
@@ -70,12 +70,24 @@ export class NarrativeEventCardComponent {
     this.store.effectiveConnectionsForEvent()(this.event().id, this.activePathIds())
   );
 
-  incomingConns = computed(() =>
-    this.effectiveConns().filter(c => c.targetNarrativeEventId === this.event().id)
-  );
-  outgoingConns = computed(() =>
-    this.effectiveConns().filter(c => c.sourceNarrativeEventId === this.event().id)
-  );
+  incomingConns = computed(() => {
+    const seen = new Set<string>();
+    return this.effectiveConns().filter(c => {
+      if (c.targetNarrativeEventId !== this.event().id) return false;
+      if (seen.has(c.sourceNarrativeEventId)) return false;
+      seen.add(c.sourceNarrativeEventId);
+      return true;
+    });
+  });
+  outgoingConns = computed(() => {
+    const seen = new Set<string>();
+    return this.effectiveConns().filter(c => {
+      if (c.sourceNarrativeEventId !== this.event().id) return false;
+      if (seen.has(c.targetNarrativeEventId)) return false;
+      seen.add(c.targetNarrativeEventId);
+      return true;
+    });
+  });
 
   // ── Hover state (for inline + buttons) ───────────────────────────────────
 

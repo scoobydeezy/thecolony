@@ -20,6 +20,5 @@ public class NarrativeEventOverride
     // false = inherit the effective value from a less-specific override or the base event.
     // true  = use this override's collection records (even if the collection is empty).
     public bool OverridesConnections { get; set; }
-    public bool OverridesThreads { get; set; }
     public bool OverridesAssets { get; set; }
 }

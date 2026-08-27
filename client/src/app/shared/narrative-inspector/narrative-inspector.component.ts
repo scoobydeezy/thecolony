@@ -6,6 +6,7 @@ import {
   NarrativeThreadState,
   NARRATIVE_THREAD_STATE_OPTIONS,
 } from '../../core/models/types';
+import { NarrativeThreadSummaryService } from '../../features/narrative/services/narrative-thread-summary.service';
 
 type QuickAddMode = 'thread' | 'event' | null;
 
@@ -17,8 +18,9 @@ type QuickAddMode = 'thread' | 'event' | null;
   styleUrl: './narrative-inspector.component.scss',
 })
 export class NarrativeInspectorComponent {
-  store  = inject(AppStore);
-  router = inject(Router);
+  store      = inject(AppStore);
+  router     = inject(Router);
+  threadSummary = inject(NarrativeThreadSummaryService);
 
   readonly stateOptions = NARRATIVE_THREAD_STATE_OPTIONS;
 
@@ -29,6 +31,21 @@ export class NarrativeInspectorComponent {
   threads = computed(() => {
     const f = this.focus();
     if (!f) return this.store.narrativeThreads();
+
+    const summaries = this.threadSummary.summaries();
+
+    if (f.type === 'Character') {
+      return this.store.narrativeThreads().filter(t =>
+        summaries.get(t.id)?.characterIds.includes(f.id)
+      );
+    }
+    if (f.type === 'Asset') {
+      return this.store.narrativeThreads().filter(t =>
+        summaries.get(t.id)?.assetIds.includes(f.id)
+      );
+    }
+
+    // Fallback for Faction / Location / Session: direct thread entity-link lookup
     const linkedOwnerIds = new Set(
       this.store.narrativeEntityLinks()
         .filter(l => l.ownerType === 'Thread' && l.entityType === f.type && l.entityId === f.id)

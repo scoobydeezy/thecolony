@@ -2,7 +2,7 @@ import { signalStore, withState, withMethods, withComputed, patchState } from '@
 import { inject } from '@angular/core';
 import { tapResponse } from '@ngrx/operators';
 import { rxMethod } from '@ngrx/signals/rxjs-interop';
-import { pipe, switchMap, tap } from 'rxjs';
+import { firstValueFrom, pipe, switchMap, tap } from 'rxjs';
 import { computed } from '@angular/core';
 import {
   Faction, ColonyState, RelationshipBreakdown, RelationshipOverride,
@@ -18,9 +18,9 @@ import {
   Location, LocationState, ColonyMap, MapPlacement, GeometryType,
   PathSet, NarrativePath, PathSetContext, NarrativeEventVariantParticipation,
   NarrativeEventOverride, EventOverridePath, EventOverrideConnection,
-  EventOverrideThread, EventOverrideEntityLink,
+  EventOverrideEntityLink,
   NarrativeThread, NarrativeEvent, NarrativeEventConnection,
-  NarrativeThreadEvent, NarrativeEntityLink, NarrativeEntityLinkType,
+  NarrativeEntityLink, NarrativeEntityLinkType,
   NarrativeEventRealization, NarrativeEventPlacement,
   NarrativeOwnerType,
 } from '../core/models/types';
@@ -54,12 +54,10 @@ interface AppState {
   narrativeEventOverrides: NarrativeEventOverride[];
   eventOverridePaths: EventOverridePath[];
   eventOverrideConnections: EventOverrideConnection[];
-  eventOverrideThreads: EventOverrideThread[];
   eventOverrideEntityLinks: EventOverrideEntityLink[];
   narrativeThreads: NarrativeThread[];
   narrativeEvents: NarrativeEvent[];
   narrativeConnections: NarrativeEventConnection[];
-  narrativeThreadEvents: NarrativeThreadEvent[];
   narrativeEntityLinks: NarrativeEntityLink[];
   narrativeRealizations: NarrativeEventRealization[];
   narrativePlacements: NarrativeEventPlacement[];
@@ -93,12 +91,10 @@ const initialState: AppState = {
   narrativeEventOverrides: [],
   eventOverridePaths: [],
   eventOverrideConnections: [],
-  eventOverrideThreads: [],
   eventOverrideEntityLinks: [],
   narrativeThreads: [],
   narrativeEvents: [],
   narrativeConnections: [],
-  narrativeThreadEvents: [],
   narrativeEntityLinks: [],
   narrativeRealizations: [],
   narrativePlacements: [],
@@ -1694,17 +1690,17 @@ export const AppStore = signalStore(
     ),
     eventsForThread: computed(() => (threadId: string) => {
       const linkedIds = new Set(
-        store.narrativeThreadEvents()
-          .filter(te => te.narrativeThreadId === threadId)
-          .map(te => te.narrativeEventId)
+        store.narrativeConnections()
+          .filter(c => c.threadId === threadId)
+          .flatMap(c => [c.sourceNarrativeEventId, c.targetNarrativeEventId])
       );
       return store.narrativeEvents().filter(e => linkedIds.has(e.id));
     }),
     threadsForEvent: computed(() => (eventId: string) => {
       const linkedIds = new Set(
-        store.narrativeThreadEvents()
-          .filter(te => te.narrativeEventId === eventId)
-          .map(te => te.narrativeThreadId)
+        store.narrativeConnections()
+          .filter(c => c.sourceNarrativeEventId === eventId || c.targetNarrativeEventId === eventId)
+          .map(c => c.threadId)
       );
       return store.narrativeThreads().filter(t => linkedIds.has(t.id));
     }),
@@ -1768,12 +1764,24 @@ export const AppStore = signalStore(
     effectiveConnectionsForGraph: computed(() => (activePathIds: ReadonlySet<string>): NarrativeEventConnection[] => {
       if (activePathIds.size === 0) return store.narrativeConnections();
 
-      const overrides     = store.narrativeEventOverrides();
-      const overridePaths = store.eventOverridePaths();
+      const overrides      = store.narrativeEventOverrides();
+      const overridePaths  = store.eventOverridePaths();
+      const participations = store.variantParticipations();
 
-      // Find events whose best applicable override replaces connections
+      // Build set of path set IDs that are represented in activePathIds
+      const activePaths    = store.narrativePaths().filter(p => activePathIds.has(p.id));
+      const activePathSetIds = new Set(activePaths.map(p => p.pathSetId));
+
+      // Find events whose best applicable override replaces connections.
+      // Guard: only suppress base connections for events that actually participate
+      // in one of the active path sets — non-variant events always use base connections.
       const overrideConnSources = new Map<string, string>(); // eventId → overrideId
       for (const ev of store.narrativeEvents()) {
+        const participatesInActivePath = participations.some(
+          vp => vp.narrativeEventId === ev.id && activePathSetIds.has(vp.pathSetId)
+        );
+        if (!participatesInActivePath) continue;
+
         const applicable = overrides.filter(o => {
           if (o.narrativeEventId !== ev.id) return false;
           const required = overridePaths.filter(op => op.eventOverrideId === o.id).map(op => op.pathId);
@@ -1800,7 +1808,7 @@ export const AppStore = signalStore(
             id: oc.id, campaignId: '',
             sourceNarrativeEventId: eventId,
             targetNarrativeEventId: oc.targetNarrativeEventId,
-            label: oc.label, visibility: oc.visibility,
+            threadId: oc.threadId, visibility: oc.visibility,
           });
         }
       }
@@ -1815,58 +1823,77 @@ export const AppStore = signalStore(
         c => c.sourceNarrativeEventId === eventId || c.targetNarrativeEventId === eventId
       );
       if (activePathIds.size > 0) {
-        const overrides     = store.narrativeEventOverrides().filter(o => o.narrativeEventId === eventId);
-        const overridePaths = store.eventOverridePaths();
-        const applicable = overrides.filter(o => {
-          const required = overridePaths.filter(op => op.eventOverrideId === o.id).map(op => op.pathId);
-          return required.length > 0 && required.every(id => activePathIds.has(id));
-        });
-        applicable.sort((a, b) =>
-          overridePaths.filter(op => op.eventOverrideId === b.id).length -
-          overridePaths.filter(op => op.eventOverrideId === a.id).length
+        const activePaths      = store.narrativePaths().filter(p => activePathIds.has(p.id));
+        const activePathSetIds = new Set(activePaths.map(p => p.pathSetId));
+        const participates     = store.variantParticipations().some(
+          vp => vp.narrativeEventId === eventId && activePathSetIds.has(vp.pathSetId)
         );
-        const match = applicable.find(o => o.overridesConnections);
-        if (match) {
-          const overrideOutgoing = store.eventOverrideConnections()
-            .filter(c => c.eventOverrideId === match.id)
-            .map(c => ({
-              id: c.id, campaignId: '',
-              sourceNarrativeEventId: eventId,
-              targetNarrativeEventId: c.targetNarrativeEventId,
-              label: c.label, visibility: c.visibility,
-            }));
-          const baseIncoming = baseConns.filter(c => c.targetNarrativeEventId === eventId);
-          return [...baseIncoming, ...overrideOutgoing];
+        if (participates) {
+          const overrides     = store.narrativeEventOverrides().filter(o => o.narrativeEventId === eventId);
+          const overridePaths = store.eventOverridePaths();
+          const applicable = overrides.filter(o => {
+            const required = overridePaths.filter(op => op.eventOverrideId === o.id).map(op => op.pathId);
+            return required.length > 0 && required.every(id => activePathIds.has(id));
+          });
+          applicable.sort((a, b) =>
+            overridePaths.filter(op => op.eventOverrideId === b.id).length -
+            overridePaths.filter(op => op.eventOverrideId === a.id).length
+          );
+          const match = applicable.find(o => o.overridesConnections);
+          if (match) {
+            const overrideOutgoing = store.eventOverrideConnections()
+              .filter(c => c.eventOverrideId === match.id)
+              .map(c => ({
+                id: c.id, campaignId: '',
+                sourceNarrativeEventId: eventId,
+                targetNarrativeEventId: c.targetNarrativeEventId,
+                threadId: c.threadId, visibility: c.visibility,
+              }));
+            const baseIncoming = baseConns.filter(c => c.targetNarrativeEventId === eventId);
+            return [...baseIncoming, ...overrideOutgoing];
+          }
         }
       }
       return baseConns;
     }),
 
-    // Returns the thread IDs that belong to this event under the given path context.
-    // When an override exists and overridesThreads=true, returns override threads only.
-    // Otherwise falls back to base thread-events.
+    // Returns the thread IDs for this event under the given path context.
+    // Derived from effective connections: any connection incident to this event carries a threadId.
     effectiveThreadIdsForEvent: computed(() => (eventId: string, activePathIds: ReadonlySet<string>): string[] => {
+      const baseConns = store.narrativeConnections().filter(
+        c => c.sourceNarrativeEventId === eventId || c.targetNarrativeEventId === eventId
+      );
+      let conns = baseConns;
       if (activePathIds.size > 0) {
-        const overrides     = store.narrativeEventOverrides().filter(o => o.narrativeEventId === eventId);
-        const overridePaths = store.eventOverridePaths();
-        const applicable = overrides.filter(o => {
-          const required = overridePaths.filter(op => op.eventOverrideId === o.id).map(op => op.pathId);
-          return required.length > 0 && required.every(id => activePathIds.has(id));
-        });
-        applicable.sort((a, b) =>
-          overridePaths.filter(op => op.eventOverrideId === b.id).length -
-          overridePaths.filter(op => op.eventOverrideId === a.id).length
+        const activePaths      = store.narrativePaths().filter(p => activePathIds.has(p.id));
+        const activePathSetIds = new Set(activePaths.map(p => p.pathSetId));
+        const participates     = store.variantParticipations().some(
+          vp => vp.narrativeEventId === eventId && activePathSetIds.has(vp.pathSetId)
         );
-        const match = applicable.find(o => o.overridesThreads);
-        if (match) {
-          return store.eventOverrideThreads()
-            .filter(t => t.eventOverrideId === match.id)
-            .map(t => t.narrativeThreadId);
+        if (participates) {
+          const overrides     = store.narrativeEventOverrides().filter(o => o.narrativeEventId === eventId);
+          const overridePaths = store.eventOverridePaths();
+          const applicable = overrides.filter(o => {
+            const required = overridePaths.filter(op => op.eventOverrideId === o.id).map(op => op.pathId);
+            return required.length > 0 && required.every(id => activePathIds.has(id));
+          });
+          applicable.sort((a, b) =>
+            overridePaths.filter(op => op.eventOverrideId === b.id).length -
+            overridePaths.filter(op => op.eventOverrideId === a.id).length
+          );
+          const match = applicable.find(o => o.overridesConnections);
+          if (match) {
+            const overrideOutgoing = store.eventOverrideConnections()
+              .filter(c => c.eventOverrideId === match.id)
+              .map(c => ({ threadId: c.threadId } as { threadId: string }));
+            const baseIncomingThreadIds = baseConns
+              .filter(c => c.targetNarrativeEventId === eventId)
+              .map(c => ({ threadId: c.threadId }));
+            conns = [...baseIncomingThreadIds, ...overrideOutgoing] as typeof baseConns;
+          }
         }
       }
-      return store.narrativeThreadEvents()
-        .filter(te => te.narrativeEventId === eventId)
-        .map(te => te.narrativeThreadId);
+      return [...new Set(conns.map(c => c.threadId).filter((id): id is string => !!id))];
     }),
 
     // Returns entity links for this event under the given path context.
@@ -1901,45 +1928,9 @@ export const AppStore = signalStore(
     // PathSets whose scope includes this event, derived via BFS graph traversal.
     // A PathSet's scope is the set of events reachable from its origin event
     // following NarrativeEventConnections, stopping at (and excluding) its
-    // convergence event. No PathEventScope join table needed.
+    // Any event may participate in any PathSet — no topological eligibility gate.
     applicablePathSetsForEvent: computed(() => (eventId: string): PathSet[] => {
-      const connections = store.narrativeConnections();
-      const pathSets    = store.pathSets();
-
-      // Build adjacency list: sourceId → [targetId]
-      const adj = new Map<string, string[]>();
-      for (const c of connections) {
-        if (!adj.has(c.sourceNarrativeEventId)) adj.set(c.sourceNarrativeEventId, []);
-        adj.get(c.sourceNarrativeEventId)!.push(c.targetNarrativeEventId);
-      }
-
-      const result: PathSet[] = [];
-      for (const ps of pathSets) {
-        if (!ps.originEventId)           continue;
-        if (ps.originEventId === eventId) continue;
-
-        // BFS from origin, stopping at convergence
-        const visited = new Set<string>();
-        const queue   = [ps.originEventId];
-        let found = false;
-
-        while (queue.length > 0) {
-          const cur = queue.shift()!;
-          if (visited.has(cur)) continue;
-          visited.add(cur);
-
-          if (cur === ps.convergenceEventId) continue; // don't cross convergence
-
-          if (cur === eventId) { found = true; break; }
-
-          for (const next of (adj.get(cur) ?? [])) {
-            if (!visited.has(next)) queue.push(next);
-          }
-        }
-
-        if (found) result.push(ps);
-      }
-      return result;
+      return store.pathSets().filter(ps => ps.originEventId !== eventId);
     }),
   })),
 
@@ -1965,12 +1956,10 @@ export const AppStore = signalStore(
         narrativeEventOverrides,
         eventOverridePaths,
         eventOverrideConnections,
-        eventOverrideThreads,
         eventOverrideEntityLinks,
         narrativeThreads,
         narrativeEvents,
         narrativeConnections,
-        narrativeThreadEvents,
         narrativeEntityLinks,
         narrativeRealizations,
         narrativePlacements,
@@ -1982,12 +1971,10 @@ export const AppStore = signalStore(
         api.get<NarrativeEventOverride[]>('narrative/event-overrides'),
         api.get<EventOverridePath[]>('narrative/event-override-paths'),
         api.get<EventOverrideConnection[]>('narrative/event-override-connections'),
-        api.get<EventOverrideThread[]>('narrative/event-override-threads'),
         api.get<EventOverrideEntityLink[]>('narrative/event-override-entity-links'),
         api.get<NarrativeThread[]>('narrative/threads'),
         api.get<NarrativeEvent[]>('narrative/events'),
         api.get<NarrativeEventConnection[]>('narrative/connections'),
-        api.get<NarrativeThreadEvent[]>('narrative/thread-events'),
         api.get<NarrativeEntityLink[]>('narrative/entity-links'),
         api.get<NarrativeEventRealization[]>('narrative/realizations'),
         api.get<NarrativeEventPlacement[]>('narrative/placements'),
@@ -2000,15 +1987,32 @@ export const AppStore = signalStore(
         narrativeEventOverrides,
         eventOverridePaths,
         eventOverrideConnections,
-        eventOverrideThreads,
         eventOverrideEntityLinks,
         narrativeThreads,
         narrativeEvents,
         narrativeConnections,
-        narrativeThreadEvents,
         narrativeEntityLinks,
         narrativeRealizations,
         narrativePlacements,
+      });
+    },
+
+    savePathSetContext: async (ctx: PathSetContext) => {
+      const exists = store.pathSetContexts().some(
+        c => c.pathSetId === ctx.pathSetId && c.requiredPathId === ctx.requiredPathId
+      );
+      if (!exists) {
+        await api.post<PathSetContext>('narrative/path-set-contexts', ctx);
+        patchState(store, { pathSetContexts: [...store.pathSetContexts(), ctx] });
+      }
+    },
+
+    deletePathSetContext: async (pathSetId: string, requiredPathId: string) => {
+      await api.delete(`narrative/path-set-contexts?pathSetId=${pathSetId}&requiredPathId=${requiredPathId}`);
+      patchState(store, {
+        pathSetContexts: store.pathSetContexts().filter(
+          c => !(c.pathSetId === pathSetId && c.requiredPathId === requiredPathId)
+        ),
       });
     },
 
@@ -2066,7 +2070,6 @@ export const AppStore = signalStore(
       await api.delete(`narrative/threads/${id}`);
       patchState(store, {
         narrativeThreads: store.narrativeThreads().filter(t => t.id !== id),
-        narrativeThreadEvents: store.narrativeThreadEvents().filter(te => te.narrativeThreadId !== id),
         narrativeEntityLinks: store.narrativeEntityLinks().filter(
           l => !(l.ownerType === 'Thread' && l.ownerId === id)
         ),
@@ -2097,7 +2100,7 @@ export const AppStore = signalStore(
         })
         .filter((e): e is NarrativeEvent => e !== null);
       patchState(store, { narrativeEvents: reordered });
-      await api.reorderNarrativeEvents(orderedIds);
+      await firstValueFrom(api.reorderNarrativeEvents(orderedIds));
     },
 
     deleteNarrativeEvent: async (id: string) => {
@@ -2107,7 +2110,6 @@ export const AppStore = signalStore(
         narrativeConnections: store.narrativeConnections().filter(
           c => c.sourceNarrativeEventId !== id && c.targetNarrativeEventId !== id
         ),
-        narrativeThreadEvents: store.narrativeThreadEvents().filter(te => te.narrativeEventId !== id),
         narrativeEntityLinks: store.narrativeEntityLinks().filter(
           l => !(l.ownerType === 'Event' && l.ownerId === id)
         ),
@@ -2174,7 +2176,7 @@ export const AppStore = signalStore(
     },
 
     deleteEventOverridePath: async (eventOverrideId: string, pathId: string) => {
-      await api.delete(`narrative/event-override-paths?eventOverrideId=${eventOverrideId}&pathId=${pathId}`);
+      await api.delete(`narrative/event-override-paths?overrideId=${eventOverrideId}&pathId=${pathId}`);
       patchState(store, {
         eventOverridePaths: store.eventOverridePaths().filter(
           x => !(x.eventOverrideId === eventOverrideId && x.pathId === pathId)
@@ -2197,21 +2199,6 @@ export const AppStore = signalStore(
     deleteConnection: async (id: string) => {
       await api.delete(`narrative/connections/${id}`);
       patchState(store, { narrativeConnections: store.narrativeConnections().filter(c => c.id !== id) });
-    },
-
-    saveThreadEvent: async (te: NarrativeThreadEvent) => {
-      const saved = await api.post<NarrativeThreadEvent>('narrative/thread-events', te);
-      patchState(store, { narrativeThreadEvents: [...store.narrativeThreadEvents(), saved] });
-      return saved;
-    },
-
-    deleteThreadEvent: async (threadId: string, eventId: string) => {
-      await api.delete(`narrative/thread-events/${threadId}/${eventId}`);
-      patchState(store, {
-        narrativeThreadEvents: store.narrativeThreadEvents().filter(
-          te => !(te.narrativeThreadId === threadId && te.narrativeEventId === eventId)
-        ),
-      });
     },
 
     saveEntityLink: async (link: NarrativeEntityLink) => {
@@ -2247,25 +2234,6 @@ export const AppStore = signalStore(
       await api.delete(`narrative/event-override-connections/${id}`);
       patchState(store, {
         eventOverrideConnections: store.eventOverrideConnections().filter(c => c.id !== id),
-      });
-    },
-
-    saveOverrideThread: async (ot: EventOverrideThread) => {
-      const exists = store.eventOverrideThreads().some(
-        x => x.eventOverrideId === ot.eventOverrideId && x.narrativeThreadId === ot.narrativeThreadId
-      );
-      if (!exists) {
-        await api.post<EventOverrideThread>('narrative/event-override-threads', ot);
-        patchState(store, { eventOverrideThreads: [...store.eventOverrideThreads(), ot] });
-      }
-    },
-
-    deleteOverrideThread: async (eventOverrideId: string, threadId: string) => {
-      await api.delete(`narrative/event-override-threads?overrideId=${eventOverrideId}&threadId=${threadId}`);
-      patchState(store, {
-        eventOverrideThreads: store.eventOverrideThreads().filter(
-          x => !(x.eventOverrideId === eventOverrideId && x.narrativeThreadId === threadId)
-        ),
       });
     },
 

@@ -10,7 +10,7 @@ import {
   NarrativeEvent, NarrativeEventStatus, NarrativeVisibility,
   NarrativeEventOverride, EventOverridePath, PathSet, NarrativePath,
   NarrativeEventVariantParticipation, NarrativeEntityLink, NarrativeEntityLinkType,
-  NarrativeThreadEvent, EventOverrideEntityLink,
+  EventOverrideEntityLink,
   NARRATIVE_EVENT_STATUS_OPTIONS, NARRATIVE_VISIBILITY_OPTIONS,
 } from '../../core/models/types';
 
@@ -402,26 +402,31 @@ export class NarrativeEventEditorComponent implements OnDestroy {
 
   // ── Links tab ────────────────────────────────────────────────────────────
 
-  readonly showAddThread = signal(false);
   readonly showAddActor  = signal(false);
   readonly showAddAsset  = signal(false);
-  readonly newThreadId   = signal('');
   readonly newActorId    = signal('');
   readonly newAssetId    = signal('');
 
+  // Path IDs for text/field override resolution (requires variant participation)
   private readonly activePathIdsForEditor = computed<ReadonlySet<string>>(() =>
     new Set(this.editingContextPaths().map(c => c.pathId))
   );
 
+  // Path IDs for connection/thread/link resolution — use the raw canvas context,
+  // not the participation-gated one, so path-specific connections show correctly.
+  private readonly activePathIdsForDisplay = computed<ReadonlySet<string>>(() =>
+    this.pathCtx.activePathIds()
+  );
+
   readonly linkedThreads = computed(() => {
     const threadIds = new Set(
-      this.store.effectiveThreadIdsForEvent()(this.event().id, this.activePathIdsForEditor())
+      this.store.effectiveThreadIdsForEvent()(this.event().id, this.activePathIdsForDisplay())
     );
     return this.store.narrativeThreads().filter(t => threadIds.has(t.id));
   });
 
   readonly effectiveLinks = computed(() =>
-    this.store.effectiveEntityLinksForEvent()(this.event().id, this.activePathIdsForEditor())
+    this.store.effectiveEntityLinksForEvent()(this.event().id, this.activePathIdsForDisplay())
   );
 
   readonly characterLinks = computed(() =>
@@ -431,11 +436,6 @@ export class NarrativeEventEditorComponent implements OnDestroy {
   readonly assetLinks = computed(() =>
     this.effectiveLinks().filter(l => l.entityType === 'Asset')
   );
-
-  readonly availableThreads = computed(() => {
-    const linked = new Set(this.linkedThreads().map(t => t.id));
-    return this.store.narrativeThreads().filter(t => !linked.has(t.id));
-  });
 
   readonly availableActors = computed(() => {
     const linked = new Set(this.characterLinks().map(l => l.entityId));
@@ -461,39 +461,12 @@ export class NarrativeEventEditorComponent implements OnDestroy {
     const saved = await this.store.saveEventOverride({
       id: '', narrativeEventId: this.event().id,
       overridesSummary: false, overridesDescription: false,
-      overridesConnections: false, overridesThreads: false, overridesAssets: false,
+      overridesConnections: false, overridesAssets: false,
     });
     for (const ctx of ctxPaths) {
       await this.store.saveEventOverridePath({ eventOverrideId: saved.id, pathId: ctx.pathId });
     }
     return saved.id;
-  }
-
-  async addThread(): Promise<void> {
-    const threadId = this.newThreadId();
-    if (!threadId) return;
-
-    if (this.hasVariantContext()) {
-      const overrideId = await this.ensureEditorOverride();
-      const override = this.activeOverride() ?? this.store.narrativeEventOverrides().find(o => o.id === overrideId)!;
-      await this.store.saveEventOverride({ ...override, id: overrideId, overridesThreads: true });
-      await this.store.saveOverrideThread({ eventOverrideId: overrideId, narrativeThreadId: threadId, isPrimary: false });
-    } else {
-      await this.store.saveThreadEvent({ narrativeThreadId: threadId, narrativeEventId: this.event().id, isPrimary: false });
-    }
-
-    this.showAddThread.set(false);
-    this.newThreadId.set('');
-  }
-
-  async removeThread(threadId: string): Promise<void> {
-    if (this.hasVariantContext()) {
-      const override = this.activeOverride();
-      if (!override) return;
-      await this.store.deleteOverrideThread(override.id, threadId);
-    } else {
-      await this.store.deleteThreadEvent(threadId, this.event().id);
-    }
   }
 
   async addActor(): Promise<void> {
@@ -579,7 +552,7 @@ export class NarrativeEventEditorComponent implements OnDestroy {
       const existing = this.activeOverride();
       const ctxPaths = this.editingContextPaths();
       const hasTextOverride = draft.overridesSummary || draft.overridesDescription;
-      const hasCollectionOverride = (existing?.overridesThreads ?? false) || (existing?.overridesAssets ?? false) || (existing?.overridesConnections ?? false);
+      const hasCollectionOverride = (existing?.overridesAssets ?? false) || (existing?.overridesConnections ?? false);
       const hasAnyOverride = hasTextOverride || hasCollectionOverride;
 
       if (hasAnyOverride) {
@@ -591,7 +564,6 @@ export class NarrativeEventEditorComponent implements OnDestroy {
           overridesDescription: draft.overridesDescription,
           description:          draft.overridesDescription ? (draft.description || undefined) : undefined,
           overridesConnections: existing?.overridesConnections ?? false,
-          overridesThreads:     existing?.overridesThreads ?? false,
           overridesAssets:      existing?.overridesAssets ?? false,
         };
 

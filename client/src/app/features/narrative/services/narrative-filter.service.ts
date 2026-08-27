@@ -57,9 +57,9 @@ export class NarrativeFilterService {
           const checks: boolean[] = [];
 
           if (tIds.length > 0) {
-            const evThreadIds = this.store.narrativeThreadEvents()
-              .filter(te => te.narrativeEventId === ev.id)
-              .map(te => te.narrativeThreadId);
+            const evThreadIds = this.store.narrativeConnections()
+              .filter(c => c.sourceNarrativeEventId === ev.id || c.targetNarrativeEventId === ev.id)
+              .map(c => c.threadId);
             checks.push(tIds.some(id => evThreadIds.includes(id)));
           }
           if (cIds.length > 0) {

@@ -98,9 +98,9 @@ export class NarrativeEventsCardsComponent implements OnDestroy {
       if (q && !ev.title.toLowerCase().includes(q)) continue;
       if (st !== 'all' && ev.status !== st) continue;
       if (th !== 'all') {
-        const ids = this.store.narrativeThreadEvents()
-          .filter(te => te.narrativeEventId === ev.id)
-          .map(te => te.narrativeThreadId);
+        const ids = this.store.narrativeConnections()
+          .filter(c => c.sourceNarrativeEventId === ev.id || c.targetNarrativeEventId === ev.id)
+          .map(c => c.threadId);
         if (!ids.includes(th)) continue;
       }
 
@@ -211,14 +211,19 @@ export class NarrativeEventsCardsComponent implements OnDestroy {
   updateCardMidpoints(): void {
     const track = this.trackEl()?.nativeElement;
     if (!track) return;
-    const cards = Array.from(track.querySelectorAll<HTMLElement>('.card-outer'));
-    this.cardMidpoints = cards.map(c => {
-      const r = c.getBoundingClientRect();
-      return r.left + r.width / 2;
-    });
+    // Compute from track geometry rather than card DOM positions.
+    // Reading individual card positions breaks when an active slot is rendered
+    // inline in the flex track — it shifts every subsequent card and invalidates
+    // the snapshot taken at drag-start.
+    const trackLeft = track.getBoundingClientRect().left;
+    const count = this.trackItems().length;
+    this.cardMidpoints = Array.from({ length: count }, (_, i) =>
+      trackLeft + TRACK_PAD + i * (CARD_W + TRACK_GAP) + CARD_W / 2
+    );
   }
 
   updateSlot(clientX: number): void {
+    this.updateCardMidpoints(); // recompute each call — scroll and slot DOM changes affect positions
     const mids = this.cardMidpoints;
     if (!mids.length) { this.slotIndex.set(0); return; }
     let idx = mids.length;
@@ -263,6 +268,20 @@ export class NarrativeEventsCardsComponent implements OnDestroy {
     }
   }
 
+  // Re-integrate a reordered visible subset back into the full event list.
+  // Visible events occupy the same slots in the full order; hidden events stay put.
+  // Returns the complete ordered ID list safe to pass to reorderNarrativeEvents.
+  private mergeIntoFullOrder(reorderedVisible: NarrativeEvent[]): string[] {
+    const visibleIds = new Set(reorderedVisible.map(e => e.id));
+    const allSorted = this.store.narrativeEvents().slice().sort((a, b) => a.sortOrder - b.sortOrder);
+    const full: NarrativeEvent[] = [];
+    let vi = 0;
+    for (const ev of allSorted) {
+      full.push(visibleIds.has(ev.id) ? reorderedVisible[vi++] : ev);
+    }
+    return full.map(e => e.id);
+  }
+
   async commitSlot(insertIndex: number): Promise<void> {
     const ds = this.dragState();
     const cards = this.cardItems();
@@ -273,9 +292,9 @@ export class NarrativeEventsCardsComponent implements OnDestroy {
       const evs = cards.map(c => c.event);
       const without = [...evs.slice(0, fromIdx), ...evs.slice(fromIdx + 1)];
       const insertAt = fromIdx < insertIndex ? insertIndex - 1 : insertIndex;
-      const reordered = [...without.slice(0, insertAt), evs[fromIdx], ...without.slice(insertAt)];
+      const reorderedVisible = [...without.slice(0, insertAt), evs[fromIdx], ...without.slice(insertAt)];
       this.cancelDrag();
-      await this.store.reorderNarrativeEvents(reordered.map(e => e.id));
+      await this.store.reorderNarrativeEvents(this.mergeIntoFullOrder(reorderedVisible));
     } else if (ds?.mode === 'adding') {
       this.cancelDrag();
       this.addEventAt.emit(insertIndex);
@@ -292,7 +311,7 @@ export class NarrativeEventsCardsComponent implements OnDestroy {
     const evs = cards.map(c => c.event);
     const swapped = [...evs];
     [swapped[i - 1], swapped[i]] = [swapped[i], swapped[i - 1]];
-    await this.store.reorderNarrativeEvents(swapped.map(e => e.id));
+    await this.store.reorderNarrativeEvents(this.mergeIntoFullOrder(swapped));
   }
 
   async moveRight(ev: NarrativeEvent): Promise<void> {
@@ -302,7 +321,7 @@ export class NarrativeEventsCardsComponent implements OnDestroy {
     const evs = cards.map(c => c.event);
     const swapped = [...evs];
     [swapped[i], swapped[i + 1]] = [swapped[i + 1], swapped[i]];
-    await this.store.reorderNarrativeEvents(swapped.map(e => e.id));
+    await this.store.reorderNarrativeEvents(this.mergeIntoFullOrder(swapped));
   }
 
   // ── Helpers ───────────────────────────────────────────────────────────────

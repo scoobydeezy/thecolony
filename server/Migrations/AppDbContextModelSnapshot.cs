@@ -487,10 +487,11 @@ namespace ColonyTracker.Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Label")
+                    b.Property<string>("TargetNarrativeEventId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("TargetNarrativeEventId")
+                    b.Property<string>("ThreadId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -549,22 +550,6 @@ namespace ColonyTracker.Api.Migrations
                     b.HasIndex("PathId");
 
                     b.ToTable("EventOverridePaths");
-                });
-
-            modelBuilder.Entity("ColonyTracker.Api.Models.EventOverrideThread", b =>
-                {
-                    b.Property<string>("EventOverrideId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NarrativeThreadId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsPrimary")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("EventOverrideId", "NarrativeThreadId");
-
-                    b.ToTable("EventOverrideThreads");
                 });
 
             modelBuilder.Entity("ColonyTracker.Api.Models.Faction", b =>
@@ -911,14 +896,15 @@ namespace ColonyTracker.Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Label")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("SourceNarrativeEventId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TargetNarrativeEventId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ThreadId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -952,9 +938,6 @@ namespace ColonyTracker.Api.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<bool>("OverridesSummary")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("OverridesThreads")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Summary")
@@ -1055,6 +1038,9 @@ namespace ColonyTracker.Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Color")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("State")
                         .HasColumnType("INTEGER");
 
@@ -1068,22 +1054,6 @@ namespace ColonyTracker.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("NarrativeThreads");
-                });
-
-            modelBuilder.Entity("ColonyTracker.Api.Models.NarrativeThreadEvent", b =>
-                {
-                    b.Property<string>("NarrativeThreadId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NarrativeEventId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsPrimary")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("NarrativeThreadId", "NarrativeEventId");
-
-                    b.ToTable("NarrativeThreadEvents");
                 });
 
             modelBuilder.Entity("ColonyTracker.Api.Models.PathEventScope", b =>
@@ -1374,15 +1344,6 @@ namespace ColonyTracker.Api.Migrations
                     b.HasOne("ColonyTracker.Api.Models.NarrativePath", null)
                         .WithMany()
                         .HasForeignKey("PathId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ColonyTracker.Api.Models.EventOverrideThread", b =>
-                {
-                    b.HasOne("ColonyTracker.Api.Models.NarrativeEventOverride", null)
-                        .WithMany()
-                        .HasForeignKey("EventOverrideId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

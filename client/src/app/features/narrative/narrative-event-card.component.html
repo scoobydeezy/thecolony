@@ -19,18 +19,17 @@
 
   <!-- ── Body text ──────────────────────────────────────────────────── -->
   @if (effectiveEvent().summary) {
-    <p class="ev-summary">{{ effectiveEvent().summary }}</p>
-  }
-
-  @if (effectiveEvent().narrativeFunction) {
     <div class="ev-field">
-      <span class="ev-field-label">Narrative Role</span>
-      <p class="ev-field-value">{{ effectiveEvent().narrativeFunction }}</p>
+      @if (effectiveEvent().narrativeFunction) {
+        <span class="ev-field-label">{{ effectiveEvent().narrativeFunction }}</span>
+      }
+      <p class="ev-summary">{{ effectiveEvent().summary }}</p>
     </div>
   }
 
   @if (effectiveEvent().description) {
     <div class="ev-field">
+      <span class="ev-field-label">Description</span>
       <p class="ev-field-value">{{ effectiveEvent().description }}</p>
     </div>
   }

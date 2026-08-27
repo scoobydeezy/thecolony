@@ -46,7 +46,6 @@ public class NarrativeEventOverridesController(AppDbContext db) : ControllerBase
         existing.OverridesDescription = o.OverridesDescription;
         existing.Description = o.Description;
         existing.OverridesConnections = o.OverridesConnections;
-        existing.OverridesThreads = o.OverridesThreads;
         existing.OverridesAssets = o.OverridesAssets;
         await db.SaveChangesAsync();
         return Ok(existing);

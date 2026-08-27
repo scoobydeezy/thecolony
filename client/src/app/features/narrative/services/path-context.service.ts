@@ -30,13 +30,32 @@ export class PathContextService {
   readonly editingLocked = signal(false);
 
   constructor() {
+    // Persist selections to sessionStorage whenever they change.
+    effect(() => {
+      const cid = this.store.activeCampaign()?.id;
+      if (!cid) return;
+      const sel = this.selectedPaths();
+      if (sel.size === 0) return;
+      sessionStorage.setItem(`path-context-${cid}`, JSON.stringify([...sel]));
+    });
+
     // When PathSets or NarrativePaths load/change, ensure every applicable PathSet
-    // has a selection. Run in an effect so it responds to async store loads.
+    // has a selection. Prefers a saved sessionStorage selection over the sort-order default.
     effect(() => {
       const allSets  = this.store.pathSets();
       const allPaths = this.store.narrativePaths();
       const current  = this.selectedPaths();
       const active   = this.activePathIds();
+      const cid      = this.store.activeCampaign()?.id;
+
+      // Load saved selections once per campaign
+      const saved = new Map<string, string>();
+      if (cid) {
+        try {
+          const raw = sessionStorage.getItem(`path-context-${cid}`);
+          if (raw) for (const [k, v] of JSON.parse(raw) as [string, string][]) saved.set(k, v);
+        } catch { /* ignore malformed */ }
+      }
 
       let changed = false;
       const next = new Map(current);
@@ -45,10 +64,14 @@ export class PathContextService {
         if (!this.isApplicable(ps, active)) continue;
 
         if (!next.has(ps.id) || !allPaths.some(p => p.pathSetId === ps.id && p.id === next.get(ps.id))) {
-          const first = allPaths
+          // Prefer saved path ID if the path still exists, else fall back to lowest sortOrder
+          const savedId  = saved.get(ps.id);
+          const isValid  = !!savedId && allPaths.some(p => p.pathSetId === ps.id && p.id === savedId);
+          const fallback = allPaths
             .filter(p => p.pathSetId === ps.id)
             .sort((a, b) => a.sortOrder - b.sortOrder)[0];
-          if (first) { next.set(ps.id, first.id); changed = true; }
+          const pick = isValid ? savedId : fallback?.id;
+          if (pick) { next.set(ps.id, pick); changed = true; }
         }
       }
 

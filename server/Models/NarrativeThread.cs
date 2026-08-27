@@ -9,4 +9,5 @@ public class NarrativeThread
     public string? Summary { get; set; }
 
     public NarrativeThreadState State { get; set; } = NarrativeThreadState.Open;
+    public string? Color { get; set; }
 }

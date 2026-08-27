@@ -207,40 +207,20 @@
     @if (activeTab() === 'links') {
       <div class="editor-body">
 
-        <!-- Threads -->
+        <!-- Threads (read-only — membership is derived from connections) -->
         <div class="editor-section">
           <div class="links-section-header">
             <div class="section-title">Threads</div>
-            <button class="btn-add-link" (click)="showAddThread.set(!showAddThread())">
-              <i class="fa-solid fa-plus"></i> Add
-            </button>
           </div>
 
-          @if (showAddThread()) {
-            <div class="link-add-row">
-              <select class="form-select"
-                      [ngModel]="newThreadId()"
-                      (ngModelChange)="newThreadId.set($event)">
-                <option value="">— select thread —</option>
-                @for (t of availableThreads(); track t.id) {
-                  <option [value]="t.id">{{ t.title }}</option>
-                }
-              </select>
-              <button class="btn-primary btn-sm" [disabled]="!newThreadId()" (click)="addThread()">Add</button>
-              <button class="btn-secondary btn-sm" (click)="showAddThread.set(false); newThreadId.set('')">Cancel</button>
+          @if (linkedThreads().length === 0) {
+            <p class="empty-hint">No threads — add a connection to associate this event with a thread.</p>
+          } @else {
+            <div class="thread-chips">
+              @for (t of linkedThreads(); track t.id) {
+                <span class="thread-chip">{{ t.title }}</span>
+              }
             </div>
-          }
-
-          @for (t of linkedThreads(); track t.id) {
-            <div class="link-row">
-              <span class="link-row-name">{{ t.title }}</span>
-              <button class="icon-btn icon-btn--danger" title="Unlink" (click)="removeThread(t.id)">
-                <i class="fa-solid fa-xmark"></i>
-              </button>
-            </div>
-          }
-          @if (linkedThreads().length === 0 && !showAddThread()) {
-            <p class="empty-hint">No threads linked.</p>
           }
         </div>
 

@@ -26,6 +26,27 @@
   &.connection-mode { cursor: crosshair; }
   &.erase-mode      { cursor: not-allowed; }
   &.condense-mode   { cursor: default; }
+  &.placing-event   { cursor: crosshair; }
+}
+
+// ── Ghost event card (placement preview) ─────────────────────────────────────
+
+.ghost-event-card {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 60;
+  width: 220px;
+  padding: 0.5rem 0.75rem;
+  border: 2px dashed var(--accent);
+  border-radius: 8px;
+  background: var(--bg-surface);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  opacity: 0.85;
 }
 
 // ── Toolbar + filter panel stack ──────────────────────────────────────────────
@@ -86,8 +107,6 @@
 
 .edge-path {
   fill: none;
-  stroke: var(--border);
-  stroke-width: 1.5;
   transition: stroke 0.12s;
   pointer-events: none;
 
@@ -98,13 +117,21 @@
   }
 }
 
+.edge-tail {
+  fill: none;
+  pointer-events: none;
+  stroke-linecap: round;
+  opacity: 0.75;
+}
+
 .edge-path-hit {
   fill: none;
   stroke: transparent;
   stroke-width: 12;
-  pointer-events: none;
+  pointer-events: stroke; // always hoverable so SVG <title> tooltip fires
 
-  .edge-group--erasable & { pointer-events: stroke; }
+  .edge-group:not(.edge-group--erasable) & { cursor: default; }
+  .edge-group--erasable & { cursor: pointer; }
 }
 
 // ── Node scene ────────────────────────────────────────────────────────────────
@@ -258,6 +285,91 @@
   i { font-size: 10px; }
 }
 
+// ── Node detail panel — slides in below the main card ────────────────────────
+
+.node-detail-panel {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 220px;
+  margin-top: 6px;
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+  box-sizing: border-box;
+  z-index: 20;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.22);
+  cursor: default;
+  user-select: text;
+}
+
+.ndp-section {
+  & + & { margin-top: 0.55rem; padding-top: 0.55rem; border-top: 1px solid var(--border); }
+}
+
+.ndp-label {
+  font-size: var(--text-size-label);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+
+  i { font-size: 10px; }
+}
+
+.ndp-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 1.5rem;
+}
+
+.ndp-dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.ndp-name {
+  flex: 1;
+  font-size: var(--text-size-meta);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ndp-state {
+  font-size: var(--text-size-label);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.ndp-role {
+  font-size: var(--text-size-label);
+  color: var(--text-muted);
+  font-style: italic;
+  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 70px;
+}
+
+.ndp-empty {
+  font-size: var(--text-size-meta);
+  color: var(--text-muted);
+  font-style: italic;
+}
+
 // ── Connection handle — right-center edge of node, shown on hover ─────────────
 
 .connect-handle {
@@ -319,6 +431,7 @@
 
 .modal-flow-event { max-width: 520px; }
 .modal-pathsets   { max-width: 600px; }
+.modal--sm        { min-width: 300px; max-width: 360px; }
 
 .field-error {
   font-size: var(--text-size-meta);

@@ -47,7 +47,7 @@ public class NarrativeConnectionsController(AppDbContext db, ICampaignContext ca
         if (existing is null) return NotFound();
         existing.SourceNarrativeEventId = connection.SourceNarrativeEventId;
         existing.TargetNarrativeEventId = connection.TargetNarrativeEventId;
-        existing.Label = connection.Label;
+        existing.ThreadId = connection.ThreadId;
         existing.Visibility = connection.Visibility;
         await db.SaveChangesAsync();
         return Ok(existing);
