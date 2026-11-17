@@ -112,7 +112,7 @@
           <div class="alert-row">
             <span class="alert-label">Most Influential</span>
             <span class="alert-value">{{ mostInfluential.faction.name }}</span>
-            <span class="alert-meta">momentum {{ mostInfluential.momentum }}</span>
+            <span class="alert-meta">momentum {{ mostInfluential.momentum > 0 ? '+' : '' }}{{ mostInfluential.momentum }}</span>
           </div>
         }
         @if (fastestRising) {
@@ -122,11 +122,11 @@
             <span class="alert-meta">↑ this session</span>
           </div>
         }
-        @if (lowestLegitimacy) {
+        @if (powerless.length) {
           <div class="alert-row danger">
-            <span class="alert-label">Lowest Legitimacy</span>
-            <span class="alert-value">{{ lowestLegitimacy.faction.name }}</span>
-            <span class="alert-meta">{{ lowestLegitimacy.legitimacy }}</span>
+            <span class="alert-label">No Power</span>
+            <span class="alert-value">{{ powerless.map(f => f.name).join(', ') }}</span>
+            <span class="alert-meta">no operations</span>
           </div>
         }
         @if (highestDefectionRisk) {
@@ -136,7 +136,7 @@
             <span class="alert-meta">drift {{ highestDefectionRisk.driftScore > 0 ? '+' : '' }}{{ highestDefectionRisk.driftScore }}</span>
           </div>
         }
-        @if (!mostInfluential && !lowestLegitimacy && !highestDefectionRisk) {
+        @if (!mostInfluential && !powerless.length && !highestDefectionRisk) {
           <p class="alerts-empty">No data yet. Add factions and characters.</p>
         }
       </div>
@@ -151,7 +151,6 @@
               <th>#</th>
               <th>Faction</th>
               <th>Momentum</th>
-              <th>Legitimacy</th>
               <th>Power</th>
             </tr>
           </thead>
@@ -163,7 +162,6 @@
                 <td><span [class]="'momentum ' + (row.momentum > 0 ? 'pos' : row.momentum < 0 ? 'neg' : 'neutral')">
                   {{ row.momentum > 0 ? '+' : '' }}{{ row.momentum }}
                 </span></td>
-                <td>{{ row.legitimacy }}</td>
                 <td>{{ row.power }}</td>
               </tr>
             }

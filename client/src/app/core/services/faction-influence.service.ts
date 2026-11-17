@@ -1,85 +1,14 @@
 import { Injectable } from '@angular/core';
-import { Character, Faction, FormulasConfig, DEFAULT_FORMULAS, Asset, computeAssetInfluence, computeAssetLegitimacy } from '../models/types';
+import { Character, Faction, FormulasConfig, DEFAULT_FORMULAS, Asset } from '../models/types';
+import { PowerBreakdown, computePowerBreakdown } from '../sim/power';
 
+// Thin injectable wrapper over core/sim/power.ts, the single Power implementation (capacity channels, M2).
 @Injectable({ providedIn: 'root' })
 export class FactionInfluenceService {
 
-  private static readonly ADDITIONAL_MEMBER_BASE_INFLUENCE = 30;
-
-  // CharacterStrength = (avg * memberAvgWeight) + (max * memberMaxWeight)
-  // Leaderless penalty applied here rather than to final power.
-  // additionalMemberCount pads the pool with baseline generics (influence 30) so large
-  // factions don't need every NPC entered to model their mass accurately.
-  calculateCharacterStrength(members: Character[], f: FormulasConfig = DEFAULT_FORMULAS, additionalMemberCount = 0, leaderId?: string): number {
-    const base = FactionInfluenceService.ADDITIONAL_MEMBER_BASE_INFLUENCE;
-    const totalCount = members.length + additionalMemberCount;
-    if (totalCount === 0) return 0;
-    const representedSum = members.reduce((s, c) => s + c.influence, 0);
-    const avg = (representedSum + additionalMemberCount * base) / totalCount;
-    const max = members.length > 0 ? Math.max(...members.map(c => c.influence)) : base;
-    const raw = avg * f.memberAvgWeight + max * f.memberMaxWeight;
-    const hasLeader = leaderId != null;
-    return raw * (hasLeader ? 1 : (f.leaderlessPowerMultiplier ?? 0.75));
-  }
-
-  // Normalized asset influence score: raw sum → 0–100
-  calculateAssetInfluenceScore(assets: Asset[], factionId: string, f: FormulasConfig = DEFAULT_FORMULAS): number {
-    const raw = assets
-      .filter(a => a.controllingFactionId === factionId)
-      .reduce((sum, a) => sum + computeAssetInfluence(a), 0);
-    return Math.min(100, raw / (f.assetInfluenceScale ?? 25) * 100);
-  }
-
-  // Normalized asset legitimacy score: raw sum → 0–100
-  calculateAssetLegitimacyScore(assets: Asset[], factionId: string, f: FormulasConfig = DEFAULT_FORMULAS): number {
-    const raw = assets
-      .filter(a => a.controllingFactionId === factionId)
-      .reduce((sum, a) => sum + computeAssetLegitimacy(a), 0);
-    return Math.min(100, raw / (f.assetLegitimacyScale ?? 25) * 100);
-  }
-
-  // normalizedMomentum maps -100..+100 → 0..100
-  calculateNormalizedMomentum(momentum: number): number {
-    return 50 + momentum / 2;
-  }
-
-  // Organization = CharacterStrength×charWeight + AssetInfluenceScore×assetWeight + NormalizedMomentum×momentumWeight
-  calculateOrganization(faction: Faction, members: Character[], f: FormulasConfig = DEFAULT_FORMULAS, assets: Asset[] = []): number {
-    const charStrength = this.calculateCharacterStrength(members, f, faction.additionalMemberCount ?? 0, faction.leaderId);
-    const assetInfluenceScore = this.calculateAssetInfluenceScore(assets, faction.id, f);
-    const normalizedMomentum = this.calculateNormalizedMomentum(faction.momentum);
-    const raw =
-      charStrength       * f.charInfluenceWeight
-      + assetInfluenceScore * f.assetInfluenceWeight
-      + normalizedMomentum  * f.momentumInfluenceWeight;
-    return Math.min(100, Math.max(0, Math.round(raw)));
-  }
-
-  // Legitimacy = BaseLegitimacy×baseWeight + AssetLegitimacyScore×assetWeight
-  calculateLegitimacy(faction: Faction, f: FormulasConfig = DEFAULT_FORMULAS, assets: Asset[] = []): number {
-    const assetLegitimacyScore = this.calculateAssetLegitimacyScore(assets, faction.id, f);
-    const raw =
-      faction.baseLegitimacy  * (f.baseLegitimacyWeight ?? 0.70)
-      + assetLegitimacyScore  * (f.assetLegitimacyWeight ?? 0.30);
-    return Math.min(100, Math.max(0, Math.round(raw)));
-  }
-
-  // Power = Organization × LegitimacyMultiplier + PowerModifier
-  calculateEffectivePower(faction: Faction, members: Character[], f: FormulasConfig = DEFAULT_FORMULAS, assets: Asset[] = []): number {
-    const organization = this.calculateOrganization(faction, members, f, assets);
-    const legitimacy   = this.calculateLegitimacy(faction, f, assets);
-    const legitimacyMultiplier = f.legitimacyBase + legitimacy / f.legitimacyScale;
-    return Math.round(organization * legitimacyMultiplier + faction.powerModifier);
-  }
-
-  // Kept for backwards compat with the faction detail influence card
-  calculateCharacterInfluence(members: Character[], f: FormulasConfig = DEFAULT_FORMULAS, additionalMemberCount = 0): number {
-    return this.calculateCharacterStrength(members, f, additionalMemberCount);
-  }
-
-  // Kept for backwards compat — now Organization is the equivalent of totalInfluence
-  calculateTotalInfluence(faction: Faction, members: Character[], f: FormulasConfig = DEFAULT_FORMULAS, assets: Asset[] = []): number {
-    return this.calculateOrganization(faction, members, f, assets);
+  /** Power (1–3) and its People / Holdings / Mandate channels, counted from the given (projected) world. */
+  breakdown(faction: Faction, characters: Character[], assets: Asset[], f: FormulasConfig = DEFAULT_FORMULAS): PowerBreakdown {
+    return computePowerBreakdown(faction, characters, assets, f);
   }
 
   topMembers(members: Character[], count = 5): Character[] {

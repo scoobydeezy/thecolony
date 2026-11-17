@@ -15,6 +15,14 @@ export const routes: Routes = [
     loadComponent: () => import('./features/factions/faction-detail.component').then(m => m.FactionDetailComponent)
   },
   {
+    path: 'goals',
+    loadComponent: () => import('./features/goals/goals.component').then(m => m.GoalsComponent)
+  },
+  {
+    path: 'world-conditions',
+    loadComponent: () => import('./features/world-conditions/world-conditions.component').then(m => m.WorldConditionsComponent)
+  },
+  {
     path: 'relationships',
     loadComponent: () => import('./features/relationships/relationships.component').then(m => m.RelationshipsComponent)
   },

@@ -6,7 +6,7 @@ public class ColonyState
     public string PartyName { get; set; } = "The Party";
     public int Act { get; set; } = 1;
     public int Week { get; set; } = 1;
-    public int ColonyStress { get; set; } = 0;
+    // §18.10: no stored Colony Stress. Stress is derived on the client from the World Conditions in force.
 
     // Party / Party State
     public BeliefPosition PartyBeliefC { get; set; } = BeliefPosition.Neutral;

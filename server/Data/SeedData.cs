@@ -329,7 +329,6 @@ public static class SeedData
             Id = "singleton",
             Act = 1,
             Week = 1,
-            ColonyStress = 3,
             PartyBeliefC = BeliefPosition.Neutral,
             PartyBeliefA = BeliefPosition.Neutral,
             PartyBeliefB = BeliefPosition.Positive,

@@ -38,7 +38,32 @@
             <p class="content-desc warning-text">You must have at least one campaign. Create another before deleting.</p>
           }
 
-          @if (deletingId()) {
+          @if (activating()) {
+            <div class="delete-confirm-panel">
+              <p class="delete-warning">
+                Going Live with <strong>{{ store.activeCampaign()?.name }}</strong> is <strong>one-way</strong>.
+                Baseline simulation fields (values, pressure, membership, Momentum, Asset ownership and status,
+                goal targets…) become locked and change only through recorded Events. Rule changes become new
+                versions instead of rewriting history. Names, prose and portraits stay editable.
+              </p>
+              @if (recordedSessionCount() > 0) {
+                <p class="delete-warning">
+                  This campaign has {{ recordedSessionCount() }} recorded session(s). They become permanent history.
+                  To start Live from a clean history, export and remove them first.
+                </p>
+              }
+              <div class="field">
+                <label class="field-label">Type <strong>{{ store.activeCampaign()?.name }}</strong> to confirm</label>
+                <input class="field-input" type="text" [placeholder]="store.activeCampaign()?.name ?? ''"
+                  [value]="activateConfirmText()" (input)="activateConfirmText.set($any($event.target).value)" />
+              </div>
+              <div class="form-actions form-actions-row">
+                <button class="btn btn-danger btn-sm" type="button"
+                  [disabled]="!activateEnabled()" (click)="submitActivate()">Go Live</button>
+                <button class="btn btn-ghost btn-sm" type="button" (click)="cancelActivate()">Cancel</button>
+              </div>
+            </div>
+          } @else if (deletingId()) {
             <div class="delete-confirm-panel">
               <p class="delete-warning">
                 You are about to permanently delete <strong>{{ campaignToDelete()?.name }}</strong> and all of its data.
@@ -87,6 +112,9 @@
                           @if (store.activeCampaign()?.id === campaign.id) {
                             <span class="active-chip">Active</span>
                           }
+                          <span class="active-chip" [title]="campaign.mode === 'Live' ? 'Baseline locked; rules versioned' : 'Design: baseline and rules freely editable'">
+                            {{ campaign.mode === 'Live' ? 'Live' : 'Design' }}
+                          </span>
                           @if (campaign.description) {
                             <span class="campaign-list-desc">{{ campaign.description }}</span>
                           }
@@ -101,6 +129,12 @@
                             (click)="startEdit(campaign)">
                             <i class="fa-solid fa-pen"></i>
                           </button>
+                          @if (store.activeCampaign()?.id === campaign.id && campaign.mode !== 'Live') {
+                            <button class="icon-btn" type="button" title="Go Live (one-way)" aria-label="Go Live"
+                              (click)="startActivate()">
+                              <i class="fa-solid fa-lock"></i>
+                            </button>
+                          }
                           <button class="icon-btn icon-btn-danger" type="button" title="Delete campaign" aria-label="Delete campaign"
                             [disabled]="!canDelete()" (click)="startDelete(campaign)">
                             <i class="fa-solid fa-trash"></i>

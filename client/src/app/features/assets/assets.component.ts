@@ -1,10 +1,11 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { FormField, form } from '@angular/forms/signals';
 import { AppStore } from '../../store/app.store';
+import { ToastService, ImportTally } from '../../core/services/toast.service';
 import {
   Asset, AssetType, AssetRole, AssetStatus,
   ASSET_TYPE_OPTIONS, ASSET_ROLE_OPTIONS, ASSET_STATUS_OPTIONS, ASSET_TIER_OPTIONS,
-  computeAssetInfluence, computeAssetLegitimacy,
+  ASSET_ROLE_CHANNEL, assetStars,
 } from '../../core/models/types';
 import { downloadCsv, parseCsv, csvHeaderMap } from '../../core/utils/csv-export';
 import { oneOf } from '../../core/utils/validation';
@@ -75,14 +76,17 @@ const fromFormModel = (fm: AssetFormModel): Asset => ({
 })
 export class AssetsComponent {
   store = inject(AppStore);
+  private readonly toast = inject(ToastService);
 
   readonly typeOptions   = ASSET_TYPE_OPTIONS;
   readonly roleOptions   = ASSET_ROLE_OPTIONS;
   readonly tierOptions   = ASSET_TIER_OPTIONS;
   readonly statusOptions = ASSET_STATUS_OPTIONS;
 
-  computedInfluence  = computeAssetInfluence;
-  computedLegitimacy = computeAssetLegitimacy;
+  /** §18.7: an Asset's capacity contribution: its stars, toward its Role's channel (none while Destroyed). */
+  contribution(a: Asset): string {
+    return `${assetStars(a)}★ ${ASSET_ROLE_CHANNEL[a.role] === 'holdings' ? 'Holdings' : 'Mandate'}`;
+  }
 
   readonly showModal = signal(false);
   readonly editForm = signal<AssetFormModel>(emptyForm());
@@ -132,11 +136,11 @@ export class AssetsComponent {
   };
 
   readonly ROLE_HINTS: Record<AssetRole, string> = {
-    Operational: 'Balanced — contributes equally to Influence and Legitimacy (×1.0 / ×1.0).',
-    Strategic:   'Power-forward — high Influence, weak Legitimacy (×1.25 / ×0.25). Use for military or logistical holdings.',
-    Symbolic:    'Legitimacy-forward — weak Influence, high Legitimacy (×0.25 / ×1.25). Use for cultural or religious sites.',
-    Covert:      'Covert — full Influence, zero Legitimacy (×1.0 / ×0). Asset is known only to the controlling faction.',
-    Mandate:     'Civic — zero Influence, full Legitimacy (×0 / ×1.0). Derives power entirely from public recognition.',
+    Operational: 'Its stars count toward its controller\'s Holdings.',
+    Strategic:   'Its stars count toward its controller\'s Holdings. Use for military or logistical holdings.',
+    Symbolic:    'Its stars count toward its controller\'s Mandate. Use for cultural or religious sites.',
+    Covert:      'Its stars count toward its controller\'s Holdings. Known only to the controlling faction.',
+    Mandate:     'Its stars count toward its controller\'s Mandate: formal civic authority.',
   };
 
   slotIcon(status: AssetStatus): string {
@@ -219,6 +223,8 @@ export class AssetsComponent {
         return;
       }
 
+      const existingIds = new Set(this.store.assets().map(a => a.id));
+      const tally = new ImportTally();
       for (const row of rows.slice(1)) {
         const asset: Asset = {
           id:                   get(row, 'id'),
@@ -233,8 +239,9 @@ export class AssetsComponent {
           locationId:           get(row, 'locationid') || undefined,
           description:          get(row, 'description') || undefined,
         };
-        this.store.saveAsset(asset);
+        tally.track(existingIds.has(asset.id) ? 'replaced' : 'added', this.store.saveAsset(asset));
       }
+      tally.report(this.toast, 'Assets');
       (event.target as HTMLInputElement).value = '';
     };
     reader.readAsText(file);

@@ -24,4 +24,21 @@ public class FactionGoal
     public string? TargetProperty { get; set; }      // 'legitimacy' | 'momentum' | 'influence'
     public string? TargetOperator { get; set; }       // 'gte' | 'lte' | 'eq'
     public int? TargetThreshold { get; set; }
+    // M1: Live campaigns record when an entity enters the world (absent from replay before this Event).
+    public string? IntroducedAtEventId { get; set; }
+
+    // M4 (simplified 2026-10-15): Achieve goals only. A Goal defines a desired world change; the Colony Turn decides
+    // whether progress occurs; an Event records what actually happened.
+    // Auto-Resolve: Automatic = the second success writes the target and Accomplishes the goal; Adjudicated = it raises
+    // a GM resolution task (Ready to Resolve) instead.
+    public GoalOutcomeMode OutcomeMode { get; set; } = GoalOutcomeMode.Automatic;
+    // §18.11: explicit Effects the Faction Phase writes when this goal advances (JSON arrays of
+    // { targetType, targetId, property, delta, value }, ordinary Effect vocabulary only; see GoalAdvanceRules).
+    // What becomes true in words is not stored here (2026-10-26): it is the text of the World Conditions that vary by,
+    // or require, the goal's stage.
+    public string ProgressingEffectsJson { get; set; } = "[]";    // at Planning → Progressing
+    public string AccomplishedEffectsJson { get; set; } = "[]";   // at Accomplished, after the target
+    // §18.6: the first Act in which the faction may pursue it in the Faction Phase (1–3). Eligibility only: Session
+    // Events, the Goal Detector and GM resolutions are never restricted by it.
+    public int EarliestAct { get; set; } = 2;
 }

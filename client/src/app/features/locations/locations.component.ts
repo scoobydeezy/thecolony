@@ -153,7 +153,7 @@ function registerMultiPointHandler(): void {
 }
 import { AppStore } from '../../store/app.store';
 import {
-  Location, LocationState, LOCATION_STATE_OPTIONS,
+  Location, LocationState, LOCATION_STATE_OPTIONS, locationStateLabel,
   ColonyMap, MapPlacement, Character, Asset,
   PlacementSubjectType, GeometryType, ColonySnapshot,
 } from '../../core/models/types';
@@ -211,7 +211,7 @@ interface LocationFormModel {
 interface MapFormModel { name: string; imageWidth: number; imageHeight: number; }
 
 const emptyForm = (): LocationFormModel => ({
-  id: '', name: '', description: '', parentLocationId: '', state: 'Active', linkedAssetId: '',
+  id: '', name: '', description: '', parentLocationId: '', state: 'Stable', linkedAssetId: '',
   markerColor: '',
 });
 
@@ -298,6 +298,7 @@ export class LocationsComponent implements OnDestroy {
   private destroyRef = inject(DestroyRef);
   store = inject(AppStore);
 
+  readonly locationStateLabel = locationStateLabel;
   readonly stateOptions = LOCATION_STATE_OPTIONS;
   constructor() {
     toObservable(this.store.isViewingSnapshot)
@@ -1340,10 +1341,7 @@ export class LocationsComponent implements OnDestroy {
   }
 
   stateClass(state: LocationState): string {
-    const map: Record<LocationState, string> = {
-      Active: 'state-active', Abandoned: 'state-abandoned',
-      Ruined: 'state-ruined', Unknown: 'state-unknown',
-    };
+    const map: Record<LocationState, string> = { Stable: 'state-stable', ActiveIncursion: 'state-incursion', Unstable: 'state-unstable' };
     return map[state];
   }
 

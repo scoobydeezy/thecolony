@@ -8,74 +8,10 @@ import {
   Session, CampaignEvent, Campaign, AppSettings,
   Asset, FactionGoal,
   CharacterNarrativeProfile, CharacterDetail, CharacterRelationship,
-  Location, ColonyMap, MapPlacement, EventEffect,
+  Location, ColonyMap, MapPlacement, EventEffect, RulesVersion, ColonyTurn, ColonyTurnPhase, ColonyTurnPhaseKind, WorldCondition,
 } from '../models/types';
 
-// The C# model stores value floats as truthValue/stabilityValue/agencyValue; map to/from ValueVector a/b/c.
-// BeliefPosition enums arrive as Pascal-case strings ("Positive"/"Neutral"/"Negative"); lowercase them.
-// Server sends beliefC/beliefA/beliefB (camelCase from C# BeliefC/BeliefA/BeliefB).
-// Client models use beliefc/beliefa/beliefb (all lowercase). Remap and lowercase.
-function lowerBeliefPositions(obj: any): void {
-  const remap: Record<string, string> = {
-    beliefC: 'beliefc', beliefA: 'beliefa', beliefB: 'beliefb',
-    partyBeliefC: 'partyBeliefc', partyBeliefA: 'partyBeliefa', partyBeliefB: 'partyBeliefb',
-  };
-  for (const [from, to] of Object.entries(remap)) {
-    if (obj[from] != null) { obj[to] = obj[from].toLowerCase(); delete obj[from]; }
-  }
-}
-
-function factionFromApi(f: any): Faction {
-  const { truthValue, stabilityValue, agencyValue, ...rest } = f;
-  lowerBeliefPositions(rest);
-  return { ...rest, sortOrder: rest.sortOrder ?? 0, additionalMemberCount: rest.additionalMemberCount ?? 0, values: { a: truthValue ?? 1/3, b: stabilityValue ?? 1/3, c: agencyValue ?? 1/3 } };
-}
-
-function upperBeliefPositions(obj: any): void {
-  const remap: Record<string, string> = {
-    beliefc: 'beliefC', beliefa: 'beliefA', beliefb: 'beliefB',
-    partyBeliefc: 'partyBeliefC', partyBeliefa: 'partyBeliefA', partyBeliefb: 'partyBeliefB',
-  };
-  for (const [from, to] of Object.entries(remap)) {
-    if (obj[from] != null) { obj[to] = obj[from]; delete obj[from]; }
-    else if (obj[from] === undefined) delete obj[from];
-  }
-}
-
-function factionToApi(f: Faction): any {
-  const { values, ...rest } = f;
-  const out: any = { ...rest, truthValue: values.a, stabilityValue: values.b, agencyValue: values.c };
-  upperBeliefPositions(out);
-  return out;
-}
-
-function characterFromApi(c: any): Character {
-  const { truthValue, stabilityValue, agencyValue, ...rest } = c;
-  if (rest.doubtDirection) rest.doubtDirection = rest.doubtDirection.toLowerCase();
-  lowerBeliefPositions(rest);
-  return { ...rest, values: { a: truthValue ?? 1/3, b: stabilityValue ?? 1/3, c: agencyValue ?? 1/3 } };
-}
-
-function characterToApi(c: Character): any {
-  const { values, ...rest } = c;
-  const out: any = { ...rest, truthValue: values.a, stabilityValue: values.b, agencyValue: values.c };
-  if (out.doubtDirection) out.doubtDirection = out.doubtDirection.toUpperCase();
-  upperBeliefPositions(out);
-  return out;
-}
-
-function colonyStateFromApi(cs: any): ColonyState {
-  const { partyTruthValue, partyStabilityValue, partyAgencyValue, ...rest } = cs;
-  lowerBeliefPositions(rest);
-  return { ...rest, partyName: rest.partyName ?? 'party', partyValues: { a: partyTruthValue ?? 0.6, b: partyStabilityValue ?? 0.25, c: partyAgencyValue ?? 0.15 } };
-}
-
-function colonyStateToApi(cs: ColonyState): any {
-  const { partyValues, ...rest } = cs;
-  const out: any = { ...rest, partyTruthValue: partyValues.a, partyStabilityValue: partyValues.b, partyAgencyValue: partyValues.c };
-  upperBeliefPositions(out);
-  return out;
-}
+import { factionFromApi, factionToApi, characterFromApi, characterToApi, colonyStateFromApi, colonyStateToApi } from './api-mappers';
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -121,8 +57,12 @@ export class ApiService {
   getRules(): Observable<RulesConfig> {
     return this.http.get<RulesConfig>(`${this.base}/rules`);
   }
-  updateRules(rules: RulesConfig): Observable<RulesConfig> {
-    return this.http.put<RulesConfig>(`${this.base}/rules`, rules);
+  // Live campaigns version rules: pass the Event the new rules take effect from (M1).
+  updateRules(rules: RulesConfig, effectiveFromEventId?: string, engineVersion?: string): Observable<RulesConfig> {
+    const params: Record<string, string> = {};
+    if (effectiveFromEventId) params['effectiveFromEventId'] = effectiveFromEventId;
+    if (engineVersion) params['engineVersion'] = engineVersion;
+    return this.http.put<RulesConfig>(`${this.base}/rules`, rules, { params });
   }
 
   // Relationships
@@ -247,6 +187,14 @@ export class ApiService {
     return this.http.delete<void>(`${this.base}/faction-goals/${id}`);
   }
 
+  // World Conditions (§18.6)
+  getWorldConditions(): Observable<WorldCondition[]> { return this.http.get<WorldCondition[]>(`${this.base}/world-conditions`); }
+  createWorldCondition(c: Omit<WorldCondition, 'id' | 'campaignId'>): Observable<WorldCondition> {
+    return this.http.post<WorldCondition>(`${this.base}/world-conditions`, c);
+  }
+  updateWorldCondition(c: WorldCondition): Observable<WorldCondition> { return this.http.put<WorldCondition>(`${this.base}/world-conditions/${c.id}`, c); }
+  deleteWorldCondition(id: string): Observable<void> { return this.http.delete<void>(`${this.base}/world-conditions/${id}`); }
+
   importSessions(sessions: Session[]): Observable<{ imported: number; skipped: number }> {
     return this.http.post<{ imported: number; skipped: number }>(`${this.base}/sessions/import`, sessions);
   }
@@ -260,6 +208,43 @@ export class ApiService {
   }
   updateCampaign(campaign: Campaign): Observable<Campaign> {
     return this.http.put<Campaign>(`${this.base}/campaigns/${campaign.id}`, campaign);
+  }
+  activateCampaign(id: string, engineVersion: string): Observable<Campaign> {
+    return this.http.post<Campaign>(`${this.base}/campaigns/${id}/activate`, { engineVersion });
+  }
+  getRulesVersions(campaignId: string): Observable<RulesVersion[]> {
+    return this.http.get<RulesVersion[]>(`${this.base}/campaigns/${campaignId}/rules-versions`);
+  }
+  getColonyTurns(): Observable<ColonyTurn[]> {
+    return this.http.get<ColonyTurn[]>(`${this.base}/colony-turns`);
+  }
+  // M5: Colony Turn procedure. Phase commits and voids carry If-History-Version (409 'stale' if history moved).
+  getHistoryVersion(): Observable<{ historyVersion: number }> {
+    return this.http.get<{ historyVersion: number }>(`${this.base}/colony-turns/history-version`);
+  }
+  createColonyTurn(sessionId: string, seed: number, engineVersion: string): Observable<ColonyTurn> {
+    return this.http.post<ColonyTurn>(`${this.base}/colony-turns`, { sessionId, seed, engineVersion });
+  }
+  commitColonyTurnPhase(turnId: string, historyVersion: number, body: {
+    kind: ColonyTurnPhaseKind; frozenInputsJson: string; frozenInputsHash: string; resultsJson: string; effects: Omit<EventEffect, 'id' | 'eventId'>[];
+  }): Observable<{ phase: ColonyTurnPhase; historyVersion: number }> {
+    return this.http.post<{ phase: ColonyTurnPhase; historyVersion: number }>(`${this.base}/colony-turns/${turnId}/phases`, body,
+      { headers: { 'If-History-Version': String(historyVersion) } });
+  }
+  completeColonyTurn(historyVersion: number, body: {
+    sessionId: string; seed: number; engineVersion: string;
+    phases: { kind: ColonyTurnPhaseKind; frozenInputsJson: string; frozenInputsHash: string; resultsJson: string; effects: Omit<EventEffect, 'id' | 'eventId'>[] }[];
+  }): Observable<{ turn: ColonyTurn; historyVersion: number }> {
+    return this.http.post<{ turn: ColonyTurn; historyVersion: number }>(`${this.base}/colony-turns/complete`, body,
+      { headers: { 'If-History-Version': String(historyVersion) } });
+  }
+  voidColonyTurnPhase(turnId: string, phaseId: string, historyVersion: number): Observable<{ historyVersion: number }> {
+    return this.http.post<{ historyVersion: number }>(`${this.base}/colony-turns/${turnId}/phases/${phaseId}/void`, {},
+      { headers: { 'If-History-Version': String(historyVersion) } });
+  }
+  voidColonyTurn(turnId: string, historyVersion: number): Observable<{ historyVersion: number }> {
+    return this.http.post<{ historyVersion: number }>(`${this.base}/colony-turns/${turnId}/void`, {},
+      { headers: { 'If-History-Version': String(historyVersion) } });
   }
   deleteCampaign(id: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/campaigns/${id}`);

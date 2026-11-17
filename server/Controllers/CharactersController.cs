@@ -31,7 +31,7 @@ public class CharactersController(AppDbContext db, ICampaignContext campaign, IW
     public async Task<IActionResult> Create([FromBody] Character character)
     {
         var cid = await campaign.GetActiveIdAsync();
-        character.Id = Guid.NewGuid().ToString();
+        character.Id = await EntityIds.ForCreateAsync(db.Characters, character.Id);   // keep an imported id when it is free
         character.CampaignId = cid;
         db.Characters.Add(character);
         await db.SaveChangesAsync();

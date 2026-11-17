@@ -1,0 +1,1178 @@
+[
+ {
+  "at": "baseline",
+  "factions": {
+   "aspis": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 17"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 17,
+    "mandate": 0
+   },
+   "burdened": {
+    "members": 15,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "civilians": {
+    "members": 10,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "cult": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Mandate 9"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 7,
+    "mandate": 9
+   },
+   "fractured": {
+    "members": 8,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "heirs": {
+    "members": 7,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "institute": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 18"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 18,
+    "mandate": 0
+   },
+   "keepers": {
+    "members": 6,
+    "leaderCapable": true,
+    "power": 0,
+    "reasons": [],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 13,
+    "mandate": 4
+   },
+   "seekers": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Mandate 5"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 12,
+    "mandate": 5
+   },
+   "shattered": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 16"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 16,
+    "mandate": 0
+   },
+   "witnesses": {
+    "members": 6,
+    "leaderCapable": true,
+    "power": 0,
+    "reasons": [],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 13,
+    "mandate": 3
+   }
+  }
+ },
+ {
+  "at": "S1",
+  "factions": {
+   "aspis": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 17"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 17,
+    "mandate": 0
+   },
+   "burdened": {
+    "members": 15,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "civilians": {
+    "members": 9,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "cult": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Mandate 9"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 7,
+    "mandate": 9
+   },
+   "fractured": {
+    "members": 8,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "heirs": {
+    "members": 7,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "institute": {
+    "members": 4,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 18"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 18,
+    "mandate": 0
+   },
+   "keepers": {
+    "members": 6,
+    "leaderCapable": true,
+    "power": 0,
+    "reasons": [],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 13,
+    "mandate": 4
+   },
+   "seekers": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Mandate 5"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 12,
+    "mandate": 5
+   },
+   "shattered": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 16"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 16,
+    "mandate": 0
+   },
+   "witnesses": {
+    "members": 6,
+    "leaderCapable": true,
+    "power": 0,
+    "reasons": [],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 13,
+    "mandate": 3
+   }
+  }
+ },
+ {
+  "at": "S2",
+  "factions": {
+   "aspis": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 17"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 17,
+    "mandate": 0
+   },
+   "burdened": {
+    "members": 15,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "civilians": {
+    "members": 8,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "cult": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Mandate 9"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 7,
+    "mandate": 9
+   },
+   "fractured": {
+    "members": 8,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "heirs": {
+    "members": 7,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "institute": {
+    "members": 4,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 18"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 18,
+    "mandate": 0
+   },
+   "keepers": {
+    "members": 6,
+    "leaderCapable": true,
+    "power": 0,
+    "reasons": [],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 13,
+    "mandate": 4
+   },
+   "seekers": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Mandate 5"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 12,
+    "mandate": 5
+   },
+   "shattered": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 16"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 16,
+    "mandate": 0
+   },
+   "witnesses": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 0,
+    "reasons": [],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 13,
+    "mandate": 3
+   }
+  }
+ },
+ {
+  "at": "S3",
+  "factions": {
+   "aspis": {
+    "members": 4,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 17"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 17,
+    "mandate": 0
+   },
+   "burdened": {
+    "members": 15,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "civilians": {
+    "members": 7,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "cult": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Mandate 9"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 7,
+    "mandate": 9
+   },
+   "fractured": {
+    "members": 8,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "heirs": {
+    "members": 7,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "institute": {
+    "members": 4,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 18"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 18,
+    "mandate": 0
+   },
+   "keepers": {
+    "members": 6,
+    "leaderCapable": true,
+    "power": 0,
+    "reasons": [],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 13,
+    "mandate": 4
+   },
+   "seekers": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Mandate 5"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 12,
+    "mandate": 5
+   },
+   "shattered": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 16"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 16,
+    "mandate": 0
+   },
+   "witnesses": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 0,
+    "reasons": [],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 13,
+    "mandate": 3
+   }
+  }
+ },
+ {
+  "at": "S4",
+  "factions": {
+   "aspis": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 17"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 17,
+    "mandate": 0
+   },
+   "burdened": {
+    "members": 14,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "civilians": {
+    "members": 7,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "cult": {
+    "members": 3,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Mandate 9"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 7,
+    "mandate": 9
+   },
+   "fractured": {
+    "members": 7,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "heirs": {
+    "members": 6,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "institute": {
+    "members": 2,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 18"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 18,
+    "mandate": 0
+   },
+   "keepers": {
+    "members": 6,
+    "leaderCapable": true,
+    "power": 0,
+    "reasons": [],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 13,
+    "mandate": 4
+   },
+   "seekers": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Mandate 5"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 12,
+    "mandate": 5
+   },
+   "shattered": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 16"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 16,
+    "mandate": 0
+   },
+   "witnesses": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 0,
+    "reasons": [],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 13,
+    "mandate": 3
+   }
+  }
+ },
+ {
+  "at": "S5",
+  "factions": {
+   "aspis": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 17"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 17,
+    "mandate": 0
+   },
+   "burdened": {
+    "members": 14,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "civilians": {
+    "members": 7,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "cult": {
+    "members": 3,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Mandate 9"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 7,
+    "mandate": 9
+   },
+   "fractured": {
+    "members": 7,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "heirs": {
+    "members": 6,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "institute": {
+    "members": 2,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 18"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 18,
+    "mandate": 0
+   },
+   "keepers": {
+    "members": 6,
+    "leaderCapable": true,
+    "power": 0,
+    "reasons": [],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 13,
+    "mandate": 4
+   },
+   "seekers": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Mandate 5"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 12,
+    "mandate": 5
+   },
+   "shattered": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 16"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 16,
+    "mandate": 0
+   },
+   "witnesses": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 0,
+    "reasons": [],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 13,
+    "mandate": 3
+   }
+  }
+ },
+ {
+  "at": "S6",
+  "factions": {
+   "aspis": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 17"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 17,
+    "mandate": 0
+   },
+   "burdened": {
+    "members": 14,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "civilians": {
+    "members": 7,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "cult": {
+    "members": 3,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Mandate 9"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 7,
+    "mandate": 9
+   },
+   "fractured": {
+    "members": 7,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "heirs": {
+    "members": 6,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "institute": {
+    "members": 2,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 18"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 18,
+    "mandate": 0
+   },
+   "keepers": {
+    "members": 6,
+    "leaderCapable": true,
+    "power": 0,
+    "reasons": [],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 13,
+    "mandate": 4
+   },
+   "seekers": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Mandate 5"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 12,
+    "mandate": 5
+   },
+   "shattered": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 16"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 16,
+    "mandate": 0
+   },
+   "witnesses": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 0,
+    "reasons": [],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 13,
+    "mandate": 3
+   }
+  }
+ },
+ {
+  "at": "S7",
+  "factions": {
+   "aspis": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 17"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 17,
+    "mandate": 0
+   },
+   "burdened": {
+    "members": 14,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "civilians": {
+    "members": 7,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "cult": {
+    "members": 3,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Mandate 9"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 7,
+    "mandate": 9
+   },
+   "fractured": {
+    "members": 7,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "heirs": {
+    "members": 6,
+    "leaderCapable": false,
+    "power": 0,
+    "reasons": [],
+    "people": 0,
+    "leaderBonus": 0,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 0,
+    "mandate": 0
+   },
+   "institute": {
+    "members": 2,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 18"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 18,
+    "mandate": 0
+   },
+   "keepers": {
+    "members": 6,
+    "leaderCapable": true,
+    "power": 0,
+    "reasons": [],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 13,
+    "mandate": 4
+   },
+   "seekers": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Mandate 5"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 12,
+    "mandate": 5
+   },
+   "shattered": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 1,
+    "reasons": [
+     "Holdings 16"
+    ],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 16,
+    "mandate": 0
+   },
+   "witnesses": {
+    "members": 5,
+    "leaderCapable": true,
+    "power": 0,
+    "reasons": [],
+    "people": 5,
+    "leaderBonus": 5,
+    "size": 0,
+    "sizePoints": 0,
+    "holdings": 13,
+    "mandate": 3
+   }
+  }
+ }
+]

@@ -14,7 +14,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
         ?? "Data Source=colony.db"));
 
 builder.Services.AddScoped<IScoringEngine, ScoringEngine>();
-builder.Services.AddScoped<IFactionInfluenceService, FactionInfluenceService>();
 builder.Services.AddScoped<ICampaignContext, CampaignContext>();
 
 builder.Services.AddCors(options =>
@@ -40,6 +39,29 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors();
+
+// M1: Live-campaign lock violations → 409; optional stale-state guard via If-History-Version on any write.
+app.Use(async (ctx, next) =>
+{
+    if (!HttpMethods.IsGet(ctx.Request.Method) && ctx.Request.Headers.TryGetValue("If-History-Version", out var hv))
+    {
+        var db = ctx.RequestServices.GetRequiredService<AppDbContext>();
+        var cid = await ctx.RequestServices.GetRequiredService<ICampaignContext>().GetActiveIdAsync();
+        var current = await db.Campaigns.AsNoTracking().Where(c => c.Id == cid).Select(c => (long?)c.HistoryVersion).FirstOrDefaultAsync();
+        if (current is not null && (!long.TryParse(hv, out var expected) || expected != current))
+        {
+            ctx.Response.StatusCode = StatusCodes.Status409Conflict;
+            await ctx.Response.WriteAsJsonAsync(new { error = "stale", message = "Campaign history changed since this was computed; recompute and retry.", currentHistoryVersion = current });
+            return;
+        }
+    }
+    try { await next(); }
+    catch (LiveCampaignViolationException ex)
+    {
+        ctx.Response.StatusCode = StatusCodes.Status409Conflict;
+        await ctx.Response.WriteAsJsonAsync(new { error = "live-locked", message = ex.Message });
+    }
+});
 
 // Resolve the canonical uploads root from config (overridden per-environment via env var in docker-compose)
 var uploadsRaw = app.Configuration["UploadsPath"] ?? "../colony-uploads";

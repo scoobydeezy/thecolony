@@ -1,5 +1,7 @@
 using ColonyTracker.Api.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using ColonyTracker.Api.Services;
 
 namespace ColonyTracker.Api.Data;
 
@@ -24,6 +26,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Location> Locations => Set<Location>();
     public DbSet<ColonyMap> ColonyMaps => Set<ColonyMap>();
     public DbSet<MapPlacement> MapPlacements => Set<MapPlacement>();
+
+    // ── M1: rule versions and Colony Turns ────────────────────────────────────
+    public DbSet<RulesVersion> RulesVersions => Set<RulesVersion>();
+    public DbSet<ColonyTurn> ColonyTurns => Set<ColonyTurn>();
+    public DbSet<ColonyTurnPhase> ColonyTurnPhases => Set<ColonyTurnPhase>();
+    public DbSet<WorldCondition> WorldConditions => Set<WorldCondition>();   // §18.6
+
+    /// <summary>Set by RulesController when a Live campaign's rules change is being versioned.</summary>
+    public bool AllowRulesVersioning { get; set; }
 
     // ── Narrative path/scope model ────────────────────────────────────────────
     public DbSet<PathSet> PathSets => Set<PathSet>();
@@ -150,5 +161,75 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
         modelBuilder.Entity<NarrativeEventPlacement>()
             .HasKey(x => x.NarrativeEventId);
+
+        modelBuilder.Entity<ColonyTurn>()
+            .HasMany(t => t.Phases)
+            .WithOne()
+            .HasForeignKey(p => p.ColonyTurnId)
+            .OnDelete(DeleteBehavior.Cascade);
+        modelBuilder.Entity<RulesVersion>().HasIndex(r => new { r.CampaignId, r.Version }).IsUnique();
+        modelBuilder.Entity<ColonyTurnPhase>().HasIndex(p => new { p.ColonyTurnId, p.Ordinal }).IsUnique();
+    }
+
+    // ── M1: history version and Live-campaign locks ───────────────────────────
+    public override int SaveChanges(bool acceptAllChangesOnSuccess) =>
+        SaveChangesAsync(acceptAllChangesOnSuccess).GetAwaiter().GetResult();
+
+    public override async Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken ct = default)
+    {
+        var entries = ChangeTracker.Entries()
+            .Where(e => e.State is EntityState.Added or EntityState.Modified or EntityState.Deleted
+                        && SimulationGuard.Tracks(e.Entity))
+            .ToList();
+        if (entries.Count > 0)
+        {
+            var campaignIds = new HashSet<string>();
+            foreach (var e in entries)
+            {
+                var cid = await CampaignOf(e, ct);
+                if (cid is null) continue;
+                campaignIds.Add(cid);
+                var campaign = await Campaigns.FindAsync(new object[] { cid }, ct);
+                if (campaign is { Mode: CampaignMode.Live })
+                    await SimulationGuard.CheckLiveAsync(e, this, ct);
+            }
+            foreach (var cid in campaignIds)
+            {
+                var campaign = await Campaigns.FindAsync(new object[] { cid }, ct);
+                if (campaign is not null) campaign.HistoryVersion++;
+            }
+        }
+        return await base.SaveChangesAsync(acceptAllChangesOnSuccess, ct);
+    }
+
+    private async Task<string?> CampaignOf(EntityEntry e, CancellationToken ct)
+    {
+        string? Val(string prop) => (e.State == EntityState.Deleted ? e.Property(prop).OriginalValue : e.Property(prop).CurrentValue) as string;
+        switch (e.Entity)
+        {
+            case Event:
+                return await SessionCampaign(Val(nameof(Event.SessionId)), ct);
+            case EventEffect:
+            {
+                var eventId = Val(nameof(EventEffect.EventId));
+                var ev = Events.Local.FirstOrDefault(x => x.Id == eventId) ?? await Events.AsNoTracking().FirstOrDefaultAsync(x => x.Id == eventId, ct);
+                return ev is null ? null : await SessionCampaign(ev.SessionId, ct);
+            }
+            case ColonyTurnPhase:
+            {
+                var turnId = Val(nameof(ColonyTurnPhase.ColonyTurnId));
+                var turn = ColonyTurns.Local.FirstOrDefault(x => x.Id == turnId) ?? await ColonyTurns.AsNoTracking().FirstOrDefaultAsync(x => x.Id == turnId, ct);
+                return turn?.CampaignId;
+            }
+            default:
+                return e.Metadata.FindProperty("CampaignId") is null ? null : Val("CampaignId");
+        }
+    }
+
+    private async Task<string?> SessionCampaign(string? sessionId, CancellationToken ct)
+    {
+        if (sessionId is null) return null;
+        var session = Sessions.Local.FirstOrDefault(x => x.Id == sessionId) ?? await Sessions.AsNoTracking().FirstOrDefaultAsync(x => x.Id == sessionId, ct);
+        return session?.CampaignId;
     }
 }

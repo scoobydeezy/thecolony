@@ -36,6 +36,7 @@ public class MapEditsController(AppDbContext db) : ControllerBase
                 SessionId = req.SessionId,
                 Title = "MapEdits",
                 IsSynthetic = true,
+                Kind = EventKind.MapEdits,
                 SortOrder = 0
             };
             db.Events.Add(mapEditsEvent);
@@ -63,7 +64,8 @@ public class MapEditsController(AppDbContext db) : ControllerBase
                 TargetId = req.TargetId,
                 Property = req.Property,
                 Value = req.Value,
-                SecondaryTargetId = req.SecondaryTargetId
+                SecondaryTargetId = req.SecondaryTargetId,
+                Ordinal = await db.EventEffects.CountAsync(ef => ef.EventId == mapEditsEvent.Id)
             };
             db.EventEffects.Add(existing);
         }

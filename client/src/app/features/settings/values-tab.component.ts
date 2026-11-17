@@ -67,13 +67,6 @@ export class ValuesTabComponent {
     return `${n} = ${posVal.toLowerCase()} ≥ threshold ? ${axis.positive} : ${negVal.toLowerCase()} ≥ threshold ? ${axis.negative} : ${axis.neutral}`;
   });
 
-  toggleAxisType(axis: 'axisA' | 'axisB' | 'axisC'): void {
-    this.valuesModel.update(m => ({
-      ...m,
-      [axis]: { ...m[axis], type: m[axis].type === 'opinion' ? 'boolean' : 'opinion' },
-    }));
-  }
-
   togglePositiveAligns(axis: 'axisA' | 'axisB' | 'axisC'): void {
     this.valuesModel.update(m => ({
       ...m,

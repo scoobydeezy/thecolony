@@ -1,0 +1,196 @@
+@let t = turn();
+<div class="ct-card card" [class.ct-card--done]="t?.status === 'Committed'">
+  <div class="ct-head">
+    <span class="ct-icon"><i class="fa-solid fa-dice"></i></span>
+    <div class="ct-heading">
+      <span class="ct-title" [title]="'Colony Turn before Session ' + session().number + (t ? ' · seed ' + t.seed : base() ? ' · seed ' + base()!.seed : '')">Colony Turn</span>
+      <div class="ct-when">Act {{ session().act }}<span class="ct-when-gap"></span>Week {{ session().week }}</div>
+    </div>
+    <!-- beside the whole title block, centred on it -->
+    @if (t && t.status !== 'Committed') {
+      <span class="ct-chip">Unfinished</span>
+    } @else if (!t && opening()) {
+      <button class="ct-reset" (click)="reset()" [disabled]="ct.busy()" title="Start the turn over: new dice, nothing saved"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+    }
+    <span class="ct-head-spacer"></span>
+    @if (ct.busy()) { <span class="ct-meta">working…</span> }
+    @if (t?.status === 'Committed') {
+      <span class="ct-done-mark" role="img" aria-label="Complete" title="Complete: this Colony Turn is saved"><i class="fa-solid fa-check"></i></span>
+    }
+    @if (!t && !opening()) {
+      <button class="ct-start" (click)="begin()" [disabled]="ct.busy()" title="Draw this Colony Turn. Nothing is saved until you confirm.">Start <i class="fa-solid fa-arrow-right"></i></button>
+    }
+    @if (!t && opening()) {
+      <span class="ct-step-label">{{ label(step()) }}</span>
+      <button class="ct-arrow" (click)="back()" [disabled]="stepIndex() === 0 || ct.busy()" aria-label="Back"><i class="fa-solid fa-arrow-left"></i></button>
+      @if (isLast()) {
+        <button class="ct-arrow ct-arrow--primary ct-arrow--confirm" (click)="confirm()" [disabled]="ct.busy() || draftStale()" aria-label="Confirm the turn" title="Confirm: save the whole turn"><i class="fa-solid fa-check"></i></button>
+      } @else {
+        <button class="ct-arrow ct-arrow--primary" (click)="next()" [disabled]="ct.busy()" [attr.aria-label]="'Next: ' + label(steps[stepIndex() + 1])"><i class="fa-solid fa-arrow-right"></i></button>
+      }
+    }
+  </div>
+  @if (ct.error(); as e) { <div class="ct-error">{{ e }}</div> }
+  @if (championVacancies().length) {
+    <div class="ct-stale ct-champions" role="status">
+      <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+      <span>Champions available for reassignment (they champion no active goal):</span>
+      <ul class="ct-champions-list">
+        @for (v of championVacancies(); track v.id) {
+          <li><strong>{{ v.name }}</strong>: {{ v.people }}@if (v.unassigned) {<span class="ct-champions-open"> · {{ v.unassigned }} goal{{ v.unassigned === 1 ? '' : 's' }} without a champion</span>}</li>
+        }
+      </ul>
+    </div>
+  }
+  @if (draftStale()) {
+    <div class="ct-stale"><i class="fa-solid fa-triangle-exclamation"></i> The campaign's history changed since this turn was drawn (an event, a session or another turn was saved), so these results are out of date. Reset to draw it again; nothing has been saved.
+      <button class="ct-reset" (click)="reset()" [disabled]="ct.busy()"><i class="fa-solid fa-rotate-left"></i> Reset</button></div>
+  }
+  @if (recordedOnOlderHistory(); as n) {
+    <div class="ct-stale ct-stale--soft"><i class="fa-solid fa-clock-rotate-left"></i> Saved before the turn for Session {{ n }}, so its results were worked out on the history as it was then. Its recorded changes still apply.</div>
+  }
+
+  @if (t?.status === 'Committed') {
+    <!-- A complete turn: what it did -->
+    <app-colony-turn-results [cards]="committedReview()" [details]="committedSummary()" [conditions]="committedConditions()" />
+  } @else if (t) {
+    <!-- Left by the earlier phase-by-phase flow -->
+    <div class="ct-actions">
+      <span class="ct-meta">This turn was started step by step and never published ({{ livePhases().length }} phase{{ livePhases().length === 1 ? '' : 's' }} saved). Discard it to run the turn again.</span>
+      <button class="btn btn-secondary btn-sm" [disabled]="ct.busy()" (click)="discardLegacy()">Discard</button>
+    </div>
+  } @else if (opening()) {
+    <div class="ct-board">
+      @switch (step()) {
+        @case ('faction') {
+          @if (!faction()) {
+            <div class="ct-empty">No faction operations this turn.</div>
+          } @else if (board().length === 0) {
+            <div class="ct-empty">No faction has Power and an eligible goal this turn.</div>
+          } @else {
+            <div class="fp-grid">
+              @for (f of board(); track f.id) {
+                <div class="fp-col">
+                  <div class="fp-card">
+                    <div class="fp-head">
+                      <span class="fp-name">{{ f.name }}</span>
+                      @if (f.momentum > 0) {
+                        <span class="fp-mom fp-mom--up" [title]="'Momentum +' + f.momentum + ' (added to every roll)'"><i class="fa-solid fa-arrow-trend-up"></i>{{ f.momentum }}</span>
+                      } @else if (f.momentum < 0) {
+                        <span class="fp-mom fp-mom--down" [title]="'Momentum −' + (-f.momentum) + ' (subtracted from every roll)'"><i class="fa-solid fa-arrow-trend-down"></i>{{ -f.momentum }}</span>
+                      }
+                    </div>
+                    @for (gd of f.guards; track gd.id) {
+                      <div class="fp-guard" [title]="gd.title + ' (' + gd.priority + '): attacks on ' + gd.target + ' face DC +' + gd.bonus + ' this turn'">
+                        <i class="fa-solid fa-shield-halved"></i> Guarding {{ gd.target }} <span class="fp-guard-bonus">DC +{{ gd.bonus }}</span>
+                      </div>
+                    }
+                    @for (g of f.goals; track g.id) {
+                      <div class="fp-goal">
+                        <div class="fp-goal-title" [class.fp-goal-title--adv]="g.advanced && !g.preempted">
+                          {{ g.title }}
+                          <span class="fp-dots" [title]="dotsLabel(g.dots) + (g.pending && !g.accepted ? ' (Ready to Resolve)' : '')" [attr.aria-label]="dotsLabel(g.dots)">
+                            @for (d of [1, 2, 3]; track d) { <i class="fp-dot" [class.fp-dot--on]="d <= g.dots"></i> }
+                          </span>
+                        </div>
+                        <div class="fp-attempts">
+                          @for (a of g.attempts; track a.id) {
+                            <span class="fp-attempt" [title]="attemptTitle(a)">
+                              <button type="button" [class]="dieClass(a)" (click)="rerollDie(a, 0)" [attr.aria-label]="'Re-roll die showing ' + a.d1"><i [class]="dieIcon(a.d1)"></i></button>
+                              <button type="button" [class]="dieClass(a)" (click)="rerollDie(a, 1)" [attr.aria-label]="'Re-roll die showing ' + a.d2"><i [class]="dieIcon(a.d2)"></i></button>
+                              @if (succeeded(a)) { <i class="fa-solid fa-check fp-mark fp-mark--ok" aria-label="success"></i> }
+                              @else { <i class="fa-solid fa-xmark fp-mark fp-mark--fail" aria-label="failure"></i> }
+                              @if (a.signal > 0) { <i class="fa-solid fa-arrow-trend-up fp-signal fp-signal--up" title="Critical Success: +1 Momentum next Turn"></i> }
+                              @if (a.signal < 0) { <i class="fa-solid fa-arrow-trend-down fp-signal fp-signal--down" title="Critical Failure: −1 Momentum next Turn"></i> }
+                            </span>
+                          }
+                          @for (u of g.unrolled; track u) {
+                            <span class="fp-attempt fp-attempt--unrolled" title="Not rolled: the goal already advanced this turn">
+                              <span class="fp-die-blank"></span><span class="fp-die-blank"></span><i class="fa-solid fa-minus fp-mark"></i>
+                            </span>
+                          }
+                        </div>
+                        @if (g.preempted) { <div class="fp-note">Pre-empted by another faction's success on the same target</div> }
+                        @if (g.pending) {
+                          <div class="fp-resolve">
+                            <button type="button" class="fp-choice fp-choice--accept" [class.fp-choice--on]="g.accepted" (click)="setAccepted(g.id, true)" title="Resolve it now: the goal is Accomplished when the turn is confirmed"><i class="fa-solid fa-circle-check"></i> Accept</button>
+                            <button type="button" class="fp-choice fp-choice--defer" [class.fp-choice--on]="g.deferred" (click)="setAccepted(g.id, false)" title="Leave it a resolution task for the session"><i class="fa-solid fa-clock"></i> Defer</button>
+                          </div>
+                          @if (g.deferred) {
+                            <div class="fp-deferred"><i class="fa-solid fa-clock"></i> Deferred: not resolved by this turn. It becomes a resolution task in Session {{ session().number }}.</div>
+                          } @else if (!g.accepted) {
+                            <div class="fp-undecided">Accept to resolve it now, or Defer it to the session.</div>
+                          }
+                        }
+                        @if (g.world && g.advanced && !g.preempted && !g.deferred) {
+                          <div class="fp-world">
+                            <div class="fp-world-title">{{ g.pending && !g.accepted ? 'Pending World Results' : 'World Results' }}</div>
+                            <p class="fp-world-text">{{ g.world }}</p>
+                          </div>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        }
+
+        @case ('character') {
+          @if (characterBoard().length === 0) {
+            <div class="ct-empty">No one is in crisis and no faction has a member under strain this turn.</div>
+          } @else {
+            <div class="fp-grid">
+              @for (f of characterBoard(); track f.id) {
+                <div class="fp-col">
+                  <div class="fp-card">
+                    <div class="fp-head"><span class="fp-name">{{ f.name }}</span></div>
+                    @for (c of f.rows; track c.id + c.kind) {
+                      <div class="fp-goal" [title]="c.title">
+                        <div class="fp-goal-title" [class]="'fp-goal-title cp-name cp-name--' + c.outcome">
+                          @if (c.leader) { <i class="fa-solid fa-crown cp-leader" title="Faction leader"></i> }
+                          {{ c.name }}
+                          @if (c.dots > 0) {
+                            <span class="fp-dots" [attr.aria-label]="instabilityLabel(c.dots)" [title]="instabilityLabel(c.dots)">
+                              @for (d of [1, 2, 3]; track d) { <i class="fp-dot" [class.fp-dot--on]="d <= c.dots"></i> }
+                            </span>
+                          }
+                        </div>
+                        <div class="fp-attempts">
+                          <span class="fp-attempt">
+                            @if (c.kind === 'check') { <span class="cp-kind" title="Defection Check">Crisis</span> }
+                            @if (c.dice; as d) {
+                              <button type="button" class="fp-die"
+                                      (click)="rerollCharacterDie(c.id, d, 0)" [attr.aria-label]="'Re-roll die showing ' + d[0]"><i [class]="dieIcon(d[0])"></i></button>
+                              <button type="button" class="fp-die"
+                                      (click)="rerollCharacterDie(c.id, d, 1)" [attr.aria-label]="'Re-roll die showing ' + d[1]"><i [class]="dieIcon(d[1])"></i></button>
+                            }
+                            @switch (c.outcome) {
+                              @case ('left')    { <i class="fa-solid fa-person-walking-arrow-right fp-mark fp-mark--fail" aria-label="leaves the faction"></i><span class="cp-out cp-out--bad">Leaves</span> }
+                              @case ('stayed')  { <i class="fa-solid fa-check fp-mark fp-mark--ok" aria-label="stays"></i><span class="cp-out">Stays</span> }
+                              @case ('crisis')  { <i class="fa-solid fa-angles-up fp-mark fp-mark--fail" aria-label="worse: crisis"></i><span class="cp-out cp-out--bad">Crisis</span> }
+                              @case ('worse')   { <i class="fa-solid fa-angle-up fp-mark cp-mark--warn" aria-label="worse"></i><span class="cp-out cp-out--warn">Conflicted</span> }
+                              @case ('better')  { <i class="fa-solid fa-angle-down fp-mark fp-mark--ok" aria-label="recovers"></i><span class="cp-out cp-out--good">Recovers</span> }
+                              @case ('settled') { <i class="fa-solid fa-check fp-mark fp-mark--ok" aria-label="settled"></i><span class="cp-out cp-out--good">Settles</span> }
+                              @default          { <i class="fa-solid fa-minus fp-mark" aria-label="no change"></i> }
+                            }
+                          </span>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        }
+
+        @case ('review') {
+          <div class="ct-sub">Confirming saves the whole turn; its results become Session {{ session().number }}'s starting state, and a completed turn cannot be changed.</div>
+          <app-colony-turn-results [cards]="draftReview()" [details]="draftSummary()" [conditions]="draftConditions()" />
+        }
+      }
+    </div>
+  }
+</div>

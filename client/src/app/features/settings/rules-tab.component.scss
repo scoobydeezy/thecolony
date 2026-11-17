@@ -22,13 +22,8 @@
   margin-bottom: 1rem;
 }
 
-.rules-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1.5rem;
-}
-
 .rule-group {
+  & + & { margin-top: 1.25rem; }
   h4 {
     font-size: var(--text-size-meta);
     text-transform: uppercase;

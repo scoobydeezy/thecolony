@@ -198,10 +198,9 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
-.state-active    { background: color-mix(in srgb, #22c55e 15%, transparent); color: #22c55e; }
-.state-abandoned { background: color-mix(in srgb, #f59e0b 15%, transparent); color: #f59e0b; }
-.state-ruined    { background: color-mix(in srgb, #ef4444 15%, transparent); color: #ef4444; }
-.state-unknown   { background: color-mix(in srgb, #94a3b8 15%, transparent); color: #94a3b8; }
+.state-stable    { background: color-mix(in srgb, #22c55e 15%, transparent); color: #22c55e; }
+.state-unstable  { background: color-mix(in srgb, #f59e0b 15%, transparent); color: #f59e0b; }
+.state-incursion { background: color-mix(in srgb, #ef4444 15%, transparent); color: #ef4444; }
 
 // Modal
 .modal-add {

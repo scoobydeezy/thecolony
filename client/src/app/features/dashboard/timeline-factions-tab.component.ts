@@ -22,11 +22,10 @@ export class TimelineFactionsTabComponent {
   markerTooltip = signal<{ x: number; y: number; lines: string[]; flip: boolean } | null>(null);
 
   readonly metrics: { value: FactionMetric; label: string }[] = [
-    { value: 'momentum', label: 'Momentum' },
-    { value: 'legitimacy', label: 'Legitimacy' },
-    { value: 'effectivePower', label: 'Effective Power' },
+    { value: 'momentum', label: 'Momentum (tier)' },
+    { value: 'effectivePower', label: 'Power (0–3)' },
     { value: 'membership', label: 'Membership' },
-    { value: 'influence', label: 'Influence' },
+    { value: 'influence', label: 'People points' },
   ];
 
   private dataset = computed(() => this.timeline.factionsDataset(this.selectedMetric()));

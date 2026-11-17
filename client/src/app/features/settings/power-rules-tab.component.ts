@@ -4,8 +4,8 @@ import { AppStore } from '../../store/app.store';
 import { RulesConfig, FormulasConfig, DEFAULT_FORMULAS } from '../../core/models/types';
 
 const DEFAULT_RULES_STUB: RulesConfig = {
-  id: '', beliefMatch: 3, beliefConflict: -2, valueAlignmentScale: 5.5,
-  valueConflictScale: 3, stressPositiveMultiplierPerPoint: 0.25,
+  id: '', beliefMatch: 3, beliefConflict: -2, beliefAdjacent: -1, beliefWeightBlend: 0.5,
+  valueSimilarityScale: 3.5, valueOppositionScale: 3, stressPositiveMultiplierPerPoint: 0.25,
   stressNegativeMultiplierPerPoint: 0.2, positiveEnabled: true, negativeEnabled: true,
   thresholdsJson: '[]', valueLabelsJson: '{}', beliefAxisLabelsJson: '{}',
   cascadeRulesJson: '[]', formulasJson: '{}', stressWeightEnabled: true,

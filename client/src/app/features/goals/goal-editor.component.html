@@ -1,0 +1,245 @@
+<!-- The goal editor (moved from the faction page). Opened by the Goals page and the faction page. -->
+  <div class="modal-backdrop" (click)="close()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ goalModel().id ? 'Edit Goal' : 'Add Goal' }}</h3>
+        <button class="modal-close" (click)="close()">✕</button>
+      </div>
+      <div class="modal-body">
+        <!-- Goal Type -->
+        <div class="goal-section-title">Goal Type</div>
+        <div class="form-row three-col">
+          <div>
+            <label class="form-label">Type</label>
+            <select class="form-input" [formField]="goalForm.conditionType" (change)="onConditionTypeChange($any($event.target).value)">
+              @for (opt of conditionTypeOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+          @if (goalModel().conditionType === 'Achieve') {
+            <div>
+              <label class="form-label" for="goal-auto-resolve">Auto-Resolve</label>
+              <label class="toggle-switch">
+                <input id="goal-auto-resolve" type="checkbox" [checked]="goalModel().outcomeMode !== 'Adjudicated'"
+                       (change)="setAutoResolve($any($event.target).checked)" />
+                <span class="toggle-track"></span>
+              </label>
+            </div>
+          }
+          <div>
+            <label class="form-label" for="goal-earliest-act" [title]="goalModel().conditionType === 'Achieve'
+              ? 'The first Act in which the faction may pursue it in the Faction Phase. Session Events can still fulfil it at any time.'
+              : 'The first Act in which the assignment is in force: before it, it neither defends its target nor guards it in the Faction Phase.'">Earliest Act</label>
+            <select id="goal-earliest-act" class="form-input" [value]="goalModel().earliestAct" (change)="setEarliestAct($any($event.target).value)">
+              <option value="1" [selected]="goalModel().earliestAct === '1'">Act I</option>
+              <option value="2" [selected]="goalModel().earliestAct === '2'">Act II</option>
+              <option value="3" [selected]="goalModel().earliestAct === '3'">Act III</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- General Info -->
+        <div class="goal-section-title">General Info</div>
+        @if (!goalModel().id && !factionId()) {
+          <div class="form-row">
+            <label class="form-label" for="goal-faction">Faction *</label>
+            <select id="goal-faction" class="form-input" [value]="goalModel().factionId" (change)="setFaction($any($event.target).value)">
+              <option value="">— Choose —</option>
+              @for (f of factionChoices(); track f.id) { <option [value]="f.id" [selected]="f.id === goalModel().factionId">{{ f.name }}</option> }
+            </select>
+          </div>
+        }
+        <div class="form-row">
+          <label class="form-label">Title *</label>
+          <input class="form-input" [formField]="goalForm.title" placeholder="e.g. Seize control of the Dock Office">
+        </div>
+        <div class="form-row three-col">
+          <div>
+            <label class="form-label">Champion</label>
+            <select class="form-input" [formField]="goalForm.championId" title="One active goal or assignment per champion: characters already championing another are not listed">
+              <option value="">— None —</option>
+              @for (c of championChoices(); track c.id) {
+                <option [value]="c.id">{{ c.name }}</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label class="form-label" title="§18.12: the Faction Phase roll bonus (Critical +3, Major +2, Minor +1); for a Maintain assignment, what it adds to the DC when it guards">Priority</label>
+            <select class="form-input" [formField]="goalForm.priority">
+              @for (opt of priorityOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label class="form-label">Visibility</label>
+            <select class="form-input" [formField]="goalForm.visibility">
+              @for (opt of visibilityOptions; track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <label class="form-label">Status</label>
+          <div class="goal-progress" role="radiogroup" aria-label="Status">
+            @for (st of goalProgressSteps(); track st.value; let last = $last) {
+              <button type="button" class="goal-progress-step" role="radio" [attr.aria-checked]="goalModel().status === st.value"
+                      [class.goal-progress-step--on]="goalModel().status === st.value" (click)="setGoalStatus(st.value)">{{ st.label }}</button>
+              @if (!last) { <span class="goal-progress-arrow" aria-hidden="true">→</span> }
+            }
+            <span class="goal-progress-gap"></span>
+            @for (st of goalEndSteps; track st.value) {
+              <button type="button" class="goal-progress-step goal-progress-step--end" role="radio" [attr.aria-checked]="goalModel().status === st.value"
+                      [class.goal-progress-step--on]="goalModel().status === st.value" (click)="setGoalStatus(st.value)">{{ st.label }}</button>
+            }
+          </div>
+          <p class="form-hint">Colony Turns move goals forward on their own; set this only to correct a goal.</p>
+        </div>
+
+        <!-- Goal Info -->
+        <div class="goal-section-title">Goal Info</div>
+        <div class="form-row">
+          <label class="form-label">Target Type{{ goalModel().conditionType === 'Maintain' ? ' (what it protects)' : '' }}</label>
+          <select class="form-input" [formField]="goalForm.targetEntityType" (change)="resetTargetFields()">
+            <option value="">— None —</option>
+            <option value="Character">Character</option>
+            <option value="Asset">Asset</option>
+            @if (goalModel().conditionType === 'Achieve') { <option value="Faction">Faction</option> }
+          </select>
+        </div>
+        @if (goalModel().targetEntityType) {
+          <div class="form-row two-col">
+            <div>
+              <label class="form-label">Target Entity</label>
+              <select class="form-input" [formField]="goalForm.targetEntityId">
+                <option value="">— Select —</option>
+                @for (e of goalTargetEntityOptions(); track e.id) {
+                  <option [value]="e.id">{{ e.name }}</option>
+                }
+              </select>
+            </div>
+            @if (goalModel().targetEntityType === 'Character' && goalModel().conditionType === 'Achieve') {
+              <div>
+                <label class="form-label">Target State</label>
+                <select class="form-input" [formField]="goalForm.targetState">
+                  <option value="">— Select —</option>
+                  @for (s of goalTargetStateOptions(); track s) {
+                    <option [value]="s">{{ s }}</option>
+                  }
+                </select>
+              </div>
+            }
+            @if (goalModel().targetEntityType === 'Asset' && goalModel().conditionType === 'Achieve') {
+              <div>
+                <label class="form-label">Asset Condition</label>
+                <select class="form-input" [value]="goalModel().targetOwnerFactionId ? 'ownership' : 'status'"
+                  (change)="onAssetConditionModeChange($any($event.target).value)">
+                  <option value="status">Reaches state</option>
+                  <option value="ownership">Comes under control</option>
+                </select>
+              </div>
+            }
+          </div>
+          @if (goalModel().conditionType === 'Achieve' && goalModel().targetEntityType === 'Asset' && !goalModel().targetOwnerFactionId) {
+            <div class="form-row">
+              <div>
+                <label class="form-label">Target State</label>
+                <select class="form-input" [formField]="goalForm.targetState">
+                  <option value="">— Select —</option>
+                  @for (s of goalTargetStateOptions(); track s) {
+                    <option [value]="s">{{ s }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+          }
+          @if (goalModel().conditionType === 'Achieve' && goalModel().targetEntityType === 'Asset' && goalModel().targetOwnerFactionId !== '') {
+            <div class="form-row">
+              <div>
+                <label class="form-label">Controlling Faction</label>
+                <select class="form-input" [formField]="goalForm.targetOwnerFactionId">
+                  <option value="">— Select —</option>
+                  @for (f of store.factions(); track f.id) {
+                    @if (f.active) { <option [value]="f.id">{{ f.name }}</option> }
+                  }
+                </select>
+              </div>
+            </div>
+          }
+          @if (goalModel().targetEntityType === 'Faction') {
+            <div class="form-row three-col">
+              <div>
+                <label class="form-label">Property</label>
+                <select class="form-input" [formField]="goalForm.targetProperty">
+                  <option value="">— Select —</option>
+                  @for (p of factionTargetProps; track p) { <option [value]="p">{{ p }}</option> }
+                </select>
+              </div>
+              <div>
+                <label class="form-label">Operator</label>
+                <select class="form-input" [formField]="goalForm.targetOperator">
+                  <option value="">— Select —</option>
+                  <option value="gte">≥ (at least)</option>
+                  <option value="lte">≤ (at most)</option>
+                  <option value="eq">= (exactly)</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label">Threshold</label>
+                <input class="form-input" type="number" [formField]="goalForm.targetThreshold">
+              </div>
+            </div>
+          }
+        }
+
+
+        @if (goalModel().conditionType === 'Achieve') {
+          <!-- What becomes true: the World Conditions this goal drives (written on the World Conditions page) -->
+          <div class="goal-section-title">World Conditions</div>
+          <div class="form-row">
+            @for (c of drivenConditions(); track c.title) {
+              <div class="goal-driven"><strong>{{ c.title }}</strong> <span class="form-hint">{{ c.stages }}</span></div>
+            } @empty {
+              <span class="form-hint">No World Condition follows this goal. On the World Conditions page, one can vary by this goal's stage, or require it.</span>
+            }
+          </div>
+          <!-- §18.11 advance Effects: what the Faction Phase writes when this goal advances -->
+          <div class="goal-section-title">Advance Effects</div>
+          <div class="form-row">
+            <span class="form-label">At Progressing (first success)</span>
+            <app-advance-effects-editor [effects]="goalProgressingEffects()" [defaultTarget]="goalEffectDefaultTarget()"
+              (changed)="setGoalEffects('progressing', $event)" />
+          </div>
+          <div class="form-row">
+            <span class="form-label">At Accomplished (after the target)</span>
+            <app-advance-effects-editor [effects]="goalAccomplishedEffects()" [defaultTarget]="goalEffectDefaultTarget()"
+              (changed)="setGoalEffects('accomplished', $event)" />
+          </div>
+          <p class="form-hint">Written by the Faction Phase, credited to this faction, when it advances the goal: e.g. an Asset becomes
+            Contested, a Faction loses members, a Location becomes Unstable. Only this goal's own advances write them (a goal
+            Accomplished by play does not). Progressing Effects apply only from Planning.</p>
+        } @else {
+          <p class="form-hint">A defensive assignment. While another faction has a known (not Secret) goal on its target, it
+            competes for this faction's Power in the Faction Phase; if drawn, attacks on the target face the DC plus its
+            Priority (Critical +3, Major +2, Minor +1). It is active while the champion is capable and in this faction, and the
+            target is held and not Destroyed (Asset) or Alive (Character).</p>
+        }
+        @if (goalModel().status === 'Retired') {
+          <p class="form-hint">Retired: set aside as impossible or obsolete. Saving unassigns its champion.</p>
+        }
+      </div>
+      <div class="modal-footer">
+        @if (goalModel().id) {
+          <button class="btn btn-danger" (click)="remove()">Delete</button>
+        } @else {
+          <span></span>
+        }
+        <div class="modal-footer-actions">
+          <button class="btn btn-secondary" (click)="close()">Cancel</button>
+          <button class="btn btn-primary" (click)="saveGoal()" [disabled]="!goalModel().title.trim() || !goalModel().factionId || goalEffectsIncomplete()" [title]="goalEffectsIncomplete() ? 'Finish or remove each advance Effect to save' : ''">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>

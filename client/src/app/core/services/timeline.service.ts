@@ -7,8 +7,9 @@ import {
 } from '../models/types';
 import { scoreRelationship, ScoringActor } from './scoring.service';
 import { FactionInfluenceService } from './faction-influence.service';
+import { projectFactions, projectCharacters, projectAssets } from '../sim/replay';
 
-export type FactionMetric = 'momentum' | 'legitimacy' | 'effectivePower' | 'membership' | 'influence';
+export type FactionMetric = 'momentum' | 'effectivePower' | 'membership' | 'influence';   // §18.7: Legitimacy retired
 export type CharacterMetric = 'pressure' | 'drift' | 'influence';
 export type CharacterSelector =
   | { type: 'single'; characterId: string }
@@ -141,30 +142,18 @@ export class TimelineService {
       data: snapshots.map(snap => {
         if (snap.factionMomentum[faction.id] === undefined) return null;
         switch (metric) {
-          case 'momentum': return snap.factionMomentum[faction.id] ?? null;
-          case 'legitimacy': return snap.factionBaseLegitimacy[faction.id] ?? null;
+          case 'momentum': return snap.factionMomentumTier?.[faction.id] ?? faction.momentumTier ?? 0;   // M3: tier −2..+2
           case 'membership':
             return Object.entries(snap.characterFactions)
               .filter(([, fid]) => fid === faction.id).length;
           case 'influence':
           case 'effectivePower': {
-            const factionAtSnap: Faction = {
-              ...faction,
-              momentum:       snap.factionMomentum[faction.id]       ?? faction.momentum,
-              baseLegitimacy: snap.factionBaseLegitimacy[faction.id] ?? faction.baseLegitimacy,
-              powerModifier:  snap.factionPowerModifier[faction.id]  ?? faction.powerModifier,
-            };
-            const membersAtSnap: Character[] = characters
-              .filter(c => (snap.characterFactions[c.id] ?? c.factionId) === faction.id)
-              .map(c => ({
-                ...c,
-                pressure: snap.characterPressure[c.id] ?? c.pressure,
-                influence: snap.characterInfluence[c.id] ?? c.influence,
-              }));
-            if (metric === 'influence') {
-              return this.influenceSvc.calculateTotalInfluence(factionAtSnap, membersAtSnap, rules);
-            }
-            return this.influenceSvc.calculateEffectivePower(factionAtSnap, membersAtSnap, rules);
+            // D4: the same Power breakdown as the faction pages, over the world projected to this snapshot
+            // (alive members only, and the Assets the faction controls at this point).
+            const [factionAtSnap] = projectFactions([faction], snap);
+            const pb = this.influenceSvc.breakdown(factionAtSnap, projectCharacters(characters, snap), projectAssets(this.store.assets(), snap), rules);
+            // §18.7: 'effectivePower' is Power (0–3); 'influence' is the People channel in points.
+            return metric === 'influence' ? Math.round(pb.people.score) : pb.power;
           }
         }
       }),
@@ -299,7 +288,7 @@ export class TimelineService {
               .filter(p => (snap.characterStates[p.id] ?? p.state) === 'Alive')
               .map(p => ({ ...p, influence: snap.characterInfluence[p.id] ?? p.influence }));
             const effConv = char.conviction + influenceConvictionBonus(char, peers, scale);
-            return effectivePressure({ pressure } as Character, snap.colonyStress) - effConv;
+            return effectivePressure({ pressure } as Character, snap.colonyStress, this.store.formulas().stressPressureCoefficient) - effConv;
           }
         }
       }),
@@ -332,7 +321,7 @@ export class TimelineService {
         continue;
       }
 
-      const factionMetrics: FactionMetric[] = ['momentum', 'legitimacy', 'effectivePower', 'membership', 'influence'];
+      const factionMetrics: FactionMetric[] = ['momentum', 'effectivePower', 'membership', 'influence'];
       if ((factionMetrics as string[]).includes(def.metric) && def.entityId) {
         const faction = this.store.factions().find(f => f.id === def.entityId);
         if (!faction) continue;

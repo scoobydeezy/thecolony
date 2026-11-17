@@ -1,5 +1,7 @@
+import { downloadBlob } from '../../core/utils/csv-export';
 import { Component, inject, OnInit, signal, viewChild } from '@angular/core';
 import { AppStore } from '../../store/app.store';
+import { ToastService, ImportTally } from '../../core/services/toast.service';
 import { NarrativeThreadsListComponent } from './narrative-threads-list.component';
 import { NarrativeEventsCardsComponent } from './narrative-events-cards.component';
 import { NarrativeFlowComponent } from './narrative-flow.component';
@@ -28,6 +30,7 @@ type Tab = 'threads' | 'events' | 'flow';
 })
 export class NarrativeShellComponent implements OnInit {
   store = inject(AppStore);
+  private readonly toast = inject(ToastService);
   tab = signal<Tab>('flow');
 
   cardsRef   = viewChild(NarrativeEventsCardsComponent);
@@ -100,13 +103,8 @@ export class NarrativeShellComponent implements OnInit {
       eventOverridePaths:   this.store.eventOverridePaths(),
       eventOverrideConnections: this.store.eventOverrideConnections(),
     };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement('a');
-    a.href     = url;
-    a.download = `narrative-${campaignId}-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+    downloadBlob(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }),
+                 `narrative-${campaignId}-${new Date().toISOString().slice(0, 10)}.json`);
   }
 
   importJson(event: Event): void {
@@ -131,6 +129,8 @@ export class NarrativeShellComponent implements OnInit {
 
       try {
         const campaignId = this.store.activeCampaign()!.id;
+        // §toast: records (threads, events, connections, links, path sets, paths, overrides, override connections)
+        let replaced = 0, added = 0, removed = 0;
 
         // IDs present in the import file — anything live but NOT in these sets gets deleted.
         const fileIds = {
@@ -147,7 +147,7 @@ export class NarrativeShellComponent implements OnInit {
         // ── Delete phase (leaves → roots to respect FK constraints) ─────────
 
         for (const oc of this.store.eventOverrideConnections())
-          if (!fileIds.overConns.has(oc.id)) await this.store.deleteOverrideConnection(oc.id);
+          if (!fileIds.overConns.has(oc.id)) { await this.store.deleteOverrideConnection(oc.id); removed++; }
 
         for (const op of this.store.eventOverridePaths()) {
           const stillNeeded = (payload.eventOverridePaths ?? []).some(
@@ -157,7 +157,7 @@ export class NarrativeShellComponent implements OnInit {
         }
 
         for (const o of this.store.narrativeEventOverrides())
-          if (!fileIds.overrides.has(o.id)) await this.store.deleteEventOverride(o.id);
+          if (!fileIds.overrides.has(o.id)) { await this.store.deleteEventOverride(o.id); removed++; }
 
         for (const vp of this.store.variantParticipations()) {
           const stillNeeded = (payload.variantParticipations ?? []).some(
@@ -167,13 +167,13 @@ export class NarrativeShellComponent implements OnInit {
         }
 
         for (const c of this.store.narrativeConnections())
-          if (!fileIds.conns.has(c.id)) await this.store.deleteConnection(c.id);
+          if (!fileIds.conns.has(c.id)) { await this.store.deleteConnection(c.id); removed++; }
 
         for (const l of this.store.narrativeEntityLinks())
-          if (!fileIds.links.has(l.id)) await this.store.deleteEntityLink(l.id);
+          if (!fileIds.links.has(l.id)) { await this.store.deleteEntityLink(l.id); removed++; }
 
         for (const p of this.store.narrativePaths())
-          if (!fileIds.paths.has(p.id)) await this.store.deleteNarrativePath(p.id);
+          if (!fileIds.paths.has(p.id)) { await this.store.deleteNarrativePath(p.id); removed++; }
 
         for (const ctx of this.store.pathSetContexts()) {
           const stillNeeded = (payload.pathSetContexts ?? []).some(
@@ -183,13 +183,13 @@ export class NarrativeShellComponent implements OnInit {
         }
 
         for (const ps of this.store.pathSets())
-          if (!fileIds.pathSets.has(ps.id)) await this.store.deletePathSet(ps.id);
+          if (!fileIds.pathSets.has(ps.id)) { await this.store.deletePathSet(ps.id); removed++; }
 
         for (const e of this.store.narrativeEvents())
-          if (!fileIds.events.has(e.id)) await this.store.deleteNarrativeEvent(e.id);
+          if (!fileIds.events.has(e.id)) { await this.store.deleteNarrativeEvent(e.id); removed++; }
 
         for (const t of this.store.narrativeThreads())
-          if (!fileIds.threads.has(t.id)) await this.store.deleteThread(t.id);
+          if (!fileIds.threads.has(t.id)) { await this.store.deleteThread(t.id); removed++; }
 
         // Live IDs still in the store after deletions — records whose IDs match are updated (PUT),
         // others are treated as new (POST) and the server assigns a fresh GUID.
@@ -229,7 +229,7 @@ export class NarrativeShellComponent implements OnInit {
 
         // ── 1. Threads ──────────────────────────────────────────────────────
         for (const t of (payload.threads ?? []) as NarrativeThread[]) {
-          const isLive = liveIds.threads.has(t.id);
+          const isLive = liveIds.threads.has(t.id); if (isLive) replaced++; else added++;
           const saved = await this.store.saveThread(
             clean({ ...t, campaignId, id: isLive ? t.id : '' })
           );
@@ -238,7 +238,7 @@ export class NarrativeShellComponent implements OnInit {
 
         // ── 2. Events ───────────────────────────────────────────────────────
         for (const e of (payload.events ?? []) as NarrativeEvent[]) {
-          const isLive = liveIds.events.has(e.id);
+          const isLive = liveIds.events.has(e.id); if (isLive) replaced++; else added++;
           const saved = await this.store.saveNarrativeEvent(
             clean({ ...e, campaignId, id: isLive ? e.id : '' })
           );
@@ -247,7 +247,7 @@ export class NarrativeShellComponent implements OnInit {
 
         // ── 3. Connections (base) ────────────────────────────────────────────
         for (const c of (payload.connections ?? []) as NarrativeEventConnection[]) {
-          const isLive = liveIds.conns.has(c.id);
+          const isLive = liveIds.conns.has(c.id); if (isLive) replaced++; else added++;
           await this.store.saveConnection(clean({
             ...c,
             campaignId,
@@ -261,7 +261,7 @@ export class NarrativeShellComponent implements OnInit {
         // ── 4. Entity links ──────────────────────────────────────────────────
         for (const l of (payload.entityLinks ?? []) as NarrativeEntityLink[]) {
           if (l.ownerType !== 'Event') continue;
-          const isLive = liveIds.links.has(l.id);
+          const isLive = liveIds.links.has(l.id); if (isLive) replaced++; else added++;
           await this.store.saveEntityLink(clean({
             ...l,
             campaignId,
@@ -272,7 +272,7 @@ export class NarrativeShellComponent implements OnInit {
 
         // ── 5. Path sets ─────────────────────────────────────────────────────
         for (const ps of (payload.pathSets ?? []) as PathSet[]) {
-          const isLive = liveIds.pathSets.has(ps.id);
+          const isLive = liveIds.pathSets.has(ps.id); if (isLive) replaced++; else added++;
           const saved = await this.store.savePathSet(clean({
             ...ps,
             campaignId,
@@ -285,7 +285,7 @@ export class NarrativeShellComponent implements OnInit {
 
         // ── 6. Paths ─────────────────────────────────────────────────────────
         for (const p of (payload.paths ?? []) as NarrativePath[]) {
-          const isLive = liveIds.paths.has(p.id);
+          const isLive = liveIds.paths.has(p.id); if (isLive) replaced++; else added++;
           const saved = await this.store.saveNarrativePath(clean({
             ...p,
             id: isLive ? p.id : '',
@@ -312,7 +312,7 @@ export class NarrativeShellComponent implements OnInit {
 
         // ── 9. Event overrides ────────────────────────────────────────────────
         for (const o of (payload.eventOverrides ?? []) as NarrativeEventOverride[]) {
-          const isLive = liveIds.overrides.has(o.id);
+          const isLive = liveIds.overrides.has(o.id); if (isLive) replaced++; else added++;
           const saved = await this.store.saveEventOverride(clean({
             ...o,
             id: isLive ? o.id : '',
@@ -331,7 +331,7 @@ export class NarrativeShellComponent implements OnInit {
 
         // ── 11. Event override connections ────────────────────────────────────
         for (const oc of (payload.eventOverrideConnections ?? []) as EventOverrideConnection[]) {
-          const isLive = liveIds.overConns.has(oc.id);
+          const isLive = liveIds.overConns.has(oc.id); if (isLive) replaced++; else added++;
           await this.store.saveOverrideConnection(clean({
             ...oc,
             id: isLive ? oc.id : '',
@@ -341,6 +341,7 @@ export class NarrativeShellComponent implements OnInit {
           }));
         }
 
+        this.toast.imported('Narrative', { replaced, added, removed });
       } catch (e) {
         alert('Import failed. Check the browser console for details.');
         console.error('Import error:', e);

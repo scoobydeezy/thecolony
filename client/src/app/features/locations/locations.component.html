@@ -268,7 +268,7 @@
       @if (loc.description) {
         <p class="loc-desc">{{ loc.description }}</p>
       }
-      <span [class]="'state-badge ' + stateClass(loc.state)">{{ loc.state }}</span>
+      <span [class]="'state-badge ' + stateClass(loc.state)">{{ locationStateLabel(loc.state) }}</span>
 
       @if (maps.length > 0) {
         <div class="loc-maps">

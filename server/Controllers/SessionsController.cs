@@ -17,7 +17,7 @@ public class SessionsController(AppDbContext db, ICampaignContext campaign) : Co
         var sessions = await db.Sessions
             .Where(s => s.CampaignId == cid)
             .Include(s => s.Events)
-                .ThenInclude(e => e.Effects)
+                .ThenInclude(e => e.Effects.OrderBy(ef => ef.Ordinal))
             .OrderBy(s => s.Number)
             .ToListAsync();
         return Ok(sessions);
@@ -28,7 +28,7 @@ public class SessionsController(AppDbContext db, ICampaignContext campaign) : Co
     {
         var session = await db.Sessions
             .Include(s => s.Events.OrderBy(e => e.SortOrder))
-                .ThenInclude(e => e.Effects)
+                .ThenInclude(e => e.Effects.OrderBy(ef => ef.Ordinal))
             .FirstOrDefaultAsync(s => s.Id == id);
         if (session is null) return NotFound();
         return Ok(session);
@@ -42,12 +42,16 @@ public class SessionsController(AppDbContext db, ICampaignContext campaign) : Co
         session.CampaignId = cid;
         foreach (var ev in session.Events)
         {
+            if (ev.Kind == EventKind.ColonyTurn) return BadRequest("Colony Turn events are created via /api/colony-turns.");
             ev.Id = Guid.NewGuid().ToString();
             ev.SessionId = session.Id;
+            var ordinal = 0;
             foreach (var ef in ev.Effects)
             {
                 ef.Id = Guid.NewGuid().ToString();
                 ef.EventId = ev.Id;
+                ef.Origin = EffectOrigin.Manual;
+                ef.Ordinal = ordinal++;
             }
         }
         db.Sessions.Add(session);
@@ -62,7 +66,7 @@ public class SessionsController(AppDbContext db, ICampaignContext campaign) : Co
 
         var existing = await db.Sessions
             .Include(s => s.Events)
-                .ThenInclude(e => e.Effects)
+                .ThenInclude(e => e.Effects.OrderBy(ef => ef.Ordinal))
             .FirstOrDefaultAsync(s => s.Id == id);
         if (existing is null) return NotFound();
 
@@ -82,6 +86,7 @@ public class SessionsController(AppDbContext db, ICampaignContext campaign) : Co
     {
         var session = await db.Sessions.FindAsync(id);
         if (session is null) return NotFound();
+        db.ColonyTurns.RemoveRange(db.ColonyTurns.Where(t => t.SessionId == id));   // M5: its turns (phases cascade)
         db.Sessions.Remove(session);
         await db.SaveChangesAsync();
         return NoContent();
@@ -107,10 +112,14 @@ public class SessionsController(AppDbContext db, ICampaignContext campaign) : Co
             {
                 ev.Id = string.IsNullOrWhiteSpace(ev.Id) ? Guid.NewGuid().ToString() : ev.Id;
                 ev.SessionId = session.Id;
+                // Imports keep exported order; pre-M1 exports have no ordinals, so fall back to file order.
+                var assignOrder = ev.Effects.All(ef => ef.Ordinal == 0);
+                var ordinal = 0;
                 foreach (var ef in ev.Effects)
                 {
                     ef.Id = string.IsNullOrWhiteSpace(ef.Id) ? Guid.NewGuid().ToString() : ef.Id;
                     ef.EventId = ev.Id;
+                    if (assignOrder) ef.Ordinal = ordinal++;
                 }
             }
             db.Sessions.Add(session);

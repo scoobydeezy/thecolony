@@ -1,3 +1,4 @@
+import { InstabilityBadgeComponent } from '../../shared/instability-badge/instability-badge.component';
 import { Component, inject, computed, signal, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { DecimalPipe, NgClass } from '@angular/common';
@@ -11,15 +12,15 @@ import {
   NarrativeVisibility, RelationshipState,
   NARRATIVE_VISIBILITY_OPTIONS, RELATIONSHIP_STATE_OPTIONS,
   effectivePressure, computeDriftTarget, lerpValueVector,
-  topCompatibleFactions, effectiveBeliefs,
+  effectiveBeliefs,
   primaryValue, secondaryValue, sacrificedValue,
   influenceConvictionBonus, beliefAxisOptions, beliefPositionLabel
 } from '../../core/models/types';
 import { TernaryPlotComponent, TernaryOverlayPoint } from '../../shared/ternary-plot/ternary-plot.component';
-import { scoreRelationship, ScoringActor, DEFAULT_RULES } from '../../core/services/scoring.service';
+import { scoreRelationship, ScoringActor, DEFAULT_RULES, topCompatibleFactions } from '../../core/services/scoring.service';
 import { getAncestryImagePath, FALLBACK_ANCESTRY_IMAGE } from '../../core/utils/ancestry-images';
+import { EditingCard, CharacterFormModel, toFormModel, applyCardEdit, baselineForSave } from './character-card-edit';
 
-type EditingCard = 'header' | 'identity' | 'society' | 'narrative' | 'beliefs' | 'doubt' | null;
 
 interface RelFormModel {
   relationshipType: string;
@@ -35,35 +36,6 @@ interface DetailFormModel {
   visibility: string;
 }
 
-interface CharacterFormModel {
-  id: string;
-  name: string;
-  characterType: string;
-  narrativeTier: string;
-  state: CharacterState;
-  ancestry: string;
-  heritage: string;
-  class: string;
-  background: string;
-  level: string;
-  gender: string;
-  pronouns: string;
-  age: string;
-  occupation: string;
-  aliases: string;
-  summary: string;
-  factionId: string;
-  socialClassId: string;
-  locationId: string;
-  beliefc: string;
-  beliefa: string;
-  beliefb: string;
-  doubtDirection: string;
-  conviction: string;
-  pressure: string;
-  influence: string;
-  impressionable: string;
-}
 
 const DEFAULT_VALUES: ValueVector = { a: 1/3, b: 1/3, c: 1/3 };
 
@@ -78,41 +50,12 @@ const emptyFormModel = (): CharacterFormModel => ({
   influence: '0', impressionable: '50'
 });
 
-const toFormModel = (c: Character): CharacterFormModel => ({
-  id: c.id,
-  name: c.name,
-  characterType: c.characterType,
-  narrativeTier: c.narrativeTier ?? 'Minor',
-  state: c.state,
-  ancestry: c.ancestry ?? '',
-  heritage: c.heritage ?? '',
-  class: c.class ?? '',
-  background: c.background ?? '',
-  level: c.level?.toString() ?? '',
-  gender: c.gender ?? '',
-  pronouns: c.pronouns ?? '',
-  age: c.age?.toString() ?? '',
-  occupation: c.occupation ?? '',
-  aliases: c.aliases ?? '',
-  summary: c.summary ?? '',
-  factionId: c.factionId ?? '',
-  socialClassId: c.socialClassId ?? '',
-  locationId: c.locationId ?? '',
-  beliefc: c.beliefc ?? '',
-  beliefa: c.beliefa ?? '',
-  beliefb: c.beliefb ?? '',
-  doubtDirection: c.doubtDirection ?? '',
-  conviction: c.conviction.toString(),
-  pressure: c.pressure.toString(),
-  influence: c.influence.toString(),
-  impressionable: c.impressionable.toString()
-});
 
 
 @Component({
   selector: 'app-character-detail',
   standalone: true,
-  imports: [RouterLink, FormField, TernaryPlotComponent, DecimalPipe, NgClass],
+  imports: [InstabilityBadgeComponent, RouterLink, FormField, TernaryPlotComponent, DecimalPipe, NgClass],
   templateUrl: './character-detail.component.html',
   styleUrl: './character-detail.component.scss'
 })
@@ -129,76 +72,21 @@ export class CharacterDetailComponent implements OnInit {
   isEditing(card: EditingCard): boolean { return this.editingCard() === card; }
 
   openCard(card: EditingCard): void {
-    this.editForm.set(toFormModel(this.character()));
-    this.editValues.set({ ...this.character().values });
+    const source = baselineForSave(this.store.characters(), this.characterId()) ?? this.character();
+    this.editForm.set(toFormModel(source));
+    this.editValues.set({ ...source.values });
     this.editingCard.set(card);
   }
 
   closeCard(): void { this.editingCard.set(null); }
 
   saveCard(card: EditingCard): void {
-    const fm = this.editForm();
-    const current = this.character();
-    let updated: Character;
-
-    switch (card) {
-      case 'header':
-        updated = { ...current, name: fm.name, characterType: fm.characterType as CharacterType, narrativeTier: fm.narrativeTier as NarrativeTier, state: fm.state, summary: fm.summary || undefined };
-        break;
-      case 'identity':
-        updated = {
-          ...current,
-          gender: fm.gender || undefined,
-          pronouns: fm.pronouns || undefined,
-          age: fm.age ? +fm.age : undefined,
-          occupation: fm.occupation || undefined,
-          aliases: fm.aliases || undefined,
-          ancestry: fm.ancestry || undefined,
-          heritage: fm.heritage || undefined,
-          class: fm.class || undefined,
-          background: fm.background || undefined,
-          level: fm.level ? +fm.level : undefined,
-        };
-        break;
-      case 'society':
-        updated = {
-          ...current,
-          factionId: fm.factionId || undefined,
-          socialClassId: fm.socialClassId || undefined,
-          locationId: fm.locationId || undefined,
-          influence: fm.influence !== '' ? +fm.influence : 0,
-          impressionable: fm.impressionable !== '' ? +fm.impressionable : 50,
-        };
-        break;
-      case 'narrative':
-        updated = { ...current, summary: fm.summary || undefined };
-        break;
-      case 'beliefs':
-        updated = {
-          ...current,
-          values: this.editValues(),
-          beliefc: (fm.beliefc as BeliefPosition) || undefined,
-          beliefa: (fm.beliefa as BeliefPosition) || undefined,
-          beliefb: (fm.beliefb as BeliefPosition) || undefined,
-          doubtDirection: (fm.doubtDirection as DoubtDirection) || undefined,
-          conviction: fm.conviction !== '' ? +fm.conviction : 0,
-          pressure: fm.pressure !== '' ? +fm.pressure : 0,
-        };
-        break;
-      case 'doubt':
-        updated = {
-          ...current,
-          pressure: fm.pressure !== '' ? +fm.pressure : 0,
-          influence: fm.influence !== '' ? +fm.influence : 0,
-          impressionable: fm.impressionable !== '' ? +fm.impressionable : 50,
-        };
-        break;
-      default:
-        return;
-    }
-
+    // D9: start from the baseline record, not the (possibly snapshot-projected) view.
+    const base = baselineForSave(this.store.characters(), this.characterId());
+    if (!base) return;
+    const updated = applyCardEdit(base, card, this.editForm(), this.editValues());
+    if (!updated) return;
     this.store.saveCharacter(updated);
-    this.character.set({ ...updated, values: { ...updated.values } });
     this.editingCard.set(null);
   }
 
@@ -206,11 +94,14 @@ export class CharacterDetailComponent implements OnInit {
 
   private portraitBust = signal<string | null>(null);
 
-  character = signal<Character>({
-    id: '', name: '', characterType: 'NPC', state: 'Alive',
-    values: { ...DEFAULT_VALUES }, conviction: 50, pressure: 0,
-    influence: 0, impressionable: 50
-  });
+  // D9: the displayed character follows the viewing context (baseline / current / session).
+  readonly characterId = signal('');
+  readonly character = computed<Character>(() =>
+    this.store.viewCharacters().find(c => c.id === this.characterId()) ?? {
+      id: '', name: '', characterType: 'NPC', state: 'Alive',
+      values: { ...DEFAULT_VALUES }, conviction: 50, pressure: 0,
+      influence: 0, impressionable: 50
+    });
 
   readonly portrait = computed<string>(() => {
     const bust = this.portraitBust();
@@ -323,7 +214,7 @@ export class CharacterDetailComponent implements OnInit {
   readonly colonyStress = computed(() => this.store.viewColonyStress());
 
   readonly effectivePressureValue = computed(() =>
-    effectivePressure(this.character(), this.colonyStress())
+    effectivePressure(this.character(), this.colonyStress(), this.store.formulas().stressPressureCoefficient)
   );
 
   readonly characterFaction = computed(() => {
@@ -414,7 +305,7 @@ export class CharacterDetailComponent implements OnInit {
   );
 
   readonly compatibilityList = computed(() =>
-    topCompatibleFactions(this.character(), this.activeFactions(), this.store.formulas().beliefDerivationThreshold)
+    topCompatibleFactions(this.character(), this.activeFactions(), this.store.formulas().beliefDerivationThreshold, this.store.beliefAxisLabels(), this.store.rules() ?? DEFAULT_RULES)
   );
 
   readonly top3Compatible = computed(() =>
@@ -446,12 +337,12 @@ export class CharacterDetailComponent implements OnInit {
   readonly driftedCompatibilityList = computed(() => {
     const drifted = this.driftedCharacter();
     if (!drifted) return null;
-    return topCompatibleFactions(drifted, this.activeFactions(), this.store.formulas().beliefDerivationThreshold);
+    return topCompatibleFactions(drifted, this.activeFactions(), this.store.formulas().beliefDerivationThreshold, this.store.beliefAxisLabels(), this.store.rules() ?? DEFAULT_RULES);
   });
 
   readonly driftedBeliefs = computed(() => {
     const target = this.driftTarget();
-    return effectiveBeliefs({ ...this.character(), values: target ?? this.character().values });
+    return effectiveBeliefs({ ...this.character(), values: target ?? this.character().values }, this.store.formulas().beliefDerivationThreshold, this.store.beliefAxisLabels());
   });
 
   readonly driftedTop3 = computed(() =>
@@ -480,7 +371,7 @@ export class CharacterDetailComponent implements OnInit {
     const cs = this.store.colonyState();
     if (!cs) return null;
     const c = this.character();
-    const beliefs = effectiveBeliefs(c);
+    const beliefs = effectiveBeliefs(c, this.store.formulas().beliefDerivationThreshold, this.store.beliefAxisLabels());
     const source: ScoringActor = { id: c.id, values: c.values, beliefc: beliefs.beliefc, beliefa: beliefs.beliefa, beliefb: beliefs.beliefb };
     const party: ScoringActor  = { id: 'party', values: cs.partyValues, beliefc: cs.partyBeliefc, beliefa: cs.partyBeliefa, beliefb: cs.partyBeliefb };
     return scoreRelationship(source, party, this.colonyStress(), 0, this.store.rules() ?? DEFAULT_RULES);
@@ -492,7 +383,7 @@ export class CharacterDetailComponent implements OnInit {
     this.store.viewGoals().filter(g => g.championId === this.character().id)
   );
 
-  readonly derivedBeliefs = computed(() => effectiveBeliefs(this.character()));
+  readonly derivedBeliefs = computed(() => effectiveBeliefs(this.character(), this.store.formulas().beliefDerivationThreshold, this.store.beliefAxisLabels()));
 
   readonly driftedBeliefChanges = computed(() => {
     const current = this.derivedBeliefs();
@@ -515,7 +406,7 @@ export class CharacterDetailComponent implements OnInit {
     const id = this.route.snapshot.paramMap.get('id');
     const found = this.store.viewCharacters().find(c => c.id === id);
     if (found) {
-      this.character.set({ ...found, values: { ...found.values } });
+      this.characterId.set(found.id);
       this.loadNarrativeData(found.id);
       this.store.setNarrativeFocus({ type: 'Character', id: found.id, name: found.name });
     } else {
@@ -746,7 +637,9 @@ export class CharacterDetailComponent implements OnInit {
     if (!file) return;
     this.api.uploadCharacterPortrait(this.character().id, file).subscribe(res => {
       this.portraitBust.set(`${res.path}?v=${Date.now()}`);
-      this.store.saveCharacter({ ...this.character(), portraitPath: res.path });
+      // D9: patch the baseline record, not the projected view.
+      const base = baselineForSave(this.store.characters(), this.characterId());
+      if (base) this.store.saveCharacter({ ...base, portraitPath: res.path });
     });
     (event.target as HTMLInputElement).value = '';
   }

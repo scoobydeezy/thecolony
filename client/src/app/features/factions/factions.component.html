@@ -14,14 +14,14 @@
     </button>
   </div>
   <div class="toolbar-actions">
-    @if (!store.isViewingSnapshot()) {
+    @if (!store.isViewingSnapshot() && !store.isLive()) {
       <label class="btn btn-secondary">
         <i class="fa-solid fa-right-to-bracket"></i> Import
         <input type="file" accept=".csv" style="display:none" (change)="importCsv($event)">
       </label>
     }
     <button class="btn btn-secondary" (click)="exportCsv()">Export <i class="fa-solid fa-right-from-bracket"></i></button>
-    @if (!store.isViewingSnapshot()) {
+    @if (!store.isViewingSnapshot() && !store.isLive()) {
       <button class="btn btn-primary" (click)="openAdd()">+ Add Faction</button>
     }
   </div>
@@ -76,12 +76,7 @@
           </div>
         </div>
         <div class="faction-header-stats">
-          <div class="card-stat">
-            <span class="card-stat-label">Influence</span>
-            <span class="card-stat-value">{{ factionTotalInfluence(f) }}</span>
-          </div>
-          <div class="card-stat-divider"></div>
-          <div class="card-stat">
+          <div class="card-stat" [title]="factionPowerReasons(f)">
             <span class="card-stat-label">Power</span>
             <span class="card-stat-value card-stat-power">{{ factionEffectivePower(f) }}</span>
           </div>
@@ -90,7 +85,7 @@
             <span class="card-stat-label">Members</span>
             <span class="card-stat-value">
               {{ factionMemberCount(f) }}
-              @if ((f.additionalMemberCount ?? 0) > 0) {
+              @if ((f.factionSize ?? 0) > 0) {
                 <span class="card-stat-total">/ {{ factionTotalMemberCount(f) }}</span>
               }
             </span>

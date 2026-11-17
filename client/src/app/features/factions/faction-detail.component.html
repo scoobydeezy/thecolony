@@ -40,20 +40,40 @@
     <div class="header-panel">
       <div class="header-stats">
         <div class="influence-hero">
-          <div class="influence-hero-col">
-            <div class="influence-total">{{ totalInfluence() }}</div>
-            <div class="detail-label">Influence</div>
-          </div>
-          <div class="influence-hero-col">
+          <div class="influence-hero-col" [title]="'Power = qualifying channels = tokens drawn in the Faction Phase (one roll per drawn goal; a drawn assignment guards its target). ' + (power().reasons.length ? power().reasons.join(' + ') : 'No channel qualifies: no operations this turn')">
             <div class="influence-total influence-power">{{ effectivePower() }}</div>
             <div class="detail-label">Power</div>
           </div>
+          <!-- §18.7: capacity channels; each one at its threshold is one Power (0–3). Details in each tooltip. -->
+          <div class="power-channels" role="list" aria-label="Capacity channels">
+            <span class="power-connector" aria-hidden="true"></span>
+            <div class="power-bracket">
+              @for (ch of [
+                  { name: 'People', icon: 'fa-user', c: power().people, detail: peopleDetail() },
+                  { name: 'Holdings', icon: 'fa-building-columns', c: power().holdings, detail: assetDetail('holdings') },
+                  { name: 'Mandate', icon: 'fa-scroll', c: power().mandate, detail: assetDetail('mandate') }]; track ch.name) {
+                <div class="power-channel" role="listitem" [class.power-channel--on]="ch.c.qualifies"
+                     [attr.aria-label]="ch.name + ' ' + ch.c.score + ' of ' + ch.c.threshold + (ch.c.qualifies ? ', qualifies' : ', does not qualify')"
+                     [title]="ch.name + ' ' + ch.c.score + ' / ' + ch.c.threshold + (ch.c.qualifies ? ': qualifies (+1 Power)' : ': does not qualify') + ' — ' + ch.detail">
+                  <i [class]="'fa-solid ' + ch.icon"></i>
+                  <span class="power-channel-score">{{ ch.c.score }}/{{ ch.c.threshold }}</span>
+                </div>
+              }
+            </div>
+          </div>
           <div class="influence-hero-col">
-            <i class="fa-solid momentum-icon"
-              [class]="momentumIcon(faction().momentum)"
-              [class.momentum-flip]="momentumFlip(faction().momentum)"
-              [ngClass]="momentumClass(faction().momentum)"></i>
+            <!-- M3: Momentum tier (−2..+2) and the signals pending for the next Opening -->
+            <i class="fa-solid momentum-icon" [ngClass]="[momentumIcon(momentumTier()), momentumClass(momentumTier())]"
+               role="img" [attr.aria-label]="'Momentum ' + formatMomentum(momentumTier())"
+               [title]="'Momentum ' + formatMomentum(momentumTier())"></i>
             <span class="detail-label">Momentum</span>
+            @if (pendingSignals().length > 0) {
+              <div class="momentum-tokens" title="Pending: resolves at the next Opening (net change capped at one step)">
+                @for (p of pendingSignals(); track $index) {
+                  <span class="momentum-token" [ngClass]="momentumClass(p.sign)" [title]="p.reason">{{ p.sign > 0 ? '+1' : '−1' }}</span>
+                }
+              </div>
+            }
           </div>
         </div>
         @if (mostAligned().length > 0 || mostOpposed().length > 0) {
@@ -168,7 +188,7 @@
     <div class="card" [class.card--editing]="isEditing('beliefs')">
       <div class="card-header-row">
         <h3 class="section-title">Values</h3>
-        @if (!store.isViewingSnapshot()) {
+        @if (!store.isViewingSnapshot() && !store.isLive()) {
           <button class="card-edit-btn" (click)="isEditing('beliefs') ? closeCard() : openCard('beliefs')" [title]="isEditing('beliefs') ? 'Cancel' : 'Edit'">
             <i [class]="isEditing('beliefs') ? 'fa-solid fa-xmark' : 'fa-solid fa-pen'"></i>
           </button>
@@ -285,7 +305,7 @@
     <div class="card" [class.card--editing]="isEditing('perception')">
       <div class="card-header-row">
         <h3 class="section-title">Perception &amp; Influence</h3>
-        @if (!store.isViewingSnapshot()) {
+        @if (!store.isViewingSnapshot() && !store.isLive()) {
           <button class="card-edit-btn" (click)="isEditing('perception') ? closeCard() : openCard('perception')" [title]="isEditing('perception') ? 'Cancel' : 'Edit'">
             <i [class]="isEditing('perception') ? 'fa-solid fa-xmark' : 'fa-solid fa-pen'"></i>
           </button>
@@ -303,16 +323,10 @@
             <input type="text" [formField]="f.selfImage" placeholder="How they see themselves" />
           </div>
           <div class="form-group">
-            <label>Base Legitimacy <span class="range-hint">(0–100)</span></label>
-            <input type="number" [formField]="f.baseLegitimacy" />
-          </div>
-          <div class="form-group">
-            <label>Starting Momentum <span class="range-hint">(–100 to +100)</span></label>
-            <input type="number" [formField]="f.momentum" />
-          </div>
-          <div class="form-group">
-            <label>Power Modifier</label>
-            <input type="number" [formField]="f.powerModifier" />
+            <label>Starting Momentum tier <span class="range-hint">(−2 to +2)</span></label>
+            <select [formField]="f.momentumTier">
+              @for (t of momentumSteps; track t) { <option [value]="'' + t">{{ formatMomentum(t) }}</option> }
+            </select>
           </div>
         </div>
         <div class="card-edit-actions">
@@ -336,18 +350,6 @@
             }
           </div>
 
-          <div class="influence-factors">
-            <div class="influence-factor">
-              <span class="influence-factor-label">Base Legitimacy</span>
-              <span class="influence-factor-value">{{ faction().baseLegitimacy }}</span>
-            </div>
-            @if (faction().powerModifier !== 0) {
-              <div class="influence-factor">
-                <span class="influence-factor-label">Power Modifier</span>
-                <span class="influence-factor-value">{{ faction().powerModifier > 0 ? '+' : '' }}{{ faction().powerModifier }}</span>
-              </div>
-            }
-          </div>
         } @else {
           <p class="empty-state">No perception recorded.</p>
         }
@@ -437,101 +439,19 @@
   <!-- ── COLUMN 2: Status ─────────────────────────────────────────────────── -->
   <div class="entity-col">
 
-    <!-- Goals -->
+    <!-- Goals: a summary, like the Assets (managed on the Goals page) -->
     <div class="entity-section">
       <div class="entity-section-header">
         <span class="section-title">Goals</span>
-        @if (!store.isViewingSnapshot()) {
-          <button class="btn btn-secondary btn-sm" (click)="openAddGoal()">+ Add</button>
-        }
+        <span class="section-stat">{{ goalStat() }}
+          <a class="section-link" [routerLink]="['/goals']" [queryParams]="{ faction: faction().id }" title="Manage this faction's goals on the Goals page">Manage <i class="fa-solid fa-arrow-right"></i></a>
+        </span>
       </div>
-      @if (activeGoals().length === 0 && resolvedGoals().length === 0) {
-        <p class="empty-state">No goals yet.</p>
-      }
-      @for (g of activeGoals(); track g.id) {
-        <div class="entity-card goal-card">
-          <!-- Col 1: priority icon -->
-          <div class="goal-priority-col">
-            <app-priority-icon [priority]="g.priority"
-              [class]="'goal-priority-icon priority-' + g.priority.toLowerCase()"
-              [title]="g.priority"></app-priority-icon>
-          </div>
-          <!-- Col 2: content -->
-          <div class="goal-content">
-            <div class="goal-row-top">
-              <span class="goal-name">{{ g.title }}</span>
-              <span [class]="'badge ' + visibilityClass(g.visibility)">{{ g.visibility }}</span>
-            </div>
-            @let targetLabel = goalTargetLabel(g);
-            @if (targetLabel) {
-              <div class="goal-row-bottom">
-                <span class="target-item">TARGET: <strong>{{ targetLabel }}</strong></span>
-              </div>
-            }
-          </div>
-          <!-- Col 3: status pill -->
-          <div [class]="'goal-status-pill ' + goalStatusClass(g)">
-            <i [class]="'fa-solid ' + goalStatusIcon(g)"></i>
-            {{ goalStatusLabel(g).toUpperCase() }}
-          </div>
-          <!-- Col 4: champion -->
-          <div class="goal-champion-col">
-            @let champ = championFor(g);
-            @if (champ) {
-              <div class="champion-avatar" [title]="champ.name" [class.champion-avatar--inactive]="isChampionInactive(champ)"
-                   [style.background-image]="'url(' + championPortrait(champ) + ')'">
-                @if (stateIconClass(champ.state)) {
-                  <i [class]="stateIconClass(champ.state) + ' champion-avatar__state-icon'"></i>
-                }
-              </div>
-            }
-          </div>
-          <!-- Col 5: actions -->
-          <div class="goal-actions">
-            @if (!store.isViewingSnapshot()) {
-              <button class="goal-icon-btn" (click)="openEditGoal(g)" title="Edit">
-                <i class="fa-solid fa-pen"></i>
-              </button>
-            }
-          </div>
-        </div>
-      }
-
-      <!-- Resolved Goals -->
+      @if (goals().length === 0) { <p class="empty-state">No goals yet.</p> }
+      @for (g of activeGoals(); track g.id) { <app-goal-card [goal]="g" [compact]="true" /> }
       @if (resolvedGoals().length > 0) {
         <div class="goal-resolved-header">Resolved</div>
-        @for (g of resolvedGoals(); track g.id) {
-          <div class="entity-card goal-card goal-card--resolved">
-            <!-- Col 1: outcome icon -->
-            <div class="goal-priority-col">
-              @if (g.status === 'Accomplished') {
-                <i class="fa-solid fa-check goal-priority-icon goal-accomplished" title="Accomplished"></i>
-              } @else {
-                <i class="fa-solid fa-xmark goal-priority-icon goal-failed" title="Failed"></i>
-              }
-            </div>
-            <!-- Col 2: content -->
-            <div class="goal-content">
-              <div class="goal-row-top">
-                <span class="goal-name">{{ g.title }}</span>
-              </div>
-              @let targetLabel = goalTargetLabel(g);
-              @if (targetLabel) {
-                <div class="goal-row-bottom">
-                  <span class="target-item">{{ targetLabel }}</span>
-                </div>
-              }
-            </div>
-            <!-- Col 3: actions -->
-            <div class="goal-actions">
-              @if (!store.isViewingSnapshot()) {
-                <button class="goal-icon-btn" (click)="openEditGoal(g)" title="Edit">
-                  <i class="fa-solid fa-pen"></i>
-                </button>
-              }
-            </div>
-          </div>
-        }
+        @for (g of resolvedGoals(); track g.id) { <app-goal-card [goal]="g" [compact]="true" /> }
       }
     </div>
 
@@ -540,7 +460,7 @@
       <div class="entity-section">
         <div class="entity-section-header">
           <span class="section-title">Assets</span>
-          <span class="section-stat" title="Asset influence score / Asset legitimacy score (0–100)">{{ assetInfluenceScore() | number:'1.0-0' }} INF / {{ assetLegitimacyScore() | number:'1.0-0' }} LGT</span>
+          <span class="section-stat" title="Stars of controlled Assets: Operational, Strategic and Covert count toward Holdings; Symbolic and Mandate toward Mandate">{{ power().holdings.score }}★ Holdings / {{ power().mandate.score }}★ Mandate</span>
         </div>
         @for (a of assets(); track a.id) {
           <div class="entity-card">
@@ -571,7 +491,7 @@
     <div class="entity-section">
       <div class="entity-section-header">
         <span class="section-title">Members</span>
-        <span class="section-stat">{{ charInfluence() | number:'1.0-0' }} INF</span>
+        <span class="section-stat" [title]="'People channel: ' + peopleDetail()">{{ power().people.score }} / {{ power().people.threshold }} People</span>
       </div>
       @if (allCharacters().length === 0) {
         <p class="empty-state">No characters belong to this faction.</p>
@@ -588,6 +508,7 @@
               <div class="member-card-body">
                 <div class="character-row-main">
                   <span class="char-name">{{ char.name }}</span>
+                  <app-instability-badge [character]="char" />
                   <span class="char-type-chip leader">Leader</span>
                   @if (faction().type === 'SocialClass' && char.factionId) {
                     <span class="char-type-chip faction-label">{{ factionNameById(char.factionId) }}</span>
@@ -603,7 +524,7 @@
                 </div>
                 @if (char.summary) { <p class="char-summary">{{ char.summary }}</p> }
               </div>
-              @if (!store.isViewingSnapshot()) {
+              @if (!store.isViewingSnapshot() && !store.isLive()) {
                 <div class="member-card-actions">
                   <button class="btn-icon btn-icon--danger btn-icon--leader-action" title="Demote from leader" (click)="setLeader(null)">
                     <i class="fa-solid fa-circle-minus"></i>
@@ -623,6 +544,7 @@
               <div class="member-card-body">
                 <div class="character-row-main">
                   <span class="char-name">{{ char.name }}</span>
+                  <app-instability-badge [character]="char" />
                   <span class="char-type-chip" [class.party]="char.characterType === 'PartyMember'">
                     {{ char.characterType === 'PartyMember' ? 'Party' : 'NPC' }}
                   </span>
@@ -637,7 +559,7 @@
                 </div>
                 @if (char.summary) { <p class="char-summary">{{ char.summary }}</p> }
               </div>
-              @if (!store.isViewingSnapshot() && faction().type !== 'SocialClass' && !faction().leaderId) {
+              @if (!store.isViewingSnapshot() && !store.isLive() && faction().type !== 'SocialClass' && !faction().leaderId) {
                 <div class="member-card-actions">
                   <button class="btn-icon btn-icon--muted btn-icon--leader-action" title="Promote to leader" (click)="setLeader(char.id)">
                     <i class="fa-solid fa-circle-plus"></i>
@@ -671,19 +593,17 @@
         }
       }
 
-      @if (isBaselineView()) {
+      @if (isBaselineView() && !store.isLive()) {
         <div class="additional-members-row">
-          <span class="additional-members-label">
-            {{ (faction().additionalMemberCount ?? 0) + activeCharacters().length }} total
-            @if ((faction().additionalMemberCount ?? 0) > 0) {
-              <span class="additional-members-count">(+{{ faction().additionalMemberCount }} unrepresented)</span>
-            }
+          <span class="additional-members-label" [title]="'Faction Size: total membership, named and unnamed, as recorded. Every full ' + power().people.membersPerPoint + ' is one People point (now +' + power().people.sizePoints + '). Named characters do not add to it.'">
+            Faction size {{ faction().factionSize ?? 0 }}
+            <span class="additional-members-count">(+{{ power().people.sizePoints }} People)</span>
           </span>
           <div class="additional-members-controls">
-            <button class="adj-btn" (click)="adjustAdditionalMembers(-10)" [disabled]="(faction().additionalMemberCount ?? 0) < 10" title="−10">−10</button>
-            <button class="adj-btn" (click)="adjustAdditionalMembers(-1)"  [disabled]="(faction().additionalMemberCount ?? 0) < 1"  title="−1">−1</button>
-            <button class="adj-btn" (click)="adjustAdditionalMembers(1)"   title="+1">+1</button>
-            <button class="adj-btn" (click)="adjustAdditionalMembers(10)"  title="+10">+10</button>
+            <button class="adj-btn" (click)="adjustFactionSize(-10)" [disabled]="(faction().factionSize ?? 0) < 10" title="−10">−10</button>
+            <button class="adj-btn" (click)="adjustFactionSize(-1)"  [disabled]="(faction().factionSize ?? 0) < 1"  title="−1">−1</button>
+            <button class="adj-btn" (click)="adjustFactionSize(1)"   title="+1">+1</button>
+            <button class="adj-btn" (click)="adjustFactionSize(10)"  title="+10">+10</button>
           </div>
         </div>
       }
@@ -693,175 +613,6 @@
   </div><!-- /col 2 -->
 
 </div><!-- /detail-layout -->
-
-<!-- ── Goal modal ──────────────────────────────────────────────────────────── -->
-@if (showGoalModal()) {
-  <div class="modal-backdrop" (click)="closeGoalModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>{{ goalModel().id ? 'Edit Goal' : 'Add Goal' }}</h3>
-        <button class="modal-close" (click)="closeGoalModal()">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-row">
-          <label class="form-label">Title *</label>
-          <input class="form-input" [formField]="goalForm.title" placeholder="e.g. Seize control of the Dock Office">
-        </div>
-        <div class="form-row two-col">
-          <div>
-            <label class="form-label">Condition Type</label>
-            <select class="form-input" [formField]="goalForm.conditionType">
-              @for (opt of conditionTypeOptions; track opt.value) {
-                <option [value]="opt.value">{{ opt.label }}</option>
-              }
-            </select>
-          </div>
-          <div>
-            <label class="form-label">Status</label>
-            <select class="form-input" [formField]="goalForm.status">
-              @for (opt of goalStatusOptions(); track opt.value) {
-                <option [value]="opt.value">{{ opt.label }}</option>
-              }
-            </select>
-          </div>
-        </div>
-        <div class="form-row three-col">
-          <div>
-            <label class="form-label">Priority</label>
-            <select class="form-input" [formField]="goalForm.priority">
-              @for (opt of priorityOptions; track opt.value) {
-                <option [value]="opt.value">{{ opt.label }}</option>
-              }
-            </select>
-          </div>
-          <div>
-            <label class="form-label">Visibility</label>
-            <select class="form-input" [formField]="goalForm.visibility">
-              @for (opt of visibilityOptions; track opt.value) {
-                <option [value]="opt.value">{{ opt.label }}</option>
-              }
-            </select>
-          </div>
-          <div>
-            <label class="form-label">Champion</label>
-            <select class="form-input" [formField]="goalForm.championId">
-              <option value="">— None —</option>
-              @for (c of store.characters(); track c.id) {
-                @if (c.factionId === faction().id) {
-                  <option [value]="c.id">{{ c.name }}</option>
-                }
-              }
-            </select>
-          </div>
-        </div>
-        <div class="form-row">
-          <label class="form-label">Target Entity Type</label>
-          <select class="form-input" [formField]="goalForm.targetEntityType" (change)="resetTargetFields()">
-            <option value="">— None —</option>
-            <option value="Character">Character</option>
-            <option value="Asset">Asset</option>
-            <option value="Faction">Faction</option>
-          </select>
-        </div>
-        @if (goalModel().targetEntityType) {
-          <div class="form-row two-col">
-            <div>
-              <label class="form-label">Target Entity</label>
-              <select class="form-input" [formField]="goalForm.targetEntityId">
-                <option value="">— Select —</option>
-                @for (e of goalTargetEntityOptions(); track e.id) {
-                  <option [value]="e.id">{{ e.name }}</option>
-                }
-              </select>
-            </div>
-            @if (goalModel().targetEntityType === 'Character') {
-              <div>
-                <label class="form-label">Target State</label>
-                <select class="form-input" [formField]="goalForm.targetState">
-                  <option value="">— Select —</option>
-                  @for (s of goalTargetStateOptions(); track s) {
-                    <option [value]="s">{{ s }}</option>
-                  }
-                </select>
-              </div>
-            }
-            @if (goalModel().targetEntityType === 'Asset') {
-              <div>
-                <label class="form-label">Asset Condition</label>
-                <select class="form-input" [value]="goalModel().targetOwnerFactionId ? 'ownership' : 'status'"
-                  (change)="onAssetConditionModeChange($any($event.target).value)">
-                  <option value="status">Reaches state</option>
-                  <option value="ownership">Comes under control</option>
-                </select>
-              </div>
-            }
-          </div>
-          @if (goalModel().targetEntityType === 'Asset' && !goalModel().targetOwnerFactionId) {
-            <div class="form-row">
-              <div>
-                <label class="form-label">Target State</label>
-                <select class="form-input" [formField]="goalForm.targetState">
-                  <option value="">— Select —</option>
-                  @for (s of goalTargetStateOptions(); track s) {
-                    <option [value]="s">{{ s }}</option>
-                  }
-                </select>
-              </div>
-            </div>
-          }
-          @if (goalModel().targetEntityType === 'Asset' && goalModel().targetOwnerFactionId !== '') {
-            <div class="form-row">
-              <div>
-                <label class="form-label">Controlling Faction</label>
-                <select class="form-input" [formField]="goalForm.targetOwnerFactionId">
-                  <option value="">— Select —</option>
-                  @for (f of store.factions(); track f.id) {
-                    @if (f.active) { <option [value]="f.id">{{ f.name }}</option> }
-                  }
-                </select>
-              </div>
-            </div>
-          }
-          @if (goalModel().targetEntityType === 'Faction') {
-            <div class="form-row three-col">
-              <div>
-                <label class="form-label">Property</label>
-                <select class="form-input" [formField]="goalForm.targetProperty">
-                  <option value="">— Select —</option>
-                  @for (p of factionTargetProps; track p) { <option [value]="p">{{ p }}</option> }
-                </select>
-              </div>
-              <div>
-                <label class="form-label">Operator</label>
-                <select class="form-input" [formField]="goalForm.targetOperator">
-                  <option value="">— Select —</option>
-                  <option value="gte">≥ (at least)</option>
-                  <option value="lte">≤ (at most)</option>
-                  <option value="eq">= (exactly)</option>
-                </select>
-              </div>
-              <div>
-                <label class="form-label">Threshold</label>
-                <input class="form-input" type="number" [formField]="goalForm.targetThreshold">
-              </div>
-            </div>
-          }
-        }
-      </div>
-      <div class="modal-footer">
-        @if (goalModel().id) {
-          <button class="btn btn-danger" (click)="deleteGoal(goalModel().id); closeGoalModal()">Delete</button>
-        } @else {
-          <span></span>
-        }
-        <div class="modal-footer-actions">
-          <button class="btn btn-secondary" (click)="closeGoalModal()">Cancel</button>
-          <button class="btn btn-primary" (click)="saveGoal()" [disabled]="!goalModel().title.trim()">Save</button>
-        </div>
-      </div>
-    </div>
-  </div>
-}
 
 <!-- ── Header edit modal ───────────────────────────────────────────────────── -->
 @if (isEditing('header')) {

@@ -1,6 +1,6 @@
 <div class="page-header">
   <h2>Assets</h2>
-  <p>Physical and cultural holdings that anchor faction influence and legitimacy.</p>
+  <p>Physical and cultural holdings. Asset tiers contribute points to a Faction's power.</p>
 </div>
 
 <div class="toolbar">
@@ -13,14 +13,14 @@
     }
   </div>
   <div class="toolbar-actions">
-    @if (!store.isViewingSnapshot()) {
+    @if (!store.isViewingSnapshot() && !store.isLive()) {
       <label class="btn btn-secondary">
         <i class="fa-solid fa-right-to-bracket"></i> Import
         <input type="file" accept=".csv" style="display:none" (change)="importCsv($event)">
       </label>
     }
     <button class="btn btn-secondary" (click)="exportCsv()">Export <i class="fa-solid fa-right-from-bracket"></i></button>
-    @if (!store.isViewingSnapshot()) {
+    @if (!store.isViewingSnapshot() && !store.isLive()) {
       <button class="btn btn-primary" (click)="openAdd()">+ Add Asset</button>
     }
   </div>
@@ -28,7 +28,7 @@
 
 @if (displayAssets().length === 0) {
   <div class="empty-state card">
-    <p>No assets yet. Add one to anchor faction influence to physical holdings.</p>
+    <p>No assets yet. Add one to give a faction Holdings or Mandate.</p>
   </div>
 } @else {
   <!-- Column header row -->

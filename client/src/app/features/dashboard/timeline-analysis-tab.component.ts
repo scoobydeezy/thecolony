@@ -12,7 +12,7 @@ interface SeriesRow {
   entityId: string;
 }
 
-const FACTION_METRICS: FactionMetric[] = ['momentum', 'legitimacy', 'effectivePower', 'membership', 'influence'];
+const FACTION_METRICS: FactionMetric[] = ['momentum', 'effectivePower', 'membership', 'influence'];
 const CHARACTER_METRICS: CharacterMetric[] = ['pressure', 'drift', 'influence'];
 
 function metricNeedsEntity(metric: MetricCategory | ''): 'faction' | 'character' | null {
@@ -49,11 +49,10 @@ export class TimelineAnalysisTabComponent {
 
   readonly metricOptions: { value: MetricCategory; label: string; group: string }[] = [
     { value: 'stress', label: 'Global Stress', group: 'Colony' },
-    { value: 'momentum', label: 'Faction Momentum', group: 'Faction' },
-    { value: 'legitimacy', label: 'Faction Legitimacy', group: 'Faction' },
-    { value: 'effectivePower', label: 'Faction Effective Power', group: 'Faction' },
+    { value: 'momentum', label: 'Faction Momentum (tier)', group: 'Faction' },
+    { value: 'effectivePower', label: 'Faction Power (0–3)', group: 'Faction' },
     { value: 'membership', label: 'Faction Membership', group: 'Faction' },
-    { value: 'influence', label: 'Faction Influence', group: 'Faction' },
+    { value: 'influence', label: 'Faction People points', group: 'Faction' },
     { value: 'pressure', label: 'Character Pressure', group: 'Character' },
     { value: 'drift', label: 'Character Drift Risk', group: 'Character' },
   ];

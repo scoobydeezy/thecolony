@@ -11,9 +11,11 @@
 
       <li class="nav-section-label">World</li>
       <li><a routerLink="/factions" routerLinkActive="active">Factions</a></li>
+      <li><a routerLink="/goals" routerLinkActive="active">Goals</a></li>
       <li><a routerLink="/characters" routerLinkActive="active">Characters</a></li>
       <li><a routerLink="/assets" routerLinkActive="active">Assets</a></li>
       <li><a routerLink="/locations" routerLinkActive="active">Locations</a></li>
+      <li><a routerLink="/world-conditions" routerLinkActive="active">World Conditions</a></li>
       <li><a routerLink="/relationships" routerLinkActive="active">Relationships</a></li>
 
       <li class="nav-section-label">Campaign</li>
@@ -42,7 +44,7 @@
     </div>
 
     @if (store.colonyState()) {
-      <div class="stress-badge">
+      <div class="stress-badge" [title]="stressTitle()">
         <span class="stress-label">Global Stress</span>
         <span [class]="stressClass()">{{ store.viewColonyStress() }}/10</span>
       </div>
@@ -102,6 +104,11 @@
       @if (store.isViewingSnapshot()) {
         <span class="snapshot">Read-only Session Snapshot</span>
       }
+      @if (store.isLive()) {
+        <span class="live-badge" title="Live campaign: baseline simulation fields are locked; record changes as Events. Rules are versioned.">
+          <i class="fa-solid fa-lock"></i> Live
+        </span>
+      }
       <div class="top-bar-spacer"></div>
       <button class="narrative-toggle-btn" type="button"
               [class.active]="store.narrativeInspectorOpen()"
@@ -115,9 +122,20 @@
       </button>
     </header>
 
+    @if (store.error(); as message) {
+      <div class="app-error" role="alert">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span class="app-error-text">{{ message }}</span>
+        <button class="app-error-close" type="button" aria-label="Dismiss" (click)="store.clearError()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+    }
+
     <main class="main-content" [class.is-snapshot]="store.isViewingSnapshot()">
       <router-outlet />
     </main>
+    <app-toasts />
   </div>
 
   @if (store.narrativeInspectorOpen()) {

@@ -11,7 +11,6 @@ interface SessionLogFormModel {
   summary: string;
   partyActions: string;
   factionChanges: string;
-  colonyStressChange: string;
   relationshipBumps: string;
   futureConsequences: string;
 }
@@ -24,7 +23,6 @@ const emptyForm = (act = 1, week = 1): SessionLogFormModel => ({
   summary: '',
   partyActions: '',
   factionChanges: '',
-  colonyStressChange: '0',
   relationshipBumps: '',
   futureConsequences: '',
 });
@@ -37,7 +35,6 @@ const toFormModel = (e: SessionLogEntry): SessionLogFormModel => ({
   summary: e.summary ?? '',
   partyActions: e.partyActions ?? '',
   factionChanges: e.factionChanges ?? '',
-  colonyStressChange: e.colonyStressChange.toString(),
   relationshipBumps: e.relationshipBumps ?? '',
   futureConsequences: e.futureConsequences ?? '',
 });
@@ -50,7 +47,6 @@ const fromFormModel = (fm: SessionLogFormModel): SessionLogEntry => ({
   summary: fm.summary,
   partyActions: fm.partyActions,
   factionChanges: fm.factionChanges,
-  colonyStressChange: parseInt(fm.colonyStressChange, 10) || 0,
   relationshipBumps: fm.relationshipBumps,
   futureConsequences: fm.futureConsequences,
 });

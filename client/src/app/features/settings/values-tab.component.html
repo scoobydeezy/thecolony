@@ -47,10 +47,6 @@
   <div class="axis-header">
     <h3 class="label-section-title">Value A Axis <span class="axis-note">(Belief derived from {{ m.a }})</span></h3>
     <div class="axis-controls">
-      <div class="type-tabs">
-        <button [class.active]="m.axisA.type === 'opinion'" (click)="toggleAxisType('axisA')">Opinion</button>
-        <button [class.active]="m.axisA.type === 'boolean'" (click)="toggleAxisType('axisA')">Boolean</button>
-      </div>
       <button class="btn-flip" (click)="togglePositiveAligns('axisA')" title="Flip which position aligns with this value">
         <i class="fa-solid fa-retweet"></i>
       </button>
@@ -66,12 +62,10 @@
       <span class="label-key" [class.conflict-pos]="m.axisA.positiveAligns" [class.conflict-neg]="!m.axisA.positiveAligns">Positive</span>
       <input type="text" [formField]="valuesForm.axisA.positive" />
     </div>
-    @if (m.axisA.type === 'opinion') {
-      <div class="label-row">
-        <span class="label-key muted">Neutral</span>
-        <input type="text" [formField]="valuesForm.axisA.neutral" />
-      </div>
-    }
+    <div class="label-row">
+      <span class="label-key muted">Middle</span>
+      <input type="text" [formField]="valuesForm.axisA.neutral" />
+    </div>
     <div class="label-row">
       <span class="label-key" [class.conflict-neg]="m.axisA.positiveAligns" [class.conflict-pos]="!m.axisA.positiveAligns">Negative</span>
       <input type="text" [formField]="valuesForm.axisA.negative" />
@@ -87,10 +81,6 @@
   <div class="axis-header">
     <h3 class="label-section-title">Value B Axis <span class="axis-note">(Belief derived from {{ m.b }})</span></h3>
     <div class="axis-controls">
-      <div class="type-tabs">
-        <button [class.active]="m.axisB.type === 'opinion'" (click)="toggleAxisType('axisB')">Opinion</button>
-        <button [class.active]="m.axisB.type === 'boolean'" (click)="toggleAxisType('axisB')">Boolean</button>
-      </div>
       <button class="btn-flip" (click)="togglePositiveAligns('axisB')" title="Flip which position aligns with this value">
         <i class="fa-solid fa-retweet"></i>
       </button>
@@ -106,12 +96,10 @@
       <span class="label-key" [class.conflict-pos]="m.axisB.positiveAligns" [class.conflict-neg]="!m.axisB.positiveAligns">Positive</span>
       <input type="text" [formField]="valuesForm.axisB.positive" />
     </div>
-    @if (m.axisB.type === 'opinion') {
-      <div class="label-row">
-        <span class="label-key muted">Neutral</span>
-        <input type="text" [formField]="valuesForm.axisB.neutral" />
-      </div>
-    }
+    <div class="label-row">
+      <span class="label-key muted">Middle</span>
+      <input type="text" [formField]="valuesForm.axisB.neutral" />
+    </div>
     <div class="label-row">
       <span class="label-key" [class.conflict-neg]="m.axisB.positiveAligns" [class.conflict-pos]="!m.axisB.positiveAligns">Negative</span>
       <input type="text" [formField]="valuesForm.axisB.negative" />
@@ -127,10 +115,6 @@
   <div class="axis-header">
     <h3 class="label-section-title">Value C Axis <span class="axis-note">(Belief derived from {{ m.c }})</span></h3>
     <div class="axis-controls">
-      <div class="type-tabs">
-        <button [class.active]="m.axisC.type === 'opinion'" (click)="toggleAxisType('axisC')">Opinion</button>
-        <button [class.active]="m.axisC.type === 'boolean'" (click)="toggleAxisType('axisC')">Boolean</button>
-      </div>
       <button class="btn-flip" (click)="togglePositiveAligns('axisC')" title="Flip which position aligns with this value">
         <i class="fa-solid fa-retweet"></i>
       </button>
@@ -146,12 +130,10 @@
       <span class="label-key" [class.conflict-pos]="m.axisC.positiveAligns" [class.conflict-neg]="!m.axisC.positiveAligns">Positive</span>
       <input type="text" [formField]="valuesForm.axisC.positive" />
     </div>
-    @if (m.axisC.type === 'opinion') {
-      <div class="label-row">
-        <span class="label-key muted">Neutral</span>
-        <input type="text" [formField]="valuesForm.axisC.neutral" />
-      </div>
-    }
+    <div class="label-row">
+      <span class="label-key muted">Middle</span>
+      <input type="text" [formField]="valuesForm.axisC.neutral" />
+    </div>
     <div class="label-row">
       <span class="label-key" [class.conflict-neg]="m.axisC.positiveAligns" [class.conflict-pos]="!m.axisC.positiveAligns">Negative</span>
       <input type="text" [formField]="valuesForm.axisC.negative" />

@@ -5,17 +5,20 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ColonyTracker.Api.Controllers;
 
+// D11 (M0): scoped to the active campaign like every other controller. Previously this endpoint read the
+// "singleton" ColonyState/RulesConfig rows and every campaign's factions and overrides.
 [ApiController]
 [Route("api/relationships")]
-public class RelationshipsController(AppDbContext db, IScoringEngine scoring) : ControllerBase
+public class RelationshipsController(AppDbContext db, IScoringEngine scoring, ICampaignContext campaign) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var factions = await db.Factions.Where(f => f.Active).ToListAsync();
-        var colonyState = await db.ColonyStates.FindAsync("singleton");
-        var rules = await db.RulesConfigs.FindAsync("singleton");
-        var overrides = await db.RelationshipOverrides.ToListAsync();
+        var cid = await campaign.GetActiveIdAsync();
+        var factions = await db.Factions.Where(f => f.CampaignId == cid && f.Active).ToListAsync();
+        var colonyState = await db.ColonyStates.FirstOrDefaultAsync(s => s.CampaignId == cid);
+        var rules = await db.RulesConfigs.FirstOrDefaultAsync(r => r.CampaignId == cid);
+        var overrides = await db.RelationshipOverrides.Where(o => o.CampaignId == cid).ToListAsync();
 
         if (colonyState is null || rules is null) return StatusCode(500, "Colony state or rules not initialized");
 
@@ -28,7 +31,7 @@ public class RelationshipsController(AppDbContext db, IScoringEngine scoring) : 
             {
                 if (source.Id == target.Id) continue;
                 var bump = overrides.FirstOrDefault(o => o.SourceId == source.Id && o.TargetId == target.Id)?.ScoreBump ?? 0;
-                var breakdown = scoring.ScoreRelationship(source, target, colonyState.ColonyStress, bump, rules);
+                var breakdown = scoring.ScoreRelationship(source, target, ScoringEngine.ServerStress, bump, rules);
                 results.Add(breakdown);
             }
         }
@@ -47,25 +50,22 @@ public class RelationshipsController(AppDbContext db, IScoringEngine scoring) : 
     [HttpGet("{sourceId}/{targetId}")]
     public async Task<IActionResult> GetOne(string sourceId, string targetId)
     {
-        var colonyState = await db.ColonyStates.FindAsync("singleton");
-        var rules = await db.RulesConfigs.FindAsync("singleton");
+        var cid = await campaign.GetActiveIdAsync();
+        var colonyState = await db.ColonyStates.FirstOrDefaultAsync(s => s.CampaignId == cid);
+        var rules = await db.RulesConfigs.FirstOrDefaultAsync(r => r.CampaignId == cid);
         var bump = (await db.RelationshipOverrides
-            .FirstOrDefaultAsync(o => o.SourceId == sourceId && o.TargetId == targetId))?.ScoreBump ?? 0;
+            .FirstOrDefaultAsync(o => o.CampaignId == cid && o.SourceId == sourceId && o.TargetId == targetId))?.ScoreBump ?? 0;
 
         if (colonyState is null || rules is null) return StatusCode(500);
 
+        var source = await db.Factions.FirstOrDefaultAsync(f => f.CampaignId == cid && f.Id == sourceId);
+        if (source is null) return NotFound();
+
         if (targetId == "party")
-        {
-            var source = await db.Factions.FindAsync(sourceId);
-            if (source is null) return NotFound();
             return Ok(scoring.ScoreRelationshipToParty(source, colonyState, bump, rules));
-        }
-        else
-        {
-            var source = await db.Factions.FindAsync(sourceId);
-            var target = await db.Factions.FindAsync(targetId);
-            if (source is null || target is null) return NotFound();
-            return Ok(scoring.ScoreRelationship(source, target, colonyState.ColonyStress, bump, rules));
-        }
+
+        var target = await db.Factions.FirstOrDefaultAsync(f => f.CampaignId == cid && f.Id == targetId);
+        if (target is null) return NotFound();
+        return Ok(scoring.ScoreRelationship(source, target, ScoringEngine.ServerStress, bump, rules));
     }
 }

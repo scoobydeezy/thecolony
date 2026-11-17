@@ -1,7 +1,11 @@
+import type { MomentumResolution, MomentumSignal } from '../sim/momentum';
+
 export type BeliefPosition = 'positive' | 'neutral' | 'negative';
 export type CoreValue = 'A' | 'B' | 'C';
 
 // ── Campaign ───────────────────────────────────────────────────────────────
+
+export type CampaignMode = 'Design' | 'Live';
 
 export interface Campaign {
   id: string;
@@ -9,6 +13,50 @@ export interface Campaign {
   description?: string;
   createdAt: string;
   updatedAt: string;
+  // M1 lifecycle (server-controlled): Live locks baseline simulation fields; activation is one-way.
+  mode?: CampaignMode;
+  activatedAt?: string;
+  historyVersion?: number;
+}
+
+export interface RulesVersion {
+  id: string;
+  campaignId: string;
+  version: number;
+  rulesJson: string;
+  engineVersion: string;
+  effectiveFromEventId?: string;
+  createdAt: string;
+}
+
+export type ColonyTurnStatus = 'Draft' | 'Committed' | 'Voided';
+export type ColonyTurnPhaseKind = 'Opening' | 'FactionPhase' | 'CharacterPhase' | 'Publish';
+
+export interface ColonyTurnPhase {
+  id: string;
+  colonyTurnId: string;
+  ordinal: number;
+  kind: ColonyTurnPhaseKind;
+  status: ColonyTurnStatus;
+  frozenInputsJson: string;
+  frozenInputsHash: string;
+  resultsJson: string;
+  historyVersion: number;
+  committedAt: string;
+}
+
+export interface ColonyTurn {
+  id: string;
+  campaignId: string;
+  sessionId: string;
+  eventId: string;
+  seed: number;
+  status: ColonyTurnStatus;
+  rulesVersionId?: string;
+  engineVersion: string;
+  createdAt: string;
+  committedAt?: string;
+  phases: ColonyTurnPhase[];
 }
 
 export interface AppSettings {
@@ -28,14 +76,14 @@ export interface ValueLabels {
   edgeBC: string;  // ternary edge between Value B and Value C vertices
 }
 
-// A single unified shape for every belief axis.
-// type='opinion' uses all three BeliefPosition slots; type='boolean' uses positive/negative only.
+// A single unified shape for every belief axis. Every axis has three positions (scoring audit): `type` is kept for
+// stored JSON compatibility but no longer changes derivation, scoring or the options offered.
 export interface BeliefAxisConfig {
   axisName: string;
-  type: 'opinion' | 'boolean';
+  /** @deprecated every axis is three-position; 'boolean' is ignored */ type: 'opinion' | 'boolean';
   positiveAligns: boolean;  // true → 'positive' aligns with this value (e.g. Revealed=Truth); false → 'negative' aligns (e.g. No Change=Stability)
   positive: string;
-  neutral: string;               // only shown when type='opinion'
+  neutral: string;               // the middle position (a position in its own right, not an absence of opinion)
   negative: string;
 }
 
@@ -56,13 +104,13 @@ export const DEFAULT_VALUE_LABELS: ValueLabels = {
 
 export const DEFAULT_BELIEF_AXIS_LABELS: BeliefAxisLabels = {
   a: { axisName: 'Knowledge', type: 'opinion', positiveAligns: true,  positive: 'Revealed', neutral: 'Controlled', negative: 'Hidden' },
-  b: { axisName: 'Change',    type: 'boolean', positiveAligns: false, positive: 'Yes',      neutral: 'Neutral',    negative: 'No'     },
+  b: { axisName: 'Change',    type: 'opinion', positiveAligns: false, positive: 'Yes',      neutral: 'Neutral',    negative: 'No'     },
   c: { axisName: 'Ritual',    type: 'opinion', positiveAligns: false, positive: 'Good',     neutral: 'Neutral',    negative: 'Bad'    },
 };
 
-// Returns the engine positions available for an axis. For 'boolean' type, neutral is omitted.
-export function beliefAxisOptions(cfg: BeliefAxisConfig): BeliefPosition[] {
-  return cfg.type === 'opinion' ? ['positive', 'neutral', 'negative'] : ['positive', 'negative'];
+// Returns the engine positions available for an axis: always all three.
+export function beliefAxisOptions(_cfg: BeliefAxisConfig): BeliefPosition[] {
+  return ['positive', 'neutral', 'negative'];
 }
 
 // Returns the display label for a BeliefPosition on an axis.
@@ -84,6 +132,26 @@ export function dot(a: ValueVector, b: ValueVector): number {
 
 export function inverseVector(v: ValueVector): ValueVector {
   return { a: 1 - v.a, b: 1 - v.b, c: 1 - v.c };
+}
+
+// ── Value geometry for relationship scoring (SCORING-AUDIT.md) ──────────────
+// The former alignment/conflict pair reduced to one dot product, which scores a zealot above an identical twin.
+// These measure position on the ternary instead.
+
+/** Normalized Manhattan distance on the ternary: 0 for identical positions … 1 for opposite corners. */
+export function valueDistance(s: ValueVector, t: ValueVector): number {
+  return (Math.abs(s.a - t.a) + Math.abs(s.b - t.b) + Math.abs(s.c - t.c)) / 2;
+}
+
+/** Symmetric similarity, 1 − 2·distance: +1 for identical positions anywhere (including the centre) … −1. */
+export function valueSimilarity(s: ValueVector, t: ValueVector): number {
+  return 1 - 2 * valueDistance(s, t);
+}
+
+/** Directional opposition: how much of what the SOURCE cares about the target lacks, Σ sᵢ·max(0, sᵢ − tᵢ), 0 … 1.
+ *  Asymmetric by design: a purist is more put off by a moderate than the moderate is by the purist. */
+export function valueOpposition(s: ValueVector, t: ValueVector): number {
+  return s.a * Math.max(0, s.a - t.a) + s.b * Math.max(0, s.b - t.b) + s.c * Math.max(0, s.c - t.c);
 }
 
 export function primaryValue(v: ValueVector): CoreValue {
@@ -179,11 +247,12 @@ export interface Faction {
   active: boolean;
   notes?: string;
   sortOrder: number;
-  momentum: number;
-  baseLegitimacy: number;
-  powerModifier: number;
-  additionalMemberCount: number;
+  momentum: number;               // legacy raw Momentum (pre-M3): archived for audit, ignored by the engine
+  momentumTier?: number;          // M3: starting Momentum tier, −2..+2 (GM-set baseline; projected to the snapshot tier)
+  powerModifier: number;          // retired (M2): stored, never read
+  factionSize: number;            // §18.8: total membership, recorded explicitly (not counted from Characters): ⌊÷ 20⌋ People points; changed in play by `factionSize` Effects
   leaderId?: string;
+  introducedAtEventId?: string;   // M1: absent from replay before this Event (Live campaigns)
 }
 
 export interface ColonyState {
@@ -191,7 +260,6 @@ export interface ColonyState {
   partyName: string;
   act: number;
   week: number;
-  colonyStress: number;
   partyBeliefc: BeliefPosition;
   partyBeliefa: BeliefPosition;
   partyBeliefb: BeliefPosition;
@@ -214,56 +282,72 @@ export interface RelationshipOverride {
 // Magic-number weights used in the influence and belief derivation engines.
 
 export interface FormulasConfig {
-  // CharacterStrength blend: characterStrength = avg * memberAvgWeight + max * memberMaxWeight
-  memberAvgWeight: number;              // default 0.6
-  memberMaxWeight: number;              // default 0.4
-  // Organization blend: charStrength * charWeight + assetInfluenceScore * assetWeight + normalizedMomentum * momentumWeight + powerModifier
-  charInfluenceWeight: number;          // default 0.40
-  assetInfluenceWeight: number;         // default 0.40
-  momentumInfluenceWeight: number;      // default 0.20
-  // Normalization scales for asset raw scores → 0–100
-  assetInfluenceScale: number;          // default 25 (raw sum at which score = 100)
-  assetLegitimacyScale: number;         // default 25
-  // Legitimacy blend: baseLegitimacy * baseWeight + assetLegitimacyScore * assetWeight
-  baseLegitimacyWeight: number;         // default 0.70
-  assetLegitimacyWeight: number;        // default 0.30
-  // Power: Organization × (legitimacyBase + Legitimacy / legitimacyScale) + powerModifier
-  legitimacyBase: number;               // default 0.5
-  legitimacyScale: number;              // default 100
-  // Leaderless penalty applied to CharacterStrength (not final power)
-  leaderlessPowerMultiplier: number;    // default 0.75
+  // ── Power: capacity channels in plain points (§18.7). Each channel at its threshold is one Power (0–3). ──
+  peoplePoints: number;                 // default 10: People = leader bonus + ⌊Faction Size ÷ membersPerPoint⌋ (§18.8)
+  leaderBonus: number;                  // default 5: a capable leader (alive, in the faction)
+  membersPerPoint: number;              // default 20: Faction Size per People point (whole groups only)
+  holdingsPoints: number;               // default 15: Holdings = stars of controlled Operational, Strategic and Covert Assets
+  mandatePoints: number;                // default 5: Mandate = stars of controlled Symbolic and Mandate Assets
   // Belief derivation: value axis must exceed this to assign a non-neutral position
-  beliefDerivationThreshold: number;    // default 0.4
+  beliefDerivationThreshold: number;    // default 0.5
+  operationTarget?: number;             // §18.12 Faction Phase DC: 2d6 + Priority + Momentum ≥ this + the best guard's Priority (10)
+  // M6 Character Phase (provisional): effective Pressure = Pressure + Stress × coefficient; Drift Risk bands; roll targets
+  stressPressureCoefficient?: number;   // ×5 (was ×10)
+  driftWaveringAt?: number;             // Drift Risk ≥ this is Wavering (default 15); > 0 Strained; ≤ 0 Steady
+  driftBreakingAt?: number;             // Drift Risk ≥ this is Breaking (default 30)
+  driftRollTarget?: number;             // 2d6 + band modifier ≥ this advances one state (default 8)
+  defectionTarget?: number;             // 2d6 + label modifier ≥ this defects (default 8)
+  // ── Retired by M2 (kept so older stored configs still parse; no longer read by the engine) ──
+  /** @deprecated M2 */ memberAvgWeight?: number;
+  /** @deprecated M2 */ memberMaxWeight?: number;
+  /** @deprecated M2 */ charInfluenceWeight?: number;
+  /** @deprecated M2 */ assetInfluenceWeight?: number;
+  /** @deprecated M2: Momentum is not a Power input */ momentumInfluenceWeight?: number;
+  /** @deprecated M2 */ legitimacyBase?: number;
+  /** @deprecated M2 */ legitimacyScale?: number;
+  /** @deprecated M2: no leaderless multiplier */ leaderlessPowerMultiplier?: number;
+  // ── Retired by §18.7 (stars and members replace scores; Legitimacy retired) ──
+  /** @deprecated §18.8 (named members no longer count) */ unnamedPerPoint?: number;
+  /** @deprecated §18.7 */ peopleThreshold?: number;
+  /** @deprecated §18.7 */ headcountThreshold?: number;
+  /** @deprecated §18.7 */ holdingsThreshold?: number;
+  /** @deprecated §18.7 */ mandateThreshold?: number;
+  /** @deprecated §18.7 */ assetInfluenceScale?: number;
+  /** @deprecated §18.7 */ assetLegitimacyScale?: number;
+  /** @deprecated §18.7 */ baseLegitimacyWeight?: number;
+  /** @deprecated §18.7 */ assetLegitimacyWeight?: number;
 }
 
 export const DEFAULT_FORMULAS: FormulasConfig = {
-  memberAvgWeight:            0.6,
-  memberMaxWeight:            0.4,
-  charInfluenceWeight:        0.40,
-  assetInfluenceWeight:       0.40,
-  momentumInfluenceWeight:    0.20,
-  assetInfluenceScale:        25,
-  assetLegitimacyScale:       25,
-  baseLegitimacyWeight:       0.70,
-  assetLegitimacyWeight:      0.30,
-  legitimacyBase:             0.5,
-  legitimacyScale:            100,
-  leaderlessPowerMultiplier:  0.75,
-  beliefDerivationThreshold:  0.4,
+  peoplePoints:               10,    // §18.7 rule definitions (not fitted to the current roster)
+  leaderBonus:                5,
+  membersPerPoint:            20,
+  holdingsPoints:             15,
+  mandatePoints:              5,
+  beliefDerivationThreshold:  0.5,   // 2026-10-15: a pole only when that Value outweighs the other two combined
+  operationTarget:            10,    // 2026-10-22 (§18.12: with the Priority bonus; was 9)
+  stressPressureCoefficient:  5,     // M6 (§3.2): ×10 → ×5, provisional
+  driftWaveringAt:            15,
+  driftBreakingAt:            30,
+  driftRollTarget:            8,
+  defectionTarget:            8,
 };
 
 // ── Session Effect Descriptors (single source of truth) ───────────────────
-// Used by both the session event editor and the cascade event rule trigger.
+// Used by the session event editor.
 // inputType 'delta'           → numeric stepper (delta field)
 // inputType 'select'          → string value dropdown (value field, options provided)
 // inputType 'none'            → no value input (e.g. factionChange uses a separate target select)
 // inputType 'faction-select'  → faction dropdown stored in value
 // inputType 'location-select' → location dropdown stored in value
+// inputType 'signal'          → Momentum Signal: +1 / −1 (delta) with a required reason (value)
+// inputType 'character-select' → character dropdown stored in value ('' = none)
+// inputType 'flag'            → no input: the effect's presence is the fact
 
 export interface EffectPropDescriptor {
   property: string;
   label: string;
-  inputType: 'delta' | 'select' | 'none' | 'faction-select' | 'participate' | 'location-select';
+  inputType: 'delta' | 'select' | 'none' | 'faction-select' | 'participate' | 'location-select' | 'signal' | 'character-select' | 'flag';
   selectOptions?: { value: string; label: string }[];
   needsSecondaryTarget?: boolean;  // true for relationshipBump
 }
@@ -288,11 +372,17 @@ export const CHARACTER_SUBTYPE_OPTIONS: { value: string; label: string }[] = [
 ];
 
 export const FACTION_EFFECT_PROPS: EffectPropDescriptor[] = [
-  { property: 'momentum',              label: 'Momentum',              inputType: 'delta' },
-  { property: 'baseLegitimacy',        label: 'Base Legitimacy',       inputType: 'delta' },
-  { property: 'powerModifier',         label: 'Power Modifier',        inputType: 'delta' },
+  // M3: a Momentum Signal (delta ±1, reason in `value`, optional root-cause Effect id in `secondaryTargetId`),
+  // resolved at the next Opening. Legacy raw `momentum` effects still replay into the archived raw value only.
+  { property: 'momentumSignal',        label: 'Momentum Signal',       inputType: 'signal' },
   { property: 'relationshipBump',      label: 'Relationship Bump',     inputType: 'delta', needsSecondaryTarget: true },
   { property: 'partyRelationshipBump', label: 'Party Rel. Bump',       inputType: 'delta' },
+  { property: 'leaderChange',          label: 'Leader Change',         inputType: 'character-select' },   // M4; '' = leaderless
+  { property: 'factionSize',           label: 'Faction Size',          inputType: 'delta' },   // §18.8: members gained (+) or lost (−)
+];
+
+export const INSTABILITY_OPTIONS: { value: CharacterInstability; label: string }[] = [
+  { value: 'Stable', label: 'Stable' }, { value: 'Conflicted', label: 'Conflicted' }, { value: 'Compromised', label: 'Compromised (crisis)' },
 ];
 
 export const CHARACTER_EFFECT_PROPS: EffectPropDescriptor[] = [
@@ -301,97 +391,20 @@ export const CHARACTER_EFFECT_PROPS: EffectPropDescriptor[] = [
   { property: 'state',       label: 'State',       inputType: 'select', selectOptions: CHARACTER_STATE_OPTIONS },
   { property: 'factionChange', label: 'Faction Change', inputType: 'none' },
   { property: 'locationChange', label: 'Location Change', inputType: 'location-select' },
+  { property: 'instability', label: 'Instability', inputType: 'select', selectOptions: INSTABILITY_OPTIONS },   // M6: crises in play
 ];
 
-export const COLONY_EFFECT_PROPS: EffectPropDescriptor[] = [
-  { property: 'stress', label: 'Stress', inputType: 'delta' },
-];
-
-// ── Cascade Rules ──────────────────────────────────────────────────────────
-// Rules fire each session when their trigger condition is met.
-// triggerType 'streak': source property moved in the same direction for
-//   minConsecutiveWeeks sessions.
-// triggerType 'threshold': source property's current value is above/below
-//   a fixed value.
-// triggerType 'event': fires when an entity matching sourceEntitySubtype has
-//   its sourceProperty set/changed during this session. For select-type
-//   properties (e.g. state), sourcePropertyValue narrows to a specific value.
-// effectType 'multiplier': multiplies the change that already happened to
-//   the source property by `multiplier` and applies the result to the target.
-// effectType 'flat': adds `flatDelta` directly to the target property.
-
-export type FactionSourceProp = 'momentum' | 'baseLegitimacy';
-export type CharacterSourceProp = 'pressure' | 'conviction' | 'influence' | 'impressionable';
-export type FactionTargetProp = 'momentum' | 'baseLegitimacy';
-export type CharacterTargetProp = 'pressure' | 'conviction' | 'influence' | 'impressionable';
-
-export interface CascadeRule {
-  id: string;
-  label: string;
-
-  // ── Trigger ──
-  triggerType: 'streak' | 'threshold' | 'event';
-  sourceEntityType: 'faction' | 'character' | 'goal';
-  sourceProperty: string;
-  // streak trigger
-  direction?: 'positive' | 'negative' | 'either';
-  minConsecutiveWeeks?: number;
-  // threshold trigger
-  thresholdOperator?: 'gt' | 'lt';
-  thresholdValue?: number;
-  // event trigger
-  sourceEntitySubtype?: string;     // faction/character: type filter; goal: priority filter (Critical/Major/Minor)
-  sourceEntityId?: string;          // goal: pin to a specific goal ID; '' = any
-  sourcePropertyValue?: string[];   // for select-type properties; any listed value matches (OR logic)
-  // goal + any-goal mode: optional faction override — filters to goals owned by this faction AND applies effect there
-  targetEntityId?: string;
-
-  // ── Effect ──
-  effectType: 'multiplier' | 'flat';
-  targetEntityType: 'faction' | 'character';
-  targetProperty: FactionTargetProp | CharacterTargetProp;
-  // multiplier effect
-  multiplier?: number;
-  // flat effect
-  flatDelta?: number;
-}
-
-export const DEFAULT_CASCADE_RULES: CascadeRule[] = [
-  { id: 'neg-2', label: '2+ negative weeks',  triggerType: 'streak', sourceEntityType: 'faction', sourceProperty: 'momentum', direction: 'negative', minConsecutiveWeeks: 2, effectType: 'multiplier', targetEntityType: 'faction', targetProperty: 'baseLegitimacy', multiplier: 2 },
-  { id: 'neg-3', label: '3+ negative weeks',  triggerType: 'streak', sourceEntityType: 'faction', sourceProperty: 'momentum', direction: 'negative', minConsecutiveWeeks: 3, effectType: 'multiplier', targetEntityType: 'faction', targetProperty: 'baseLegitimacy', multiplier: 3 },
-  { id: 'pos-2', label: '2+ positive weeks',  triggerType: 'streak', sourceEntityType: 'faction', sourceProperty: 'momentum', direction: 'positive', minConsecutiveWeeks: 2, effectType: 'multiplier', targetEntityType: 'faction', targetProperty: 'baseLegitimacy', multiplier: 2 },
-  { id: 'pos-3', label: '3+ positive weeks',  triggerType: 'streak', sourceEntityType: 'faction', sourceProperty: 'momentum', direction: 'positive', minConsecutiveWeeks: 3, effectType: 'multiplier', targetEntityType: 'faction', targetProperty: 'baseLegitimacy', multiplier: 3 },
-];
-
-// ── Stress Triggers ────────────────────────────────────────────────────────
-// Fires when a specific entity state/status transition occurs in the timeline,
-// applying a flat stress delta. oneShot triggers fire only once per entity
-// across the entire campaign timeline.
-
-export type StressTriggerEntityType = 'asset' | 'goal' | 'character' | 'faction';
-
-export interface StressTrigger {
-  id: string;
-  label: string;
-  sourceEntityType: StressTriggerEntityType;
-  // For status/state transitions: name of the property being watched (e.g. 'status', 'state')
-  sourceProperty: string;
-  // One or more values that trigger this rule (OR logic)
-  sourcePropertyValue: string[];
-  // Optional: filter by entity subtype (e.g. AssetType, GoalPriority, CharacterType)
-  sourceEntitySubtype?: string;
-  // Optional: restrict to a single specific entity by ID
-  sourceEntityId?: string;
-  flatDelta: number;
-  oneShot: boolean;
-}
 
 export interface RulesConfig {
   id: string;
-  beliefMatch: number;
-  beliefConflict: number;
-  valueAlignmentScale: number;
-  valueConflictScale: number;
+  beliefMatch: number;               // same position
+  beliefConflict: number;            // opposite poles
+  beliefAdjacent: number;            // middle vs a pole: disagreement, milder than opposite poles
+  beliefWeightBlend: number;         // belief weight per axis = blend·(source Value on the axis) + (1 − blend)/3
+  valueSimilarityScale: number;      // × valueSimilarity (−1 … +1)
+  valueOppositionScale: number;      // × valueOpposition (0 … 1), subtracted
+  /** @deprecated pre-audit dot-product scale; unused */ valueAlignmentScale?: number;
+  /** @deprecated pre-audit dot-product scale; unused */ valueConflictScale?: number;
   stressPositiveMultiplierPerPoint: number;
   stressNegativeMultiplierPerPoint: number;
   positiveEnabled: boolean;
@@ -403,7 +416,7 @@ export interface RulesConfig {
   valueLabelsJson: string;
   beliefAxisLabelsJson: string;
 
-  // Cascade rules — stored as JSON; empty string = use client defaults
+  /** @deprecated §18.10: Cascade Rules are retired; the stored JSON is kept for reference and never executed. */
   cascadeRulesJson: string;
 
   // Formula weights — stored as JSON; empty string = use client defaults
@@ -414,7 +427,7 @@ export interface RulesConfig {
   stressWeightCurve: StressWeightCurve;
   stressWeightIntensity: number;
 
-  // Stress triggers — stored as JSON
+  /** @deprecated §18.10: Stress Triggers are retired; the stored JSON is kept for reference and never executed. */
   stressTriggersJson: string;
 }
 
@@ -424,8 +437,8 @@ export interface RelationshipContributions {
   beliefc: number;
   beliefa: number;
   beliefb: number;
-  valueAlignment: number;
-  valueConflict: number;
+  valueSimilarity: number;    // valueSimilarityScale × similarity (signed)
+  valueOpposition: number;    // −valueOppositionScale × opposition (≤ 0)
   beliefSubScore: number;
   valueSubScore: number;
   stressWeight: number;
@@ -450,7 +463,6 @@ export interface SessionLogEntry {
   summary?: string;
   partyActions?: string;
   factionChanges?: string;
-  colonyStressChange: number;
   relationshipBumps?: string;
   futureConsequences?: string;
 }
@@ -481,7 +493,14 @@ export interface EventEffect {
   value?: string;                 // non-numeric effects: CharacterState or factionId
   secondaryTargetId?: string;     // relationship bumps: the other faction id
   actorFactionId?: string;        // asset status changes: faction responsible for the change
+  // M1 provenance and explicit order within the Event
+  origin?: EffectOrigin;
+  ordinal?: number;
+  phaseId?: string;
 }
+
+export type EffectOrigin = 'Manual' | 'Opening' | 'FactionPhase' | 'CharacterPhase' | 'GoalGenerator' | 'MomentumResolution' | 'Consequence' | 'Correction';
+export type EventKind = 'Play' | 'ColonyTurn' | 'Correction' | 'MapEdits';
 
 export interface CampaignEvent {
   id: string;
@@ -490,41 +509,34 @@ export interface CampaignEvent {
   description?: string;
   sortOrder: number;
   isSynthetic?: boolean;
+  kind?: EventKind;
   effects: EventEffect[];
 }
 
-export interface DerivedEffect {
-  ruleId: string;
-  ruleLabel: string;
-  // source
-  sourceEntityType: 'faction' | 'character';
-  sourceEntityId: string;
-  sourceProperty: string;
-  // trigger context
-  triggerType: 'streak' | 'threshold' | 'event';
-  consecutiveWeeks?: number;       // streak trigger
-  direction?: 'positive' | 'negative'; // streak trigger
-  thresholdValue?: number;         // threshold trigger
-  eventCharacterType?: string;     // event trigger: which character type fired it
-  eventStateValue?: string;        // event trigger: which state value was matched
-  // effect
-  targetEntityType: 'faction' | 'character';
-  targetEntityId: string;
-  targetProperty: string;
-  delta: number;                   // change applied (positive = gain, negative = drain)
-  // convenience aliases kept for backward compat with sessions display
-  /** @deprecated use sourceEntityId */ factionId?: string;
-  /** @deprecated use delta */ legitimacyChange?: number;
-}
+/** §18.10: one World Condition's share of Colony Stress, with where it came from. */
+export interface StressPart { conditionId: string; title: string; stress: number; origin: string }
 
 // Computed from session events against baseline world state
 export interface ColonySnapshot {
   sessionId: string;
   sessionNumber: number;
   colonyStress: number;
-  factionMomentum: Record<string, number>;          // factionId → momentum
-  factionBaseLegitimacy: Record<string, number>;    // factionId → baseLegitimacy (cascade writes here)
+  factionMomentum: Record<string, number>;          // factionId → legacy raw momentum (archived; not an engine input since M3)
+  factionMomentumTier: Record<string, number>;      // M3: factionId → Momentum tier (−2..+2) in force for this session's play
+  momentumResolutions: MomentumResolution[];        // M3: the resolution at the start of this session (the interim Opening)
+  pendingMomentumSignals: MomentumSignal[];         // M3: signals recorded this session, resolved at the next Opening
+  goalChampions: Record<string, string | null>;    // M4: goalId → champion; null = unassigned (championChange; cleared on defection or retirement)
+  factionLeaders: Record<string, string | null>;   // M4: factionId → leader; null = leaderless (leaderChange; cleared when the leader defects)
+  goalReady: Record<string, GoalReady>;               // M4: goals with the Ready to Resolve overlay
+  goalAccomplishedBy: Record<string, string | null>;  // §18.3: who brought each completion about (attribution only)
+  conditionStates: Record<string, ConditionEstablishment>;   // §18.6: World Conditions established or ended by Events
+  stressFromConditions: StressPart[];   // §18.10: the in-force contributions; colonyStress = clamp(Σ, 0, 10)
+  characterInstability: Record<string, CharacterInstability>;  // M6
+  characterReaffirmed: Record<string, string | null>;          // M6: characterId → faction it is Reaffirmed for
+  characterRecoveredAt: Record<string, number>;                // M6: session number of the last Conflicted → Stable
+  lastCharacterPhaseSession: number | null;                    // M6: the session whose Colony Turn last ran a Character Phase
   factionPowerModifier: Record<string, number>;     // factionId → powerModifier
+  factionSize: Record<string, number>;              // §18.8: factionId → total membership (Faction Size, changed by Effects)
   characterPressure: Record<string, number>;   // characterId → pressure
   characterInfluence: Record<string, number>;  // characterId → influence
   characterStates: Record<string, CharacterState>;   // characterId → state at this point
@@ -532,7 +544,6 @@ export interface ColonySnapshot {
   // cumulative relationship bumps added via session effects (compound per session pair)
   factionRelationshipBumps: Record<string, Record<string, number>>; // sourceId → targetId → bump
   factionPartyBumps: Record<string, number>;   // factionId → cumulative party bump
-  derivedEffects: DerivedEffect[];             // computed momentum cascade effects this session
   // Assets — cumulative control, status, and status-actor state
   assetControl: Record<string, string | undefined>;        // assetId → factionId
   assetStatuses: Record<string, AssetStatus>;              // assetId → status
@@ -540,8 +551,6 @@ export interface ColonySnapshot {
   // Goals — cumulative status and participants
   goalStatuses: Record<string, GoalStatus>;
   goalParticipants: Record<string, Array<{ actorId: string; actorType: string; role: string; delta: number; sessionId: string }>>;
-  // Stress triggers that have fired (oneShot tracking)
-  firedStressTriggers: string[];
   // Locations — cumulative state and entity placements
   locationStates: Record<string, LocationState>;           // locationId → state
   characterLocations: Record<string, string | undefined>;  // characterId → locationId
@@ -551,9 +560,7 @@ export interface ColonySnapshot {
 }
 
 export interface ColonyImpact {
-  stressDelta: number;
   momentumChanges: { factionId: string; delta: number }[];
-  baseLegitimacyChanges: { factionId: string; delta: number }[];
   powerModifierChanges: { factionId: string; delta: number }[];
   characterDeaths: string[];
   defections: { characterId: string; fromFactionId: string; toFactionId: string }[];
@@ -570,16 +577,18 @@ export interface RelationshipThreshold {
 
 // ── Locations ──────────────────────────────────────────────────────────────
 
-export type LocationState = 'Active' | 'Abandoned' | 'Ruined' | 'Unknown';
+/** §18.9: a transient condition of the place (usable in World Condition requirements), not a permanent attribute. */
+export type LocationState = 'Stable' | 'ActiveIncursion' | 'Unstable';
 export type GeometryType = 'Point' | 'Polygon' | 'MultiPoint';
 export type PlacementSubjectType = 'Location' | 'Character' | 'Asset';
 
 export const LOCATION_STATE_OPTIONS: { value: LocationState; label: string }[] = [
-  { value: 'Active',    label: 'Active' },
-  { value: 'Abandoned', label: 'Abandoned' },
-  { value: 'Ruined',    label: 'Ruined' },
-  { value: 'Unknown',   label: 'Unknown' },
+  { value: 'Stable',          label: 'Stable' },
+  { value: 'ActiveIncursion', label: 'Active Incursion' },
+  { value: 'Unstable',        label: 'Unstable' },
 ];
+
+export const locationStateLabel = (s: LocationState | string | undefined) => LOCATION_STATE_OPTIONS.find(o => o.value === s)?.label ?? s ?? '';
 
 export type LocationType = 'Point' | 'Zone' | 'Distributed';
 
@@ -599,6 +608,7 @@ export interface Location {
   linkedAssetId?: string;
   locationType?: LocationType;
   markerColor?: string;
+  introducedAtEventId?: string;   // M1: absent from replay before this Event (Live campaigns)
 }
 
 export interface ColonyMap {
@@ -662,20 +672,11 @@ export const ASSET_STATUS_OPTIONS: { value: AssetStatus; label: string }[] = [
   { value: 'Destroyed', label: 'Destroyed' },
 ];
 
-// Role weights: base influence and legitimacy per Value point.
-export const ASSET_ROLE_WEIGHTS: Record<AssetRole, { influence: number; legitimacy: number }> = {
-  Operational: { influence: 1.00, legitimacy: 1.00 },
-  Strategic:   { influence: 1.25, legitimacy: 0.25 },
-  Symbolic:    { influence: 0.25, legitimacy: 1.25 },
-  Covert:      { influence: 1.00, legitimacy: 0.00 },
-  Mandate:     { influence: 0.00, legitimacy: 1.00 },
-};
-
-export const ASSET_STATUS_MULTIPLIERS: Record<AssetStatus, { influence: number; legitimacy: number }> = {
-  Stable:    { influence: 1.00, legitimacy: 1.00 },
-  Contested: { influence: 0.50, legitimacy: 0.50 },
-  Damaged:   { influence: 0.25, legitimacy: 0.25 },
-  Destroyed: { influence: 0.00, legitimacy: 0.00 },
+/** §18.7: the capacity channel an Asset's stars count toward, by Role (its institutional purpose; Type is descriptive). */
+export type AssetChannel = 'holdings' | 'mandate';
+export const ASSET_ROLE_CHANNEL: Record<AssetRole, AssetChannel> = {
+  Operational: 'holdings', Strategic: 'holdings', Covert: 'holdings',
+  Symbolic: 'mandate', Mandate: 'mandate',
 };
 
 export interface Asset {
@@ -691,58 +692,21 @@ export interface Asset {
   locationId?: string;
   status: AssetStatus;
   statusActorFactionId?: string;
+  introducedAtEventId?: string;   // M1: absent from replay before this Event (Live campaigns)
 }
 
-export function computeAssetInfluence(asset: Asset): number {
-  const base = ASSET_ROLE_WEIGHTS[asset.role].influence * asset.tier;
-  return base * ASSET_STATUS_MULTIPLIERS[asset.status].influence;
-}
-
-export function computeAssetLegitimacy(asset: Asset): number {
-  const base = ASSET_ROLE_WEIGHTS[asset.role].legitimacy * asset.tier;
-  return base * ASSET_STATUS_MULTIPLIERS[asset.status].legitimacy;
-}
-
-// Standalone faction metric helpers — used by both the influence service and snapshot goal evaluation.
-// Mirror FactionInfluenceService but as pure functions so the store can call them without injection.
-
-export function computeFactionInfluence(
-  faction: Faction, members: Character[], assets: Asset[], f: FormulasConfig = DEFAULT_FORMULAS
-): number {
-  const ADDITIONAL_BASE = 30;
-  const totalCount = members.length + (faction.additionalMemberCount ?? 0);
-  let charStrength = 0;
-  if (totalCount > 0) {
-    const representedSum = members.reduce((s, c) => s + c.influence, 0);
-    const avg = (representedSum + (faction.additionalMemberCount ?? 0) * ADDITIONAL_BASE) / totalCount;
-    const max = members.length > 0 ? Math.max(...members.map(c => c.influence)) : ADDITIONAL_BASE;
-    const raw = avg * f.memberAvgWeight + max * f.memberMaxWeight;
-    const hasLeader = faction.leaderId != null;
-    charStrength = raw * (hasLeader ? 1 : (f.leaderlessPowerMultiplier ?? 0.75));
-  }
-  const assetInflRaw = assets.filter(a => a.controllingFactionId === faction.id).reduce((s, a) => s + computeAssetInfluence(a), 0);
-  const assetInfluenceScore = Math.min(100, assetInflRaw / (f.assetInfluenceScale ?? 25) * 100);
-  const normalizedMomentum = 50 + faction.momentum / 2;
-  return Math.min(100, Math.max(0, Math.round(
-    charStrength * f.charInfluenceWeight + assetInfluenceScore * f.assetInfluenceWeight + normalizedMomentum * f.momentumInfluenceWeight
-  )));
-}
-
-export function computeFactionPower(
-  faction: Faction, members: Character[], assets: Asset[], f: FormulasConfig = DEFAULT_FORMULAS
-): number {
-  const influence = computeFactionInfluence(faction, members, assets, f);
-  const assetLgtRaw = assets.filter(a => a.controllingFactionId === faction.id).reduce((s, a) => s + computeAssetLegitimacy(a), 0);
-  const assetLegitimacyScore = Math.min(100, assetLgtRaw / (f.assetLegitimacyScale ?? 25) * 100);
-  const legitimacy = Math.min(100, Math.max(0, Math.round(
-    faction.baseLegitimacy * (f.baseLegitimacyWeight ?? 0.70) + assetLegitimacyScore * (f.assetLegitimacyWeight ?? 0.30)
-  )));
-  return Math.round(influence * (f.legitimacyBase + legitimacy / f.legitimacyScale) + faction.powerModifier);
+/** §18.7: an Asset's capacity contribution: its stars (tier), toward its Role's channel. A Destroyed Asset contributes
+ *  nothing; Damaged and Contested Assets count in full (a specific impairment is a World Condition). */
+export function assetStars(asset: Pick<Asset, 'tier' | 'status'>): number {
+  return asset.status === 'Destroyed' ? 0 : asset.tier;
 }
 
 // ── Faction Goals ──────────────────────────────────────────────────────────
 
-export type GoalStatus = 'Plotting' | 'Progressing' | 'Stalled' | 'Accomplished' | 'Failed';
+export type GoalStatus = 'Plotting' | 'Progressing' | 'Stalled' | 'Accomplished' | 'Failed' | 'Retired';   // Stalled: legacy, not offered
+/** M4: terminal statuses. Retired = the goal became impossible or obsolete and was set aside (no Momentum signal). */
+export const TERMINAL_GOAL_STATUSES: readonly GoalStatus[] = ['Accomplished', 'Failed', 'Retired'];
+export type GoalOutcomeMode = 'Automatic' | 'Adjudicated';
 export type GoalConditionType = 'Achieve' | 'Maintain';
 export type GoalPriority = 'Critical' | 'Major' | 'Minor';
 export type GoalVisibility = 'Open' | 'Known' | 'Secret';
@@ -750,9 +714,9 @@ export type GoalVisibility = 'Open' | 'Known' | 'Secret';
 export const GOAL_STATUS_OPTIONS: { value: GoalStatus; label: string }[] = [
   { value: 'Plotting',     label: 'Plotting' },
   { value: 'Progressing',  label: 'Progressing' },
-  { value: 'Stalled',      label: 'Stalled' },
   { value: 'Accomplished', label: 'Accomplished' },
   { value: 'Failed',       label: 'Failed' },
+  { value: 'Retired',      label: 'Retired' },
 ];
 
 export const GOAL_PRIORITY_OPTIONS: { value: GoalPriority; label: string }[] = [
@@ -770,16 +734,49 @@ export const GOAL_VISIBILITY_OPTIONS: { value: GoalVisibility; label: string }[]
 export const ASSET_EFFECT_PROPS: EffectPropDescriptor[] = [
   { property: 'controllingFactionId', label: 'Controlling Faction', inputType: 'faction-select' },
   { property: 'status',               label: 'Status',              inputType: 'select', selectOptions: ASSET_STATUS_OPTIONS },
-  { property: 'stress',               label: 'Stress',              inputType: 'delta' },
   { property: 'locationChange',       label: 'Location Change',     inputType: 'location-select' },
 ];
 
+// M4: the GM resolution task (Ready to Resolve). 'Ready' is written by the Faction Phase when a goal that does not
+// Auto-Resolve succeeds; the GM resolves it (Accomplished / Failed) or clears it (it remains Progressing).
+export const GOAL_READY_OPTIONS: { value: string; label: string }[] = [
+  { value: 'Ready',   label: 'Ready to Resolve' },
+  { value: 'Cleared', label: 'Remains Progressing (task cleared)' },
+];
+
 export const GOAL_EFFECT_PROPS: EffectPropDescriptor[] = [
-  { property: 'status',      label: 'Status',        inputType: 'select', selectOptions: GOAL_STATUS_OPTIONS },
-  { property: 'participate', label: 'Participation', inputType: 'participate' },
+  { property: 'status',         label: 'Status',           inputType: 'select', selectOptions: GOAL_STATUS_OPTIONS },
+  { property: 'participate',    label: 'Participation',    inputType: 'participate' },
+  { property: 'championChange', label: 'Champion Change',  inputType: 'character-select' },   // M4; '' = unassigned
+  { property: 'readyToResolve', label: 'Ready to Resolve', inputType: 'select', selectOptions: GOAL_READY_OPTIONS },
 ];
 
 export type GoalTargetEntityType = 'Faction' | 'Character' | 'Asset';
+
+// ── World Conditions (§18.6) ─────────────────────────────────────────────────
+/** A persistent rule or circumstance the party can encounter. The app tracks whether it is in force, and why; it never
+ *  executes it. In force ⇔ established (from the start, or by an Event, until one ends it) ∧ its dependency holds. */
+export interface WorldCondition {
+  id: string;
+  campaignId: string;
+  title: string;
+  rule: string;
+  ruleOtherwise?: string | null;    // optional: what holds at the table while it is NOT in force (shown dimmed while in force)
+  variesByJson?: string | null;     // 2026-10-26: ConditionVariesBy (conditions.ts): one entity's property, a row per state; replaces rule/requirements
+  activeAtStart: boolean;
+  requirementsJson: string;         // §18.9: ConditionRequirement[] (core/sim/conditions.ts), all must hold
+  stressContribution: number;       // §18.9: added to Colony Stress while in force (may be negative)
+  sortOrder: number;
+}
+/** The latest Event that established or ended a condition (replay). */
+export interface ConditionEstablishment { active: boolean; session: number; eventId: string; eventTitle: string }
+export const CONDITION_STATE_OPTIONS: { value: string; label: string }[] = [
+  { value: 'Active', label: 'Established (in force while its dependency holds)' },
+  { value: 'Ended',  label: 'Ended' },
+];
+export const CONDITION_EFFECT_PROPS: EffectPropDescriptor[] = [
+  { property: 'state', label: 'State', inputType: 'select', selectOptions: CONDITION_STATE_OPTIONS },
+];
 export type GoalTargetOperator   = 'gte' | 'lte' | 'eq';
 
 // States available per target entity type
@@ -809,6 +806,22 @@ export interface FactionGoal {
   targetProperty?: string;
   targetOperator?: GoalTargetOperator;
   targetThreshold?: number;
+  introducedAtEventId?: string;   // M1: absent from replay before this Event (Live campaigns)
+  // M4 (simplified 2026-10-15), Achieve goals only. Auto-Resolve = 'Automatic': the second success writes the target and
+  // Accomplishes the goal; 'Adjudicated': it raises a GM resolution task (Ready to Resolve) instead.
+  outcomeMode?: GoalOutcomeMode;
+  progressingEffectsJson?: string;   // §18.11: AdvanceEffect[] written by the Faction Phase at Planning → Progressing
+  accomplishedEffectsJson?: string;  // §18.11: AdvanceEffect[] written at Accomplished, after the target
+  earliestAct?: number;             // §18.6: first Act of Faction Phase eligibility (1–3); a Maintain assignment is in force from it
+  /** Projection only (never stored): the Ready to Resolve overlay at the viewed snapshot. */
+  ready?: GoalReady;
+  /** Projection only: who brought an Accomplished goal about (faction id, 'party', a participant; null = not recorded). */
+  accomplishedBy?: string | null;
+}
+
+/** M4: a goal's Ready to Resolve overlay: a GM resolution task, open since the session whose Turn raised it. */
+export interface GoalReady {
+  sinceSession: number;
 }
 
 // ── Narrative System ───────────────────────────────────────────────────────
@@ -882,6 +895,7 @@ export type CharacterType = 'NPC' | 'PartyMember';
 // Secondary: doubt pulls toward an edge — away from the opposite vertex (ab, ac, bc)
 export type DoubtDirection = 'a' | 'b' | 'c' | 'ab' | 'ac' | 'bc';
 export type CharacterState = 'Alive' | 'Dead' | 'Missing' | 'Forgotten';
+export type CharacterInstability = 'Stable' | 'Conflicted' | 'Compromised';
 
 export interface Character {
   id: string;
@@ -935,12 +949,15 @@ export interface Character {
 
   // Spatial location
   locationId?: string;
+  introducedAtEventId?: string;   // M1: absent from replay before this Event (Live campaigns)
+  instability?: CharacterInstability;   // M6: Stable → Conflicted → Compromised (a visible crisis); changes only by Effects
+  reaffirmedFactionId?: string;         // M6: survived a crisis without defecting; not nominated again for this faction
 }
 
 /**
  * Derives belief positions from a value vector using per-axis thresholds.
  *   knowledge ← A axis: A dominant → positive, C dominant → negative, else neutral
- *   change    ← B axis: B dominant → negative, C dominant → positive, else neutral/positive
+ *   change    ← B axis: B dominant → negative, C dominant → positive, else neutral
  *   ritual    ← C axis: C dominant → negative, A dominant → positive, else neutral
  */
 export function deriveBeliefs(
@@ -958,18 +975,24 @@ export function deriveBeliefs(
     values.c >= threshold ? 'negative' :
     values.a >= threshold ? 'positive' : 'neutral';
 
-  // beliefb ← B axis: B dominant → negative (status quo); C dominant → positive (change); else neutral/positive
-  const bIsOpinion = axisLabels.b.type === 'opinion';
-  const beliefb: BeliefPosition = bIsOpinion
-    ? (values.b >= threshold ? 'negative' : values.c >= threshold ? 'positive' : 'neutral')
-    : (values.b >= threshold ? 'negative' : 'positive');
+  // beliefb ← B axis: B dominant → negative (status quo); C dominant → positive (change); else neutral.
+  // Every axis is three-position (scoring audit), so the axis `type` no longer matters here.
+  void axisLabels;
+  const beliefb: BeliefPosition =
+    values.b >= threshold ? 'negative' :
+    values.c >= threshold ? 'positive' : 'neutral';
 
   return { beliefc, beliefa, beliefb };
 }
 
 /** Returns the character's effective beliefs: overrides where set, derived elsewhere. */
-export function effectiveBeliefs(character: Character): { beliefc: BeliefPosition; beliefa: BeliefPosition; beliefb: BeliefPosition } {
-  const derived = deriveBeliefs(character.values);
+export function effectiveBeliefs(
+  character: Character,
+  threshold = 0.4,
+  axisLabels: BeliefAxisLabels = DEFAULT_BELIEF_AXIS_LABELS
+): { beliefc: BeliefPosition; beliefa: BeliefPosition; beliefb: BeliefPosition } {
+  // D12: callers pass the configured derivation threshold and axis labels (store.formulas / store.beliefAxisLabels).
+  const derived = deriveBeliefs(character.values, threshold, axisLabels);
   return {
     beliefc:   character.beliefc ?? derived.beliefc,
     beliefa:   character.beliefa ?? derived.beliefa,
@@ -994,17 +1017,17 @@ export function basePressure(character: Character): number {
 }
 
 /**
- * Effective pressure = base pressure + (colonyStress * 10).
- * Colony stress is treated as a percentage contribution: stress 5 → +50.
+ * Effective pressure = base pressure + colonyStress × coefficient (M6: ×5 by default, configurable).
+ * Stress is a percentage-point contribution: stress 5 → +25 at ×5.
  * Can exceed 100; callers display values above 100 as "MAX".
  */
-export function effectivePressure(character: Character, colonyStress: number): number {
-  return character.pressure + colonyStress * 10;
+export function effectivePressure(character: Pick<Character, 'pressure'>, colonyStress: number, coefficient: number = DEFAULT_FORMULAS.stressPressureCoefficient ?? 5): number {
+  return character.pressure + colonyStress * coefficient;   // M6: coefficient ×5 by default (formulas.stressPressureCoefficient)
 }
 
 /** Drift score using the effective (stress-adjusted) pressure. */
-export function effectiveDriftScore(character: Character, colonyStress: number): number {
-  return effectivePressure(character, colonyStress) - character.conviction;
+export function effectiveDriftScore(character: Character, colonyStress: number, coefficient?: number): number {
+  return effectivePressure(character, colonyStress, coefficient) - character.conviction;
 }
 
 /** Legacy drift score (ignores colony stress). */
@@ -1048,9 +1071,10 @@ export function effectiveDriftScoreWithInfluence(
   character: Character,
   colonyStress: number,
   factionPeers: Character[],
-  scale: number
+  scale: number,
+  coefficient?: number
 ): number {
-  return effectivePressure(character, colonyStress) - effectiveConviction(character, factionPeers, scale);
+  return effectivePressure(character, colonyStress, coefficient) - effectiveConviction(character, factionPeers, scale);
 }
 
 /**
@@ -1071,76 +1095,7 @@ export function computeDriftTarget(values: ValueVector, doubtDirection: DoubtDir
   }
 }
 
-export interface FactionCompatibility {
-  factionId: string;
-  score: number;
-}
-
-/**
- * Scores character-to-faction compatibility using the same relationship formula
- * as faction-to-faction scoring (scales 5/3). BeliefPosition 'neutral' always counts as buffer (score 0).
- */
-export function scoreFactionCompatibility(
-  characterValues: ValueVector,
-  characterBeliefs: { beliefc: BeliefPosition; beliefa: BeliefPosition; beliefb: BeliefPosition },
-  faction: Faction
-): number {
-  const sv = characterValues;
-
-  const beliefcScore = scoreBelief(characterBeliefs.beliefc, faction.beliefc, r => r === 'neutral', 2.5, -1.0) * sv.c;
-  const beliefaScore = scoreBelief(characterBeliefs.beliefa, faction.beliefa, k => k === 'neutral', 2.5, -1.0) * sv.a;
-  const beliefbScore = scoreBelief(characterBeliefs.beliefb, faction.beliefb, c => c === 'neutral', 2.5, -1.0) * sv.b;
-
-  const alignment = dot(sv, faction.values)             * 5;
-  const conflict  = dot(sv, inverseVector(faction.values)) * 3;
-
-  return Math.round((beliefcScore + beliefaScore + beliefbScore + alignment - conflict) * 10) / 10;
-}
-
-function scoreBelief<T>(
-  a: T | undefined, b: T | undefined,
-  isBuffer: (v: T) => boolean,
-  matchScore: number, conflictScore: number
-): number {
-  if (a == null || b == null) return 0;
-  if (isBuffer(a) || isBuffer(b)) return 0;
-  return a === b ? matchScore : conflictScore;
-}
-
-export function topCompatibleFactions(
-  character: { values: ValueVector; beliefc?: BeliefPosition; beliefa?: BeliefPosition; beliefb?: BeliefPosition },
-  factions: Faction[],
-  beliefThreshold = 0.4,
-  axisLabels: BeliefAxisLabels = DEFAULT_BELIEF_AXIS_LABELS
-): FactionCompatibility[] {
-  const derived = deriveBeliefs(character.values, beliefThreshold, axisLabels);  // axisLabels drives beliefb-axis type only
-  const beliefs = {
-    beliefc:   character.beliefc ?? derived.beliefc,
-    beliefa:   character.beliefa ?? derived.beliefa,
-    beliefb:   character.beliefb ?? derived.beliefb,
-  };
-  return factions
-    .map(f => ({ factionId: f.id, score: scoreFactionCompatibility(character.values, beliefs, f) }))
-    .sort((a, b) => b.score - a.score);
-}
-
-// Returns the top N active factions (excluding self, Factions only) sorted by highest dot product —
-// shared desires and shared sacrifices signal natural alignment.
-export function mostAlignedFactions(faction: Faction, others: Faction[], n = 3): Faction[] {
-  return others
-    .filter(f => f.id !== faction.id && f.active && f.type === 'Faction')
-    .sort((a, b) => dot(faction.values, b.values) - dot(faction.values, a.values))
-    .slice(0, n);
-}
-
-// Returns the top N active factions (excluding self, Factions only) sorted by lowest dot product —
-// one faction desires what the other sacrifices, producing natural opposition.
-export function mostOpposedFactions(faction: Faction, others: Faction[], n = 3): Faction[] {
-  return others
-    .filter(f => f.id !== faction.id && f.active && f.type === 'Faction')
-    .sort((a, b) => dot(faction.values, a.values) - dot(faction.values, b.values))
-    .slice(0, n);
-}
+// Compatibility and most-aligned/opposed lists moved to core/services/scoring.service.ts (one relationship formula).
 
 // ── Narrative Planning System ───────────────────────────────────────────────
 

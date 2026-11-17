@@ -1,0 +1,1184 @@
+{
+ "REF (fp-4)": {
+  "runs": 1000,
+  "secondsPerRun": 0.006142000000000001,
+  "rollsPerPhase": 8.537,
+  "maintainShareOfTokens": 0,
+  "idleShare": 0.2133766233766234,
+  "successOpen": 0.3386931402066889,
+  "successDefended": 0.19213233935062535,
+  "defendedShareOfRolls": 0.34568243048973984,
+  "advancesPerCampaign": 26.744,
+  "advancesByAct": [
+   7.01,
+   11.143,
+   8.591
+  ],
+  "accomplishedPerCampaign": 10.908,
+  "readyPerCampaign": 0.15,
+  "reachedByPriority": {
+   "Critical": 0.6686666666666666,
+   "Major": 0.327875,
+   "Minor": 0.6343333333333333
+  },
+  "accomplishedByFaction": {
+   "aspis": 1.224,
+   "cult": 0.385,
+   "institute": 1.146,
+   "keepers": 2.737,
+   "seekers": 3.545,
+   "shattered": 0.086,
+   "witnesses": 1.785
+  },
+  "powerStart": {
+   "aspis": 2,
+   "cult": 1,
+   "institute": 2,
+   "keepers": 3,
+   "seekers": 3,
+   "shattered": 1,
+   "witnesses": 2
+  },
+  "powerEnd": {
+   "aspis": 1.973,
+   "cult": 1,
+   "institute": 2.585,
+   "keepers": 1.367,
+   "seekers": 1.83,
+   "shattered": 1.009,
+   "witnesses": 1.936
+  },
+  "powerZeroAtEnd": 0,
+  "finalHolders": {
+   "Book of Names": {
+    "seekers": 0.375,
+    "aspis": 0.597,
+    "keepers": 0.028
+   },
+   "The Ledger": {
+    "witnesses": 0.929,
+    "cult": 0.06,
+    "shattered": 0.011
+   },
+   "Civic Improvement Fund": {
+    "seekers": 0.228,
+    "witnesses": 0.431,
+    "institute": 0.341
+   },
+   "The Unclaimed Object": {
+    "witnesses": 0.435,
+    "institute": 0.349,
+    "cult": 0.141,
+    "no one": 0.058,
+    "shattered": 0.017
+   },
+   "Hall of the Keepers": {
+    "seekers": 0.651,
+    "keepers": 0.349
+   },
+   "Hidden Stockpiles": {
+    "shattered": 0.811,
+    "institute": 0.189
+   },
+   "The Offering Chest": {
+    "cult": 0.483,
+    "aspis": 0.517
+   },
+   "Claims Registry": {
+    "aspis": 0.949,
+    "cult": 0.051
+   }
+  }
+ },
+ "A DC 9": {
+  "runs": 1000,
+  "secondsPerRun": 0.007527,
+  "rollsPerPhase": 6.634727272727273,
+  "maintainShareOfTokens": 0,
+  "idleShare": 0.2702987012987013,
+  "successOpen": 0.552719735354466,
+  "successDefended": 0.2837827121332276,
+  "defendedShareOfRolls": 0.3455646597791236,
+  "advancesPerCampaign": 32.943,
+  "advancesByAct": [
+   8.211,
+   14.479,
+   10.253
+  ],
+  "accomplishedPerCampaign": 14.105,
+  "readyPerCampaign": 0.288,
+  "reachedByPriority": {
+   "Critical": 0.6913333333333334,
+   "Major": 0.4556875,
+   "Minor": 0.838
+  },
+  "accomplishedByFaction": {
+   "aspis": 1.769,
+   "cult": 0.849,
+   "institute": 1.799,
+   "keepers": 2.933,
+   "seekers": 3.701,
+   "shattered": 0.56,
+   "witnesses": 2.494
+  },
+  "powerStart": {
+   "aspis": 2,
+   "cult": 1,
+   "institute": 2,
+   "keepers": 3,
+   "seekers": 3,
+   "shattered": 1,
+   "witnesses": 2
+  },
+  "powerEnd": {
+   "aspis": 1.978,
+   "cult": 1,
+   "institute": 2.83,
+   "keepers": 1.221,
+   "seekers": 1.823,
+   "shattered": 1.035,
+   "witnesses": 1.806
+  },
+  "powerZeroAtEnd": 0,
+  "finalHolders": {
+   "Book of Names": {
+    "aspis": 0.71,
+    "seekers": 0.272,
+    "keepers": 0.018
+   },
+   "The Ledger": {
+    "witnesses": 0.79,
+    "cult": 0.148,
+    "shattered": 0.062
+   },
+   "Civic Improvement Fund": {
+    "institute": 0.393,
+    "witnesses": 0.468,
+    "seekers": 0.139
+   },
+   "The Unclaimed Object": {
+    "witnesses": 0.172,
+    "cult": 0.196,
+    "institute": 0.558,
+    "shattered": 0.07,
+    "no one": 0.004
+   },
+   "Hall of the Keepers": {
+    "seekers": 0.742,
+    "keepers": 0.258
+   },
+   "Hidden Stockpiles": {
+    "institute": 0.444,
+    "shattered": 0.556
+   },
+   "The Offering Chest": {
+    "aspis": 0.871,
+    "cult": 0.129
+   },
+   "Claims Registry": {
+    "aspis": 0.952,
+    "cult": 0.048
+   }
+  }
+ },
+ "A DC 10": {
+  "runs": 1000,
+  "secondsPerRun": 0.007280999999999999,
+  "rollsPerPhase": 7.617181818181818,
+  "maintainShareOfTokens": 0,
+  "idleShare": 0.20067532467532467,
+  "successOpen": 0.4122844309717011,
+  "successDefended": 0.18098221503637835,
+  "defendedShareOfRolls": 0.35431858597190563,
+  "advancesPerCampaign": 27.391,
+  "advancesByAct": [
+   7.109,
+   10.907,
+   9.375
+  ],
+  "accomplishedPerCampaign": 11.086,
+  "readyPerCampaign": 0.128,
+  "reachedByPriority": {
+   "Critical": 0.6746666666666666,
+   "Major": 0.315125,
+   "Minor": 0.6913333333333334
+  },
+  "accomplishedByFaction": {
+   "aspis": 1.278,
+   "cult": 0.518,
+   "institute": 0.909,
+   "keepers": 2.726,
+   "seekers": 3.523,
+   "shattered": 0.268,
+   "witnesses": 1.864
+  },
+  "powerStart": {
+   "aspis": 2,
+   "cult": 1,
+   "institute": 2,
+   "keepers": 3,
+   "seekers": 3,
+   "shattered": 1,
+   "witnesses": 2
+  },
+  "powerEnd": {
+   "aspis": 1.987,
+   "cult": 1,
+   "institute": 2.53,
+   "keepers": 1.41,
+   "seekers": 1.966,
+   "shattered": 1.018,
+   "witnesses": 1.923
+  },
+  "powerZeroAtEnd": 0,
+  "finalHolders": {
+   "Book of Names": {
+    "seekers": 0.428,
+    "aspis": 0.48,
+    "keepers": 0.092
+   },
+   "The Ledger": {
+    "witnesses": 0.917,
+    "shattered": 0.024,
+    "cult": 0.059
+   },
+   "Civic Improvement Fund": {
+    "seekers": 0.463,
+    "witnesses": 0.33,
+    "institute": 0.207
+   },
+   "The Unclaimed Object": {
+    "witnesses": 0.415,
+    "cult": 0.195,
+    "institute": 0.321,
+    "shattered": 0.044,
+    "no one": 0.025
+   },
+   "Hall of the Keepers": {
+    "seekers": 0.66,
+    "keepers": 0.34
+   },
+   "Hidden Stockpiles": {
+    "shattered": 0.791,
+    "institute": 0.209
+   },
+   "The Offering Chest": {
+    "cult": 0.339,
+    "aspis": 0.661
+   },
+   "Claims Registry": {
+    "aspis": 0.984,
+    "cult": 0.016
+   }
+  }
+ },
+ "A DC 11": {
+  "runs": 1000,
+  "secondsPerRun": 0.0073739999999999995,
+  "rollsPerPhase": 8.585818181818182,
+  "maintainShareOfTokens": 0,
+  "idleShare": 0.15322077922077923,
+  "successOpen": 0.293645978519308,
+  "successDefended": 0.10391822827938671,
+  "defendedShareOfRolls": 0.3542734318749735,
+  "advancesPerCampaign": 21.282,
+  "advancesByAct": [
+   5.789,
+   7.831,
+   7.662
+  ],
+  "accomplishedPerCampaign": 8.073,
+  "readyPerCampaign": 0.038,
+  "reachedByPriority": {
+   "Critical": 0.665,
+   "Major": 0.1938125,
+   "Minor": 0.5025
+  },
+  "accomplishedByFaction": {
+   "aspis": 0.683,
+   "cult": 0.293,
+   "institute": 0.407,
+   "keepers": 2.316,
+   "seekers": 3.122,
+   "shattered": 0.098,
+   "witnesses": 1.154
+  },
+  "powerStart": {
+   "aspis": 2,
+   "cult": 1,
+   "institute": 2,
+   "keepers": 3,
+   "seekers": 3,
+   "shattered": 1,
+   "witnesses": 2
+  },
+  "powerEnd": {
+   "aspis": 2,
+   "cult": 1,
+   "institute": 2.298,
+   "keepers": 1.756,
+   "seekers": 2.227,
+   "shattered": 1.005,
+   "witnesses": 1.976
+  },
+  "powerZeroAtEnd": 0,
+  "finalHolders": {
+   "Book of Names": {
+    "keepers": 0.326,
+    "aspis": 0.233,
+    "seekers": 0.441
+   },
+   "The Ledger": {
+    "witnesses": 0.975,
+    "cult": 0.02,
+    "shattered": 0.005
+   },
+   "Civic Improvement Fund": {
+    "seekers": 0.752,
+    "institute": 0.112,
+    "witnesses": 0.136
+   },
+   "The Unclaimed Object": {
+    "witnesses": 0.496,
+    "cult": 0.171,
+    "no one": 0.145,
+    "institute": 0.162,
+    "shattered": 0.026
+   },
+   "Hall of the Keepers": {
+    "keepers": 0.443,
+    "seekers": 0.557
+   },
+   "Hidden Stockpiles": {
+    "shattered": 0.909,
+    "institute": 0.091
+   },
+   "The Offering Chest": {
+    "cult": 0.615,
+    "aspis": 0.385
+   },
+   "Claims Registry": {
+    "aspis": 0.999,
+    "cult": 0.001
+   }
+  }
+ },
+ "A DC 12": {
+  "runs": 1000,
+  "secondsPerRun": 0.007579,
+  "rollsPerPhase": 9.424454545454546,
+  "maintainShareOfTokens": 0,
+  "idleShare": 0.12807792207792207,
+  "successOpen": 0.19324461735708917,
+  "successDefended": 0.056433597676756396,
+  "defendedShareOfRolls": 0.3454456009028736,
+  "advancesPerCampaign": 15.104,
+  "advancesByAct": [
+   4.302,
+   5.369,
+   5.433
+  ],
+  "accomplishedPerCampaign": 5.274,
+  "readyPerCampaign": 0.015,
+  "reachedByPriority": {
+   "Critical": 0.6493333333333333,
+   "Major": 0.0933125,
+   "Minor": 0.308
+  },
+  "accomplishedByFaction": {
+   "aspis": 0.242,
+   "cult": 0.125,
+   "institute": 0.136,
+   "keepers": 1.728,
+   "seekers": 2.431,
+   "shattered": 0.038,
+   "witnesses": 0.574
+  },
+  "powerStart": {
+   "aspis": 2,
+   "cult": 1,
+   "institute": 2,
+   "keepers": 3,
+   "seekers": 3,
+   "shattered": 1,
+   "witnesses": 2
+  },
+  "powerEnd": {
+   "aspis": 2,
+   "cult": 1,
+   "institute": 2.114,
+   "keepers": 2.289,
+   "seekers": 2.566,
+   "shattered": 1.008,
+   "witnesses": 1.99
+  },
+  "powerZeroAtEnd": 0,
+  "finalHolders": {
+   "Book of Names": {
+    "keepers": 0.644,
+    "seekers": 0.273,
+    "aspis": 0.083
+   },
+   "The Ledger": {
+    "witnesses": 0.988,
+    "shattered": 0.008,
+    "cult": 0.004
+   },
+   "Civic Improvement Fund": {
+    "seekers": 0.918,
+    "witnesses": 0.05,
+    "institute": 0.032
+   },
+   "The Unclaimed Object": {
+    "no one": 0.472,
+    "witnesses": 0.359,
+    "cult": 0.097,
+    "institute": 0.064,
+    "shattered": 0.008
+   },
+   "Hall of the Keepers": {
+    "keepers": 0.651,
+    "seekers": 0.349
+   },
+   "Hidden Stockpiles": {
+    "shattered": 0.969,
+    "institute": 0.031
+   },
+   "The Offering Chest": {
+    "cult": 0.853,
+    "aspis": 0.147
+   },
+   "Claims Registry": {
+    "aspis": 1
+   }
+  }
+ },
+ "B DC 9": {
+  "runs": 1000,
+  "secondsPerRun": 0.007589,
+  "rollsPerPhase": 5.311909090909091,
+  "maintainShareOfTokens": 0.5491539547695655,
+  "idleShare": 0.3412077922077922,
+  "successOpen": 0.5747755046924583,
+  "successDefended": 0.3060437205315045,
+  "defendedShareOfRolls": 0.23956461467371773,
+  "advancesPerCampaign": 29.25,
+  "advancesByAct": [
+   7.596,
+   11.657,
+   9.997
+  ],
+  "accomplishedPerCampaign": 11.306,
+  "readyPerCampaign": 0.427,
+  "reachedByPriority": {
+   "Critical": 0.7186666666666667,
+   "Major": 0.354875,
+   "Minor": 0.6498333333333334
+  },
+  "accomplishedByFaction": {
+   "aspis": 0.862,
+   "cult": 0.751,
+   "institute": 0.916,
+   "keepers": 2.811,
+   "seekers": 3.702,
+   "shattered": 0.654,
+   "witnesses": 1.61
+  },
+  "powerStart": {
+   "aspis": 2,
+   "cult": 1,
+   "institute": 2,
+   "keepers": 3,
+   "seekers": 3,
+   "shattered": 1,
+   "witnesses": 2
+  },
+  "powerEnd": {
+   "aspis": 1.925,
+   "cult": 1,
+   "institute": 2.532,
+   "keepers": 1.241,
+   "seekers": 1.944,
+   "shattered": 1.109,
+   "witnesses": 1.719
+  },
+  "powerZeroAtEnd": 0,
+  "finalHolders": {
+   "Book of Names": {
+    "aspis": 0.418,
+    "seekers": 0.541,
+    "keepers": 0.041
+   },
+   "The Ledger": {
+    "cult": 0.161,
+    "witnesses": 0.691,
+    "shattered": 0.148
+   },
+   "Civic Improvement Fund": {
+    "seekers": 0.467,
+    "institute": 0.271,
+    "witnesses": 0.262
+   },
+   "The Unclaimed Object": {
+    "witnesses": 0.357,
+    "shattered": 0.094,
+    "cult": 0.217,
+    "institute": 0.285,
+    "no one": 0.047
+   },
+   "Hall of the Keepers": {
+    "seekers": 0.75,
+    "keepers": 0.25
+   },
+   "Hidden Stockpiles": {
+    "institute": 0.225,
+    "shattered": 0.775
+   },
+   "The Offering Chest": {
+    "cult": 0.595,
+    "aspis": 0.405
+   },
+   "Claims Registry": {
+    "aspis": 0.879,
+    "cult": 0.121
+   }
+  }
+ },
+ "B DC 10": {
+  "runs": 1000,
+  "secondsPerRun": 0.007414,
+  "rollsPerPhase": 5.760727272727273,
+  "maintainShareOfTokens": 0.5280378356235802,
+  "idleShare": 0.2985714285714286,
+  "successOpen": 0.43779904306220097,
+  "successDefended": 0.200875931494313,
+  "defendedShareOfRolls": 0.24141522535033455,
+  "advancesPerCampaign": 23.823,
+  "advancesByAct": [
+   6.632,
+   8.923,
+   8.268
+  ],
+  "accomplishedPerCampaign": 8.704,
+  "readyPerCampaign": 0.229,
+  "reachedByPriority": {
+   "Critical": 0.6943333333333334,
+   "Major": 0.2435,
+   "Minor": 0.49233333333333335
+  },
+  "accomplishedByFaction": {
+   "aspis": 0.487,
+   "cult": 0.452,
+   "institute": 0.436,
+   "keepers": 2.426,
+   "seekers": 3.548,
+   "shattered": 0.337,
+   "witnesses": 1.018
+  },
+  "powerStart": {
+   "aspis": 2,
+   "cult": 1,
+   "institute": 2,
+   "keepers": 3,
+   "seekers": 3,
+   "shattered": 1,
+   "witnesses": 2
+  },
+  "powerEnd": {
+   "aspis": 1.944,
+   "cult": 1,
+   "institute": 2.31,
+   "keepers": 1.404,
+   "seekers": 2.173,
+   "shattered": 1.078,
+   "witnesses": 1.816
+  },
+  "powerZeroAtEnd": 0,
+  "finalHolders": {
+   "Book of Names": {
+    "seekers": 0.675,
+    "aspis": 0.219,
+    "keepers": 0.106
+   },
+   "The Ledger": {
+    "witnesses": 0.81,
+    "cult": 0.106,
+    "shattered": 0.084
+   },
+   "Civic Improvement Fund": {
+    "seekers": 0.708,
+    "institute": 0.158,
+    "witnesses": 0.134
+   },
+   "The Unclaimed Object": {
+    "institute": 0.143,
+    "no one": 0.174,
+    "cult": 0.172,
+    "witnesses": 0.45,
+    "shattered": 0.061
+   },
+   "Hall of the Keepers": {
+    "seekers": 0.672,
+    "keepers": 0.328
+   },
+   "Hidden Stockpiles": {
+    "shattered": 0.91,
+    "institute": 0.09
+   },
+   "The Offering Chest": {
+    "cult": 0.769,
+    "aspis": 0.231
+   },
+   "Claims Registry": {
+    "aspis": 0.938,
+    "cult": 0.062
+   }
+  }
+ },
+ "B DC 11": {
+  "runs": 1000,
+  "secondsPerRun": 0.007378,
+  "rollsPerPhase": 6.269454545454545,
+  "maintainShareOfTokens": 0.5061972375571929,
+  "idleShare": 0.2638441558441558,
+  "successOpen": 0.3193200616051566,
+  "successDefended": 0.11349337242685235,
+  "defendedShareOfRolls": 0.2373847224638942,
+  "advancesPerCampaign": 18.532,
+  "advancesByAct": [
+   5.47,
+   6.627,
+   6.435
+  ],
+  "accomplishedPerCampaign": 6.425,
+  "readyPerCampaign": 0.094,
+  "reachedByPriority": {
+   "Critical": 0.6653333333333333,
+   "Major": 0.1488125,
+   "Minor": 0.357
+  },
+  "accomplishedByFaction": {
+   "aspis": 0.225,
+   "cult": 0.24,
+   "institute": 0.149,
+   "keepers": 1.923,
+   "seekers": 3.161,
+   "shattered": 0.126,
+   "witnesses": 0.601
+  },
+  "powerStart": {
+   "aspis": 2,
+   "cult": 1,
+   "institute": 2,
+   "keepers": 3,
+   "seekers": 3,
+   "shattered": 1,
+   "witnesses": 2
+  },
+  "powerEnd": {
+   "aspis": 1.972,
+   "cult": 1,
+   "institute": 2.122,
+   "keepers": 1.755,
+   "seekers": 2.466,
+   "shattered": 1.027,
+   "witnesses": 1.919
+  },
+  "powerZeroAtEnd": 0,
+  "finalHolders": {
+   "Book of Names": {
+    "seekers": 0.632,
+    "aspis": 0.102,
+    "keepers": 0.266
+   },
+   "The Ledger": {
+    "witnesses": 0.915,
+    "cult": 0.056,
+    "shattered": 0.029
+   },
+   "Civic Improvement Fund": {
+    "seekers": 0.894,
+    "witnesses": 0.05,
+    "institute": 0.056
+   },
+   "The Unclaimed Object": {
+    "no one": 0.414,
+    "witnesses": 0.38,
+    "institute": 0.058,
+    "cult": 0.117,
+    "shattered": 0.031
+   },
+   "Hall of the Keepers": {
+    "seekers": 0.495,
+    "keepers": 0.505
+   },
+   "Hidden Stockpiles": {
+    "shattered": 0.971,
+    "institute": 0.029
+   },
+   "The Offering Chest": {
+    "cult": 0.893,
+    "aspis": 0.107
+   },
+   "Claims Registry": {
+    "aspis": 0.969,
+    "cult": 0.031
+   }
+  }
+ },
+ "B DC 12": {
+  "runs": 1000,
+  "secondsPerRun": 0.007272,
+  "rollsPerPhase": 6.792272727272727,
+  "maintainShareOfTokens": 0.4848626921035032,
+  "idleShare": 0.24194805194805194,
+  "successOpen": 0.21473014781711927,
+  "successDefended": 0.0595706078016329,
+  "defendedShareOfRolls": 0.22130763568225925,
+  "advancesPerCampaign": 13.437,
+  "advancesByAct": [
+   4.082,
+   4.662,
+   4.693
+  ],
+  "accomplishedPerCampaign": 4.443,
+  "readyPerCampaign": 0.037,
+  "reachedByPriority": {
+   "Critical": 0.616,
+   "Major": 0.082375,
+   "Minor": 0.219
+  },
+  "accomplishedByFaction": {
+   "aspis": 0.071,
+   "cult": 0.105,
+   "institute": 0.06,
+   "keepers": 1.347,
+   "seekers": 2.512,
+   "shattered": 0.054,
+   "witnesses": 0.294
+  },
+  "powerStart": {
+   "aspis": 2,
+   "cult": 1,
+   "institute": 2,
+   "keepers": 3,
+   "seekers": 3,
+   "shattered": 1,
+   "witnesses": 2
+  },
+  "powerEnd": {
+   "aspis": 1.988,
+   "cult": 1,
+   "institute": 2.055,
+   "keepers": 2.192,
+   "seekers": 2.705,
+   "shattered": 1.012,
+   "witnesses": 1.965
+  },
+  "powerZeroAtEnd": 0,
+  "finalHolders": {
+   "Book of Names": {
+    "seekers": 0.449,
+    "aspis": 0.035,
+    "keepers": 0.516
+   },
+   "The Ledger": {
+    "witnesses": 0.965,
+    "cult": 0.023,
+    "shattered": 0.012
+   },
+   "Civic Improvement Fund": {
+    "seekers": 0.96,
+    "institute": 0.021,
+    "witnesses": 0.019
+   },
+   "The Unclaimed Object": {
+    "no one": 0.679,
+    "witnesses": 0.216,
+    "cult": 0.062,
+    "institute": 0.029,
+    "shattered": 0.014
+   },
+   "Hall of the Keepers": {
+    "keepers": 0.685,
+    "seekers": 0.315
+   },
+   "Hidden Stockpiles": {
+    "shattered": 0.991,
+    "institute": 0.009
+   },
+   "The Offering Chest": {
+    "cult": 0.966,
+    "aspis": 0.034
+   },
+   "Claims Registry": {
+    "aspis": 0.988,
+    "cult": 0.012
+   }
+  }
+ },
+ "B2 DC 9": {
+  "runs": 1000,
+  "secondsPerRun": 0.00752,
+  "rollsPerPhase": 6.254545454545455,
+  "maintainShareOfTokens": 0.265247711908754,
+  "idleShare": 0.26125974025974025,
+  "successOpen": 0.559363200326564,
+  "successDefended": 0.30093410754859884,
+  "defendedShareOfRolls": 0.28786337209302326,
+  "advancesPerCampaign": 32.59,
+  "advancesByAct": [
+   8.211,
+   13.232,
+   11.147
+  ],
+  "accomplishedPerCampaign": 13.36,
+  "readyPerCampaign": 0.519,
+  "reachedByPriority": {
+   "Critical": 0.7203333333333334,
+   "Major": 0.4465,
+   "Minor": 0.7623333333333333
+  },
+  "accomplishedByFaction": {
+   "aspis": 1.555,
+   "cult": 1.031,
+   "institute": 1.719,
+   "keepers": 2.927,
+   "seekers": 3.693,
+   "shattered": 0.632,
+   "witnesses": 1.803
+  },
+  "powerStart": {
+   "aspis": 2,
+   "cult": 1,
+   "institute": 2,
+   "keepers": 3,
+   "seekers": 3,
+   "shattered": 1,
+   "witnesses": 2
+  },
+  "powerEnd": {
+   "aspis": 1.96,
+   "cult": 1,
+   "institute": 2.82,
+   "keepers": 1.232,
+   "seekers": 1.845,
+   "shattered": 1.077,
+   "witnesses": 1.624
+  },
+  "powerZeroAtEnd": 0,
+  "finalHolders": {
+   "Book of Names": {
+    "aspis": 0.691,
+    "seekers": 0.282,
+    "keepers": 0.027
+   },
+   "The Ledger": {
+    "witnesses": 0.61,
+    "cult": 0.255,
+    "shattered": 0.135
+   },
+   "Civic Improvement Fund": {
+    "seekers": 0.268,
+    "witnesses": 0.332,
+    "institute": 0.4
+   },
+   "The Unclaimed Object": {
+    "institute": 0.554,
+    "shattered": 0.082,
+    "witnesses": 0.178,
+    "cult": 0.176,
+    "no one": 0.01
+   },
+   "Hall of the Keepers": {
+    "seekers": 0.746,
+    "keepers": 0.254
+   },
+   "Hidden Stockpiles": {
+    "shattered": 0.556,
+    "institute": 0.444
+   },
+   "The Offering Chest": {
+    "aspis": 0.747,
+    "cult": 0.253
+   },
+   "Claims Registry": {
+    "aspis": 0.882,
+    "cult": 0.118
+   }
+  }
+ },
+ "B2 DC 10": {
+  "runs": 1000,
+  "secondsPerRun": 0.007448000000000001,
+  "rollsPerPhase": 6.938909090909091,
+  "maintainShareOfTokens": 0.259109704723263,
+  "idleShare": 0.20393506493506494,
+  "successOpen": 0.4230212355212355,
+  "successDefended": 0.19259885999287496,
+  "defendedShareOfRolls": 0.2942039618488628,
+  "advancesPerCampaign": 26.735,
+  "advancesByAct": [
+   7.109,
+   10.095,
+   9.531
+  ],
+  "accomplishedPerCampaign": 10.278,
+  "readyPerCampaign": 0.254,
+  "reachedByPriority": {
+   "Critical": 0.692,
+   "Major": 0.298375,
+   "Minor": 0.6136666666666667
+  },
+  "accomplishedByFaction": {
+   "aspis": 0.965,
+   "cult": 0.652,
+   "institute": 0.898,
+   "keepers": 2.728,
+   "seekers": 3.46,
+   "shattered": 0.323,
+   "witnesses": 1.252
+  },
+  "powerStart": {
+   "aspis": 2,
+   "cult": 1,
+   "institute": 2,
+   "keepers": 3,
+   "seekers": 3,
+   "shattered": 1,
+   "witnesses": 2
+  },
+  "powerEnd": {
+   "aspis": 1.95,
+   "cult": 1,
+   "institute": 2.549,
+   "keepers": 1.464,
+   "seekers": 1.983,
+   "shattered": 1.052,
+   "witnesses": 1.806
+  },
+  "powerZeroAtEnd": 0,
+  "finalHolders": {
+   "Book of Names": {
+    "seekers": 0.475,
+    "aspis": 0.393,
+    "keepers": 0.132
+   },
+   "The Ledger": {
+    "cult": 0.136,
+    "witnesses": 0.798,
+    "shattered": 0.066
+   },
+   "Civic Improvement Fund": {
+    "seekers": 0.565,
+    "witnesses": 0.169,
+    "institute": 0.266
+   },
+   "The Unclaimed Object": {
+    "institute": 0.312,
+    "witnesses": 0.351,
+    "cult": 0.216,
+    "shattered": 0.043,
+    "no one": 0.078
+   },
+   "Hall of the Keepers": {
+    "seekers": 0.633,
+    "keepers": 0.367
+   },
+   "Hidden Stockpiles": {
+    "shattered": 0.782,
+    "institute": 0.218
+   },
+   "The Offering Chest": {
+    "cult": 0.509,
+    "aspis": 0.491
+   },
+   "Claims Registry": {
+    "aspis": 0.931,
+    "cult": 0.069
+   }
+  }
+ },
+ "B2 DC 11": {
+  "runs": 1000,
+  "secondsPerRun": 0.007392999999999999,
+  "rollsPerPhase": 7.614272727272727,
+  "maintainShareOfTokens": 0.25044969259819405,
+  "idleShare": 0.1640909090909091,
+  "successOpen": 0.30221200322234154,
+  "successDefended": 0.1126463409589211,
+  "defendedShareOfRolls": 0.2886087133015748,
+  "advancesPerCampaign": 20.56,
+  "advancesByAct": [
+   5.789,
+   7.277,
+   7.494
+  ],
+  "accomplishedPerCampaign": 7.311,
+  "readyPerCampaign": 0.119,
+  "reachedByPriority": {
+   "Critical": 0.674,
+   "Major": 0.17425,
+   "Minor": 0.43666666666666665
+  },
+  "accomplishedByFaction": {
+   "aspis": 0.427,
+   "cult": 0.347,
+   "institute": 0.389,
+   "keepers": 2.272,
+   "seekers": 3.026,
+   "shattered": 0.142,
+   "witnesses": 0.708
+  },
+  "powerStart": {
+   "aspis": 2,
+   "cult": 1,
+   "institute": 2,
+   "keepers": 3,
+   "seekers": 3,
+   "shattered": 1,
+   "witnesses": 2
+  },
+  "powerEnd": {
+   "aspis": 1.978,
+   "cult": 1,
+   "institute": 2.287,
+   "keepers": 1.844,
+   "seekers": 2.262,
+   "shattered": 1.038,
+   "witnesses": 1.899
+  },
+  "powerZeroAtEnd": 0,
+  "finalHolders": {
+   "Book of Names": {
+    "seekers": 0.487,
+    "aspis": 0.159,
+    "keepers": 0.354
+   },
+   "The Ledger": {
+    "witnesses": 0.896,
+    "cult": 0.063,
+    "shattered": 0.041
+   },
+   "Civic Improvement Fund": {
+    "seekers": 0.806,
+    "institute": 0.14,
+    "witnesses": 0.054
+   },
+   "The Unclaimed Object": {
+    "no one": 0.276,
+    "witnesses": 0.374,
+    "institute": 0.149,
+    "cult": 0.175,
+    "shattered": 0.026
+   },
+   "Hall of the Keepers": {
+    "seekers": 0.495,
+    "keepers": 0.505
+   },
+   "Hidden Stockpiles": {
+    "shattered": 0.924,
+    "institute": 0.076
+   },
+   "The Offering Chest": {
+    "cult": 0.765,
+    "aspis": 0.235
+   },
+   "Claims Registry": {
+    "aspis": 0.973,
+    "cult": 0.027
+   }
+  }
+ },
+ "B2 DC 12": {
+  "runs": 1000,
+  "secondsPerRun": 0.007266,
+  "rollsPerPhase": 8.219363636363637,
+  "maintainShareOfTokens": 0.2377672489377487,
+  "idleShare": 0.13972727272727273,
+  "successOpen": 0.2014191725039126,
+  "successDefended": 0.057642276422764226,
+  "defendedShareOfRolls": 0.2720847665711789,
+  "advancesPerCampaign": 14.618,
+  "advancesByAct": [
+   4.302,
+   5.067,
+   5.249
+  ],
+  "accomplishedPerCampaign": 4.824,
+  "readyPerCampaign": 0.05,
+  "reachedByPriority": {
+   "Critical": 0.636,
+   "Major": 0.0855,
+   "Minor": 0.2663333333333333
+  },
+  "accomplishedByFaction": {
+   "aspis": 0.14,
+   "cult": 0.162,
+   "institute": 0.136,
+   "keepers": 1.636,
+   "seekers": 2.368,
+   "shattered": 0.052,
+   "witnesses": 0.33
+  },
+  "powerStart": {
+   "aspis": 2,
+   "cult": 1,
+   "institute": 2,
+   "keepers": 3,
+   "seekers": 3,
+   "shattered": 1,
+   "witnesses": 2
+  },
+  "powerEnd": {
+   "aspis": 1.987,
+   "cult": 1,
+   "institute": 2.113,
+   "keepers": 2.308,
+   "seekers": 2.602,
+   "shattered": 1.012,
+   "witnesses": 1.959
+  },
+  "powerZeroAtEnd": 0,
+  "finalHolders": {
+   "Book of Names": {
+    "keepers": 0.623,
+    "aspis": 0.046,
+    "seekers": 0.331
+   },
+   "The Ledger": {
+    "witnesses": 0.959,
+    "cult": 0.029,
+    "shattered": 0.012
+   },
+   "Civic Improvement Fund": {
+    "seekers": 0.938,
+    "institute": 0.049,
+    "witnesses": 0.013
+   },
+   "The Unclaimed Object": {
+    "no one": 0.594,
+    "witnesses": 0.239,
+    "institute": 0.053,
+    "cult": 0.103,
+    "shattered": 0.011
+   },
+   "Hall of the Keepers": {
+    "seekers": 0.306,
+    "keepers": 0.694
+   },
+   "Hidden Stockpiles": {
+    "shattered": 0.971,
+    "institute": 0.029
+   },
+   "The Offering Chest": {
+    "cult": 0.911,
+    "aspis": 0.089
+   },
+   "Claims Registry": {
+    "aspis": 0.986,
+    "cult": 0.014
+   }
+  }
+ }
+}

@@ -30,14 +30,14 @@
   </div>
 
   <div class="toolbar-actions">
-    @if (!store.isViewingSnapshot()) {
+    @if (!store.isViewingSnapshot() && !store.isLive()) {
       <label class="btn btn-secondary">
         <i class="fa-solid fa-right-to-bracket"></i> Import
         <input type="file" accept=".csv" style="display:none" (change)="importCsv($event)">
       </label>
     }
     <button class="btn btn-secondary" (click)="exportCsv()">Export <i class="fa-solid fa-right-from-bracket"></i></button>
-    @if (!store.isViewingSnapshot()) {
+    @if (!store.isViewingSnapshot() && !store.isLive()) {
       <button class="btn btn-primary" (click)="openAdd()">+ New Character</button>
     }
   </div>
@@ -87,6 +87,7 @@
                 [ngClass]="'faction-flair--' + flair.bannerShape"></div>
             }
             <a [routerLink]="['/characters', c.id]" class="char-link" [style.color]="flair?.textColor">{{ c.name }}</a>
+            <app-instability-badge [character]="c" />
             @if (c.occupation) {
               <span class="occupation-tag" [style.color]="flair?.textColor ? 'color-mix(in srgb, ' + flair!.textColor + ' 60%, transparent)' : null">{{ c.occupation }}</span>
             }
@@ -99,7 +100,7 @@
           <td><span [class]="driftClass(effectiveDriftScore(c))">{{ effectiveDriftScore(c) > 0 ? '+' : '' }}{{ effectiveDriftScore(c) | number:'1.0-1' }}</span></td>
           <td class="actions">
             <button class="btn-icon btn-icon--danger" (click)="delete(c)" title="Delete"
-              [disabled]="store.isViewingSnapshot()">
+              [disabled]="store.isViewingSnapshot() || store.isLive()">
               <i class="fa-solid fa-trash"></i>
             </button>
           </td>

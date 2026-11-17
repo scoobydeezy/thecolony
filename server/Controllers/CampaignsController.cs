@@ -40,11 +40,45 @@ public class CampaignsController(AppDbContext db) : ControllerBase
     public async Task<IActionResult> Update(string id, [FromBody] Campaign campaign)
     {
         if (id != campaign.Id) return BadRequest();
-        campaign.UpdatedAt = DateTime.UtcNow;
-        db.Entry(campaign).State = EntityState.Modified;
+        // M1: only descriptive fields; Mode, ActivatedAt and HistoryVersion change through their own rules.
+        var existing = await db.Campaigns.FindAsync(id);
+        if (existing is null) return NotFound();
+        existing.Name = campaign.Name;
+        existing.Description = campaign.Description;
+        existing.UpdatedAt = DateTime.UtcNow;
         await db.SaveChangesAsync();
-        return Ok(campaign);
+        return Ok(existing);
     }
+
+    // POST /api/campaigns/{id}/activate  { engineVersion }
+    // M1: one-way Design -> Live. Writes RulesVersion 1 (snapshot of the current rules) and locks the baseline.
+    [HttpPost("{id}/activate")]
+    public async Task<IActionResult> Activate(string id, [FromBody] ActivateRequest request)
+    {
+        var existing = await db.Campaigns.FindAsync(id);
+        if (existing is null) return NotFound();
+        if (existing.Mode == CampaignMode.Live) return Conflict("Campaign is already Live.");
+        if (string.IsNullOrWhiteSpace(request.EngineVersion)) return BadRequest("engineVersion is required.");
+        var rules = await db.RulesConfigs.AsNoTracking().FirstOrDefaultAsync(r => r.CampaignId == id);
+        if (rules is null) return Conflict("Campaign has no rules to version.");
+
+        await using var tx = await db.Database.BeginTransactionAsync();
+        db.RulesVersions.Add(new RulesVersion
+        {
+            CampaignId = id, Version = 1, EngineVersion = request.EngineVersion,
+            RulesJson = System.Text.Json.JsonSerializer.Serialize(rules),
+        });
+        existing.Mode = CampaignMode.Live;
+        existing.ActivatedAt = DateTime.UtcNow;
+        existing.UpdatedAt = DateTime.UtcNow;
+        await db.SaveChangesAsync();
+        await tx.CommitAsync();
+        return Ok(existing);
+    }
+
+    [HttpGet("{id}/rules-versions")]
+    public async Task<IActionResult> RulesVersions(string id) =>
+        Ok(await db.RulesVersions.Where(r => r.CampaignId == id).OrderBy(r => r.Version).ToListAsync());
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(string id)
@@ -55,28 +89,62 @@ public class CampaignsController(AppDbContext db) : ControllerBase
         var campaign = await db.Campaigns.FindAsync(id);
         if (campaign is null) return NotFound();
 
-        // Cascade-delete all owned data for this campaign
-        await db.Factions.Where(x => x.CampaignId == id).ExecuteDeleteAsync();
+        // D15 (M0): delete EVERYTHING the campaign owns, children before parents, in one transaction
+        // (previously Assets, Goals, Locations, Maps, character narrative rows and all Narrative* rows were orphaned,
+        // and each bulk delete committed independently).
+        await using var tx = await db.Database.BeginTransactionAsync();
+
+        var characterIds = await db.Characters.Where(c => c.CampaignId == id).Select(c => c.Id).ToListAsync();
+        await db.CharacterNarrativeProfiles.Where(x => characterIds.Contains(x.CharacterId)).ExecuteDeleteAsync();
+        await db.CharacterDetails.Where(x => characterIds.Contains(x.CharacterId)).ExecuteDeleteAsync();
+        await db.CharacterRelationships.Where(x => characterIds.Contains(x.SourceCharacterId)).ExecuteDeleteAsync();
+
+        var mapIds = await db.ColonyMaps.Where(m => m.CampaignId == id).Select(m => m.Id).ToListAsync();
+        await db.MapPlacements.Where(x => mapIds.Contains(x.MapId)).ExecuteDeleteAsync();
+        await db.ColonyMaps.Where(x => x.CampaignId == id).ExecuteDeleteAsync();
+        await db.Locations.Where(x => x.CampaignId == id).ExecuteDeleteAsync();
+        await db.Assets.Where(x => x.CampaignId == id).ExecuteDeleteAsync();
+        await db.FactionGoals.Where(x => x.CampaignId == id).ExecuteDeleteAsync();
+        await db.WorldConditions.Where(x => x.CampaignId == id).ExecuteDeleteAsync();
+
+        // Narrative planning graph
+        var narrativeEventIds = await db.NarrativeEvents.Where(e => e.CampaignId == id).Select(e => e.Id).ToListAsync();
+        var pathSetIds = await db.PathSets.Where(p => p.CampaignId == id).Select(p => p.Id).ToListAsync();
+        var pathIds = await db.NarrativePaths.Where(p => pathSetIds.Contains(p.PathSetId)).Select(p => p.Id).ToListAsync();
+        var overrideIds = await db.NarrativeEventOverrides.Where(o => narrativeEventIds.Contains(o.NarrativeEventId)).Select(o => o.Id).ToListAsync();
+        await db.EventOverridePaths.Where(x => overrideIds.Contains(x.EventOverrideId)).ExecuteDeleteAsync();
+        await db.EventOverrideConnections.Where(x => overrideIds.Contains(x.EventOverrideId)).ExecuteDeleteAsync();
+        await db.EventOverrideEntityLinks.Where(x => overrideIds.Contains(x.EventOverrideId)).ExecuteDeleteAsync();
+        await db.NarrativeEventOverrides.Where(x => overrideIds.Contains(x.Id)).ExecuteDeleteAsync();
+        await db.PathEventScopes.Where(x => pathIds.Contains(x.PathId) || narrativeEventIds.Contains(x.NarrativeEventId)).ExecuteDeleteAsync();
+        await db.NarrativeEventVariantParticipations.Where(x => pathSetIds.Contains(x.PathSetId) || narrativeEventIds.Contains(x.NarrativeEventId)).ExecuteDeleteAsync();
+        await db.PathSetContexts.Where(x => pathSetIds.Contains(x.PathSetId)).ExecuteDeleteAsync();
+        await db.NarrativePaths.Where(x => pathSetIds.Contains(x.PathSetId)).ExecuteDeleteAsync();
+        await db.PathSets.Where(x => x.CampaignId == id).ExecuteDeleteAsync();
+        await db.NarrativeEventPlacements.Where(x => narrativeEventIds.Contains(x.NarrativeEventId)).ExecuteDeleteAsync();
+        await db.NarrativeEventConnections.Where(x => x.CampaignId == id).ExecuteDeleteAsync();
+        await db.NarrativeEntityLinks.Where(x => x.CampaignId == id).ExecuteDeleteAsync();
+        await db.NarrativeThreads.Where(x => x.CampaignId == id).ExecuteDeleteAsync();
+
+        // Sessions → Events → EventEffects (bulk delete bypasses EF cascade, so delete explicitly)
+        var sessionIds = await db.Sessions.Where(s => s.CampaignId == id).Select(s => s.Id).ToListAsync();
+        var sessionEventIds = await db.Events.Where(e => sessionIds.Contains(e.SessionId)).Select(e => e.Id).ToListAsync();
+        await db.NarrativeEventRealizations.Where(x => narrativeEventIds.Contains(x.NarrativeEventId) || sessionEventIds.Contains(x.SessionEventId)).ExecuteDeleteAsync();
+        await db.NarrativeEvents.Where(x => x.CampaignId == id).ExecuteDeleteAsync();
+        await db.EventEffects.Where(ef => sessionEventIds.Contains(ef.EventId)).ExecuteDeleteAsync();
+        await db.Events.Where(e => sessionIds.Contains(e.SessionId)).ExecuteDeleteAsync();
+        await db.Sessions.Where(s => s.CampaignId == id).ExecuteDeleteAsync();
+
         await db.Characters.Where(x => x.CampaignId == id).ExecuteDeleteAsync();
+        await db.Factions.Where(x => x.CampaignId == id).ExecuteDeleteAsync();
         await db.RelationshipOverrides.Where(x => x.CampaignId == id).ExecuteDeleteAsync();
         await db.ColonyStates.Where(x => x.CampaignId == id).ExecuteDeleteAsync();
         await db.RulesConfigs.Where(x => x.CampaignId == id).ExecuteDeleteAsync();
         await db.SessionLog.Where(x => x.CampaignId == id).ExecuteDeleteAsync();
 
-        // Sessions cascade to Events → EventEffects via DB FK, but EF bulk delete bypasses that.
-        // Load session IDs, delete effects and events explicitly, then sessions.
-        var sessionIds = await db.Sessions.Where(s => s.CampaignId == id).Select(s => s.Id).ToListAsync();
-        if (sessionIds.Count > 0)
-        {
-            var eventIds = await db.Events.Where(e => sessionIds.Contains(e.SessionId)).Select(e => e.Id).ToListAsync();
-            if (eventIds.Count > 0)
-                await db.EventEffects.Where(ef => eventIds.Contains(ef.EventId)).ExecuteDeleteAsync();
-            await db.Events.Where(e => sessionIds.Contains(e.SessionId)).ExecuteDeleteAsync();
-            await db.Sessions.Where(s => s.CampaignId == id).ExecuteDeleteAsync();
-        }
-
         db.Campaigns.Remove(campaign);
         await db.SaveChangesAsync();
+        await tx.CommitAsync();
         return NoContent();
     }
 
@@ -100,8 +168,9 @@ public class CampaignsController(AppDbContext db) : ControllerBase
         var types = request.EntityTypes ?? [];
         var importAll = request.ImportAll;
 
-        // Build a faction ID remap table so character.FactionId can be fixed up
+        // Build faction and character ID remap tables so references can be fixed up
         var factionIdMap = new Dictionary<string, string>();
+        var characterIdMap = new Dictionary<string, string>();
 
         if (importAll || types.Contains("factions"))
         {
@@ -144,8 +213,13 @@ public class CampaignsController(AppDbContext db) : ControllerBase
                     Notes = f.Notes,
                     SortOrder = f.SortOrder,
                     Momentum = f.Momentum,
-                    BaseLegitimacy = f.BaseLegitimacy,
                     PowerModifier = f.PowerModifier,
+                    // D15 (M0): previously dropped
+                    FactionSize = f.FactionSize,
+                    PrimaryColor = f.PrimaryColor,
+                    SecondaryColor = f.SecondaryColor,
+                    BannerShape = f.BannerShape,
+                    LeaderId = f.LeaderId, // remapped to the imported character below, or cleared
                 });
             }
         }
@@ -159,13 +233,15 @@ public class CampaignsController(AppDbContext db) : ControllerBase
             var sourceChars = await query.ToListAsync();
             foreach (var c in sourceChars)
             {
+                var newCharId = Guid.NewGuid().ToString();
+                characterIdMap[c.Id] = newCharId;
                 // Remap factionId if the faction was imported; null if it wasn't
                 var newFactionId = c.FactionId != null && factionIdMap.TryGetValue(c.FactionId, out var mapped)
                     ? mapped : null;
 
                 db.Characters.Add(new Character
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = newCharId,
                     CampaignId = targetCid,
                     Name = c.Name,
                     CharacterType = c.CharacterType,
@@ -179,7 +255,12 @@ public class CampaignsController(AppDbContext db) : ControllerBase
                     Occupation = c.Occupation,
                     Summary = c.Summary,
                     FactionId = newFactionId,
-                    SocialClassId = null, // social classes are factions; null if not imported
+                    // Social classes are factions: remap if imported, otherwise null.
+                    SocialClassId = c.SocialClassId != null && factionIdMap.TryGetValue(c.SocialClassId, out var mappedClass) ? mappedClass : null,
+                    NarrativeTier = c.NarrativeTier,
+                    Pronouns = c.Pronouns,
+                    Aliases = c.Aliases,
+                    PortraitPath = c.PortraitPath,
                     TruthValue = c.TruthValue,
                     StabilityValue = c.StabilityValue,
                     AgencyValue = c.AgencyValue,
@@ -196,10 +277,16 @@ public class CampaignsController(AppDbContext db) : ControllerBase
             }
         }
 
+        // D15: leaders point at imported characters (or nothing, if the leader wasn't imported).
+        foreach (var f in db.ChangeTracker.Entries<Faction>().Where(e => e.State == EntityState.Added).Select(e => e.Entity))
+            f.LeaderId = f.LeaderId != null && characterIdMap.TryGetValue(f.LeaderId, out var newLeader) ? newLeader : null;
+
         await db.SaveChangesAsync();
         return Ok(new { message = "Import complete." });
     }
 }
+
+public record ActivateRequest(string EngineVersion);
 
 public record ImportRequest(
     string SourceCampaignId,

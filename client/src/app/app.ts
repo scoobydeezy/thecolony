@@ -5,10 +5,11 @@ import { SettingsDrawerComponent } from './shared/settings-drawer/settings-drawe
 import { CampaignManagerComponent, CampaignManagerMode } from './shared/campaign-manager/campaign-manager.component';
 import { NarrativeInspectorComponent } from './shared/narrative-inspector/narrative-inspector.component';
 
+import { ToastsComponent } from './shared/toast/toast.component';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, SettingsDrawerComponent, CampaignManagerComponent, NarrativeInspectorComponent],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, SettingsDrawerComponent, CampaignManagerComponent, NarrativeInspectorComponent, ToastsComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
@@ -71,16 +72,27 @@ export class App implements OnInit {
     this.store.loadSessions(undefined);
     this.store.loadAssets(undefined);
     this.store.loadFactionGoals(undefined);
+    this.store.loadWorldConditions(undefined);
     this.store.loadLocations(undefined);
     this.store.loadColonyMaps(undefined);
     this.store.loadMapPlacements(undefined);
   }
 
   stressClass(): string {
-    const s = this.store.colonyState()?.colonyStress ?? 0;
+    const s = this.store.viewColonyStress();
     if (s <= 3) return 'stress-value stress-low';
     if (s <= 6) return 'stress-value stress-mid';
     return 'stress-value stress-high';
+  }
+
+  /** Tooltip: where the viewed Colony Stress comes from (§18.10: only from the World Conditions in force). */
+  stressTitle(): string {
+    const b = this.store.viewStressBreakdown();
+    if (!b.parts.length) return 'Colony Stress 0/10: no World Condition in force adds Stress';
+    const sign = (n: number) => (n > 0 ? '+' : '') + n;
+    const sum = b.parts.reduce((t, p) => t + p.stress, 0);
+    return [...b.parts.map(p => `${p.title} ${sign(p.stress)} (${p.origin})`),
+            `= ${b.total}/10${sum !== b.total ? ' (clamped)' : ''}`].join('\n');
   }
 
   toggleViewMenu(): void {

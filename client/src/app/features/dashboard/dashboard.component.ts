@@ -1,7 +1,8 @@
 import { Component, inject, signal, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AppStore } from '../../store/app.store';
-import { BeliefPosition, primaryValue, secondaryValue, sacrificedValue, topCompatibleFactions, beliefPositionLabel, effectiveDriftScoreWithInfluence } from '../../core/models/types';
+import { topCompatibleFactions, DEFAULT_RULES } from '../../core/services/scoring.service';
+import { BeliefPosition, primaryValue, secondaryValue, sacrificedValue, beliefPositionLabel, effectiveDriftScoreWithInfluence } from '../../core/models/types';
 import type { Faction, RelationshipBreakdown } from '../../core/models/types';
 import { FactionInfluenceService } from '../../core/services/faction-influence.service';
 import { TimelineStressTabComponent } from './timeline-stress-tab.component';
@@ -80,7 +81,7 @@ export class DashboardComponent {
     const c = this.store.viewCharacters().find(x => x.id === characterId);
     if (!c) return '—';
     const factions = this.store.viewFactions().filter(f => f.active && f.type === 'Faction');
-    const top = topCompatibleFactions(c, factions, this.store.formulas().beliefDerivationThreshold)[0];
+    const top = topCompatibleFactions(c, factions, this.store.formulas().beliefDerivationThreshold, this.store.beliefAxisLabels(), this.store.rules() ?? DEFAULT_RULES)[0];
     return top ? this.factionName(top.factionId) : '—';
   }
 
@@ -147,15 +148,14 @@ export class DashboardComponent {
     const factions = this.store.viewFactions().filter(f => f.active && f.type === 'Faction');
     const members  = this.store.viewCharacters();
     const formulas = this.store.formulas();
-    const assets   = this.store.assets();
+    const assets   = this.store.viewAssets();   // D4: projected assets, same as every other Power view
     return [...factions]
       .map(f => ({
         faction:    f,
-        momentum:   f.momentum,
-        legitimacy: f.baseLegitimacy,
-        power:      this.influenceSvc.calculateEffectivePower(f, members.filter(c => c.factionId === f.id), formulas, assets),
+        momentum:   f.momentumTier ?? 0,   // M3: the −2..+2 tier (raw Momentum is archived)
+        power:      this.influenceSvc.breakdown(f, members, assets, formulas).power,
       }))
-      .sort((a, b) => b.momentum - a.momentum);
+      .sort((a, b) => b.momentum - a.momentum || b.power - a.power || a.faction.name.localeCompare(b.faction.name));
   });
 
   get mostInfluential(): { faction: Faction; momentum: number } | null {
@@ -172,17 +172,16 @@ export class DashboardComponent {
     let best: { faction: Faction; momentum: number } | null = null;
     let bestDelta = -Infinity;
     for (const f of factions) {
-      const delta = (curr.factionMomentum[f.id] ?? f.momentum) - (prev.factionMomentum[f.id] ?? f.momentum);
-      if (delta > bestDelta) { bestDelta = delta; best = { faction: f, momentum: curr.factionMomentum[f.id] ?? f.momentum }; }
+      const base = f.momentumTier ?? 0;
+      const now = curr.factionMomentumTier?.[f.id] ?? base;
+      const delta = now - (prev.factionMomentumTier?.[f.id] ?? base);
+      if (delta > bestDelta) { bestDelta = delta; best = { faction: f, momentum: now }; }
     }
-    return best;
+    return bestDelta > 0 ? best : null;   // M3: only a faction whose tier actually rose this session
   }
 
-  get lowestLegitimacy(): { faction: Faction; legitimacy: number } | null {
-    const ranks = this.factionRankings();
-    if (ranks.length === 0) return null;
-    return [...ranks].sort((a, b) => a.legitimacy - b.legitimacy)[0];
-  }
+  /** §18.7: factions with Power 0 make no Faction Phase operations until their capacity changes. */
+  get powerless(): Faction[] { return this.factionRankings().filter(r => r.power === 0).map(r => r.faction); }
 
   viewDriftOf(characterId: string): number {
     const stress = this.store.viewColonyStress();
@@ -191,7 +190,7 @@ export class DashboardComponent {
     const c = alive.find(x => x.id === characterId);
     if (!c) return 0;
     const peers = alive.filter(p => p.factionId && p.factionId === c.factionId && p.id !== c.id);
-    return Math.round(effectiveDriftScoreWithInfluence(c, stress, peers, scale));
+    return Math.round(effectiveDriftScoreWithInfluence(c, stress, peers, scale, this.store.formulas().stressPressureCoefficient));
   }
 
   get highestDefectionRisk(): { name: string; driftScore: number } | null {

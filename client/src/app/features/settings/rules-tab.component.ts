@@ -5,7 +5,7 @@ import { Chart, ChartData, ChartOptions } from 'chart.js';
 import type { AnnotationOptions } from 'chartjs-plugin-annotation';
 import { AppStore } from '../../store/app.store';
 import { RulesConfig, RelationshipThreshold, RelationshipLabel } from '../../core/models/types';
-import { scoreRelationship, ScoringActor } from '../../core/services/scoring.service';
+import { scoreRelationship, ScoringActor, DEFAULT_RULES } from '../../core/services/scoring.service';
 
 const THRESHOLD_LABELS: RelationshipLabel[] = [
   'Aligned', 'Cooperative', 'Friendly', 'Tolerated', 'Strained', 'Opposed'
@@ -27,51 +27,42 @@ interface PreviewPair {
   tgt: Omit<ScoringActor, 'id'>;
 }
 
+// Archetypes that exercise each part of the formula (SCORING-AUDIT.md), not campaign factions.
+const PURIST:   Omit<ScoringActor, 'id'> = { values: { a: 0.85, b: 0.10, c: 0.05 }, beliefa: 'positive', beliefb: 'neutral', beliefc: 'positive' };
+const MODERATE: Omit<ScoringActor, 'id'> = { values: { a: 0.34, b: 0.33, c: 0.33 }, beliefa: 'neutral',  beliefb: 'neutral', beliefc: 'neutral' };
 const PREVIEW_PAIRS: PreviewPair[] = [
   {
-    label: 'Witnesses → Seekers',
-    color: 'rgba(248,113,113,0.9)',
-    src: { values: { a: 0.60, b: 0.25, c: 0.15 }, beliefc: 'positive',  beliefa: 'positive',  beliefb: 'negative' },
-    tgt: { values: { a: 0.15, b: 0.25, c: 0.60 }, beliefc: 'negative',  beliefa: 'negative',  beliefb: 'positive' },
-  },
-  {
-    label: 'Keepers → Cult',
-    color: 'rgba(251,146,60,0.9)',
-    src: { values: { a: 0.25, b: 0.60, c: 0.15 }, beliefc: 'positive',  beliefa: 'negative',  beliefb: 'negative' },
-    tgt: { values: { a: 0.60, b: 0.15, c: 0.25 }, beliefc: 'negative',  beliefa: 'neutral',   beliefb: 'positive' },
-  },
-  {
-    label: 'Witnesses → Keepers',
-    color: 'rgba(148,163,184,0.9)',
-    src: { values: { a: 0.60, b: 0.25, c: 0.15 }, beliefc: 'positive',  beliefa: 'positive',  beliefb: 'negative' },
-    tgt: { values: { a: 0.25, b: 0.60, c: 0.15 }, beliefc: 'positive',  beliefa: 'negative',  beliefb: 'negative' },
-  },
-  {
-    label: 'Aspis → Civilians',
+    label: 'Identical twins',
     color: 'rgba(52,211,153,0.9)',
-    src: { values: { a: 0.15, b: 0.60, c: 0.25 } },
-    tgt: { values: { a: 0.15, b: 0.60, c: 0.25 } },
+    src: { values: { a: 0.60, b: 0.25, c: 0.15 }, beliefa: 'positive', beliefb: 'neutral', beliefc: 'positive' },
+    tgt: { values: { a: 0.60, b: 0.25, c: 0.15 }, beliefa: 'positive', beliefb: 'neutral', beliefc: 'positive' },
   },
   {
-    label: 'Keepers → Aspis',
+    label: 'Close neighbours',
     color: 'rgba(96,165,250,0.9)',
-    src: { values: { a: 0.25, b: 0.60, c: 0.15 }, beliefc: 'positive',  beliefa: 'negative',  beliefb: 'negative' },
-    tgt: { values: { a: 0.15, b: 0.60, c: 0.25 }, beliefc: 'neutral',   beliefa: 'negative',  beliefb: 'negative' },
+    src: { values: { a: 0.60, b: 0.30, c: 0.10 }, beliefa: 'positive', beliefb: 'neutral', beliefc: 'positive' },
+    tgt: { values: { a: 0.50, b: 0.40, c: 0.10 }, beliefa: 'positive', beliefb: 'neutral', beliefc: 'positive' },
+  },
+  {
+    label: 'Shared values, opposed methods',
+    color: 'rgba(167,139,250,0.9)',
+    src: { values: { a: 0.60, b: 0.25, c: 0.15 }, beliefa: 'positive', beliefb: 'neutral',  beliefc: 'positive' },
+    tgt: { values: { a: 0.60, b: 0.25, c: 0.15 }, beliefa: 'negative', beliefb: 'positive', beliefc: 'negative' },
+  },
+  { label: 'Moderate → Purist', color: 'rgba(148,163,184,0.9)', src: MODERATE, tgt: PURIST },
+  { label: 'Purist → Moderate', color: 'rgba(251,146,60,0.9)',  src: PURIST,   tgt: MODERATE },
+  {
+    label: 'Opposed ideologies',
+    color: 'rgba(248,113,113,0.9)',
+    src: { values: { a: 0.80, b: 0.15, c: 0.05 }, beliefa: 'positive', beliefb: 'neutral',  beliefc: 'positive' },
+    tgt: { values: { a: 0.05, b: 0.15, c: 0.80 }, beliefa: 'negative', beliefb: 'positive', beliefc: 'negative' },
   },
 ];
 
 const STRESS_POINTS = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-const DEFAULT_RULES_STUB: RulesConfig = {
-  id: '', beliefMatch: 3, beliefConflict: -2, valueAlignmentScale: 5.5,
-  valueConflictScale: 3, stressPositiveMultiplierPerPoint: 0.25,
-  stressNegativeMultiplierPerPoint: 0.2, positiveEnabled: true, negativeEnabled: true,
-  thresholdsJson: JSON.stringify(DEFAULT_THRESHOLDS),
-  valueLabelsJson: '{}', beliefAxisLabelsJson: '{}',
-  cascadeRulesJson: '[]', formulasJson: '{}', stressWeightEnabled: true,
-  stressWeightCurve: 'Cubic', stressWeightIntensity: 0.7,
-  influenceConvictionScale: 0.5, stressTriggersJson: '[]',
-};
+const DEFAULT_RULES_STUB: RulesConfig = { ...DEFAULT_RULES, id: '', thresholdsJson: JSON.stringify(DEFAULT_THRESHOLDS),
+  valueLabelsJson: '{}', beliefAxisLabelsJson: '{}', cascadeRulesJson: '[]', formulasJson: '{}' };
 
 function previewScore(pair: PreviewPair, stress: number, rules: RulesConfig): number {
   const src: ScoringActor = { id: 'src', ...pair.src };
@@ -90,6 +81,7 @@ export class RulesTabComponent {
   store = inject(AppStore);
   saved = signal(false);
   thresholdLabels = THRESHOLD_LABELS;
+  readonly defaults = DEFAULT_RULES;
 
   readonly rulesModel = signal<RulesConfig>({ ...DEFAULT_RULES_STUB });
   readonly rulesForm  = form(this.rulesModel);
@@ -98,7 +90,7 @@ export class RulesTabComponent {
     effect(() => {
       const rules = this.store.rules();
       if (rules && !this.rulesModel().id) {
-        this.rulesModel.set({ ...rules });
+        this.rulesModel.set({ ...DEFAULT_RULES, ...rules });   // fills formula fields missing from an older payload
       }
     });
   }
@@ -134,10 +126,12 @@ export class RulesTabComponent {
     if (!confirm('Reset all rules to default values?')) return;
     this.rulesModel.update(f => ({
       ...f,
-      beliefMatch: 3.0,
-      beliefConflict: -2.0,
-      valueAlignmentScale: 5.5,
-      valueConflictScale: 3,
+      beliefMatch: DEFAULT_RULES.beliefMatch,
+      beliefConflict: DEFAULT_RULES.beliefConflict,
+      beliefAdjacent: DEFAULT_RULES.beliefAdjacent,
+      beliefWeightBlend: DEFAULT_RULES.beliefWeightBlend,
+      valueSimilarityScale: DEFAULT_RULES.valueSimilarityScale,
+      valueOppositionScale: DEFAULT_RULES.valueOppositionScale,
       stressPositiveMultiplierPerPoint: 0.25,
       stressNegativeMultiplierPerPoint: 0.2,
       influenceConvictionScale: 0.5,

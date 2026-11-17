@@ -17,6 +17,8 @@
   }
 </div>
 
+<app-world-conditions-summary />
+
 @if (store.sortedSessions().length === 0) {
   <div class="card empty-state">
     <p>No sessions yet. Start by adding your first session.</p>
@@ -51,21 +53,106 @@
         </div>
 
 
-        <!-- Derived effects bar -->
-        @let derived = sessionDerivedEffects(session);
-        @if (derived.length > 0) {
+        <!-- M5: the Colony Turn that prepares this session -->
+
+        <!-- §18.6/§18.10 World Conditions that came into force or ended during this session (its Colony Turn and its play), with the Stress each adds or removes -->
+        @let cc = conditionChanges(session);
+        @if (cc.started.length || cc.ended.length || cc.changed.length) {
           <div class="derived-bar">
-            <span class="derived-bar-icon" title="Derived effects"><i class="fa-solid fa-diamond"></i></span>
+            <span class="derived-bar-icon" title="World Conditions"><i class="fa-solid fa-scroll"></i></span>
             <div class="derived-bar-chips">
-            @for (de of derived; track de.ruleId + '_' + de.targetEntityId + '_' + $index) {
-              <span class="effect-chip effect-chip--derived">
-                <span class="effect-target">{{ de.targetEntityType === 'faction' ? factionName(de.targetEntityId) : characterName(de.targetEntityId) }}</span>
-                <span class="effect-prop">{{ de.targetProperty }}</span>
-                <span [class]="deltaClass(de.delta)">{{ de.delta > 0 ? '+' : '' }}{{ de.delta }}</span>
-                <span class="derived-reason"
-                  [title]="de.triggerType === 'streak' && de.consecutiveWeeks ? de.consecutiveWeeks + '× ' + (de.direction === 'positive' ? 'pos' : 'neg') + ' ' + de.sourceProperty : ''">{{ de.ruleLabel }}</span>
-              </span>
-            }
+              @for (c of cc.started; track c.condition.id) {
+                <span class="derived-chip" [title]="c.reason"><span class="delta pos">Now in force</span> {{ c.condition.title }}@if (c.stress) { <span class="delta">{{ c.stress > 0 ? '+' : '' }}{{ c.stress }} Stress</span> }@if (c.rowText ?? c.condition.rule; as text) { <span class="derived-reason">: {{ text }}</span> }</span>
+              }
+              @for (c of cc.changed; track c.condition.id) {
+                <!-- a "varies by" condition moved to another row while staying in force -->
+                <span class="derived-chip" [title]="c.reason"><span class="delta pos">Now</span> {{ c.condition.title }}@if (c.stress) { <span class="delta">{{ c.stress > 0 ? '+' : '' }}{{ c.stress }} Stress</span> }@if (c.rowText) { <span class="derived-reason">: {{ c.rowText }}</span> }</span>
+              }
+              @for (c of cc.ended; track c.condition.id) {
+                <span class="derived-chip" [title]="c.reason"><span class="delta neg">No longer in force</span> {{ c.condition.title }}@if (c.condition.stressContribution) { <span class="delta">{{ c.condition.stressContribution > 0 ? '−' : '+' }}{{ c.condition.stressContribution > 0 ? c.condition.stressContribution : -c.condition.stressContribution }} Stress</span> }</span>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- M3 Momentum: the resolution at this session's Opening, and the signals it leaves pending -->
+        @let snap = sessionSnapshot(session);
+        @if (snap && (snap.momentumResolutions.length > 0 || snap.pendingMomentumSignals.length > 0)) {
+          <div class="derived-bar momentum-bar">
+            <span class="derived-bar-icon" title="Momentum"><i class="fa-solid fa-gauge-high"></i></span>
+            <div class="derived-bar-chips">
+              @for (r of snap.momentumResolutions; track r.factionId) {
+                <span class="effect-chip effect-chip--derived" [title]="resolutionTitle(r)">
+                  <span class="effect-target">{{ factionName(r.factionId) }}</span>
+                  <span class="effect-prop">opening</span>
+                  <span [class]="deltaClass(r.applied)">{{ tierLabel(r.from) }} → {{ tierLabel(r.to) }}</span>
+                  @if (r.capped) { <span class="derived-reason">net {{ r.net > 0 ? '+' : '' }}{{ r.net }}, capped</span> }
+                  @if (r.applied !== r.to - r.from) { <span class="derived-reason">at limit</span> }
+                </span>
+              }
+              @for (p of snap.pendingMomentumSignals; track $index) {
+                <span class="effect-chip">
+                  <span class="effect-target">{{ factionName(p.factionId) }}</span>
+                  <span class="effect-prop">pending</span>
+                  <span [class]="deltaClass(p.sign)">{{ p.sign > 0 ? '+1' : '−1' }}</span>
+                  <span class="derived-reason">{{ p.reason }}</span>
+                </span>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- M6 crises: Compromised characters, visible for one session (§7.3) -->
+        @let crisisList = crises(session);
+        @if (crisisList.length > 0) {
+          <div class="derived-bar decisive-bar">
+            <span class="derived-bar-icon" title="Crises"><i class="fa-solid fa-person-circle-exclamation"></i></span>
+            <div class="decisive-list">
+              @for (c of crisisList; track c.id) {
+                <div class="decisive-scene">
+                  <div class="decisive-head">
+                    <span class="effect-target">{{ c.name }}</span>
+                    <span class="derived-reason">{{ factionName(c.factionId ?? '') }} · Compromised: unless play resolves it, the next Colony Turn's Character Phase makes a Defection Check</span>
+                  </div>
+                  @if (!c.resolvedHere) {
+                    <div class="decisive-actions">
+                      <button class="btn btn-secondary btn-sm" (click)="resolveCrisis(session, c.id, 'talkedDown')" title="Talked down, but still uneasy: Conflicted">Talked down</button>
+                      <button class="btn btn-secondary btn-sm" (click)="resolveCrisis(session, c.id, 'recommitted')" title="Recommitted: Stable and Reaffirmed for this faction">Recommitted</button>
+                      <button class="btn btn-danger btn-sm" (click)="resolveCrisis(session, c.id, 'leaves')" title="Leaves the faction now: no faction, Stable">Leaves now</button>
+                    </div>
+                  } @else {
+                    <span class="derived-reason">resolved in this session's play</span>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- M4 resolution tasks: goals Ready to Resolve when this session's play begins -->
+        @let tasks = resolutionTasks(session);
+        @if (tasks.length > 0) {
+          <div class="derived-bar decisive-bar">
+            <span class="derived-bar-icon" title="Resolution tasks"><i class="fa-solid fa-chess-knight"></i></span>
+            <div class="decisive-list">
+              @for (t of tasks; track t.goal.id) {
+                <div class="decisive-scene">
+                  <div class="decisive-head">
+                    <span class="effect-target">{{ factionName(t.goal.factionId) }}: {{ t.goal.title }}</span>
+                    <span class="derived-reason">Ready to Resolve since Session {{ t.ready.sinceSession }}</span>
+                  </div>
+                  @if (worldIfAccomplished(t.goal.id); as w) { <div class="derived-reason">If accomplished: {{ w }}</div> }
+                  @if (!t.resolvedHere) {
+                    <div class="decisive-actions">
+                      <button class="btn btn-primary btn-sm" (click)="resolveAsDeclared(session, t.goal)" title="Accomplished: writes the goal's target, if it has one the app can apply (credited to the faction), and the status">Accomplished</button>
+                      <button class="btn btn-secondary btn-sm" (click)="addSceneEffects(session, [statusEffect(t.goal.id, 'Failed')])">Failed</button>
+                      <button class="btn btn-secondary btn-sm" (click)="addSceneEffects(session, [readyEffect(t.goal.id, 'Cleared')])" title="Not resolved: the task clears and the goal returns to the pool, still Progressing">Remains Progressing</button>
+                    </div>
+                  } @else {
+                    <span class="derived-reason">resolved in this session's play</span>
+                  }
+                </div>
+              }
             </div>
           </div>
         }
@@ -115,12 +202,12 @@
                         <!-- Target type -->
                         <select [value]="draft.targetType ?? 'faction'"
                           (change)="updateInlineEffect(ev.id, $index, 'targetType', $any($event.target).value)">
-                          <option value="colony"    [selected]="(draft.targetType ?? 'faction') === 'colony'">Colony</option>
                           <option value="faction"   [selected]="(draft.targetType ?? 'faction') === 'faction'">Faction</option>
                           <option value="character" [selected]="(draft.targetType ?? 'faction') === 'character'">Character</option>
                           <option value="asset"     [selected]="(draft.targetType ?? 'faction') === 'asset'">Asset</option>
                           <option value="goal"      [selected]="(draft.targetType ?? 'faction') === 'goal'">Goal</option>
                           <option value="location"  [selected]="(draft.targetType ?? 'faction') === 'location'">Location</option>
+                          <option value="condition" [selected]="(draft.targetType ?? 'faction') === 'condition'">Condition</option>
                         </select>
 
                         <!-- Primary target -->
@@ -149,6 +236,14 @@
                                 <option [value]="g.id" [selected]="draft.targetId === g.id">{{ g.title }}</option>
                               }
                             </select>
+                          } @else if (draft.targetType === 'condition') {
+                            <select [value]="draft.targetId ?? ''"
+                              (change)="updateInlineEffect(ev.id, $index, 'targetId', $any($event.target).value)">
+                              <option value="">— condition —</option>
+                              @for (c of store.worldConditions(); track c.id) {
+                                <option [value]="c.id" [selected]="draft.targetId === c.id">{{ c.title }}</option>
+                              }
+                            </select>
                           } @else if (draft.targetType === 'location') {
                             <select [value]="draft.targetId ?? ''"
                               (change)="updateInlineEffect(ev.id, $index, 'targetId', $any($event.target).value)">
@@ -169,10 +264,10 @@
                         }
 
                         <!-- Property -->
-                        <select [value]="draft.property ?? 'momentum'"
+                        <select [value]="draft.property ?? 'momentumSignal'"
                           (change)="updateInlineEffect(ev.id, $index, 'property', $any($event.target).value)">
                           @for (d of descriptorsFor(draft.targetType ?? 'faction'); track d.property) {
-                            <option [value]="d.property" [selected]="(draft.property ?? 'momentum') === d.property">{{ d.label }}</option>
+                            <option [value]="d.property" [selected]="(draft.property ?? 'momentumSignal') === d.property">{{ d.label }}</option>
                           }
                         </select>
 
@@ -225,6 +320,27 @@
                                 <option [value]="l.id" [selected]="draft.value === l.id">{{ l.name }}</option>
                               }
                             </select>
+                          } @else if (d.inputType === 'character-select') {
+                            <!-- M4 championChange / leaderChange: character stored in value ('' = none) -->
+                            <select [value]="draft.value ?? ''"
+                              (change)="updateInlineEffect(ev.id, $index, 'value', $any($event.target).value)">
+                              <option value="">— None —</option>
+                              @for (c of characterChoices(draft); track c.id) {
+                                <option [value]="c.id" [selected]="draft.value === c.id">{{ c.name }}</option>
+                              }
+                            </select>
+                          } @else if (d.inputType === 'flag') {
+                            <span class="effect-prop">recorded this session</span>
+                          } @else if (d.inputType === 'signal') {
+                            <!-- M3 Momentum Signal: ±1 with a reason; resolves at the next Opening -->
+                            <div class="signal-toggle" role="group" aria-label="Signal direction">
+                              <button type="button" class="stepper-btn" [class.signal-on]="(draft.delta ?? 1) > 0" [attr.aria-pressed]="(draft.delta ?? 1) > 0"
+                                (click)="updateInlineEffect(ev.id, $index, 'delta', 1)">+1</button>
+                              <button type="button" class="stepper-btn" [class.signal-on]="(draft.delta ?? 1) < 0" [attr.aria-pressed]="(draft.delta ?? 1) < 0"
+                                (click)="updateInlineEffect(ev.id, $index, 'delta', -1)">−1</button>
+                            </div>
+                            <input type="text" class="signal-reason" placeholder="Reason (required)" aria-label="Signal reason" [value]="draft.value ?? ''"
+                              (input)="updateInlineEffect(ev.id, $index, 'value', $any($event.target).value)" />
                           } @else if (d.inputType === 'participate') {
                             <!-- Participation: actor + role (Helping/Hindering) + magnitude -->
                             <select [value]="draft.secondaryTargetId ?? ''"
@@ -256,11 +372,13 @@
                           }
                         }
 
-                        <!-- Actor faction selector for asset status changes -->
-                        @if (draft.targetType === 'asset' && draft.property === 'status') {
-                          <select [value]="draft.actorFactionId ?? ''"
+                        <!-- Actor: who brought the change about. §18.3: recorded as the attribution of any goal it completes -->
+                        @if ((draft.targetType === 'asset' && (draft.property === 'status' || draft.property === 'controllingFactionId'))
+                             || (draft.targetType === 'character' && draft.property === 'state')) {
+                          <select [value]="draft.actorFactionId ?? ''" title="Who brought this about (recorded on any goal it completes)"
                             (change)="updateInlineEffect(ev.id, $index, 'actorFactionId', $any($event.target).value)">
-                            <option value="">— actor faction —</option>
+                            <option value="">— caused by —</option>
+                            <option value="party" [selected]="draft.actorFactionId === 'party'">Party</option>
                             @for (f of activeFactions; track f.id) {
                               <option [value]="f.id" [selected]="draft.actorFactionId === f.id">{{ f.name }}</option>
                             }
@@ -293,6 +411,8 @@
         </div>
 
       </div>
+      <!-- The Colony Turn before this session (newest first: it sits between this session and the one before) -->
+      <app-colony-turn-card [session]="session" />
     }
   </div>
 }

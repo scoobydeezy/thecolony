@@ -209,6 +209,17 @@
   text-align: center;
 }
 
+.momentum-bar { background: rgba(16, 185, 129, 0.04); }
+.decisive-bar { background: rgba(245, 158, 11, 0.05); }
+.decisive-list { display: flex; flex-direction: column; gap: 0.6rem; flex: 1; }
+.decisive-head { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: baseline; }
+.decisive-actions { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; margin-top: 0.25rem; }
+.decisive-check { display: inline-flex; gap: 0.25rem; align-items: center; font-size: var(--text-size-label); }
+
+.signal-toggle { display: inline-flex; gap: 2px; }
+.signal-on { background: var(--accent, #6366f1); color: #fff; }
+.signal-reason { min-width: 12rem; }
+
 .derived-bar-chips {
   display: flex;
   flex-wrap: wrap;

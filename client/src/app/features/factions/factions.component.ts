@@ -2,13 +2,12 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormField, form, required } from '@angular/forms/signals';
 import { AppStore } from '../../store/app.store';
+import { ToastService, ImportTally } from '../../core/services/toast.service';
 import { FactionInfluenceService } from '../../core/services/faction-influence.service';
 import {
   Faction, GroupType, BeliefPosition,
   ValueVector, primaryValue, secondaryValue, sacrificedValue,
-  beliefConflicts, BeliefConflicts, beliefPositionLabel,
-  FactionGoal, GoalStatus, GoalPriority, GoalVisibility,
-  GOAL_STATUS_OPTIONS, GOAL_PRIORITY_OPTIONS, GOAL_VISIBILITY_OPTIONS,
+  beliefConflicts, BeliefConflicts, beliefPositionLabel, TERMINAL_GOAL_STATUSES,
 } from '../../core/models/types';
 import { TernaryPlotComponent, TernaryOverlayPoint } from '../../shared/ternary-plot/ternary-plot.component';
 import { downloadCsv, parseCsv, csvHeaderMap } from '../../core/utils/csv-export';
@@ -34,6 +33,7 @@ const emptyAddForm = (): AddFactionFormModel => ({ name: '', represents: '', typ
 })
 export class FactionsComponent {
   store     = inject(AppStore);
+  private readonly toast = inject(ToastService);
   influence = inject(FactionInfluenceService);
   router    = inject(Router);
 
@@ -74,7 +74,7 @@ export class FactionsComponent {
       type: fm.type as GroupType,
       coreTenet: '', certainOf: '', rightAbout: '', afraidOf: '', wrongAbout: '',
       values: { ...DEFAULT_VALUES },
-      active: true, sortOrder: 0, momentum: 0, baseLegitimacy: 50, powerModifier: 0, additionalMemberCount: 0,
+      active: true, sortOrder: 0, momentum: 0, momentumTier: 0, powerModifier: 0, factionSize: 0,
     });
     this.showModal.set(false);
   }
@@ -123,24 +123,25 @@ export class FactionsComponent {
     return this.store.viewCharacters().filter(c => c.factionId === f.id || c.socialClassId === f.id).length;
   }
 
-  factionTotalMemberCount(f: Faction): number {
-    return this.factionMemberCount(f) + (f.additionalMemberCount ?? 0);
-  }
+  /** §18.8: Faction Size is the recorded total membership (named characters are part of it, not added to it). */
+  factionTotalMemberCount(f: Faction): number { return f.factionSize ?? 0; }
 
-  factionTotalInfluence(f: Faction): number {
-    const members = this.store.viewCharacters().filter(c => c.state === 'Alive' && (c.factionId === f.id || c.socialClassId === f.id));
-    const assets  = this.store.viewAssets().filter(a => a.controllingFactionId === f.id);
-    return this.influence.calculateTotalInfluence(f, members, this.store.formulas(), assets);
+  // D4/M2: Power (1–3 cards) and its reasons come from the single Power breakdown.
+  private powerOf(f: Faction) {
+    return this.influence.breakdown(f, this.store.viewCharacters(), this.store.viewAssets(), this.store.formulas());
   }
 
   factionEffectivePower(f: Faction): number {
-    const members = this.store.viewCharacters().filter(c => c.state === 'Alive' && (c.factionId === f.id || c.socialClassId === f.id));
-    const assets  = this.store.viewAssets().filter(a => a.controllingFactionId === f.id);
-    return this.influence.calculateEffectivePower(f, members, this.store.formulas(), assets);
+    return this.powerOf(f).power;
+  }
+
+  factionPowerReasons(f: Faction): string {
+    const r = this.powerOf(f).reasons;
+    return r.length ? `Base card + ${r.join(' + ')}` : 'Base card only';
   }
 
   factionGoalCount(f: Faction): number {
-    return this.store.viewGoals().filter(g => g.factionId === f.id && g.status !== 'Accomplished' && g.status !== 'Failed').length;
+    return this.store.viewGoals().filter(g => g.factionId === f.id && !TERMINAL_GOAL_STATUSES.includes(g.status)).length;   // Retired is terminal too
   }
 
   // ── Navigation ──────────────────────────────────────────────────────────────
@@ -214,32 +215,12 @@ export class FactionsComponent {
       }
 
       if (h.has('conditiontype')) {
-        // Goals file
-        const factionIds = new Set(this.store.factions().map(f => f.id));
-        for (const row of rows.slice(1)) {
-          const factionId = get(row, 'factionid');
-          if (!factionIds.has(factionId)) continue;
-          const goal: FactionGoal = {
-            id:               get(row, 'id') || crypto.randomUUID(),
-            campaignId:       this.store.activeCampaign()!.id,
-            factionId,
-            title:            get(row, 'title'),
-            status:           oneOf(get(row, 'status'),   GOAL_STATUS_OPTIONS.map(o => o.value)   as GoalStatus[])   ?? 'Plotting',
-            conditionType:    oneOf(get(row, 'conditiontype'), ['Achieve', 'Maintain'] as const) ?? 'Achieve',
-            priority:         oneOf(get(row, 'priority'), GOAL_PRIORITY_OPTIONS.map(o => o.value) as GoalPriority[]) ?? 'Major',
-            visibility:       oneOf(get(row, 'visibility'), GOAL_VISIBILITY_OPTIONS.map(o => o.value) as GoalVisibility[]) ?? 'Open',
-            targetEntityType: oneOf(get(row, 'targetentitytype'), ['Character', 'Asset', 'Faction'] as const) || undefined,
-            targetEntityId:   get(row, 'targetentityid') || undefined,
-            targetState:            get(row, 'targetstate') || undefined,
-            targetOwnerFactionId:   get(row, 'targetownerfactionid') || undefined,
-            championId:             get(row, 'championid') || undefined,
-            targetProperty:         get(row, 'targetproperty') || undefined,
-            targetOperator:   oneOf(get(row, 'targetoperator'), ['gte', 'lte', 'eq'] as const) || undefined,
-            targetThreshold:  parseFloat(get(row, 'targetthreshold')) || undefined,
-          };
-          this.store.saveFactionGoal(goal);
-        }
-      } else if (h.has('bannershape')) {
+        alert(`Wrong file: this looks like a faction goals export. Import it from the Goals page instead.`);
+        (event.target as HTMLInputElement).value = '';
+        return;
+      }
+
+      if (h.has('bannershape')) {
         // Factions file
         const vl = this.store.valueLabels();
         const bl = this.store.beliefAxisLabels();
@@ -247,6 +228,7 @@ export class FactionsComponent {
         const getCol = (row: string[], fixed: string, display: string) =>
           get(row, fixed) || get(row, display.toLowerCase());
         const existingById = new Map(this.store.factions().map(f => [f.id, f]));
+        const tally = new ImportTally();
         for (const row of rows.slice(1)) {
           const id = get(row, 'id');
           const existing = existingById.get(id);
@@ -287,15 +269,19 @@ export class FactionsComponent {
             secondaryColor: get(row, 'secondarycolor') || undefined,
             bannerShape:    (get(row, 'bannershape')   || undefined) as import('../../core/models/types').BannerShape | undefined,
             momentum:              parseInt(get(row, 'momentum'))              || 0,
-            baseLegitimacy:        parseInt(get(row, 'baselegitimacy'))        || 50,
+            momentumTier:          Math.max(-2, Math.min(2, parseInt(get(row, 'momentumtier')) || 0)),
             powerModifier:         parseInt(get(row, 'powermodifier'))         || 0,
-            additionalMemberCount: parseInt(get(row, 'additionalmembercount')) || 0,
+            // a file without the column keeps the faction's value (older exports omitted it, and importing them reset it to 0)
+            // §18.8: a file without the column keeps the faction's value. 'AdditionalMemberCount' (unnamed members, exported
+            // before the rename) is not read as a total: it meant something else.
+            factionSize: h.has('factionsize') ? Math.max(0, parseInt(get(row, 'factionsize')) || 0) : existing?.factionSize ?? 0,
             leaderId:              get(row, 'leaderid') || undefined,
           };
-          this.store.saveFaction(faction);
+          tally.track(existing ? 'replaced' : 'added', this.store.saveFaction(faction));
         }
+        tally.report(this.toast, 'Factions');
       } else {
-        alert(`Unrecognized file format. Expected a factions or faction goals export.`);
+        alert(`Unrecognized file format. Expected a factions export.`);
       }
       (event.target as HTMLInputElement).value = '';
     };
@@ -313,8 +299,8 @@ export class FactionsComponent {
       'Origin', 'FoundedAs', 'Became', 'PublicFace', 'SelfImage', 'History',
       bl.c.axisName, bl.a.axisName, bl.b.axisName,
       vl.a, vl.b, vl.c,
-      'Momentum', 'BaseLegitimacy', 'PowerModifier',
-      'Notes', 'PrimaryColor', 'SecondaryColor', 'BannerShape', 'LeaderId'
+      'Momentum', 'MomentumTier', 'PowerModifier',
+      'Notes', 'PrimaryColor', 'SecondaryColor', 'BannerShape', 'LeaderId', 'FactionSize'
     ];
     const factionRows = factions.map(f => [
       f.id, f.name, f.type, f.active ? 'true' : 'false', f.sortOrder,
@@ -323,44 +309,10 @@ export class FactionsComponent {
       f.origin ?? '', f.foundedAs ?? '', f.became ?? '', f.publicFace ?? '', f.selfImage ?? '', f.history ?? '',
       f.beliefc ?? '', f.beliefa ?? '', f.beliefb ?? '',
       f.values.a.toFixed(4), f.values.b.toFixed(4), f.values.c.toFixed(4),
-      f.momentum, f.baseLegitimacy, f.powerModifier,
+      f.momentum, f.momentumTier ?? 0, f.powerModifier,
       f.notes ?? '', f.primaryColor ?? '', f.secondaryColor ?? '', f.bannerShape ?? '',
-      f.leaderId ?? ''
+      f.leaderId ?? '', f.factionSize ?? 0
     ]);
-    downloadCsv([factionHeader, ...factionRows], 'factions.csv');
-
-    const factionNameById = new Map(factions.map(f => [f.id, f.name]));
-    const characterNameById = new Map(this.store.characters().map(c => [c.id, c.name]));
-    const assetNameById = new Map(this.store.assets().map(a => [a.id, a.name]));
-    const resolveEntityName = (type: string | undefined, id: string | undefined): string => {
-      if (!id) return '';
-      if (type === 'Faction')   return factionNameById.get(id)   ?? id;
-      if (type === 'Character') return characterNameById.get(id) ?? id;
-      if (type === 'Asset')     return assetNameById.get(id)     ?? id;
-      return id;
-    };
-    const goals = this.store.factionGoals();
-    if (goals.length > 0) {
-      const goalHeader = [
-        'Id', 'FactionId', 'FactionName', 'Title',
-        'Status', 'ConditionType', 'Priority', 'Visibility',
-        'TargetEntityType', 'TargetEntityId', 'TargetEntityName', 'TargetState',
-        'TargetOwnerFactionId',
-        'TargetProperty', 'TargetOperator', 'TargetThreshold',
-        'ChampionId'
-      ];
-      const goalRows = goals.map(g => [
-        g.id, g.factionId, factionNameById.get(g.factionId) ?? '',
-        g.title,
-        g.status, g.conditionType, g.priority, g.visibility,
-        g.targetEntityType ?? '', g.targetEntityId ?? '',
-        resolveEntityName(g.targetEntityType, g.targetEntityId),
-        g.targetState ?? '',
-        g.targetOwnerFactionId ?? '',
-        g.targetProperty ?? '', g.targetOperator ?? '', g.targetThreshold ?? '',
-        g.championId ?? ''
-      ]);
-      downloadCsv([goalHeader, ...goalRows], 'faction-goals.csv');
-    }
+    downloadCsv([factionHeader, ...factionRows], 'factions.csv');   // goals export from the Goals page
   }
 }

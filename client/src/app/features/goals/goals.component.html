@@ -1,0 +1,127 @@
+<div class="page-header">
+  <h2>Goals</h2>
+  <p>Every faction's operations and defensive assignments. The Faction Phase advances Achieve goals; Maintain assignments defend their targets.</p>
+</div>
+
+<div class="toolbar">
+  <div class="filter-tabs" [class.filter-tabs--off]="groupBy() === 'grid'">
+    <button [class.active]="show() === 'active'" (click)="show.set('active')">Active</button>
+    <button [class.active]="show() === 'resolved'" (click)="show.set('resolved')">Resolved</button>
+    <button [class.active]="show() === 'all'" (click)="show.set('all')">All</button>
+  </div>
+  <div class="filter-tabs">
+    <button [class.active]="groupBy() === 'faction'" (click)="groupBy.set('faction')"><i class="fa-solid fa-flag"></i> By faction</button>
+    <button [class.active]="groupBy() === 'target'" (click)="groupBy.set('target')" title="Group by target: several factions on one target are the contests the Faction Phase settles"><i class="fa-solid fa-crosshairs"></i> By target</button>
+    <button [class.active]="groupBy() === 'grid'" (click)="groupBy.set('grid')" title="Planning grid: each faction's Achieve goals by Earliest Act and Priority, one slot each"><i class="fa-solid fa-table-cells"></i> Planning grid</button>
+  </div>
+  <div class="toolbar-actions">
+    @if (canAdd()) {
+      <label class="btn btn-secondary">
+        <i class="fa-solid fa-right-to-bracket"></i> Import
+        <input type="file" accept=".csv" style="display:none" (change)="importCsv($event)">
+      </label>
+    }
+    <button class="btn btn-secondary" (click)="exportCsv()">Export <i class="fa-solid fa-right-from-bracket"></i></button>
+    @if (canAdd()) { <button class="btn btn-primary" (click)="openAdd()">+ Add Goal</button> }
+  </div>
+</div>
+
+<div class="goals-filters">
+  <input class="form-input goals-search" type="search" placeholder="Search titles" [value]="search()" (input)="search.set($any($event.target).value)" aria-label="Search goals" />
+  <select class="form-input" [value]="factionFilter()" (change)="factionFilter.set($any($event.target).value)" aria-label="Faction">
+    <option value="">All factions</option>
+    @for (f of factions(); track f.id) { <option [value]="f.id" [selected]="f.id === factionFilter()">{{ f.name }}</option> }
+  </select>
+  @if (groupBy() !== 'grid') {
+  <select class="form-input" [value]="typeFilter()" (change)="typeFilter.set($any($event.target).value)" aria-label="Type">
+    <option value="">Achieve and Maintain</option>
+    <option value="Achieve">Achieve goals</option>
+    <option value="Maintain">Maintain assignments</option>
+  </select>
+  <select class="form-input" [value]="actFilter()" (change)="actFilter.set($any($event.target).value)" aria-label="Earliest Act">
+    <option value="">Any Earliest Act</option>
+    <option value="1">From Act I</option>
+    <option value="2">From Act II</option>
+    <option value="3">From Act III</option>
+  </select>
+  }
+  @let c = counts();
+  <span class="goals-counts">
+    {{ c.planning }} Planning · {{ c.progressing }} Progressing@if (c.ready) { · <strong>{{ c.ready }} Ready to Resolve</strong> }@if (c.dormant) { · {{ c.dormant }} Dormant } · {{ c.maintain }} Maintain · {{ c.resolved }} resolved
+  </span>
+</div>
+
+@if (groupBy() === 'grid') {
+  @for (grid of grids(); track grid.faction.id) {
+    <section class="plan-grid card">
+      <div [class]="'plan-banner faction-banner--' + grid.flair.shape" [style.background]="grid.flair.bg" [title]="grid.faction.name" aria-hidden="true">
+        @if (grid.flair.iconPath) {
+          <div class="plan-banner-icon" [style.background-color]="grid.flair.iconColor"
+               [style.mask-image]="'url(' + grid.flair.iconPath + ')'" [style.webkitMaskImage]="'url(' + grid.flair.iconPath + ')'"></div>
+        }
+      </div>
+      <div class="plan-head">
+        <span></span>
+        <div class="plan-head-main">
+          <a class="plan-faction" [routerLink]="['/factions', grid.faction.id]">{{ grid.faction.name }}</a>
+          <span class="plan-power" [class.plan-power--zero]="!grid.power.power" [title]="powerTitle(grid.power)">Power {{ grid.power.power }}</span>
+          <span class="plan-total">{{ grid.total }} {{ grid.total === 1 ? 'Goal' : 'Goals' }}</span>
+        </div>
+      </div>
+      <div class="plan-cols">
+        <span></span>
+        @for (act of ACTS; track act) { <span class="plan-act">Act {{ ['I', 'II', 'III'][act - 1] }}</span> }
+      </div>
+      @for (row of grid.cells; track $index) {
+        <div class="plan-row">
+          <span class="plan-priority">{{ row[0].priority }}</span>
+          @for (cell of row; track cell.act) {
+            <div class="plan-cell" [class.plan-cell--over]="cell.count > 1" [class.plan-cell--open]="!cell.count"
+                 [class.plan-cell--addable]="!cell.count && canAdd()"
+                 (click)="!cell.count && addInSlot(grid.faction.id, cell.priority, cell.act)"
+                 [attr.title]="!cell.count && canAdd() ? 'Add a ' + cell.priority + ' goal from Act ' + ['I', 'II', 'III'][cell.act - 1] : null">
+              <span class="plan-count" [class.plan-count--over]="cell.count > 1">{{ cell.count }}/1</span>
+              @if (cell.count) {
+                <div class="plan-goals">
+                  @for (g of cell.goals; track g.id) {
+                    <button type="button" class="plan-goal" [class.plan-goal--resolved]="isResolved(g)" [disabled]="!canEdit()"
+                            [title]="goalTitle(g)" (click)="openEdit(g); $event.stopPropagation()">{{ g.title }}</button>
+                  }
+                  @for (g of cell.maintain; track g.id) {
+                    <button type="button" class="plan-goal plan-goal--maintain" [class.plan-goal--resolved]="isResolved(g)" [disabled]="!canEdit()"
+                            [title]="goalTitle(g) + ' · Maintain assignment: it shares Power with goals, so it fills the slot'" (click)="openEdit(g); $event.stopPropagation()">
+                      <i class="fa-solid fa-shield-halved"></i> {{ g.title }}</button>
+                  }
+                </div>
+              }
+              @if (!cell.count) { <span class="plan-open">Open slot</span> }
+            </div>
+          }
+        </div>
+      }
+    </section>
+  }
+} @else {
+@if (groups().length === 0) {
+  <div class="empty-state card"><p>No goals match.</p></div>
+}
+@for (grp of groups(); track grp.key) {
+  <section class="goals-group" [class.goals-group--contested]="grp.contested">
+    <div class="goals-group-header">
+      @if (grp.link) { <a class="goals-group-title" [routerLink]="grp.link">{{ grp.title }}</a> } @else { <span class="goals-group-title">{{ grp.title }}</span> }
+      @if (grp.contested) { <span class="goals-contest" title="Goals from several factions target this. Conflicting completions in one Faction Phase are settled by the collision rule (higher margin wins)."><i class="fa-solid fa-bolt"></i> Contested</span> }
+      @if (grp.note) { <span class="goals-group-note">{{ grp.note }}</span> }
+      <span class="goals-group-count">{{ grp.goals.length }}</span>
+    </div>
+    @for (g of grp.goals; track g.id) {
+      <app-goal-card [goal]="g" [editable]="canEdit()" [showFaction]="groupBy() === 'target'" (edit)="openEdit($event)" />
+    }
+  </section>
+}
+
+}
+
+@if (editing() !== undefined) {
+  <app-goal-editor [goal]="editing() ?? null" [factionId]="newSlot()?.factionId || factionFilter() || null"
+    [preset]="newSlot()" (closed)="editing.set(undefined); newSlot.set(null)" />
+}

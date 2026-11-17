@@ -31,7 +31,7 @@ public class LocationsController(AppDbContext db, ICampaignContext campaign) : C
     public async Task<IActionResult> Create([FromBody] Location location)
     {
         var cid = await campaign.GetActiveIdAsync();
-        location.Id = Guid.NewGuid().ToString();
+        location.Id = await EntityIds.ForCreateAsync(db.Locations, location.Id);   // keep an imported id when it is free
         location.CampaignId = cid;
         db.Locations.Add(location);
         await db.SaveChangesAsync();

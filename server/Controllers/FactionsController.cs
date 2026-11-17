@@ -31,8 +31,9 @@ public class FactionsController(AppDbContext db, ICampaignContext campaign, IWeb
     public async Task<IActionResult> Create([FromBody] Faction faction)
     {
         var cid = await campaign.GetActiveIdAsync();
-        faction.Id = Guid.NewGuid().ToString();
+        faction.Id = await EntityIds.ForCreateAsync(db.Factions, faction.Id);   // keep an imported id when it is free
         faction.CampaignId = cid;
+        if (faction.MomentumTier is < -2 or > 2) return BadRequest("momentumTier must be between -2 and +2.");
         if (faction.SortOrder == 0)
             faction.SortOrder = (await db.Factions.Where(f => f.CampaignId == cid).MaxAsync(f => (int?)f.SortOrder) ?? 0) + 1;
         db.Factions.Add(faction);
@@ -44,6 +45,7 @@ public class FactionsController(AppDbContext db, ICampaignContext campaign, IWeb
     public async Task<IActionResult> Update(string id, [FromBody] Faction faction)
     {
         if (id != faction.Id) return BadRequest();
+        if (faction.MomentumTier is < -2 or > 2) return BadRequest("momentumTier must be between -2 and +2.");
         var cid = await campaign.GetActiveIdAsync();
         faction.CampaignId = cid;
         db.Entry(faction).State = EntityState.Modified;

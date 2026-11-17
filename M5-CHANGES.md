@@ -1,0 +1,144 @@
+# M5: Colony Turn: Opening and Faction Phase
+
+**Scope:** BOARD-GAME-REVIEW §17.7 M5, with the §18.1 decisions:
+- Power allocation;
+- critical-dice Momentum;
+- one advance per goal per Turn;
+- target 9+.
+
+**Status:** uncommitted on `main`, on top of M0–M4 and the scoring rewrite. The Character Phase is M6.
+
+## What a Colony Turn is now
+
+```text
+Start      a Draft ColonyTurn with a seed, recorded on the session's Colony Turn Event (SortOrder −1000, before play)
+Opening    Momentum resolution (deduplicated, net capped ±1, clamped −2…+2) + due unattended outcomes
+Faction    (Acts II–III) allocate Power, roll, resolve, collide, commit
+Publish    commits the Turn; it is immutable afterwards
+```
+
+**How each phase commits:**
+- It is **prepared from freshly fetched history**, read with the history version before and after so both belong to the same moment.
+- It is **previewed** on the Board.
+- It is **committed** with its canonical frozen inputs, their SHA-256 and the history version.
+
+**How the server checks a commit:**
+- It rejects stale history (409).
+- It rejects out-of-order phases (409).
+- It **re-derives the phase** and rejects anything that does not reproduce (422).
+
+**Correction:** a Draft turn can void a phase and every later phase (their Effects are removed and the records kept), or void the whole turn, and then re-run.
+
+## Engine (client, pure; `core/sim/`)
+
+| File | Content |
+|---|---|
+| `prng.ts` | mulberry32 seeded generator (pinned to a reference vector), Fisher–Yates shuffle, ordinal sort. **Two independent streams per seed:** allocation, and dice, so entering table dice never moves an allocation. |
+| `faction-phase.ts` | See below. |
+| `opening.ts` | Inputs: tiers, pending signals, due unattended goals. Effects, in order: an `opening` marker (colony), the unattended outcomes (Origin Opening), and one `momentumTier` delta per faction whose tier changed (Origin MomentumResolution). |
+| `colony-turn.ts` | Builds each phase's frozen inputs from baseline and history. The Opening reads the end of the previous session. The Faction Phase reads the state after this turn's Colony Turn Event: Power (channels), Momentum, eligible goals (`assessGoal`), and defense (`activeDefense`). Ineligible goals are listed with their reasons. |
+
+**`faction-phase.ts`:**
+- **Allocation:**
+  - per faction, in ordinal id order, tokens Critical 3 / Major 2 / Minor 1, seeded shuffle, draw Power-many;
+  - attempt order is the order first drawn.
+- **Resolution:**
+  - 2d6 + Momentum − defense ≥ target, stopping at the first success;
+  - natural 12 = Critical Success (always succeeds, +1); natural 2 = Critical Failure (always fails, −1);
+  - one advance per goal.
+- **Collisions (§6.4):** incompatible same-target Accomplishments are decided by margin, then attempt order. Losers are pre-empted.
+- **Effects:**
+  - Planning → Progressing: goal status;
+  - Progressing → Accomplished (Automatic): the target is written, credited, by GoalGenerator, and the status set;
+  - Progressing → Ready to Resolve (Adjudicated);
+  - criticals: a `momentumSignal` ±1 with root = the attempt id.
+- **Recorded per attempt:** natural dice, modifier, defense, total, degree, signal, and source (app or table dice).
+
+**Replay (`replay.ts`):**
+- A session whose Colony Turn Event carries the `opening` marker **folds its committed `momentumTier` Effects** instead of deriving a resolution. The interim session-boundary resolution from M3 applies only to sessions without a committed Opening.
+- Faction Phase `momentumSignal`s become `critical-success` / `critical-failure` signals.
+- Unattended outcomes (Origin Opening) are offscreen operation results: like Faction Phase Effects, a Keystone they take sends no Momentum signal.
+
+**Config:** `FormulasConfig.operationTarget` (default 9).
+
+## Server
+
+- **`Services/ColonyTurnEngine.cs`, the verifier.** A faithful C# port of the engine (generator, allocation, resolution, collisions, Effects; Opening resolution and Effects). On every Opening and Faction Phase commit it re-derives the results and Effects from the frozen inputs and the **recorded dice**:
+  - **app dice** must equal the seed's dice stream;
+  - **table dice** must be dice;
+  - **Publish** writes no Effects.
+- **`ColonyTurnsController`:**
+  - `GET history-version`;
+  - verification at commit;
+  - Act I has no Faction Phase;
+  - in Acts II–III, Publish needs the Faction Phase. The Character Phase is optional until M6.
+  - voided phases don't count for ordering;
+  - `POST {id}/phases/{phaseId}/void` and `POST {id}/void` (Draft only; If-History-Version required);
+  - a new turn reuses the session's Colony Turn Event after a void.
+- **Guards:**
+  - a Colony Turn Event cannot be deleted (void the turn instead);
+  - in Live, Effects of a committed turn are immutable;
+  - deleting a session removes its turns.
+- **Tests (`server.Tests`, 18 total, 5 new):**
+  - the generator vector;
+  - **100 cross-language vectors** generated by the client engine (60 Faction Phases including 22 criticals and 5 pre-empted collisions, plus 40 Openings), all verified by the C# port. The generator is `server.Tests/Vectors/generate.ts`.
+  - tampering rejected: wrong app dice, an extra Effect, an unsupported Momentum change, impossible table dice.
+
+## UI
+
+**Sessions, Colony Turn panel (the Board), on every session:**
+- **Start Colony Turn.**
+- **Opening:** the Momentum changes (from → to, net, capped, each signal with its reason) and the unattended outcomes that will apply.
+- **Faction Phase:** per faction:
+  - Power, Momentum, eligible goals;
+  - per goal, its allocation and each roll's two dice. The dice are **editable for table dice**, and the result recomputes instantly.
+  - the total, the degree (Critical Success / Success / Failure / Critical Failure), and the outcome (milestone reached, Accomplished, Ready to Resolve, pre-empted), showing the declared milestone;
+  - the critical tally;
+  - a "goals not eligible" list with reasons.
+- **Publish.**
+- **Void** a phase or the whole turn while it is a Draft.
+- **Committed summaries.**
+
+**Session event list.** The Colony Turn Event is owned by the panel and is not shown as an editable Event. The Decisive Scenes "Apply unattended outcome" button gives way to "applied by this session's Colony Turn Opening" once an Opening is committed.
+
+**Terminology.** Goal **Priority** (Critical / Major / Minor) and attempt **degree** (Critical Success / Critical Failure) are kept distinct in code and UI.
+
+## Verification
+
+| Check | Result |
+|---|---|
+| vitest | 136/136 (16 new in `faction-phase.spec.ts`) |
+| `ng test` | 138/138 |
+| tsc | clean |
+| Development build | succeeds |
+| Production build | only the pre-existing budgets |
+| `dotnet build` | succeeds |
+| `server.Tests` | 18/18 |
+| Snapshot and Power goldens | **no diff** (the fixture has no Colony Turns) |
+
+**End-to-end** (`tools/e2e/colony-turn.e2e.ts`, a real server on a fresh **copy** of the live DB, driven by the same engine the browser uses; **27/27 pass**):
+- a second turn for the session is refused;
+- a stale history version gets 409;
+- a Faction Phase before the Opening gets 409;
+- a forged Momentum change gets 422;
+- Publish before the Faction Phase gets 409;
+- app dice the seed didn't produce get 422;
+- commit, then void the Faction Phase (its Effects are removed and the Opening stays), then re-run with table dice 6+6 (Critical Success);
+- Publish; void after Publish gets 409; deleting the Colony Turn Event gets 409;
+- replay folds the goal advances and critical signals;
+- **Session 9's Opening resolves Session 8's two Aspis Critical Successes: net +2, capped, Aspis 0 → +1, matching replay.**
+
+The live DB was never touched (modified time unchanged).
+
+## Deferred or limited
+
+1. **Character Phase and Defection Checks: M6.** Until then Publish does not require the Character Phase.
+2. **The server verifies that a phase reproduces from its frozen inputs and dice, not that the inputs match history.** Currency of history is guaranteed by If-History-Version plus the client computing from freshly fetched history. Deriving the inputs server-side would need the replay in C#, which is not planned.
+3. **Design-mode edits after a committed turn** (e.g. a baseline change) do not re-run that turn; its stored Effects stand. M7 (history and reinterpretation) adds stale-turn flags.
+4. **Lead availability** is still recorded on the session's Decisive Scenes panel. The Opening only reads it.
+5. **The panel was built and type-checked but not viewed in a browser here.** Please give it a look.
+6. **Data you must author** before turns are meaningful:
+   - Planning goals need a milestone and its discoverability;
+   - Adjudicated goals need their contract.
+
+   Otherwise they are listed as not eligible on the Board, which the e2e had to work around by giving test goals milestones.

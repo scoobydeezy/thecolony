@@ -58,4 +58,10 @@ public class Character
 
     // Spatial location
     public string? LocationId { get; set; }
+    // M1: Live campaigns record when an entity enters the world (absent from replay before this Event).
+    public string? IntroducedAtEventId { get; set; }
+    // M6 (BOARD-GAME-REVIEW §17.3, §17.5): proximity to a Defection Check. Changes only through Effects (Character Phase,
+    // Settling, the Defection Check, or play). Reaffirmed: a lasting eligibility marker for the faction it was earned in.
+    public CharacterInstability Instability { get; set; } = CharacterInstability.Stable;
+    public string? ReaffirmedFactionId { get; set; }
 }

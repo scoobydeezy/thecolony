@@ -14,4 +14,6 @@ public class Asset
     public string? LocationId { get; set; }
     public AssetStatus Status { get; set; } = AssetStatus.Stable;
     public string? StatusActorFactionId { get; set; }
+    // M1: Live campaigns record when an entity enters the world (absent from replay before this Event).
+    public string? IntroducedAtEventId { get; set; }
 }

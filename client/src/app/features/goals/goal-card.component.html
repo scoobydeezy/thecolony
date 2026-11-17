@@ -1,0 +1,112 @@
+@let g = goal();
+@if (!resolved()) {
+  <div class="entity-card goal-card" [class.goal-card--compact]="compact()" [class.goal-card--gm]="g.conditionType === 'Achieve' && g.outcomeMode === 'Adjudicated'"
+       [attr.title]="g.conditionType === 'Achieve' && g.outcomeMode === 'Adjudicated' ? 'GM resolves: success creates a resolution task' : null">
+    <!-- priority -->
+    <div class="goal-priority-col">
+      <app-priority-icon [priority]="g.priority" [class]="'goal-priority-icon priority-' + g.priority.toLowerCase()" [title]="g.priority"></app-priority-icon>
+    </div>
+    <!-- content -->
+    <div class="goal-content">
+      <div class="goal-row-top">
+        <span class="goal-name">{{ g.title }}</span>
+        @if (showFaction() && faction(); as f) { <a class="goal-faction" [routerLink]="['/factions', f.id]">{{ f.name }}</a> }
+        @if (!compact()) { <span [class]="'badge ' + visibilityClass(g.visibility)">{{ g.visibility }}</span> }
+        @if (g.conditionType === 'Maintain') { <span class="badge badge-maintain" title="A defensive assignment">Maintain</span> }
+        @if (alsoChampions(); as others) {
+          <span class="badge status-stalled" [title]="'This champion also holds ' + others + '. Existing data is kept as is; a new duplicate is refused. Reassign one to resolve it.'">
+            <i class="fa-solid fa-user-group"></i> Champion shared
+          </span>
+        }
+      </div>
+      @if (targetLabel()) {
+        <div class="goal-row-bottom"><span class="target-item">TARGET: <strong>{{ targetLabel() }}</strong></span></div>
+      }
+      @if (!compact() && g.conditionType === 'Achieve') {
+        <!-- what becomes true: the World Conditions the goal drives, by stage -->
+        @if (worldWhenProgressing().length) {
+          <div class="goal-row-bottom"><span class="target-item">{{ g.status === 'Plotting' ? 'WHEN PROGRESSING' : 'NOW TRUE' }}: <strong>{{ worldWhenProgressing().join(' · ') }}</strong></span></div>
+        }
+        @if (worldWhenComplete().length) {
+          <div class="goal-row-bottom"><span class="target-item">WHEN COMPLETE: <strong>{{ worldWhenComplete().join(' · ') }}</strong></span></div>
+        }
+        @if (onProgressing().length && g.status === 'Plotting') {
+          <div class="goal-row-bottom"><span class="target-item">ON FIRST SUCCESS: <strong>{{ onProgressing().join(' · ') }}</strong></span></div>
+        }
+        @if (onAccomplished().length) {
+          <div class="goal-row-bottom"><span class="target-item">ON COMPLETION: <strong>{{ onAccomplished().join(' · ') }}</strong></span></div>
+        }
+      }
+      <!-- M4 overlays: why the goal is (not) in the Faction Phase pool -->
+      @if (ga(); as a) {
+        <div class="goal-row-bottom goal-overlays">
+          @if (g.conditionType === 'Achieve') {
+            @if (a.dormant) { <span class="badge status-stalled" [title]="a.dormant">Dormant: {{ a.dormant }}</span> }
+            @if (a.ready) {
+              <span class="badge status-progressing" [title]="'Awaiting the GM since Session ' + a.ready.sinceSession + ': resolve it from that session\'s resolution tasks'">Ready to Resolve</span>
+            }
+            @if (a.alreadyHolds) { <span class="badge status-stalled" title="The target is already true but was never brought about (no transition), so it cannot complete. Retire or edit the goal.">Target already holds</span> }
+          }
+          @if (a.notYetEligible) {
+            <span class="badge status-plotting" [title]="g.conditionType === 'Achieve' ? 'Not pursued in the Faction Phase before this Act; Session Events can still fulfil it'
+              : 'Not in force before this Act: it neither defends nor guards its target'">From {{ actLabel(a.notYetEligible) }}</span>
+          }
+          @if (a.obsolete) { <span class="badge status-failed" [title]="'Obsolete: ' + a.obsolete + '. Retire it from the goal editor (Design) or with a status effect (play).'">Obsolete: {{ a.obsolete }}</span> }
+        </div>
+      }
+    </div>
+    <!-- status (Maintain: Defending / Inactive, derived) -->
+    @if (g.conditionType === 'Maintain' && ga()?.defense; as d) {
+      <div [class]="'goal-status-pill ' + (d.active ? 'status-progressing' : 'status-stalled')" [title]="d.reason">
+        <i [class]="'fa-solid ' + (d.active ? 'fa-shield-halved' : 'fa-shield')"></i>
+        {{ d.active ? 'DEFENDING' : 'INACTIVE' }}
+      </div>
+    } @else {
+      <div [class]="'goal-status-pill ' + statusClass(g)">
+        <i [class]="'fa-solid ' + statusIcon(g)"></i>
+        {{ statusLabel(g).toUpperCase() }}
+      </div>
+    }
+    <!-- champion -->
+    <div class="goal-champion-col">
+      @if (champion(); as c) {
+        <div class="champion-avatar" [title]="c.name" [class.champion-avatar--inactive]="isChampionInactive(c)" [style.background-image]="'url(' + championPortrait(c) + ')'">
+          @if (stateIconClass(c.state)) { <i [class]="stateIconClass(c.state) + ' champion-avatar__state-icon'"></i> }
+        </div>
+      }
+    </div>
+    <!-- actions -->
+    <div class="goal-actions">
+      @if (editable()) {
+        <button class="goal-icon-btn" (click)="edit.emit(g)" title="Edit" aria-label="Edit goal"><i class="fa-solid fa-pen"></i></button>
+      }
+    </div>
+  </div>
+} @else {
+  <div class="entity-card goal-card goal-card--resolved" [class.goal-card--compact]="compact()">
+    <div class="goal-priority-col">
+      @if (g.status === 'Accomplished') {
+        <i class="fa-solid fa-check goal-priority-icon goal-accomplished" title="Accomplished"></i>
+      } @else if (g.status === 'Retired') {
+        <i class="fa-solid fa-box-archive goal-priority-icon" title="Retired: set aside as impossible or obsolete"></i>
+      } @else {
+        <i class="fa-solid fa-xmark goal-priority-icon goal-failed" title="Failed"></i>
+      }
+    </div>
+    <div class="goal-content">
+      <div class="goal-row-top">
+        <span class="goal-name">{{ g.title }}</span>
+        @if (showFaction() && faction(); as f) { <a class="goal-faction" [routerLink]="['/factions', f.id]">{{ f.name }}</a> }
+      </div>
+      @if (targetLabel()) { <div class="goal-row-bottom"><span class="target-item">{{ targetLabel() }}</span></div> }
+      @if (g.status === 'Accomplished' && g.accomplishedBy !== undefined) {
+        <div class="goal-row-bottom"><span class="target-item">ACCOMPLISHED BY: <strong>{{ accomplisherName(g.accomplishedBy) }}</strong></span></div>
+      }
+    </div>
+    <div class="goal-actions">
+      @if (editable()) {
+        <button class="goal-icon-btn" (click)="edit.emit(g)" title="Edit" aria-label="Edit goal"><i class="fa-solid fa-pen"></i></button>
+      }
+    </div>
+  </div>
+}

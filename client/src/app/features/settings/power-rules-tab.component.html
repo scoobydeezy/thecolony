@@ -16,134 +16,42 @@
     </small>
   </div>
 
-  <!-- Faction Character Influence -->
+  <!-- Faction Power: capacity channels in plain points (§18.7) -->
   <div class="card">
-    <h3 class="section-title">Faction Character Influence</h3>
+    <h3 class="section-title">Faction Power: Capacity Channels</h3>
     <p class="help-text">
-      A faction's character influence is a weighted blend of the average and maximum member influence scores.
-      Weights should sum to 1.
+      Power is the number of tokens a faction draws from its bag in the Faction Phase (one per eligible goal, and one per
+      threatened assignment): one for each channel at its threshold, 0 to 3. No baseline, no minimum, no modifiers. Each channel is counted in whole points, so it can be checked with
+      character tokens and Asset cards. A Destroyed Asset counts nothing; Damaged and Contested Assets count in full.
     </p>
     <div class="formula-row">
-      <code class="formula">charInfluence = avg × memberAvgWeight + max × memberMaxWeight</code>
+      <code class="formula">People = leader bonus + ⌊Faction Size ÷ per point⌋ · Holdings = ★ Operational + Strategic + Covert · Mandate = ★ Symbolic + Mandate</code>
     </div>
     <div class="fields-2">
       <div class="field-group">
-        <label>Member Avg Weight</label>
-        <small>Default: 0.6</small>
-        <input type="number" step="0.05" [formField]="f.memberAvgWeight" />
+        <label>People threshold</label>
+        <small>Default: 10 points. People = leader bonus + ⌊Faction Size ÷ members per point⌋; named characters add nothing</small>
+        <input type="number" step="1" [formField]="f.peoplePoints" />
       </div>
       <div class="field-group">
-        <label>Member Max Weight</label>
-        <small>Default: 0.4</small>
-        <input type="number" step="0.05" [formField]="f.memberMaxWeight" />
-      </div>
-    </div>
-  </div>
-
-  <!-- Organization -->
-  <div class="card">
-    <h3 class="section-title">Organization</h3>
-    <p class="help-text">
-      Organization measures operational capability — a weighted blend of character strength, asset holdings, and momentum.
-      Weights should sum to 1.
-    </p>
-    <div class="formula-row">
-      <code class="formula">organization = charStrength × charWeight + assetInfluence × assetInfluenceWeight + normalizedMomentum × momentumWeight</code>
-    </div>
-    <div class="fields-3">
-      <div class="field-group">
-        <label>Char Influence Weight</label>
-        <small>Default: 0.40</small>
-        <input type="number" step="0.05" [formField]="f.charInfluenceWeight" />
+        <label>Leader bonus</label>
+        <small>Default: 5 points, while the leader is alive and in the faction</small>
+        <input type="number" step="1" [formField]="f.leaderBonus" />
       </div>
       <div class="field-group">
-        <label>Asset Influence Weight</label>
-        <small>Default: 0.40</small>
-        <input type="number" step="0.05" [formField]="f.assetInfluenceWeight" />
+        <label>Members per point</label>
+        <small>Default: 20. Faction Size is the recorded total membership; only whole groups count (19 → 0, 20 → 1)</small>
+        <input type="number" step="1" [formField]="f.membersPerPoint" />
       </div>
       <div class="field-group">
-        <label>Momentum Weight</label>
-        <small>Default: 0.20</small>
-        <input type="number" step="0.05" [formField]="f.momentumInfluenceWeight" />
-      </div>
-    </div>
-    <div class="fields-2" style="margin-top: 0.75rem">
-      <div class="field-group">
-        <label>Asset Influence Scale</label>
-        <small>Default: 25 — raw asset tier sum that maps to 100% on the 0–100 scale</small>
-        <input type="number" step="1" [formField]="f.assetInfluenceScale" />
-      </div>
-    </div>
-  </div>
-
-  <!-- Legitimacy -->
-  <div class="card">
-    <h3 class="section-title">Legitimacy</h3>
-    <p class="help-text">
-      Legitimacy measures public trust — a weighted blend of the faction's base legitimacy and its asset legitimacy score.
-    </p>
-    <div class="formula-row">
-      <code class="formula">legitimacy = baseLegitimacy × baseLegitimacyWeight + assetLegitimacy × assetLegitimacyWeight</code>
-    </div>
-    <div class="fields-2">
-      <div class="field-group">
-        <label>Base Legitimacy Weight</label>
-        <small>Default: 0.70</small>
-        <input type="number" step="0.05" [formField]="f.baseLegitimacyWeight" />
+        <label>Holdings threshold</label>
+        <small>Default: 15 stars of controlled Operational, Strategic and Covert Assets</small>
+        <input type="number" step="1" [formField]="f.holdingsPoints" />
       </div>
       <div class="field-group">
-        <label>Asset Legitimacy Weight</label>
-        <small>Default: 0.30</small>
-        <input type="number" step="0.05" [formField]="f.assetLegitimacyWeight" />
-      </div>
-    </div>
-    <div class="fields-2" style="margin-top: 0.75rem">
-      <div class="field-group">
-        <label>Asset Legitimacy Scale</label>
-        <small>Default: 25 — raw asset tier sum that maps to 100% on the 0–100 scale</small>
-        <input type="number" step="1" [formField]="f.assetLegitimacyScale" />
-      </div>
-    </div>
-  </div>
-
-  <!-- Faction Power -->
-  <div class="card">
-    <h3 class="section-title">Faction Power</h3>
-    <p class="help-text">
-      Power combines Organization and Legitimacy. The legitimacy multiplier scales from a floor at legitimacy 0 up through legitimacyScale.
-    </p>
-    <div class="formula-row">
-      <code class="formula">power = organization × (legitimacyBase + legitimacy / legitimacyScale) + powerModifier</code>
-    </div>
-    <div class="fields-2">
-      <div class="field-group">
-        <label>Legitimacy Base</label>
-        <small>Default: 0.5 — power floor when legitimacy = 0</small>
-        <input type="number" step="0.05" [formField]="f.legitimacyBase" />
-      </div>
-      <div class="field-group">
-        <label>Legitimacy Scale</label>
-        <small>Default: 100 — full legitimacy doubles the base</small>
-        <input type="number" step="10" [formField]="f.legitimacyScale" />
-      </div>
-    </div>
-  </div>
-
-  <!-- Leaderless Penalty -->
-  <div class="card">
-    <h3 class="section-title">Leaderless Penalty</h3>
-    <p class="help-text">
-      If a faction has no alive Faction Leader, its character strength is multiplied by this value.
-      Set to 1 to disable the penalty.
-    </p>
-    <div class="formula-row">
-      <code class="formula">charStrength × leaderlessPowerMultiplier (when no alive leader)</code>
-    </div>
-    <div class="fields-1">
-      <div class="field-group">
-        <label>Leaderless Power Multiplier</label>
-        <small>Default: 0.75 — 25% reduction to character strength</small>
-        <input type="number" step="0.05" [formField]="f.leaderlessPowerMultiplier" />
+        <label>Mandate threshold</label>
+        <small>Default: 5 stars of controlled Symbolic and Mandate Assets</small>
+        <input type="number" step="1" [formField]="f.mandatePoints" />
       </div>
     </div>
   </div>

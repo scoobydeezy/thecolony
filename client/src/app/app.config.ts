@@ -1,6 +1,7 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { apiErrorInterceptor } from './core/services/api-error.interceptor';
 import { routes } from './app.routes';
 import { Chart, registerables } from 'chart.js';
 import Annotation from 'chartjs-plugin-annotation';
@@ -11,6 +12,6 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([apiErrorInterceptor])),
   ]
 };

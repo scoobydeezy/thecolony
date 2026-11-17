@@ -78,7 +78,7 @@
 <div class="card" style="margin-top:1.5rem; margin-bottom:1.5rem;">
   <div class="section-header">
     <h3 class="section-title">Manual Score Bumps</h3>
-    @if (!store.isViewingSnapshot()) {
+    @if (!store.isViewingSnapshot() && !store.isLive()) {
       <button class="btn btn-primary btn-sm" (click)="openAddOverride()">+ Add Override</button>
     }
   </div>
@@ -97,7 +97,7 @@
             <td [class]="o.scoreBump >= 0 ? 'pos' : 'neg'">{{ o.scoreBump > 0 ? '+' : '' }}{{ o.scoreBump }}</td>
             <td>{{ o.notes ?? '—' }}</td>
             <td class="col-actions">
-              @if (!store.isViewingSnapshot()) {
+              @if (!store.isViewingSnapshot() && !store.isLive()) {
                 <button class="btn btn-secondary btn-sm" (click)="openEditOverride(o.id)">Edit</button>
                 <button class="btn btn-danger btn-sm" (click)="deleteOverride(o.id)">Delete</button>
               }
@@ -111,22 +111,30 @@
   }
 </div>
 
-<!-- ── Stress ──────────────────────────────────────────────────────────────── -->
+<!-- ── Stress simulation (§18.10) ────────────────────────────────────────── -->
 <div class="card tuner-card tuner-card-stress">
-  <div class="tuner-header stress-header">Global Stress</div>
+  <div class="tuner-header stress-header">Stress Simulation</div>
   <div class="tuner-group">
     <div class="tuner-control">
-      <input type="range" min="0" max="10" step="1"
-        [value]="stress"
-        [disabled]="store.isViewingSnapshot()"
-        (input)="setStress(+$any($event.target).value)" />
-      <span class="stress-value" [class]="stress >= 7 ? 'danger' : stress >= 4 ? 'warn' : 'ok'">
-        {{ stress }} / 10
+      <input type="range" min="0" max="10" step="1" aria-label="Simulated Colony Stress"
+        [value]="stress()"
+        (input)="simulate(+$any($event.target).value)" />
+      <span class="stress-value" [class]="stress() >= 7 ? 'danger' : stress() >= 4 ? 'warn' : 'ok'">
+        {{ stress() }} / 10
       </span>
+      @if (simulating()) {
+        <button type="button" class="btn btn-secondary btn-sm" (click)="resetSimulation()">Reset to actual ({{ actualStress() }})</button>
+      }
     </div>
-    @if (store.isViewingSnapshot()) {
-      <p class="tuner-snapshot-note">Showing snapshot stress. Edit baseline to change.</p>
-    }
+    <p class="tuner-snapshot-note">
+      @if (simulating()) {
+        Simulating Stress {{ stress() }}: the matrix shows how relationships would score; nothing is saved, and the actual
+        Colony Stress is {{ actualStress() }}.
+      } @else {
+        Actual Colony Stress {{ actualStress() }}, from the World Conditions in force{{ store.isViewingSnapshot() ? ' at this snapshot' : '' }}.
+        Drag to preview relationships at another Stress.
+      }
+    </p>
   </div>
 </div>
 
@@ -155,7 +163,7 @@
           <span>Base Score</span><strong>{{ r.baseScore }}</strong>
         </div>
         <div class="total-row">
-          <span>After Stress ({{ stress }})</span>
+          <span>After Stress ({{ stress() }}{{ simulating() ? ', simulated' : '' }})</span>
           <strong>{{ r.stressedScore }}</strong>
         </div>
         @if (r.manualBump !== 0) {

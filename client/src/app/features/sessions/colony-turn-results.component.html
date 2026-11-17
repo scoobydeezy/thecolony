@@ -1,0 +1,59 @@
+@if (cards().length === 0) {
+    <div class="ct-empty">No new world states this turn.</div>
+  } @else {
+    <div class="fp-grid">
+      @for (f of cards(); track f.id) {
+        <div class="fp-col">
+          <div class="fp-card">
+            <div class="fp-head">
+              <span class="fp-name">{{ f.name }}</span>
+              @if (f.momentum > 0) {
+                <span class="fp-mom fp-mom--up" [title]="'Momentum gained (applies at the next Colony Turn): ' + f.momentumReasons.join('; ')"><i class="fa-solid fa-arrow-trend-up"></i>+1</span>
+              } @else if (f.momentum < 0) {
+                <span class="fp-mom fp-mom--down" [title]="'Momentum lost (applies at the next Colony Turn): ' + f.momentumReasons.join('; ')"><i class="fa-solid fa-arrow-trend-down"></i>−1</span>
+              }
+            </div>
+            @for (x of f.items; track $index) {
+              <div class="fp-goal rv-item">
+                <div [class]="'fp-goal-title rv-title rv-title--' + x.tone">
+                  <i [class]="x.kind === 'goal' ? 'fa-solid fa-bullseye' : 'fa-solid fa-user'"></i> {{ x.title }}
+                  @if (x.dots) {
+                    <span class="fp-dots" [title]="instabilityLabel(x.dots)" [attr.aria-label]="instabilityLabel(x.dots)">
+                      @for (d of [1, 2, 3]; track d) { <i class="fp-dot" [class.fp-dot--on]="d <= x.dots"></i> }
+                    </span>
+                  }
+                </div>
+                <p class="fp-world-text rv-text">{{ x.text }}</p>
+              </div>
+            } @empty {
+              <div class="fp-goal"><span class="fp-note">No new world states; Momentum only.</span></div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+  @if (conditions(); as conditions) { @if (conditions.started.length || conditions.ended.length) {
+    <div class="rv-conditions">
+      <span class="ct-sub"><i class="fa-solid fa-scroll"></i> World Conditions</span>
+      @for (c of conditions.started; track c.condition.id) {
+        <div class="rv-cond" [title]="c.reason"><span class="rv-cond-on">Now in force</span> <strong>{{ c.condition.title }}</strong>@if (c.condition.rule) { : {{ c.condition.rule }} }</div>
+      }
+      @for (c of conditions.ended; track c.condition.id) {
+        <div class="rv-cond" [title]="c.reason"><span class="rv-cond-off">No longer in force</span> <strong>{{ c.condition.title }}</strong></div>
+      }
+    </div>
+  }
+  }
+  <button type="button" class="rv-toggle" (click)="showDetails.set(!showDetails())" [attr.aria-expanded]="showDetails()">
+    <i class="fa-solid" [class.fa-chevron-down]="!showDetails()" [class.fa-chevron-up]="showDetails()"></i> Details
+  </button>
+  @if (showDetails()) {
+    <div class="ct-summary">
+      @for (sec of details(); track sec.title) {
+        <div class="ct-done"><span class="ct-sub">{{ sec.title }}</span>
+          @for (x of sec.items; track $index) { <span [class]="x.cls">{{ x.text }}</span> }
+        </div>
+      }
+    </div>
+  }

@@ -21,6 +21,11 @@ public interface IScoringEngine
 
 public class ScoringEngine : IScoringEngine
 {
+    /// <summary>§18.10: the server stores no Colony Stress (it is derived on the client from the World Conditions in force),
+    /// so its scores are at Stress 0. The client re-scores every relationship at the viewed Stress; the server's list
+    /// supplies the pairs.</summary>
+    public const int ServerStress = 0;
+
     public RelationshipBreakdownDto ScoreRelationship(
         Faction source,
         Faction target,
@@ -49,7 +54,7 @@ public class ScoringEngine : IScoringEngine
             source.BeliefC, source.BeliefA, source.BeliefB,
             cs.PartyTruthValue, cs.PartyStabilityValue, cs.PartyAgencyValue,
             cs.PartyBeliefC, cs.PartyBeliefA, cs.PartyBeliefB,
-            cs.ColonyStress, manualBump, rules);
+            ServerStress, manualBump, rules);
     }
 
     private static RelationshipBreakdownDto Score(
@@ -60,33 +65,22 @@ public class ScoringEngine : IScoringEngine
         BeliefPosition? targetBeliefc, BeliefPosition? targetBeliefa, BeliefPosition? targetBeliefb,
         int colonyStress, int manualBump, RulesConfig rules)
     {
-        // BeliefC weighted by source's Agency value; Neutral on either side = buffer (0)
-        double beliefcRaw = ScoreBelief(sourceBeliefc, targetBeliefc,
-            a => a == BeliefPosition.Neutral, rules) * sAgency;
+        // Same formula as client core/services/scoring.service.ts (SCORING-AUDIT.md); keep the two in step.
+        // Beliefs: three positions on every axis; weight = blend·(source Value) + (1 − blend)/3.
+        double blend = Math.Clamp(rules.BeliefWeightBlend, 0, 1), equal = (1 - blend) / 3;
+        double beliefcContrib = ClampByEnabled(ScoreBelief(sourceBeliefc, targetBeliefc, rules) * (blend * sAgency + equal), rules);
+        double beliefaContrib = ClampByEnabled(ScoreBelief(sourceBeliefa, targetBeliefa, rules) * (blend * sTruth + equal), rules);
+        double beliefbContrib = ClampByEnabled(ScoreBelief(sourceBeliefb, targetBeliefb, rules) * (blend * sStability + equal), rules);
 
-        // BeliefA weighted by source's Truth value; Neutral on either side = buffer (0)
-        double beliefaRaw = ScoreBelief(sourceBeliefa, targetBeliefa,
-            a => a == BeliefPosition.Neutral, rules) * sTruth;
-
-        // BeliefB weighted by source's Stability value; no buffer position
-        double beliefbRaw = ScoreBelief(sourceBeliefb, targetBeliefb,
-            _ => false, rules) * sStability;
-
-        // Apply enabled flags: clamp each contribution so only the allowed sign passes through
-        double beliefcContrib = ClampByEnabled(beliefcRaw, rules);
-        double beliefaContrib = ClampByEnabled(beliefaRaw, rules);
-        double beliefbContrib = ClampByEnabled(beliefbRaw, rules);
-
-        double alignmentRaw = Dot(sTruth, sStability, sAgency, tTruth, tStability, tAgency)
-                              * rules.ValueAlignmentScale;
-        double conflictRaw  = Dot(sTruth, sStability, sAgency, 1 - tTruth, 1 - tStability, 1 - tAgency)
-                              * rules.ValueConflictScale;
-
-        double alignment = rules.PositiveEnabled ? alignmentRaw : 0;
-        double conflict  = rules.NegativeEnabled ? conflictRaw  : 0;
+        // Values: similarity 1 − 2·distance (symmetric) and opposition Σ sᵢ·max(0, sᵢ − tᵢ) (directional).
+        double distance   = (Math.Abs(sTruth - tTruth) + Math.Abs(sStability - tStability) + Math.Abs(sAgency - tAgency)) / 2;
+        double opposition = sTruth * Math.Max(0, sTruth - tTruth) + sStability * Math.Max(0, sStability - tStability)
+                          + sAgency * Math.Max(0, sAgency - tAgency);
+        double similarity = ClampByEnabled((1 - 2 * distance) * rules.ValueSimilarityScale, rules);
+        double oppose     = ClampByEnabled(-opposition * rules.ValueOppositionScale, rules);
 
         double beliefSubScore = beliefcContrib + beliefaContrib + beliefbContrib;
-        double valueSubScore  = alignment - conflict;
+        double valueSubScore  = similarity + oppose;
 
         // Stress-weight scaling: shifts composition from belief-driven to value-driven as stress rises.
         // Both sub-scores remain additive; only their relative weight changes.
@@ -121,8 +115,8 @@ public class ScoringEngine : IScoringEngine
                 BeliefC        = Math.Round(beliefcContrib, 1),
                 BeliefA        = Math.Round(beliefaContrib, 1),
                 BeliefB        = Math.Round(beliefbContrib, 1),
-                ValueAlignment = Math.Round(alignment, 1),
-                ValueConflict  = Math.Round(-conflict, 1),
+                ValueSimilarity = Math.Round(similarity, 1),
+                ValueOpposition = Math.Round(oppose, 1),
                 BeliefSubScore = Math.Round(beliefSubScore, 1),
                 ValueSubScore  = Math.Round(valueSubScore, 1),
                 StressWeight   = Math.Round(stressWeight, 3)
@@ -138,18 +132,20 @@ public class ScoringEngine : IScoringEngine
         return value;
     }
 
-    private static double ScoreBelief<T>(T? a, T? b, Func<T, bool> isBuffer, RulesConfig rules)
-        where T : struct
+    // Same → BeliefMatch; middle vs pole → BeliefAdjacent; opposite poles → BeliefConflict; unset → 0.
+    private static double ScoreBelief(BeliefPosition? a, BeliefPosition? b, RulesConfig rules)
     {
         if (!a.HasValue || !b.HasValue) return 0;
-        if (isBuffer(a.Value) || isBuffer(b.Value)) return 0;
-        return EqualityComparer<T>.Default.Equals(a.Value, b.Value)
-            ? rules.BeliefMatch
-            : rules.BeliefConflict;
+        int gap = Math.Abs(Rank(a.Value) - Rank(b.Value));
+        return gap == 0 ? rules.BeliefMatch : gap == 1 ? rules.BeliefAdjacent : rules.BeliefConflict;
     }
 
-    private static double Dot(double at, double as_, double aa, double bt, double bs, double ba)
-        => at * bt + as_ * bs + aa * ba;
+    private static int Rank(BeliefPosition p) => p switch
+    {
+        BeliefPosition.Negative => 0,
+        BeliefPosition.Neutral  => 1,
+        _                       => 2,
+    };
 
     // t in [0,1] → curve output in [0,1]
     private static double ApplyCurve(double t, StressWeightCurve curve) => curve switch

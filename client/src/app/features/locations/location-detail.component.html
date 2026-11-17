@@ -15,7 +15,7 @@
       @if (!isEditing()) {
         <div class="header-title-row">
           <h2>{{ loc.name }}</h2>
-          <span [class]="'state-badge ' + stateClass(loc.state)">{{ loc.state }}</span>
+          <span [class]="'state-badge ' + stateClass(loc.state)">{{ locationStateLabel(loc.state) }}</span>
           @if (!store.isViewingSnapshot()) {
             <button class="btn btn-ghost btn-sm" (click)="startEdit()">
               <i class="fa-solid fa-pen"></i> Edit
@@ -99,7 +99,7 @@
             @for (child of childLocations(); track child.id) {
               <a [routerLink]="['/locations', child.id]" class="entity-row">
                 <span class="entity-name">{{ child.name }}</span>
-                <span [class]="'state-badge ' + stateClass(child.state)">{{ child.state }}</span>
+                <span [class]="'state-badge ' + stateClass(child.state)">{{ locationStateLabel(child.state) }}</span>
               </a>
             }
           </div>

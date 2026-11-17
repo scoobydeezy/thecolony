@@ -16,6 +16,10 @@ public class EventEffect
     public string? SecondaryTargetId { get; set; }
     // For asset status changes — the faction responsible for the state change
     public string? ActorFactionId { get; set; }
+    // M1: provenance and explicit order within the Event
+    public EffectOrigin Origin { get; set; } = EffectOrigin.Manual;
+    public int Ordinal { get; set; }
+    public string? PhaseId { get; set; }
     [JsonIgnore]
     public Event? Event { get; set; }
 }

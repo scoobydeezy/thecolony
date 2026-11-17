@@ -1,7 +1,7 @@
 import { Component, inject, computed, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { AppStore } from '../../store/app.store';
-import { Location, LocationState, LOCATION_STATE_OPTIONS } from '../../core/models/types';
+import { Location, LocationState, LOCATION_STATE_OPTIONS, locationStateLabel } from '../../core/models/types';
 import { FormField, form } from '@angular/forms/signals';
 
 interface LocationFormModel {
@@ -23,9 +23,10 @@ export class LocationDetailComponent {
   private route = inject(ActivatedRoute);
   store = inject(AppStore);
 
+  readonly locationStateLabel = locationStateLabel;
   readonly stateOptions = LOCATION_STATE_OPTIONS;
   readonly isEditing = signal(false);
-  readonly editForm = signal<LocationFormModel>({ id: '', name: '', description: '', parentLocationId: '', state: 'Active' });
+  readonly editForm = signal<LocationFormModel>({ id: '', name: '', description: '', parentLocationId: '', state: 'Stable' });
   readonly f = form(this.editForm);
 
   // ── Derived from route ────────────────────────────────────────────────────
@@ -145,12 +146,7 @@ export class LocationDetailComponent {
   }
 
   stateClass(state: LocationState): string {
-    const map: Record<LocationState, string> = {
-      Active:    'state-active',
-      Abandoned: 'state-abandoned',
-      Ruined:    'state-ruined',
-      Unknown:   'state-unknown',
-    };
+    const map: Record<LocationState, string> = { Stable: 'state-stable', ActiveIncursion: 'state-incursion', Unstable: 'state-unstable' };
     return map[state];
   }
 }

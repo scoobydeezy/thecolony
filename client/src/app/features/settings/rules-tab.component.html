@@ -3,8 +3,9 @@
   <div class="card">
     <h3 class="section-title">Relationship Preview</h3>
     <p class="help-text">
-      Five archetype pairs across the full relationship spectrum — scores at each global stress level using current rule values.
-      Dashed lines mark threshold boundaries. Changes to any rule update the chart immediately.
+      Archetype pairs across the relationship spectrum, scored at each global stress level with the current values
+      (unsaved edits included). The two moderate/purist lines show the formula's directionality. Dashed lines mark the
+      label thresholds.
     </p>
     <div class="preview-chart-wrap">
       <canvas baseChart
@@ -15,12 +16,63 @@
     </div>
   </div>
 
+  <!-- Relationship Formula -->
+  <div class="card">
+    <h3 class="section-title">Relationship Formula</h3>
+    <p class="help-text">
+      A relationship is directional: how the source sees the target. Score = Values + Beliefs, then the stress
+      composition and multipliers below, then manual bumps. The same score drives every relationship view, character
+      compatibility, and the Defection Check. Defaults are provisional until the balancing pass.
+    </p>
+    <div class="rule-group">
+      <h4>Values (position on the triangle)</h4>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Similarity</label>
+          <input type="number" step="0.5" [formField]="rulesForm.valueSimilarityScale" />
+          <small>× closeness: +1 for identical positions anywhere (including the centre), −1 for opposite corners. Default {{ defaults.valueSimilarityScale }}</small>
+        </div>
+        <div class="form-group">
+          <label>Opposition</label>
+          <input type="number" step="0.5" [formField]="rulesForm.valueOppositionScale" />
+          <small>× how much of what the source cares about the target lacks (0–1), subtracted. A purist is put off by a moderate more than the reverse. Default {{ defaults.valueOppositionScale }}</small>
+        </div>
+      </div>
+    </div>
+    <div class="rule-group">
+      <h4>Beliefs (three positions per axis; the middle is a position)</h4>
+      <div class="grid-2">
+        <div class="form-group">
+          <label>Same position</label>
+          <input type="number" step="0.1" [formField]="rulesForm.beliefMatch" />
+          <small>Both hold the same position, including both in the middle. Default +{{ defaults.beliefMatch }}</small>
+        </div>
+        <div class="form-group">
+          <label>Middle vs pole</label>
+          <input type="number" step="0.1" [formField]="rulesForm.beliefAdjacent" />
+          <small>One holds the middle, the other a pole: milder than opposite poles. Default {{ defaults.beliefAdjacent }}</small>
+        </div>
+        <div class="form-group">
+          <label>Opposite poles</label>
+          <input type="number" step="0.1" [formField]="rulesForm.beliefConflict" />
+          <small>Default {{ defaults.beliefConflict }}</small>
+        </div>
+        <div class="form-group">
+          <label>Value weighting (0–1)</label>
+          <input type="number" step="0.1" [formField]="rulesForm.beliefWeightBlend" />
+          <small>How much each axis counts: 1 = by the source's own Value on that axis, 0 = all axes equal. Default {{ defaults.beliefWeightBlend }}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Stress-Weight Composition -->
   <div class="card">
     <h3 class="section-title">Stress-Weight Composition</h3>
     <p class="help-text">
-      When enabled, Global Stress shifts which layer of ideology drives relationships.
-      At low stress, belief positions dominate. At high stress, core values dominate.
+      When enabled, Global Stress shifts which layer of ideology drives relationships: at low stress beliefs
+      (methods) carry full weight; as stress rises, Values (priorities) take over. In the preview, "Shared values,
+      opposed methods" warms as stress rises.
     </p>
     <div class="toggle-row">
       <label class="tuner-toggle" title="Enable stress-weight composition">
@@ -71,41 +123,10 @@
     </div>
   </div>
 
-  <!-- Relationship Rule Scores -->
-  <div class="card">
-    <h3 class="section-title">Relationship Multipliers</h3>
-    <p class="help-text">
-      Belief multipliers are weighted by the importance of its corresponding value to the faction or character.
-    </p>
-    <div class="rules-grid">
-      <div class="rule-group">
-        <h4>Values</h4>
-        <div class="rule-row">
-          <span class="rule-label">Alignment</span>
-          <input type="number" step="0.5" [formField]="rulesForm.valueAlignmentScale" />
-        </div>
-        <div class="rule-row">
-          <span class="rule-label">Conflict</span>
-          <input type="number" step="0.5" [formField]="rulesForm.valueConflictScale" />
-        </div>
-      </div>
-      <div class="rule-group">
-        <h4>Beliefs</h4>
-        <div class="rule-row">
-          <span class="rule-label">Matching</span>
-          <input type="number" step="0.1" [formField]="rulesForm.beliefMatch" />
-        </div>
-        <div class="rule-row">
-          <span class="rule-label">Conflicting</span>
-          <input type="number" step="0.1" [formField]="rulesForm.beliefConflict" />
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Enable/Disable Toggles -->
   <div class="card">
     <h3 class="section-title">Scoring Modes</h3>
+    <p class="help-text">Turning a mode off drops every contribution of that sign (value and belief terms) and its stress multiplier. For testing; normally both are on.</p>
     <div class="toggle-row">
       <label class="tuner-toggle" title="Enable positive relationship scoring">
         <input type="checkbox" [formField]="rulesForm.positiveEnabled" />
@@ -125,7 +146,7 @@
   <!-- Relationship Thresholds — editing parsed JSON sub-array, stays hand-rolled -->
   <div class="card">
     <h3 class="section-title">Relationship Thresholds</h3>
-    <p class="help-text">Minimum score required to reach each relationship level. Labels are applied top-down; the highest matching threshold wins. Hostile has no threshold — it applies to any score below Opposed.</p>
+    <p class="help-text">Minimum score required to reach each relationship level. Labels are applied top-down; the highest matching threshold wins. Hostile has no threshold — it applies to any score below Opposed. The Defection Check reads these labels.</p>
     <div class="threshold-rows">
       @for (label of thresholdLabels; track label) {
         <div class="rule-row threshold-row">

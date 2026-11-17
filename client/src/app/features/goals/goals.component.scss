@@ -1,0 +1,83 @@
+.toolbar {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; gap: 1rem; flex-wrap: wrap;
+  .filter-tabs {
+    display: flex; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+    button {
+      display: flex; gap: .5rem; align-items: center; background: none; border: none; padding: 0.5rem 1rem;
+      font-size: var(--text-size-body); color: var(--text-secondary); cursor: pointer; border-right: 1px solid var(--border);
+      transition: background 0.15s, color 0.15s;
+      &:last-child { border-right: none; }
+      &:hover { background: var(--bg-hover); color: var(--text-primary); }
+      &.active { background: var(--bg-active); color: var(--accent); font-weight: 600; }
+    }
+  }
+  .toolbar-actions { display: flex; gap: 0.5rem; margin-left: auto; }
+}
+.goals-filters {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-bottom: 1.25rem;
+  .form-input { width: auto; background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem 0.6rem;
+    font-size: var(--text-size-body); color: var(--text-primary); &:focus { outline: none; border-color: var(--accent); } }
+  .goals-search { min-width: 14rem; }
+}
+.goals-counts { margin-left: auto; font-size: var(--text-size-label); color: var(--text-muted); strong { color: var(--accent); } }
+.goals-group { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1.5rem; }
+.goals-group-header {
+  display: flex; align-items: baseline; gap: 0.6rem; padding-bottom: 0.4rem; margin-bottom: 0.2rem; border-bottom: 1px solid var(--border);
+}
+.goals-group-title { font-size: var(--text-size-section); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--text-secondary); text-decoration: none; }
+a.goals-group-title:hover { color: var(--accent); }
+.goals-group-note { font-size: var(--text-size-label); color: var(--text-muted); }
+.goals-group-count { margin-left: auto; font-size: var(--text-size-label); color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.goals-contest { font-size: var(--text-size-badge); font-weight: 600; color: #fbbf24; }
+.goals-group--contested .goals-group-header { border-bottom-color: color-mix(in srgb, #fbbf24 50%, var(--border)); }
+.empty-state { text-align: center; color: var(--text-muted); padding: 2.5rem; }
+
+.filter-tabs--off { opacity: 0.4; pointer-events: none; }
+.grid-intro { font-size: var(--text-size-label); color: var(--text-muted); margin: 0 0 1rem; max-width: 70rem; strong { color: var(--text-secondary); } }
+$banner-w: 52px;
+$banner-overhang: 4px;   // how far the banner peeks above the card's top edge (as on the Assets page)
+.plan-grid { position: relative; padding: 0.9rem 1rem 1rem; margin-bottom: 1.25rem; }
+// The faction's banner hangs from the card's top edge, in the priority-label column (as on the Assets page)
+.plan-banner {
+  position: absolute; top: -$banner-overhang; left: 1rem; width: $banner-w; height: calc(5.5rem + #{$banner-overhang});
+  display: flex; align-items: flex-start; justify-content: center; border-radius: 6px 6px 0 0;
+  &.faction-banner--centered-triangle  { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 22px), 50% 100%, 0 calc(100% - 22px)); }
+  &.faction-banner--left-triangle      { clip-path: polygon(0 0, 100% 0, 100% calc(100% - 22px), 0 100%); }
+  &.faction-banner--right-triangle     { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 calc(100% - 22px)); }
+  &.faction-banner--inverted-triangle  { clip-path: polygon(0 0, 100% 0, 100% 100%, 50% calc(100% - 22px), 0 100%); }
+  &.faction-banner--rectangle          { clip-path: none; }
+  &.faction-banner--semi-circle        { clip-path: none; border-radius: 6px 6px 50% 50% / 6px 6px 24px 24px; }
+  &.faction-banner--pennant            { clip-path: polygon(0 0, 100% 0, 50% 100%); border-radius: 0; }
+}
+.plan-banner-icon { width: 2rem; height: 2rem; margin-top: calc(0.9rem + #{$banner-overhang}); mask-size: contain; mask-repeat: no-repeat; mask-position: center;
+  -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; -webkit-mask-position: center; }
+.plan-head { display: grid; grid-template-columns: 5.5rem 1fr; gap: 0.5rem; margin-bottom: 0.9rem; }
+.plan-head-main { display: flex; align-items: baseline; gap: 1rem; min-height: 1.6rem; }
+.plan-faction { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); text-decoration: none; &:hover { color: var(--accent); } }
+.plan-power { font-size: 1.05rem; font-weight: 600; color: #34d399; cursor: default; &--zero { color: var(--text-muted); } }
+.plan-total { margin-left: auto; font-size: var(--text-size-label); color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.plan-cols, .plan-row { display: grid; grid-template-columns: 5.5rem repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
+.plan-cols { margin-bottom: 0.35rem; }
+.plan-act { text-align: left; padding-left: 0.1rem; font-size: var(--text-size-label); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-secondary); }
+.plan-row { margin-bottom: 0.5rem; }
+.plan-priority { align-self: center; font-size: var(--text-size-label); color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.plan-cell {
+  // even top and bottom padding, so one line sits centred; the right padding keeps text clear of the n/1 count
+  position: relative; min-height: 4.2rem; padding: 0.5rem 2.6rem 0.5rem 0.6rem; display: flex; align-items: center; gap: 0.75rem;
+  border: 1px solid var(--border); border-radius: 8px; background: var(--bg-surface);
+  &--open { justify-content: center; }
+  &--addable { cursor: pointer; &:hover { border-color: var(--accent); .plan-open { color: var(--accent); } } }
+  &--over { border-color: color-mix(in srgb, #f87171 70%, var(--border)); background: color-mix(in srgb, #f87171 6%, var(--bg-surface)); }
+}
+.plan-count { position: absolute; top: 0.35rem; right: 0.55rem; font-size: var(--text-size-badge); color: var(--text-muted); font-variant-numeric: tabular-nums;
+  &--over { color: #f87171; font-weight: 700; } }
+.plan-open { font-size: var(--text-size-label); font-style: italic; color: var(--text-muted); }
+.plan-goal { text-align: left; background: none; border: none; padding: 0.1rem 0; color: var(--text-primary); font-size: var(--text-size-body); cursor: pointer;
+  &:hover:not(:disabled) { color: var(--accent); } &:disabled { cursor: default; }
+  &--resolved { opacity: 0.5; text-decoration: line-through; } }
+
+.plan-goals { display: flex; flex-direction: column; gap: 0.25rem; min-width: 0; }
+// a Maintain assignment is already blue, so its hover brightens to white to show it opens the editor
+.plan-goal--maintain { color: var(--accent); font-size: var(--text-size-label); i { font-size: var(--text-size-badge); margin-right: 0.2rem; }
+  &:hover:not(:disabled) { color: var(--text-primary); } }

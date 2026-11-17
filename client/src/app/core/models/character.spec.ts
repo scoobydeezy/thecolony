@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import {
   Character, Faction, ValueVector,
-  driftScore, topCompatibleFactions, scoreFactionCompatibility,
-  deriveBeliefs, lerpValueVector
+  driftScore, deriveBeliefs, lerpValueVector, effectiveBeliefs
 } from './types';
+import { topCompatibleFactions } from '../services/scoring.service';
 
 // ── Helpers ──────────────────────────────────────────────────────────────
 function makeChar(conviction: number, pressure: number, values: ValueVector): Character {
@@ -14,6 +14,9 @@ function makeChar(conviction: number, pressure: number, values: ValueVector): Ch
     values,
     conviction,
     pressure,
+    influence: 0,
+    impressionable: 50,
+    state: 'Alive',
   };
 }
 
@@ -28,6 +31,9 @@ function makeFaction(id: string, values: ValueVector): Faction {
     values,
     active: true,
     sortOrder: 0,
+    momentum: 0,
+    powerModifier: 0,
+    factionSize: 0,
   };
 }
 
@@ -78,11 +84,11 @@ describe('driftScore', () => {
 
 // ── Belief derivation ────────────────────────────────────────────────────
 describe('deriveBeliefs', () => {
-  it('truth-dominant → positive knowledge, positive ritual, positive change', () => {
+  it('truth-dominant → positive knowledge, positive ritual, middle change (every axis is three-position)', () => {
     const b = deriveBeliefs({ a: 0.7, b: 0.2, c: 0.1 });
     expect(b.beliefa).toBe('positive');
     expect(b.beliefc).toBe('positive');
-    expect(b.beliefb).toBe('positive');
+    expect(b.beliefb).toBe('neutral');
   });
 
   it('stability-dominant → neutral knowledge, neutral ritual, negative change', () => {
@@ -99,11 +105,11 @@ describe('deriveBeliefs', () => {
     expect(b.beliefb).toBe('positive');
   });
 
-  it('centered (no axis ≥ 0.4) → neutral knowledge, neutral ritual, positive change', () => {
+  it('centered (no axis ≥ 0.4) → the middle on every axis', () => {
     const b = deriveBeliefs({ a: 1/3, b: 1/3, c: 1/3 });
     expect(b.beliefa).toBe('neutral');
     expect(b.beliefc).toBe('neutral');
-    expect(b.beliefb).toBe('positive');
+    expect(b.beliefb).toBe('neutral');
   });
 });
 
@@ -135,39 +141,7 @@ describe('lerpValueVector', () => {
   });
 });
 
-// ── Faction compatibility calculation ───────────────────────────────────
-describe('scoreFactionCompatibility', () => {
-  const neutralBeliefs = { beliefc: 'neutral' as const, beliefa: 'neutral' as const, beliefb: 'positive' as const };
-
-  it('identical vectors with neutral beliefs produce higher score than opposed', () => {
-    const v: ValueVector = { a: 0.6, b: 0.3, c: 0.1 };
-    const aligned = makeFaction('a', v);
-    const opposed = makeFaction('b', { a: 0.1, b: 0.1, c: 0.8 });
-    const scoreAligned = scoreFactionCompatibility(v, neutralBeliefs, aligned);
-    const scoreOpposed = scoreFactionCompatibility(v, neutralBeliefs, opposed);
-    expect(scoreAligned).toBeGreaterThan(scoreOpposed);
-  });
-
-  it('perfectly overlapping character and faction scores highest among all factions', () => {
-    const charV: ValueVector = { a: 0.7, b: 0.2, c: 0.1 };
-    const beliefs = deriveBeliefs(charV);
-    const exact   = makeFaction('exact',   charV);
-    const other1  = makeFaction('other1',  { a: 0.1, b: 0.7, c: 0.2 });
-    const other2  = makeFaction('other2',  { a: 0.2, b: 0.2, c: 0.6 });
-    const s0 = scoreFactionCompatibility(charV, beliefs, exact);
-    const s1 = scoreFactionCompatibility(charV, beliefs, other1);
-    const s2 = scoreFactionCompatibility(charV, beliefs, other2);
-    expect(s0).toBeGreaterThan(s1);
-    expect(s0).toBeGreaterThan(s2);
-  });
-
-  it('opposing vectors produce strongly negative score', () => {
-    const charV: ValueVector = { a: 0.8, b: 0.1, c: 0.1 };
-    const facV: ValueVector  = { a: 0.05, b: 0.8, c: 0.15 };
-    const score = scoreFactionCompatibility(charV, neutralBeliefs, makeFaction('opp', facV));
-    expect(score).toBeLessThan(-1);
-  });
-});
+// Faction compatibility is the full relationship score now (scoring.service.spec.ts covers its properties).
 
 // ── Top compatible faction determination ────────────────────────────────
 describe('topCompatibleFactions', () => {
@@ -220,5 +194,18 @@ describe('topCompatibleFactions', () => {
     const derived = topCompatibleFactions({ values: charV }, [faction])[0].score;
     const overridden = topCompatibleFactions({ values: charV, beliefa: 'negative' }, [faction])[0].score;
     expect(derived).toBeGreaterThan(overridden);
+  });
+});
+
+// D12 (M0): effectiveBeliefs honours the configured derivation threshold instead of a hard-coded 0.4.
+describe('effectiveBeliefs threshold (D12)', () => {
+  const c = { id: 'x', name: 'x', characterType: 'NPC', state: 'Alive', conviction: 50, pressure: 0, influence: 0, impressionable: 50,
+              values: { a: 0.45, b: 0.45, c: 0.10 } } as any;
+  it('derives Knowledge positive at 0.4 but neutral at 0.5 for a = 0.45', () => {
+    expect(effectiveBeliefs(c, 0.4).beliefa).toBe('positive');
+    expect(effectiveBeliefs(c, 0.5).beliefa).toBe('neutral');
+  });
+  it('overrides still win over derivation', () => {
+    expect(effectiveBeliefs({ ...c, beliefa: 'negative' }, 0.4).beliefa).toBe('negative');
   });
 });

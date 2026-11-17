@@ -1,0 +1,232 @@
+<div class="page-header">
+  <h2>World Conditions</h2>
+  <p>Table rules that hold while the world makes them true: from the start, or established by an Event, and while every
+    requirement holds. A condition can follow a goal's stage; its text is then what the goal brings about. Their Stress
+    contributions are Colony Stress.</p>
+</div>
+
+<div class="toolbar">
+  <div class="filter-tabs">
+    <button [class.active]="show() === 'all'" (click)="show.set('all')">All</button>
+    <button [class.active]="show() === 'on'" (click)="show.set('on')">In force</button>
+    <button [class.active]="show() === 'off'" (click)="show.set('off')">Not in force</button>
+  </div>
+  <span class="wc-meta">{{ inForceCount() }} in force {{ when() }}@if (stressFromConditions()) { · {{ stressFromConditions() > 0 ? '+' : '' }}{{ stressFromConditions() }} Stress }</span>
+  <div class="toolbar-actions">
+    @if (!store.isViewingSnapshot()) {
+      <label class="btn btn-secondary" title="Import World Conditions (CSV): updates by Id, adds new ones">
+        <i class="fa-solid fa-right-to-bracket"></i> Import
+        <input type="file" accept=".csv" style="display:none" (change)="importCsv($event)">
+      </label>
+    }
+    <button class="btn btn-secondary" (click)="exportCsv()" title="Export World Conditions (CSV)">Export <i class="fa-solid fa-right-from-bracket"></i></button>
+    @if (!store.isViewingSnapshot()) { <button class="btn btn-primary" (click)="add()">+ Add Condition</button> }
+  </div>
+</div>
+
+<div class="wc-grid">
+  @for (s of shown(); track s.condition.id) {
+    @let cap = caption(s);
+    <div class="wc-item">
+      <div class="wc-card card" [class.wc-card--off]="!s.inForce" [class.wc-card--editable]="!store.isViewingSnapshot()"
+           (click)="!store.isViewingSnapshot() && edit(s.condition)" [attr.title]="!store.isViewingSnapshot() ? 'Edit this World Condition' : null">
+        <div class="wc-card-head">
+          <span class="wc-card-title">{{ s.condition.title }}</span>
+          @if (s.condition.stressContribution) {
+            <span class="wc-stress" [class.wc-stress--off]="!s.inForce" title="Added to Colony Stress while in force">{{ s.condition.stressContribution > 0 ? '+' : '' }}{{ s.condition.stressContribution }} Stress</span>
+          }
+          @if (!store.isViewingSnapshot()) { <i class="fa-solid fa-pen wc-card-edit" aria-hidden="true"></i> }
+        </div>
+        @if (variesByOf(s.condition); as vb) {
+          <!-- "varies by": a row per state; the current one is bright, with a check -->
+          @for (row of cardRows(vb); track row.state) {
+            <div class="wc-state wc-state--row" [class.wc-state--true]="s.inForce && row.state === s.row">
+              <i class="fa-solid fa-check wc-state-mark" aria-hidden="true"></i>
+              <span class="wc-row-state">{{ stateLabel(vb.subject.kind, row.state) }}</span>
+              <span class="wc-row-text">{{ row.text || '—' }}</span>
+              @if (row.stress) { <span class="wc-stress" [class.wc-stress--off]="!(s.inForce && row.state === s.row)">{{ row.stress > 0 ? '+' : '' }}{{ row.stress }} Stress</span> }
+            </div>
+          }
+        } @else {
+        <!-- what is true at the table now is bright, with a check; the other state is dimmed -->
+          <div class="wc-state" [class.wc-state--true]="s.inForce">
+            <i class="fa-solid fa-check wc-state-mark" aria-hidden="true"></i>
+            <span>{{ s.condition.rule || '(no rule text)' }}</span>
+          </div>
+          @if (s.condition.ruleOtherwise) {
+            <div class="wc-state wc-state--otherwise" [class.wc-state--true]="!s.inForce">
+              <i class="fa-solid fa-check wc-state-mark" aria-hidden="true"></i>
+              <span>{{ s.condition.ruleOtherwise }}</span>
+            </div>
+          }
+        }
+        <span class="sr-only">{{ s.inForce ? 'In force' : 'Not in force' }}</span>
+      </div>
+      <div class="wc-caption" [title]="cap.title">
+        @for (p of cap.parts; track $index) {
+          <div class="wc-caption-line" [class.wc-caption--fails]="!p.holds">{{ p.text }}</div>
+        }
+      </div>
+    </div>
+  } @empty {
+    <p class="wc-empty">@if (statuses().length) { No conditions match. } @else { No World Conditions yet. Add a table rule, e.g. "Dead-drop caches hold loot on 4–6", with requirements such as an Asset's status or controller, or import a world-conditions.csv. }</p>
+  }
+</div>
+
+@if (editing(); as e) {
+  <div class="modal-backdrop" (click)="close()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ e.id ? 'Edit World Condition' : 'Add World Condition' }}</h3>
+        <button class="modal-close" (click)="close()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-row">
+          <label class="form-label" for="wc-title">Title *</label>
+          <input id="wc-title" class="form-input" [value]="e.title" (input)="patch({ title: $any($event.target).value })" placeholder="e.g. Dead drops thinned" />
+        </div>
+        <div class="form-row">
+          <span class="form-label">Condition Type</span>
+          <label class="wc-type-toggle">
+            <span class="wc-type-label" [class.wc-type-label--on]="conditionType() === 'event'">Event Requirement</span>
+            <input type="checkbox" [checked]="conditionType() === 'entity'" (change)="setConditionType($any($event.target).checked ? 'entity' : 'event')"
+                   aria-label="Condition type: Event Requirement (off) or Entity Requirement (on)" />
+            <span class="toggle-track" aria-hidden="true"></span>
+            <span class="wc-type-label" [class.wc-type-label--on]="conditionType() === 'entity'">Entity Requirement</span>
+          </label>
+          <p class="form-hint">@if (conditionType() === 'event') { Off until an Event establishes it; an Event can end it. }
+            @else if (mode() === 'varies') { In force while the current state's row has text; an Event can still end or re-establish it. }
+            @else { In force while every requirement holds; an Event can still end or re-establish it. }</p>
+          @if (droppedRequirements().length) {
+            <p class="form-hint wc-warn"><i class="fa-solid fa-triangle-exclamation"></i> Saving as an Event condition removes its requirements:
+              {{ droppedRequirements().join('; ') }}.</p>
+          }
+        </div>
+
+        @if (conditionType() === 'entity') {
+          <div class="wc-mode" role="radiogroup" aria-label="How the condition reads the world">
+            <button type="button" role="radio" [attr.aria-checked]="mode() === 'requirements'" [class.wc-mode--on]="mode() === 'requirements'" (click)="setMode('requirements')">When requirements hold</button>
+            <button type="button" role="radio" [attr.aria-checked]="mode() === 'varies'" [class.wc-mode--on]="mode() === 'varies'" (click)="setMode('varies')">Varies by an entity's state</button>
+          </div>
+        }
+        @if (droppedTable()) { <p class="form-hint wc-warn"><i class="fa-solid fa-triangle-exclamation"></i> Saving as an Event condition removes its "varies by" table.</p> }
+
+        @if (conditionType() === 'entity' && mode() === 'varies' && vb(); as v) {
+          <div class="wc-section-title">Varies By</div>
+          <div class="wc-req wc-vb-subject">
+            <select class="form-input wc-req-type" (change)="setVbType($any($event.target).value)" aria-label="Entity type">
+              @for (t of vbTypes; track t.value) { <option [value]="t.value" [selected]="t.value === vbTypeOf(v.subject.kind)">{{ t.label }}</option> }
+            </select>
+            <select class="form-input wc-req-entity" (change)="setVbEntity($any($event.target).value)" aria-label="Entity">
+              <option value="" [selected]="!v.subject.id">— Choose —</option>
+              @for (o of vbEntities(v.subject.kind); track o.id) { <option [value]="o.id" [selected]="o.id === v.subject.id">{{ o.name }}</option> }
+            </select>
+            <select class="form-input wc-req-verb" (change)="setVbKind($any($event.target).value)" aria-label="Property">
+              @for (p of vbProperties[vbTypeOf(v.subject.kind)]; track p.kind) { <option [value]="p.kind" [selected]="p.kind === v.subject.kind">{{ p.label }}</option> }
+            </select>
+          </div>
+          <div class="wc-vb-rows">
+            <div class="wc-vb-head"><span>State</span><span>Text at the table</span><span>Stress</span></div>
+            @for (row of v.rows; track row.state; let i = $index) {
+              <div class="wc-vb-row">
+                <span class="wc-row-state">{{ stateLabel(v.subject.kind, row.state) }}</span>
+                <input class="form-input" [value]="row.text" (input)="setVbRow(i, { text: $any($event.target).value })"
+                       [placeholder]="'Blank: not in force while ' + stateLabel(v.subject.kind, row.state)" [attr.aria-label]="'Text while ' + stateLabel(v.subject.kind, row.state)" />
+                <input class="form-input wc-stress-input" type="number" step="1" [value]="row.stress" (input)="setVbRow(i, { stress: +$any($event.target).value })"
+                       [attr.aria-label]="'Stress while ' + stateLabel(v.subject.kind, row.state)" />
+              </div>
+            }
+          </div>
+          <p class="form-hint">One row per state; the current state's row is what holds at the table. Leave a row blank for "not in force" in that state.</p>
+          @if (incomplete()) { <p class="form-hint">Choose the entity and write at least one row to save.</p> }
+        }
+
+        @if (conditionType() === 'entity' && mode() === 'requirements') {
+          <div class="wc-section-title">Requirements <span>all must hold</span></div>
+          <div class="form-row">
+            @for (r of reqs(); track $index; let i = $index) {
+              @let type = typeOf(r);
+              <div class="wc-req">
+                <select class="form-input wc-req-type" (change)="setEntityType(i, $any($event.target).value)" aria-label="Entity type">
+                  @for (t of entityTypes; track t.value) { <option [value]="t.value" [selected]="t.value === type">{{ t.label }}</option> }
+                </select>
+                <select class="form-input wc-req-entity" (change)="setEntity(i, $any($event.target).value)" aria-label="Entity">
+                  <option value="" [selected]="!entityIdOf(r)">— Choose —</option>
+                  @for (o of entitiesOf(type); track o.id) { <option [value]="o.id" [selected]="o.id === entityIdOf(r)">{{ o.name }}</option> }
+                </select>
+                <select class="form-input wc-req-verb" (change)="setVerb(i, $any($event.target).value)" aria-label="Verb">
+                  @for (v of verbs[type]; track v.key) { <option [value]="v.key" [selected]="v.key === verbKeyOf(r)">{{ v.label }}</option> }
+                </select>
+                @switch (r.kind) {
+                  @case ('assetController') {
+                    <select class="form-input wc-req-object" (change)="setField(i, 'factionId', $any($event.target).value)" aria-label="Controller">
+                      <option value="" [selected]="!r.factionId">no one</option>
+                      @for (f of store.factions(); track f.id) { @if (f.active) { <option [value]="f.id" [selected]="f.id === r.factionId">{{ f.name }}</option> } }
+                    </select>
+                  }
+                  @case ('characterFaction') {
+                    <select class="form-input wc-req-object" (change)="setField(i, 'factionId', $any($event.target).value)" aria-label="Faction">
+                      <option value="" [selected]="!r.factionId">no faction</option>
+                      @for (f of store.factions(); track f.id) { @if (f.active) { <option [value]="f.id" [selected]="f.id === r.factionId">{{ f.name }}</option> } }
+                    </select>
+                  }
+                  @default { <span class="wc-req-object"></span> }
+                }
+                <button type="button" class="wc-req-remove" (click)="removeRequirement(i)" title="Remove this requirement" aria-label="Remove requirement"><i class="fa-solid fa-xmark"></i></button>
+                <!-- states: the object of "Status is" / "State is", on their own line -->
+                @switch (r.kind) {
+                  @case ('assetStatus') {
+                    <span class="wc-statuses">@for (o of assetStatuses; track o.value) {
+                      <label class="wc-check"><input type="checkbox" [checked]="has(r, 'statuses', o.value)" (change)="toggleIn(i, 'statuses', o.value, $any($event.target).checked)" /> {{ o.label }}</label> }</span>
+                  }
+                  @case ('characterState') {
+                    <span class="wc-statuses">@for (o of characterStates; track o.value) {
+                      <label class="wc-check"><input type="checkbox" [checked]="has(r, 'states', o.value)" (change)="toggleIn(i, 'states', o.value, $any($event.target).checked)" /> {{ o.label }}</label> }</span>
+                  }
+                  @case ('locationState') {
+                    <span class="wc-statuses">@for (o of locationStates; track o.value) {
+                      <label class="wc-check"><input type="checkbox" [checked]="has(r, 'states', o.value)" (change)="toggleIn(i, 'states', o.value, $any($event.target).checked)" /> {{ o.label }}</label> }</span>
+                  }
+                  @case ('goalStage') {
+                    <span class="wc-statuses">@for (o of goalStages; track o.value) {
+                      <label class="wc-check"><input type="checkbox" [checked]="has(r, 'stages', o.value)" (change)="toggleIn(i, 'stages', o.value, $any($event.target).checked)" /> {{ o.label }}</label> }</span>
+                  }
+                }
+              </div>
+            }
+            <button type="button" class="btn btn-secondary btn-sm wc-add-req" (click)="addRequirement()">+ Requirement</button>
+            @if (incomplete()) { <p class="form-hint">Finish or remove each requirement to save.</p> }
+            @if (!reqs().length) { <p class="form-hint">With no requirements it is always in force.</p> }
+          </div>
+        }
+
+        @if (!(conditionType() === 'entity' && mode() === 'varies')) {
+        <div class="wc-section-title">While In Force</div>
+        <div class="form-row">
+          <label class="form-label" for="wc-rule">Text</label>
+          <textarea id="wc-rule" class="form-input" rows="2" [value]="e.rule" (input)="patch({ rule: $any($event.target).value })"
+                    placeholder="e.g. Maelyn can offer gifts from surrendered possessions"></textarea>
+        </div>
+        <div class="form-row">
+          <label class="form-label" for="wc-stress">Colony Stress</label>
+          <input id="wc-stress" class="form-input wc-stress-input" type="number" step="1" [value]="e.stressContribution" (input)="patch({ stressContribution: +$any($event.target).value })" />
+        </div>
+
+        <div class="wc-section-title">While Not In Force <span>optional</span></div>
+        <div class="form-row">
+          <label class="form-label" for="wc-otherwise">Text</label>
+          <textarea id="wc-otherwise" class="form-input" rows="2" [value]="e.ruleOtherwise ?? ''" (input)="patch({ ruleOtherwise: $any($event.target).value })"
+                    placeholder="e.g. Maelyn has nothing to give"></textarea>
+        </div>
+        }
+      </div>
+      <div class="modal-footer">
+        @if (e.id) { <button class="btn btn-danger" (click)="remove(e)">Delete</button> } @else { <span></span> }
+        <div class="modal-footer-actions">
+          <button class="btn btn-secondary" (click)="close()">Cancel</button>
+          <button class="btn btn-primary" (click)="save()" [disabled]="!e.title.trim() || incomplete()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

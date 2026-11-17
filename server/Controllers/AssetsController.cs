@@ -31,7 +31,7 @@ public class AssetsController(AppDbContext db, ICampaignContext campaign) : Cont
     public async Task<IActionResult> Create([FromBody] Asset asset)
     {
         var cid = await campaign.GetActiveIdAsync();
-        asset.Id = Guid.NewGuid().ToString();
+        asset.Id = await EntityIds.ForCreateAsync(db.Assets, asset.Id);   // keep an imported id when it is free
         asset.CampaignId = cid;
         db.Assets.Add(asset);
         await db.SaveChangesAsync();

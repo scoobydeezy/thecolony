@@ -34,6 +34,7 @@
       <div class="header-content-row">
         <div class="header-title-row">
           <h2>{{ character().name }}</h2>
+          <app-instability-badge [character]="character()" />
           <span class="type-chip"
             [class.party]="character().characterType === 'PartyMember'">
             {{ typeLabel(character().characterType) }}
@@ -243,7 +244,7 @@
     <div class="card" [class.card--editing]="isEditing('society')">
       <div class="card-header-row">
         <h3 class="section-title">Society</h3>
-        @if (!store.isViewingSnapshot()) {
+        @if (!store.isViewingSnapshot() && !store.isLive()) {
           <button class="card-edit-btn" (click)="isEditing('society') ? closeCard() : openCard('society')" [title]="isEditing('society') ? 'Cancel' : 'Edit'">
             <i [class]="isEditing('society') ? 'fa-solid fa-xmark' : 'fa-solid fa-pen'"></i>
           </button>
@@ -313,7 +314,7 @@
     <div class="card" [class.card--editing]="isEditing('beliefs')">
       <div class="card-header-row">
         <h3 class="section-title">Values</h3>
-        @if (!store.isViewingSnapshot()) {
+        @if (!store.isViewingSnapshot() && !store.isLive()) {
           <button class="card-edit-btn" (click)="isEditing('beliefs') ? closeCard() : openCard('beliefs')" [title]="isEditing('beliefs') ? 'Cancel' : 'Edit'">
             <i [class]="isEditing('beliefs') ? 'fa-solid fa-xmark' : 'fa-solid fa-pen'"></i>
           </button>

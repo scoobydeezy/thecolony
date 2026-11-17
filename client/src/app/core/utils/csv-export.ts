@@ -1,3 +1,5 @@
+import { zipBytes } from './zip';
+
 // Parse a CSV string into rows of string values.
 // Handles quoted fields, embedded commas, and escaped double-quotes ("").
 export function parseCsv(text: string): string[][] {
@@ -44,10 +46,11 @@ export function parseCsv(text: string): string[][] {
   return rows;
 }
 
-// Build a header-index map from a parsed header row (case-insensitive lookup).
+// Build a header-index map from a parsed header row (case-insensitive lookup). A byte-order mark (spreadsheet apps add one
+// when saving UTF-8 CSV) and surrounding spaces are ignored, so "\uFEFFId" still finds the Id column.
 export function csvHeaderMap(headerRow: string[]): Map<string, number> {
   const map = new Map<string, number>();
-  headerRow.forEach((h, i) => map.set(h.toLowerCase(), i));
+  headerRow.forEach((h, i) => map.set(h.replace(/^\uFEFF/, '').trim().toLowerCase(), i));
   return map;
 }
 
@@ -59,13 +62,27 @@ export function escapeCsv(value: unknown): string {
   return str;
 }
 
-export function downloadCsv(rows: unknown[][], filename: string): void {
-  const csv = rows.map(row => row.map(escapeCsv).join(',')).join('\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+export function toCsv(rows: unknown[][]): string {
+  return rows.map(row => row.map(escapeCsv).join(',')).join('\n');
+}
+
+/** Save a Blob. The URL is revoked a minute later, not at once: a save dialog ("ask where to save") reads it only after
+ *  the user picks a location, and revoking immediately can cancel the download. */
+export function downloadBlob(blob: Blob, filename: string): void {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;
   a.click();
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
+}
+
+export function downloadCsv(rows: unknown[][], filename: string): void {
+  downloadBlob(new Blob([toCsv(rows)], { type: 'text/csv;charset=utf-8;' }), filename);
+}
+
+/** Several CSV files as ONE download (a .zip): browsers allow one download per click, so separate files after the first
+ *  are refused. Each file inside is the same CSV the single-file export writes, ready to import after unzipping. */
+export function downloadCsvZip(files: { name: string; rows: unknown[][] }[], zipName: string): void {
+  downloadBlob(new Blob([zipBytes(files.map(f => ({ name: f.name, data: toCsv(f.rows) })))], { type: 'application/zip' }), zipName);
 }

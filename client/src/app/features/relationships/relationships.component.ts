@@ -34,20 +34,23 @@ export class RelationshipsComponent {
   readonly overrideForm = signal<OverrideFormModel>(emptyOverrideForm());
   readonly fo = form(this.overrideForm);
 
-  // ── Stress ────────────────────────────────────────────────────────────────
-  get stress(): number {
-    return this.store.viewColonyStress();
-  }
+  // ── Stress simulation (§18.10) ───────────────────────────────────────────
+  // Colony Stress is derived from World Conditions and cannot be set. The slider only previews this page's scores at
+  // another Stress; nothing is saved, and every other view keeps the actual Stress.
+  readonly simulatedStress = signal<number | null>(null);
+  readonly actualStress = computed(() => this.store.viewColonyStress());
+  readonly simulating = computed(() => this.simulatedStress() !== null && this.simulatedStress() !== this.actualStress());
+  /** The Stress the matrix is scored at: the simulated value, or the actual one. */
+  readonly stress = computed(() => this.simulatedStress() ?? this.actualStress());
+  private readonly relationships = computed((): RelationshipBreakdown[] =>
+    this.simulating() ? this.store.relationshipsAtStress(this.stress()) : this.store.viewRelationships());
 
-  setStress(value: number): void {
-    const cs = this.store.colonyState();
-    if (!cs) return;
-    this.store.saveColonyState({ ...cs, colonyStress: value });
-  }
+  simulate(value: number): void { this.simulatedStress.set(value); this.selectedBreakdown.set(null); }
+  resetSimulation(): void { this.simulatedStress.set(null); this.selectedBreakdown.set(null); }
 
   // ── Matrix helpers ────────────────────────────────────────────────────────
   getRelationship(sourceId: string, targetId: string): RelationshipBreakdown | undefined {
-    return this.store.viewRelationships().find(
+    return this.relationships().find(
       r => r.sourceId === sourceId && r.targetId === targetId
     );
   }
@@ -85,8 +88,8 @@ export class RelationshipsComponent {
   breakdownContribs(r: RelationshipBreakdown): Array<{ label: string; value: number }> {
     const bl = this.store.beliefAxisLabels();
     return [
-      { label: 'Value Alignment',   value: r.contributions.valueAlignment },
-      { label: 'Value Conflict',    value: r.contributions.valueConflict },
+      { label: 'Value Similarity',  value: r.contributions.valueSimilarity },
+      { label: 'Value Opposition',  value: r.contributions.valueOpposition },
       { label: bl.c.axisName + ' ' + (r.contributions.beliefc >= 0 ? 'Alignment' : 'Conflict'), value: r.contributions.beliefc },
       { label: bl.a.axisName + ' ' + (r.contributions.beliefa >= 0 ? 'Alignment' : 'Conflict'), value: r.contributions.beliefa },
       { label: bl.b.axisName + ' ' + (r.contributions.beliefb >= 0 ? 'Alignment' : 'Conflict'), value: r.contributions.beliefb },
@@ -138,6 +141,6 @@ export class RelationshipsComponent {
       cells.push(dw ? `${dw.finalScore} (${dw.label})` : '');
       return [source.name, ...cells];
     });
-    downloadCsv([header, ...rows], 'relationships.csv');
+    downloadCsv([header, ...rows], this.simulating() ? `relationships-simulated-stress-${this.stress()}.csv` : 'relationships.csv');
   }
 }

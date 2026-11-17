@@ -1,16 +1,30 @@
 import {
   RulesConfig, RelationshipBreakdown,
   RelationshipLabel, RelationshipThreshold,
-  ValueVector, dot, inverseVector,
-  BeliefPosition, StressWeightCurve
+  ValueVector, valueSimilarity, valueOpposition,
+  BeliefPosition, StressWeightCurve, BeliefAxisLabels, DEFAULT_BELIEF_AXIS_LABELS,
+  Faction, deriveBeliefs,
 } from '../models/types';
 
+// Relationship scoring (SCORING-AUDIT.md, 2026-10-15). One formula for faction↔faction, faction↔party and
+// character→faction (compatibility and the Defection Check):
+//
+//   value  = valueSimilarityScale · similarity(s, t)  −  valueOppositionScale · opposition(s → t)
+//   belief = Σ axes  weight(axis) · agreement(source position, target position)
+//            agreement: same → beliefMatch · middle vs pole → beliefAdjacent · opposite poles → beliefConflict
+//            weight(axis) = blend · source.values[axis] + (1 − blend) / 3        (weights sum to 1)
+//   then the stress composition and tilt, then the manual bump (unchanged).
+//
+// Every axis has three positions; declared (GM override) and derived beliefs score identically.
+// Constants are PROVISIONAL (anchored to synthetic pairs, see SCORING-AUDIT.md) until the balancing pass.
 export const DEFAULT_RULES: RulesConfig = {
   id: 'singleton',
   beliefMatch: 3.0,
   beliefConflict: -2.0,
-  valueAlignmentScale: 5.5,
-  valueConflictScale: 3,
+  beliefAdjacent: -1.0,
+  beliefWeightBlend: 0.5,
+  valueSimilarityScale: 3.5,
+  valueOppositionScale: 3.0,
   stressPositiveMultiplierPerPoint: 0.25,
   stressNegativeMultiplierPerPoint: 0.2,
   positiveEnabled: true,
@@ -34,10 +48,19 @@ export const DEFAULT_RULES: RulesConfig = {
   stressTriggersJson: '[]',
 };
 
-function scoreBelief<T>(a: T | undefined, b: T | undefined, isBuffer: (v: T) => boolean, rules: RulesConfig): number {
+const RANK: Record<BeliefPosition, number> = { negative: 0, neutral: 1, positive: 2 };
+
+/** Agreement between two positions on one axis: same, adjacent (middle vs pole) or opposite. 0 if either is unset. */
+export function beliefAgreement(a: BeliefPosition | undefined, b: BeliefPosition | undefined, rules: RulesConfig): number {
   if (a == null || b == null) return 0;
-  if (isBuffer(a) || isBuffer(b)) return 0;
-  return a === b ? rules.beliefMatch : rules.beliefConflict;
+  const gap = Math.abs(RANK[a] - RANK[b]);
+  return gap === 0 ? rules.beliefMatch : gap === 1 ? (rules.beliefAdjacent ?? DEFAULT_RULES.beliefAdjacent) : rules.beliefConflict;
+}
+
+/** Per-axis belief weights: a blend of the source's own Value on the axis and equal weighting. Always sums to 1. */
+export function beliefWeights(v: ValueVector, blend: number): ValueVector {
+  const k = Math.max(0, Math.min(1, blend)), e = (1 - k) / 3;
+  return { a: k * v.a + e, b: k * v.b + e, c: k * v.c + e };
 }
 
 export function applyCurve(t: number, curve: StressWeightCurve): number {
@@ -80,30 +103,26 @@ export function scoreRelationship(
   manualBump: number,
   rules: RulesConfig = DEFAULT_RULES
 ): RelationshipBreakdown {
-  // Treat undefined as enabled — only an explicit false disables
+  // Treat undefined as enabled — only an explicit false disables. A disabled sign drops every contribution of that sign.
   const posEnabled = rules.positiveEnabled !== false;
   const negEnabled = rules.negativeEnabled !== false;
-  const r: RulesConfig = posEnabled && negEnabled ? rules : {
+  const gate = (x: number) => (x > 0 && !posEnabled) || (x < 0 && !negEnabled) ? 0 : x;
+  const r: RulesConfig = {
     ...rules,
-    beliefMatch:                      posEnabled ? rules.beliefMatch                      : 0,
-    valueAlignmentScale:              posEnabled ? rules.valueAlignmentScale              : 0,
     stressPositiveMultiplierPerPoint: posEnabled ? rules.stressPositiveMultiplierPerPoint : 0,
-    beliefConflict:                   negEnabled ? rules.beliefConflict                   : 0,
-    valueConflictScale:               negEnabled ? rules.valueConflictScale               : 0,
     stressNegativeMultiplierPerPoint: negEnabled ? rules.stressNegativeMultiplierPerPoint : 0,
   };
 
-  const sv = source.values;
+  const w = beliefWeights(source.values, rules.beliefWeightBlend ?? DEFAULT_RULES.beliefWeightBlend);
+  const beliefcContrib = gate(beliefAgreement(source.beliefc, target.beliefc, r) * w.c);
+  const beliefaContrib = gate(beliefAgreement(source.beliefa, target.beliefa, r) * w.a);
+  const beliefbContrib = gate(beliefAgreement(source.beliefb, target.beliefb, r) * w.b);
 
-  const beliefcContrib = scoreBelief(source.beliefc, target.beliefc, r2 => r2 === 'neutral', r) * sv.c;
-  const beliefaContrib = scoreBelief(source.beliefa, target.beliefa, k  => k  === 'neutral', r) * sv.a;
-  const beliefbContrib = scoreBelief(source.beliefb, target.beliefb, () => false,            r) * sv.b;
-
-  const alignmentContrib = dot(sv, target.values)                * r.valueAlignmentScale;
-  const conflictContrib  = dot(sv, inverseVector(target.values)) * r.valueConflictScale;
+  const similarityContrib = gate(valueSimilarity(source.values, target.values) * (rules.valueSimilarityScale ?? DEFAULT_RULES.valueSimilarityScale));
+  const oppositionContrib = gate(-valueOpposition(source.values, target.values) * (rules.valueOppositionScale ?? DEFAULT_RULES.valueOppositionScale));
 
   const beliefSubScore = beliefcContrib + beliefaContrib + beliefbContrib;
-  const valueSubScore  = alignmentContrib - conflictContrib;
+  const valueSubScore  = similarityContrib + oppositionContrib;
 
   let beliefScale  = 1.0;
   let valueScale   = 1.0;
@@ -129,16 +148,62 @@ export function scoreRelationship(
     finalScore,
     label: getLabel(finalScore, r),
     contributions: {
-      beliefc:        round1(beliefcContrib),
-      beliefa:        round1(beliefaContrib),
-      beliefb:        round1(beliefbContrib),
-      valueAlignment: round1(alignmentContrib),
-      valueConflict:  round1(-conflictContrib),
-      beliefSubScore: round1(beliefSubScore),
-      valueSubScore:  round1(valueSubScore),
-      stressWeight:   Math.round(stressWeight * 1000) / 1000,
+      beliefc:         round1(beliefcContrib),
+      beliefa:         round1(beliefaContrib),
+      beliefb:         round1(beliefbContrib),
+      valueSimilarity: round1(similarityContrib),
+      valueOpposition: round1(oppositionContrib),
+      beliefSubScore:  round1(beliefSubScore),
+      valueSubScore:   round1(valueSubScore),
+      stressWeight:    Math.round(stressWeight * 1000) / 1000,
     }
   };
+}
+
+/** The directional Value score alone (no beliefs, no stress): used to rank most-aligned / most-opposed factions. */
+export function valueScore(source: ValueVector, target: ValueVector, rules: RulesConfig = DEFAULT_RULES): number {
+  return (rules.valueSimilarityScale ?? DEFAULT_RULES.valueSimilarityScale) * valueSimilarity(source, target)
+       - (rules.valueOppositionScale ?? DEFAULT_RULES.valueOppositionScale) * valueOpposition(source, target);
+}
+
+export interface FactionCompatibility {
+  factionId: string;
+  score: number;
+}
+
+/**
+ * A character's compatibility with each faction: the full relationship score at stress 0 with no bump, using
+ * effective beliefs (overrides where set, derived elsewhere). The same formula as the Defection Check. Best first.
+ */
+export function topCompatibleFactions(
+  character: { id?: string; values: ValueVector; beliefc?: BeliefPosition; beliefa?: BeliefPosition; beliefb?: BeliefPosition },
+  factions: Faction[],
+  beliefThreshold = 0.4,
+  axisLabels: BeliefAxisLabels = DEFAULT_BELIEF_AXIS_LABELS,
+  rules: RulesConfig = DEFAULT_RULES
+): FactionCompatibility[] {
+  const d = deriveBeliefs(character.values, beliefThreshold, axisLabels);
+  const source: ScoringActor = { id: character.id ?? 'character', values: character.values,
+    beliefa: character.beliefa ?? d.beliefa, beliefb: character.beliefb ?? d.beliefb, beliefc: character.beliefc ?? d.beliefc };
+  return factions
+    .map(f => ({ factionId: f.id, score: scoreRelationship(source, f, 0, 0, rules).baseScore }))
+    .sort((a, b) => b.score - a.score);
+}
+
+// The top N active factions (excluding self, Factions only) by the directional Value score, best first.
+export function mostAlignedFactions(faction: Faction, others: Faction[], n = 3, rules: RulesConfig = DEFAULT_RULES): Faction[] {
+  return others
+    .filter(f => f.id !== faction.id && f.active && f.type === 'Faction')
+    .sort((a, b) => valueScore(faction.values, b.values, rules) - valueScore(faction.values, a.values, rules))
+    .slice(0, n);
+}
+
+// The bottom N active factions (excluding self, Factions only) by the directional Value score, worst first.
+export function mostOpposedFactions(faction: Faction, others: Faction[], n = 3, rules: RulesConfig = DEFAULT_RULES): Faction[] {
+  return others
+    .filter(f => f.id !== faction.id && f.active && f.type === 'Faction')
+    .sort((a, b) => valueScore(faction.values, a.values, rules) - valueScore(faction.values, b.values, rules))
+    .slice(0, n);
 }
 
 function round1(n: number): number {

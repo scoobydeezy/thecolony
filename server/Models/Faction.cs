@@ -28,10 +28,15 @@ public class Faction
     public bool Active { get; set; } = true;
     public string? Notes { get; set; }
     public int SortOrder { get; set; } = 0;
-    public int Momentum { get; set; } = 0;
-    public int BaseLegitimacy { get; set; } = 50;
-    public int PowerModifier { get; set; } = 0;
-    public int AdditionalMemberCount { get; set; } = 0;
+    public int Momentum { get; set; } = 0;   // legacy raw Momentum (pre-M3): kept for audit, ignored by the engine
+    // M3: operational Momentum, −2..+2 (the operation-roll modifier). Set explicitly as a baseline in Design mode;
+    // during a campaign it changes only through capped Momentum resolution.
+    public int MomentumTier { get; set; } = 0;
+    public int PowerModifier { get; set; } = 0;           // retired (M2): stored, never read
+    // §18.8: total membership (named and unnamed), recorded explicitly: ⌊÷ 20⌋ People points. Live-locked, changed in
+    // play by `factionSize` Effects. (Was AdditionalMemberCount, unnamed members only; every value was 0 when renamed.)
+    // (Base Legitimacy is retired: Mandate, from Symbolic and Mandate Asset stars, is the only authority measure.)
+    public int FactionSize { get; set; } = 0;
     public string? Motto { get; set; }
     public string? History { get; set; }
     public string? GlyphPath { get; set; }
@@ -41,4 +46,6 @@ public class Faction
     public string? BannerShape { get; set; }
     public string? LeaderId { get; set; }
     public string CampaignId { get; set; } = string.Empty;
+    // M1: Live campaigns record when an entity enters the world (absent from replay before this Event).
+    public string? IntroducedAtEventId { get; set; }
 }

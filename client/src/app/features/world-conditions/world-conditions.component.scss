@@ -1,0 +1,100 @@
+:host { display: block; }
+.wc { padding: 0.25rem 1rem; }
+.toolbar {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; gap: 1rem; flex-wrap: wrap;
+  .filter-tabs {
+    display: flex; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+    button { background: none; border: none; padding: 0.5rem 1rem; font-size: var(--text-size-body); color: var(--text-secondary); cursor: pointer;
+      border-right: 1px solid var(--border); &:last-child { border-right: none; } &:hover { background: var(--bg-hover); color: var(--text-primary); }
+      &.active { background: var(--bg-active); color: var(--accent); font-weight: 600; } }
+  }
+  .toolbar-actions { display: flex; gap: 0.5rem; margin-left: auto; }
+}
+.wc-head { display: flex; align-items: center; gap: 0.5rem; }
+.wc-toggle { background: none; border: none; color: var(--text-primary); cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; padding: 0; }
+.wc-icon { color: var(--color-warn, #fbbf24); }
+.wc-title { font-weight: 600; }
+.wc-meta { font-size: var(--text-size-label); color: var(--text-muted); }
+.wc-spacer { flex: 1; }
+.wc-empty { color: var(--text-muted); font-size: var(--text-size-label); margin: 0.4rem 0; }
+.wc-check { display: inline-flex; gap: 0.35rem; align-items: center; font-size: var(--text-size-body); color: var(--text-primary); }
+.wc-statuses { display: flex; flex-wrap: wrap; gap: 0.9rem; }
+
+.wc-stress { margin-left: 0.5rem; font-size: var(--text-size-badge); color: var(--color-warn, #fbbf24); font-weight: 400; &--off { color: var(--text-muted); } }
+.wc-stress-input { max-width: 7rem; }
+.wc-req { display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin-bottom: 0.4rem;
+  .form-input { width: auto; min-width: 9rem; } }
+.wc-req-kind { min-width: 11rem; }
+.wc-add-req { margin-top: 0.2rem; }
+
+// ── cards (2026-10-26) ──
+.wc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(22rem, 1fr)); gap: 1.4rem 1.25rem; align-items: start; }
+.wc-item { display: flex; flex-direction: column; gap: 0.35rem; min-width: 0; }
+.wc-card { position: relative; padding: 0.9rem 1rem 1rem; display: flex; flex-direction: column; gap: 0.5rem; border-radius: 10px;
+  &--editable { cursor: pointer; &:hover { border-color: var(--accent); .wc-card-edit { opacity: 1; } } }
+  &--off .wc-card-title { color: var(--text-secondary); } }
+.wc-card-head { display: flex; align-items: baseline; gap: 0.6rem; margin-bottom: 0.15rem; }
+.wc-card-title { font-size: 1rem; font-weight: 600; color: var(--text-primary); }
+.wc-card-head .wc-stress { margin-left: 0; }
+.wc-card-edit { margin-left: auto; font-size: var(--text-size-badge); color: var(--text-muted); opacity: 0; transition: opacity 0.1s; }
+.wc-state { display: flex; gap: 0.55rem; align-items: baseline; font-size: var(--text-size-body); color: var(--text-muted); opacity: 0.55;
+  .wc-state-mark { visibility: hidden; color: #34d399; font-size: var(--text-size-label); }
+  &--true { color: var(--text-primary); opacity: 1; .wc-state-mark { visibility: visible; } } }
+.wc-caption { align-self: flex-end; text-align: right; max-width: 100%; font-size: var(--text-size-label); color: var(--text-secondary); cursor: default;
+  display: flex; flex-direction: column; gap: 0.1rem;   // one requirement per line
+  .wc-caption--fails { color: var(--text-muted); opacity: 0.7; } }
+// a positioned card contains it, so it never stretches the document past the scrolling main area
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+// ── the editor's fields (as in the goal editor; component styles do not reach here from elsewhere) ──
+.modal { max-width: 640px; }
+.form-row { display: flex; flex-direction: column; gap: 0.3rem; }
+.form-label { font-size: var(--text-size-label); font-weight: 500; color: var(--text-secondary); }
+.form-input {
+  background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; padding: 0.4rem 0.6rem;
+  font-size: var(--text-size-body); font-family: inherit; color: var(--text-primary); width: 100%;
+  &:focus { outline: none; border-color: var(--accent); }
+}
+textarea.form-input { resize: vertical; line-height: 1.4; }
+.form-hint { font-size: var(--text-size-meta); color: var(--text-muted); margin: 0; line-height: 1.4; }
+.modal-footer-actions { display: flex; gap: 0.5rem; }
+.wc-check input { accent-color: var(--accent); }
+.wc-req-remove { background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0.3rem; &:hover { color: var(--text-primary); } }
+.modal-body { display: flex; flex-direction: column; gap: 0.9rem; }
+.modal-footer { justify-content: space-between; align-items: center; }   // Delete on the left, Cancel / Save on the right
+.wc-add-req { align-self: flex-start; margin-top: 0.2rem; }
+.wc-req { margin-bottom: 0.5rem; }
+
+// ── editor layout (2026-10-26) ──
+.wc-section-title { font-size: var(--text-size-label); text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted);
+  margin-top: 0.4rem; padding-bottom: 0.25rem; border-bottom: 1px solid var(--border);
+  span { text-transform: none; letter-spacing: 0; margin-left: 0.4rem; opacity: 0.8; } }
+// Condition Type: "Event Requirement (switch) Entity Requirement", the unchosen side dimmed
+.wc-type-toggle { display: inline-flex; align-items: center; gap: 0.6rem; cursor: pointer; user-select: none; width: fit-content;
+  input { position: absolute; opacity: 0; width: 0; height: 0; }
+  input:focus-visible + .toggle-track { outline: 2px solid var(--accent); outline-offset: 2px; }
+  input:checked + .toggle-track::after { transform: translateX(16px); } }
+.toggle-track { width: 36px; height: 20px; flex-shrink: 0; background: var(--accent); border-radius: 10px; position: relative;
+  &::after { content: ''; position: absolute; top: 3px; left: 3px; width: 14px; height: 14px; background: #fff; border-radius: 50%; transition: transform 0.15s; } }
+.wc-type-label { font-size: var(--text-size-body); color: var(--text-muted); opacity: 0.6; transition: opacity 0.15s, color 0.15s;
+  &--on { color: var(--text-primary); opacity: 1; } }
+.wc-warn { color: #fbbf24; }
+// a requirement row: [Entity Type] [Entity] [Verb] [Object] ×, states (if any) on the next line
+.wc-req { display: grid; grid-template-columns: 8.5rem minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr) auto; gap: 0.4rem; align-items: center;
+  margin-bottom: 0.5rem;
+  .form-input { width: 100%; min-width: 0; }
+  .wc-statuses { grid-column: 2 / -1; padding: 0.15rem 0 0.1rem; } }
+
+// ── "varies by" (2026-10-26) ──
+.wc-state--row { display: grid; grid-template-columns: 0.9rem 7rem 1fr auto; gap: 0.5rem; align-items: baseline; }
+.wc-row-state { font-size: var(--text-size-label); color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wc-state--true .wc-row-state { color: var(--text-primary); font-weight: 600; }
+.wc-mode { display: inline-flex; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; width: fit-content;
+  button { background: none; border: none; border-right: 1px solid var(--border); padding: 0.4rem 0.9rem; font-size: var(--text-size-label);
+    color: var(--text-secondary); cursor: pointer; &:last-child { border-right: none; } &:hover { background: var(--bg-hover); } }
+  .wc-mode--on { background: var(--bg-active); color: var(--accent); font-weight: 600; } }
+.wc-vb-subject { grid-template-columns: 8.5rem minmax(0, 1.6fr) minmax(0, 1fr); }
+.wc-vb-rows { display: flex; flex-direction: column; gap: 0.35rem; }
+.wc-vb-head, .wc-vb-row { display: grid; grid-template-columns: 7rem 1fr 5rem; gap: 0.5rem; align-items: center; }
+.wc-vb-head span { font-size: var(--text-size-badge); text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+.wc-vb-row .wc-stress-input { max-width: none; }

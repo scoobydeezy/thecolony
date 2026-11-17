@@ -34,6 +34,8 @@ export class CampaignManagerComponent {
       this.editingId.set(null);
       this.deletingId.set(null);
       this.deleteConfirmText.set('');
+      this.activating.set(false);
+      this.activateConfirmText.set('');
       this.createName.set('');
       this.createDescription.set('');
       this.resetImport();
@@ -115,6 +117,34 @@ export class CampaignManagerComponent {
     }
     this.deletingId.set(null);
     this.deleteConfirmText.set('');
+  }
+
+  // ── Go Live (M1) ──────────────────────────────────────────────────────────
+  // One-way Design → Live for the active campaign. Locks baseline simulation fields and versions the rules.
+  activating = signal(false);
+  activateConfirmText = signal('');
+
+  readonly activateEnabled = computed(() => {
+    const c = this.store.activeCampaign();
+    return !!c && c.mode !== 'Live' && this.activateConfirmText() === c.name;
+  });
+
+  readonly recordedSessionCount = computed(() => this.store.sessions().length);
+
+  startActivate(): void {
+    this.activating.set(true);
+    this.activateConfirmText.set('');
+  }
+
+  cancelActivate(): void {
+    this.activating.set(false);
+    this.activateConfirmText.set('');
+  }
+
+  submitActivate(): void {
+    if (!this.activateEnabled()) return;
+    this.store.activateCampaign();
+    this.cancelActivate();
   }
 
   // ── Import modal ──────────────────────────────────────────────────────────

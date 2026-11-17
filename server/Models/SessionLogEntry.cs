@@ -9,7 +9,6 @@ public class SessionLogEntry
     public string? Summary { get; set; }
     public string? PartyActions { get; set; }
     public string? FactionChanges { get; set; }
-    public int ColonyStressChange { get; set; } = 0;
     public string? RelationshipBumps { get; set; }
     public string? FutureConsequences { get; set; }
     public string CampaignId { get; set; } = string.Empty;

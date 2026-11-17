@@ -1,0 +1,3209 @@
+{
+ "factions": [
+  {
+   "id": "aspis",
+   "name": "Aspis",
+   "type": "Faction",
+   "active": true,
+   "momentum": 10,
+   "baseLegitimacy": 35,
+   "powerModifier": 0,
+   "factionSize": 0,
+   "leaderId": "1e7dc50c-b814-404c-b211-4f3dba516e7e",
+   "values": {
+    "a": 0.0,
+    "b": 0.5043,
+    "c": 0.4957
+   },
+   "beliefa": "negative",
+   "beliefb": "negative",
+   "beliefc": "neutral"
+  },
+  {
+   "id": "burdened",
+   "name": "Burdened",
+   "type": "SocialClass",
+   "active": true,
+   "momentum": 0,
+   "baseLegitimacy": 75,
+   "powerModifier": 0,
+   "factionSize": 0,
+   "leaderId": null,
+   "values": {
+    "a": 0.3273,
+    "b": 0.4999,
+    "c": 0.1727
+   },
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "civilians",
+   "name": "Civilians",
+   "type": "SocialClass",
+   "active": true,
+   "momentum": 0,
+   "baseLegitimacy": 90,
+   "powerModifier": 0,
+   "factionSize": 0,
+   "leaderId": null,
+   "values": {
+    "a": 0.1387,
+    "b": 0.4988,
+    "c": 0.3625
+   },
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "cult",
+   "name": "Cult of the Unknown",
+   "type": "Faction",
+   "active": true,
+   "momentum": 0,
+   "baseLegitimacy": 20,
+   "powerModifier": 0,
+   "factionSize": 0,
+   "leaderId": "929d26ed-789d-4694-97c0-27ac7340bf12",
+   "values": {
+    "a": 0.4897,
+    "b": 0.1142,
+    "c": 0.396
+   },
+   "beliefa": "neutral",
+   "beliefb": "positive",
+   "beliefc": "negative"
+  },
+  {
+   "id": "fractured",
+   "name": "Fractured",
+   "type": "SocialClass",
+   "active": true,
+   "momentum": -10,
+   "baseLegitimacy": 25,
+   "powerModifier": 0,
+   "factionSize": 0,
+   "leaderId": null,
+   "values": {
+    "a": 0.6404,
+    "b": 0.0,
+    "c": 0.3596
+   },
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "heirs",
+   "name": "Heirs",
+   "type": "SocialClass",
+   "active": true,
+   "momentum": 5,
+   "baseLegitimacy": 55,
+   "powerModifier": 0,
+   "factionSize": 0,
+   "leaderId": null,
+   "values": {
+    "a": 0.2907,
+    "b": 0.1592,
+    "c": 0.5502
+   },
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "institute",
+   "name": "EGRESS Institute",
+   "type": "Faction",
+   "active": true,
+   "momentum": 5,
+   "baseLegitimacy": 70,
+   "powerModifier": 0,
+   "factionSize": 0,
+   "leaderId": "96e8ae60-735a-4df5-aa8b-35e001980594",
+   "values": {
+    "a": 0.4427,
+    "b": 0.338,
+    "c": 0.2193
+   },
+   "beliefa": "neutral",
+   "beliefb": "negative",
+   "beliefc": "neutral"
+  },
+  {
+   "id": "keepers",
+   "name": "The Order of Theia",
+   "type": "Faction",
+   "active": true,
+   "momentum": -90,
+   "baseLegitimacy": 80,
+   "powerModifier": 20,
+   "factionSize": 0,
+   "leaderId": "41c59623-27a2-4143-8900-67dee1fb8c8c",
+   "values": {
+    "a": 0.121,
+    "b": 0.879,
+    "c": 0.0
+   },
+   "beliefa": "negative",
+   "beliefb": "negative",
+   "beliefc": "positive"
+  },
+  {
+   "id": "seekers",
+   "name": "The Dawn Assembly",
+   "type": "Faction",
+   "active": true,
+   "momentum": 5,
+   "baseLegitimacy": 65,
+   "powerModifier": 0,
+   "factionSize": 0,
+   "leaderId": "7b74e337-3c4b-4ffc-955c-90aaaf3dfded",
+   "values": {
+    "a": 0.2697,
+    "b": 0.2878,
+    "c": 0.4425
+   },
+   "beliefa": "neutral",
+   "beliefb": "positive",
+   "beliefc": "negative"
+  },
+  {
+   "id": "shattered",
+   "name": "Shattered",
+   "type": "Faction",
+   "active": true,
+   "momentum": -15,
+   "baseLegitimacy": 30,
+   "powerModifier": 0,
+   "factionSize": 0,
+   "leaderId": "00463e27-e42c-4058-bc10-cfe3de8bda9f",
+   "values": {
+    "a": 0.234,
+    "b": 0.0,
+    "c": 0.766
+   },
+   "beliefa": "positive",
+   "beliefb": "positive",
+   "beliefc": "negative"
+  },
+  {
+   "id": "witnesses",
+   "name": "Witnesses",
+   "type": "Faction",
+   "active": true,
+   "momentum": -5,
+   "baseLegitimacy": 85,
+   "powerModifier": 0,
+   "factionSize": 0,
+   "leaderId": "8564d584-3ee7-4ac1-b5dc-2a9d428acbf5",
+   "values": {
+    "a": 0.7508,
+    "b": 0.2492,
+    "c": 0.0
+   },
+   "beliefa": "positive",
+   "beliefb": "negative",
+   "beliefc": "positive"
+  }
+ ],
+ "characters": [
+  {
+   "id": "ba38bcd2-f397-477e-b490-cedf4b6eb54f",
+   "name": "Sister Marra",
+   "characterType": "NPC",
+   "factionId": "witnesses",
+   "socialClassId": "burdened",
+   "state": "Alive",
+   "pressure": 35,
+   "conviction": 70,
+   "influence": 80,
+   "impressionable": 30,
+   "doubtDirection": "b",
+   "values": {
+    "a": 0.72,
+    "b": 0.18,
+    "c": 0.1
+   },
+   "locationId": "3bace93c-baaa-4502-af40-f1580f2a1a12",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "dc4f8ff5-683f-4808-8bf8-6f0ae77e5eb9",
+   "name": "Lysa Trent",
+   "characterType": "NPC",
+   "factionId": "aspis",
+   "socialClassId": "civilians",
+   "state": "Alive",
+   "pressure": 15,
+   "conviction": 82,
+   "influence": 92,
+   "impressionable": 20,
+   "doubtDirection": "b",
+   "values": {
+    "a": 0.05,
+    "b": 0.55,
+    "c": 0.4
+   },
+   "locationId": "d9a59066-55a9-4623-a6fa-0082da2d05fa",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "3c6db2ca-0084-4377-952c-1cbba95e4ca9",
+   "name": "Fenwick Bristlethorn",
+   "characterType": "NPC",
+   "factionId": "witnesses",
+   "socialClassId": "civilians",
+   "state": "Alive",
+   "pressure": 55,
+   "conviction": 35,
+   "influence": 15,
+   "impressionable": 70,
+   "doubtDirection": "c",
+   "values": {
+    "a": 0.6506540826617453,
+    "b": 0.11128517457821828,
+    "c": 0.23806074276003641
+   },
+   "locationId": "2ea04a14-7b36-4e41-b009-b4a99b9992f4",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "e0342897-9617-4b11-8ba2-b755a0bda7d0",
+   "name": "Asha Weaver",
+   "characterType": "NPC",
+   "factionId": "seekers",
+   "socialClassId": "heirs",
+   "state": "Alive",
+   "pressure": 60,
+   "conviction": 25,
+   "influence": 50,
+   "impressionable": 85,
+   "doubtDirection": null,
+   "values": {
+    "a": 0.2,
+    "b": 0.35,
+    "c": 0.45
+   },
+   "locationId": "3cf68c5a-352c-459c-85fd-349a4fda9771",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "6a54ca76-b7d5-4a3f-b1bc-7ef43c4db455",
+   "name": "Boruk Stonehand",
+   "characterType": "NPC",
+   "factionId": "keepers",
+   "socialClassId": "burdened",
+   "state": "Alive",
+   "pressure": 10,
+   "conviction": 88,
+   "influence": 35,
+   "impressionable": 15,
+   "doubtDirection": "a",
+   "values": {
+    "a": 0.15,
+    "b": 0.75,
+    "c": 0.1
+   },
+   "locationId": "28acb662-af23-457d-bfdb-15c9c3a1b2c3",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "886bf28e-b0bd-4a7e-8376-0821872b5b8a",
+   "name": "Nim-of-Many",
+   "characterType": "NPC",
+   "factionId": "cult",
+   "socialClassId": "fractured",
+   "state": "Alive",
+   "pressure": 70,
+   "conviction": 15,
+   "influence": 5,
+   "impressionable": 90,
+   "doubtDirection": "a",
+   "values": {
+    "a": 0.3622,
+    "b": 0.1132,
+    "c": 0.5246
+   },
+   "locationId": "30134375-d2d3-4707-8a29-9eed622bfd91",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "a08579f1-5a6f-46fb-a608-99fe672caf53",
+   "name": "Korga Flint",
+   "characterType": "NPC",
+   "factionId": "shattered",
+   "socialClassId": "fractured",
+   "state": "Alive",
+   "pressure": 45,
+   "conviction": 60,
+   "influence": 20,
+   "impressionable": 45,
+   "doubtDirection": "a",
+   "values": {
+    "a": 0.3,
+    "b": 0.1,
+    "c": 0.6
+   },
+   "locationId": "457752e2-da90-4b9f-a1cd-60cf0ca0b7ca",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "905068c3-3c8d-4c31-921e-cca768788529",
+   "name": "Elias Thorn",
+   "characterType": "NPC",
+   "factionId": "institute",
+   "socialClassId": "civilians",
+   "state": "Alive",
+   "pressure": 50,
+   "conviction": 40,
+   "influence": 25,
+   "impressionable": 60,
+   "doubtDirection": "c",
+   "values": {
+    "a": 0.42,
+    "b": 0.43,
+    "c": 0.15
+   },
+   "locationId": "3af23a75-08f8-4e13-ba1c-7187c8428aad",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "9ab1feac-4302-4795-babf-93e20ff6b35c",
+   "name": "Rinna Tealeaf",
+   "characterType": "NPC",
+   "factionId": "aspis",
+   "socialClassId": "civilians",
+   "state": "Alive",
+   "pressure": 35,
+   "conviction": 45,
+   "influence": 40,
+   "impressionable": 55,
+   "doubtDirection": "a",
+   "values": {
+    "a": 0.1,
+    "b": 0.6,
+    "c": 0.3
+   },
+   "locationId": "7fdd0357-e615-4263-b4b2-56c8b2e50b5a",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "8977963a-19cd-4794-a7dc-bff9944e8b15",
+   "name": "Jorren Vale",
+   "characterType": "NPC",
+   "factionId": "keepers",
+   "socialClassId": "heirs",
+   "state": "Alive",
+   "pressure": 50,
+   "conviction": 55,
+   "influence": 30,
+   "impressionable": 50,
+   "doubtDirection": "c",
+   "values": {
+    "a": 0.2,
+    "b": 0.65,
+    "c": 0.15
+   },
+   "locationId": "d959ee52-18d5-413a-8631-60a50db15252",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "df312f8a-613e-4a21-bfc3-8abad84d0c31",
+   "name": "Ysra Moonfall",
+   "characterType": "NPC",
+   "factionId": "witnesses",
+   "socialClassId": "burdened",
+   "state": "Alive",
+   "pressure": 25,
+   "conviction": 65,
+   "influence": 45,
+   "impressionable": 35,
+   "doubtDirection": "b",
+   "values": {
+    "a": 0.68,
+    "b": 0.22,
+    "c": 0.1
+   },
+   "locationId": "59896d52-8d20-442d-bec9-83ff9324735c",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "3fb42f2a-e015-46c7-969f-0772d4bcfbd9",
+   "name": "Tobin Marsh",
+   "characterType": "NPC",
+   "factionId": "seekers",
+   "socialClassId": "fractured",
+   "state": "Alive",
+   "pressure": 75,
+   "conviction": 30,
+   "influence": 18,
+   "impressionable": 80,
+   "doubtDirection": "c",
+   "values": {
+    "a": 0.25,
+    "b": 0.3,
+    "c": 0.45
+   },
+   "locationId": "21165f06-d416-4f5a-a8f8-cac77c63b312",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "8aeb7ad6-b29e-4913-960e-870a68f82804",
+   "name": "Velka Runebinder",
+   "characterType": "NPC",
+   "factionId": "institute",
+   "socialClassId": "burdened",
+   "state": "Alive",
+   "pressure": 5,
+   "conviction": 92,
+   "influence": 55,
+   "impressionable": 20,
+   "doubtDirection": "a",
+   "values": {
+    "a": 0.48,
+    "b": 0.42,
+    "c": 0.1
+   },
+   "locationId": "740b42a7-5317-48f4-9fb1-2093726065ac",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "c505299f-4241-492e-8d26-c229a16d10c6",
+   "name": "Pip Quickstep",
+   "characterType": "NPC",
+   "factionId": "keepers",
+   "socialClassId": "civilians",
+   "state": "Alive",
+   "pressure": 20,
+   "conviction": 20,
+   "influence": 5,
+   "impressionable": 95,
+   "doubtDirection": "b",
+   "values": {
+    "a": 0.25,
+    "b": 0.55,
+    "c": 0.2
+   },
+   "locationId": "2ea04a14-7b36-4e41-b009-b4a99b9992f4",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "c2d2c764-712a-440d-b598-4ff66c3ec558",
+   "name": "Sarith Dawnsong",
+   "characterType": "NPC",
+   "factionId": "cult",
+   "socialClassId": "heirs",
+   "state": "Alive",
+   "pressure": 55,
+   "conviction": 50,
+   "influence": 30,
+   "impressionable": 65,
+   "doubtDirection": null,
+   "values": {
+    "a": 0.38,
+    "b": 0.08,
+    "c": 0.54
+   },
+   "locationId": "215ebd7a-3cf8-43e1-991e-a5e8cbb23dae",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "e9e37787-07f9-4af9-9378-d4a68db9159c",
+   "name": "Vorik Ash",
+   "characterType": "NPC",
+   "factionId": "shattered",
+   "socialClassId": "fractured",
+   "state": "Alive",
+   "pressure": 65,
+   "conviction": 90,
+   "influence": 85,
+   "impressionable": 10,
+   "doubtDirection": "c",
+   "values": {
+    "a": 0.35,
+    "b": 0.05,
+    "c": 0.6
+   },
+   "locationId": "0b8edc49-b03f-48cb-a234-d1abca75b0c0",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "acf97ca5-db51-4c47-bca8-22f6c5788115",
+   "name": "Edrion Vykas",
+   "characterType": "NPC",
+   "factionId": "keepers",
+   "socialClassId": "burdened",
+   "state": "Alive",
+   "pressure": 20,
+   "conviction": 50,
+   "influence": 90,
+   "impressionable": 15,
+   "doubtDirection": "a",
+   "values": {
+    "a": 0.18,
+    "b": 0.72,
+    "c": 0.1
+   },
+   "locationId": "5688583c-b89e-4d50-a912-198a90abef84",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "2f14bfd9-63c7-4a63-9679-6e254123e6e6",
+   "name": "Talen Voss",
+   "characterType": "NPC",
+   "factionId": "seekers",
+   "socialClassId": "heirs",
+   "state": "Alive",
+   "pressure": 45,
+   "conviction": 65,
+   "influence": 75,
+   "impressionable": 40,
+   "doubtDirection": "c",
+   "values": {
+    "a": 0.22,
+    "b": 0.38,
+    "c": 0.4
+   },
+   "locationId": "ccdf7263-f204-44fc-a3ee-2d2e2c7c3551",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "cf8bb609-c41c-4b21-b1e9-e0e1d30567b4",
+   "name": "Professor Nhalia Lumina",
+   "characterType": "NPC",
+   "factionId": "institute",
+   "socialClassId": "burdened",
+   "state": "Alive",
+   "pressure": 25,
+   "conviction": 80,
+   "influence": 88,
+   "impressionable": 20,
+   "doubtDirection": "a",
+   "values": {
+    "a": 0.45,
+    "b": 0.45,
+    "c": 0.1
+   },
+   "locationId": "64656156-633a-459b-b4ae-6eb6145ab132",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "32fe9cb1-a645-478e-a0ea-7e7297ff31c8",
+   "name": "Brother Kesh",
+   "characterType": "NPC",
+   "factionId": "cult",
+   "socialClassId": "fractured",
+   "state": "Alive",
+   "pressure": 40,
+   "conviction": 75,
+   "influence": 78,
+   "impressionable": 25,
+   "doubtDirection": "c",
+   "values": {
+    "a": 0.35,
+    "b": 0.05,
+    "c": 0.6
+   },
+   "locationId": "30134375-d2d3-4707-8a29-9eed622bfd91",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "cb7715eb-c7be-4a49-a60a-b4217bc870b9",
+   "name": "Vic the Houseless",
+   "characterType": "PartyMember",
+   "factionId": null,
+   "socialClassId": null,
+   "state": "Alive",
+   "pressure": 0,
+   "conviction": 90,
+   "influence": 80,
+   "impressionable": 10,
+   "doubtDirection": "b",
+   "values": {
+    "a": 0.3333,
+    "b": 0.3333,
+    "c": 0.3333
+   },
+   "locationId": null,
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "41c59623-27a2-4143-8900-67dee1fb8c8c",
+   "name": "Serevan Ilvar",
+   "characterType": "NPC",
+   "factionId": "keepers",
+   "socialClassId": "burdened",
+   "state": "Alive",
+   "pressure": 75,
+   "conviction": 98,
+   "influence": 95,
+   "impressionable": 5,
+   "doubtDirection": "b",
+   "values": {
+    "a": 0.044,
+    "b": 0.901,
+    "c": 0.055
+   },
+   "locationId": "5688583c-b89e-4d50-a912-198a90abef84",
+   "beliefa": "negative",
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "892f6c8b-679b-4973-8ae9-faa23d71d740",
+   "name": "The Observer",
+   "characterType": "NPC",
+   "factionId": null,
+   "socialClassId": null,
+   "state": "Alive",
+   "pressure": 25,
+   "conviction": 85,
+   "influence": 30,
+   "impressionable": 20,
+   "doubtDirection": "c",
+   "values": {
+    "a": 0.5,
+    "b": 0.25,
+    "c": 0.25
+   },
+   "locationId": "08906af5-c3e7-4411-a2ee-11a2d9da5519",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "1e7dc50c-b814-404c-b211-4f3dba516e7e",
+   "name": "Perrik Tallow",
+   "characterType": "NPC",
+   "factionId": "aspis",
+   "socialClassId": "civilians",
+   "state": "Alive",
+   "pressure": 85,
+   "conviction": 75,
+   "influence": 78,
+   "impressionable": 40,
+   "doubtDirection": "b",
+   "values": {
+    "a": 0.08,
+    "b": 0.6,
+    "c": 0.32
+   },
+   "locationId": "0d8dedbe-c082-4f9b-b1b4-4f54be3b92bc",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "65dff6f5-4be0-4a8e-b400-a3927dddb00c",
+   "name": "Varenya \"Vara\" Cairn",
+   "characterType": "NPC",
+   "factionId": null,
+   "socialClassId": "burdened",
+   "state": "Alive",
+   "pressure": 50,
+   "conviction": 50,
+   "influence": 85,
+   "impressionable": 70,
+   "doubtDirection": "a",
+   "values": {
+    "a": 0.2058950725326538,
+    "b": 0.1155183728245822,
+    "c": 0.678586554642764
+   },
+   "locationId": "52c51d5d-1fb8-4884-a1c5-ef2ffc571d04",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": "positive"
+  },
+  {
+   "id": "5005863a-d86e-4f18-b749-3631d1c0ac37",
+   "name": "Marek Cairn",
+   "characterType": "NPC",
+   "factionId": "keepers",
+   "socialClassId": "burdened",
+   "state": "Forgotten",
+   "pressure": 0,
+   "conviction": 90,
+   "influence": 10,
+   "impressionable": 20,
+   "doubtDirection": "a",
+   "values": {
+    "a": 0.4,
+    "b": 0.35,
+    "c": 0.25
+   },
+   "locationId": null,
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "8564d584-3ee7-4ac1-b5dc-2a9d428acbf5",
+   "name": "Uldren Harthwright",
+   "characterType": "NPC",
+   "factionId": "witnesses",
+   "socialClassId": "burdened",
+   "state": "Alive",
+   "pressure": 60,
+   "conviction": 75,
+   "influence": 58,
+   "impressionable": 30,
+   "doubtDirection": "c",
+   "values": {
+    "a": 0.25,
+    "b": 0.55,
+    "c": 0.2
+   },
+   "locationId": "52c51d5d-1fb8-4884-a1c5-ef2ffc571d04",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "1f710eca-bcd1-47ad-aed7-f7fbd391ff2c",
+   "name": "Celia Harthwright",
+   "characterType": "NPC",
+   "factionId": "witnesses",
+   "socialClassId": "burdened",
+   "state": "Alive",
+   "pressure": 45,
+   "conviction": 80,
+   "influence": 70,
+   "impressionable": 25,
+   "doubtDirection": "b",
+   "values": {
+    "a": 0.7,
+    "b": 0.2,
+    "c": 0.1
+   },
+   "locationId": "59896d52-8d20-442d-bec9-83ff9324735c",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "0d7a238d-28e3-463f-9ea3-c74eb81ae543",
+   "name": "Kelda Varruk",
+   "characterType": "NPC",
+   "factionId": "keepers",
+   "socialClassId": "civilians",
+   "state": "Alive",
+   "pressure": 65,
+   "conviction": 75,
+   "influence": 85,
+   "impressionable": 30,
+   "doubtDirection": "a",
+   "values": {
+    "a": 0.15,
+    "b": 0.75,
+    "c": 0.1
+   },
+   "locationId": "d959ee52-18d5-413a-8631-60a50db15252",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "1517a791-7574-43ff-90d9-2c820c6d4afd",
+   "name": "Kivren Quozot",
+   "characterType": "NPC",
+   "factionId": "shattered",
+   "socialClassId": "fractured",
+   "state": "Alive",
+   "pressure": 70,
+   "conviction": 75,
+   "influence": 60,
+   "impressionable": 35,
+   "doubtDirection": "a",
+   "values": {
+    "a": 0.3,
+    "b": 0.05,
+    "c": 0.65
+   },
+   "locationId": "457752e2-da90-4b9f-a1cd-60cf0ca0b7ca",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "929d26ed-789d-4694-97c0-27ac7340bf12",
+   "name": "Maelyn",
+   "characterType": "NPC",
+   "factionId": "cult",
+   "socialClassId": "burdened",
+   "state": "Alive",
+   "pressure": 35,
+   "conviction": 85,
+   "influence": 80,
+   "impressionable": 25,
+   "doubtDirection": null,
+   "values": {
+    "a": 0.4107,
+    "b": 0.1676,
+    "c": 0.4217
+   },
+   "locationId": "215ebd7a-3cf8-43e1-991e-a5e8cbb23dae",
+   "beliefa": "neutral",
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "941d9464-6097-4983-b19b-5b77e37064ef",
+   "name": "Tarn",
+   "characterType": "NPC",
+   "factionId": "cult",
+   "socialClassId": "civilians",
+   "state": "Alive",
+   "pressure": 35,
+   "conviction": 75,
+   "influence": 45,
+   "impressionable": 40,
+   "doubtDirection": null,
+   "values": {
+    "a": 0.35,
+    "b": 0.25,
+    "c": 0.4
+   },
+   "locationId": "215ebd7a-3cf8-43e1-991e-a5e8cbb23dae",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "7b74e337-3c4b-4ffc-955c-90aaaf3dfded",
+   "name": "Julian Arrett",
+   "characterType": "NPC",
+   "factionId": "seekers",
+   "socialClassId": "heirs",
+   "state": "Alive",
+   "pressure": 55,
+   "conviction": 90,
+   "influence": 92,
+   "impressionable": 10,
+   "doubtDirection": null,
+   "values": {
+    "a": 0.15,
+    "b": 0.3,
+    "c": 0.55
+   },
+   "locationId": "bf1d35e4-4f0e-4a28-bf73-4143b9984168",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "04018319-5c04-42df-ad5f-7ab1a0dd6671",
+   "name": "Miriel Stoutfoot",
+   "characterType": "NPC",
+   "factionId": "seekers",
+   "socialClassId": "heirs",
+   "state": "Alive",
+   "pressure": 50,
+   "conviction": 70,
+   "influence": 75,
+   "impressionable": 45,
+   "doubtDirection": null,
+   "values": {
+    "a": 0.3,
+    "b": 0.3,
+    "c": 0.4
+   },
+   "locationId": "bf1d35e4-4f0e-4a28-bf73-4143b9984168",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "363c7a9c-092d-473f-92a1-d4ffb18f9c6a",
+   "name": "Tomlin Cobb",
+   "characterType": "NPC",
+   "factionId": null,
+   "socialClassId": "fractured",
+   "state": "Alive",
+   "pressure": 80,
+   "conviction": 85,
+   "influence": 45,
+   "impressionable": 15,
+   "doubtDirection": "a",
+   "values": {
+    "a": 0.55,
+    "b": 0.35,
+    "c": 0.1
+   },
+   "locationId": "5400bc94-36c5-4ec9-acfb-1822667d7788",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "96e8ae60-735a-4df5-aa8b-35e001980594",
+   "name": "Veyra Kess",
+   "characterType": "NPC",
+   "factionId": "institute",
+   "socialClassId": "burdened",
+   "state": "Alive",
+   "pressure": 55,
+   "conviction": 96,
+   "influence": 90,
+   "impressionable": 5,
+   "doubtDirection": "a",
+   "values": {
+    "a": 0.48,
+    "b": 0.42,
+    "c": 0.1
+   },
+   "locationId": "64656156-633a-459b-b4ae-6eb6145ab132",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "f374dad1-d495-4d8d-9564-02f553511325",
+   "name": "Orlombuthalde Nix",
+   "characterType": "NPC",
+   "factionId": "institute",
+   "socialClassId": "burdened",
+   "state": "Alive",
+   "pressure": 45,
+   "conviction": 88,
+   "influence": 55,
+   "impressionable": 25,
+   "doubtDirection": "b",
+   "values": {
+    "a": 0.55,
+    "b": 0.35,
+    "c": 0.1
+   },
+   "locationId": "3af23a75-08f8-4e13-ba1c-7187c8428aad",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "1279beb4-17b6-4360-bd3e-7c8cdd4d7549",
+   "name": "Damaris Holt",
+   "characterType": "NPC",
+   "factionId": "shattered",
+   "socialClassId": "burdened",
+   "state": "Alive",
+   "pressure": 55,
+   "conviction": 84,
+   "influence": 52,
+   "impressionable": 22,
+   "doubtDirection": "b",
+   "values": {
+    "a": 0.45,
+    "b": 0.05,
+    "c": 0.5
+   },
+   "locationId": "137dd3dd-a6c2-4fb2-b13f-f26c484f4b58",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "00463e27-e42c-4058-bc10-cfe3de8bda9f",
+   "name": "Tavia Rusk",
+   "characterType": "NPC",
+   "factionId": "shattered",
+   "socialClassId": "heirs",
+   "state": "Alive",
+   "pressure": 70,
+   "conviction": 96,
+   "influence": 38,
+   "impressionable": 5,
+   "doubtDirection": "b",
+   "values": {
+    "a": 0.25,
+    "b": 0.02,
+    "c": 0.73
+   },
+   "locationId": "457752e2-da90-4b9f-a1cd-60cf0ca0b7ca",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "2d9e30d1-663b-4985-ae56-a1e460fb00a6",
+   "name": "Merit Vance",
+   "characterType": "NPC",
+   "factionId": "aspis",
+   "socialClassId": "civilians",
+   "state": "Alive",
+   "pressure": 35,
+   "conviction": 82,
+   "influence": 70,
+   "impressionable": 18,
+   "doubtDirection": "a",
+   "values": {
+    "a": 0.08,
+    "b": 0.47,
+    "c": 0.45
+   },
+   "locationId": null,
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "34f53539-4873-4ba5-875e-d0fc73e6ba17",
+   "name": "Hadrik Sorn",
+   "characterType": "NPC",
+   "factionId": "aspis",
+   "socialClassId": "civilians",
+   "state": "Alive",
+   "pressure": 45,
+   "conviction": 78,
+   "influence": 58,
+   "impressionable": 25,
+   "doubtDirection": "c",
+   "values": {
+    "a": 0.05,
+    "b": 0.7,
+    "c": 0.25
+   },
+   "locationId": "d9a59066-55a9-4623-a6fa-0082da2d05fa",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "597e2c44-1101-44b5-9147-8b1ac805b679",
+   "name": "Orrister Fenbottom",
+   "characterType": "NPC",
+   "factionId": "witnesses",
+   "socialClassId": "burdened",
+   "state": "Alive",
+   "pressure": 0,
+   "conviction": 75,
+   "influence": 5,
+   "impressionable": 50,
+   "doubtDirection": "a",
+   "values": {
+    "a": 0.5380216361838526,
+    "b": 0.3812377614535283,
+    "c": 0.08074060236261915
+   },
+   "locationId": "3bace93c-baaa-4502-af40-f1580f2a1a12",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "2206402e-d0c7-4f48-bc18-88bc6725bc8f",
+   "name": "Aletheia",
+   "characterType": "NPC",
+   "factionId": null,
+   "socialClassId": "burdened",
+   "state": "Forgotten",
+   "pressure": 0,
+   "conviction": 100,
+   "influence": 15,
+   "impressionable": 5,
+   "doubtDirection": null,
+   "values": {
+    "a": 0.45,
+    "b": 0.15,
+    "c": 0.4
+   },
+   "locationId": null,
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "10d86e0e-3e4b-4a12-94c9-631a800ae944",
+   "name": "Sundara Cobb",
+   "characterType": "NPC",
+   "factionId": null,
+   "socialClassId": "burdened",
+   "state": "Forgotten",
+   "pressure": 0,
+   "conviction": 60,
+   "influence": 5,
+   "impressionable": 40,
+   "doubtDirection": "a",
+   "values": {
+    "a": 0.3333,
+    "b": 0.3333,
+    "c": 0.3334
+   },
+   "locationId": null,
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "6a91ba1f-8fc1-4e49-a87a-9f910a8c6a9f",
+   "name": "Evin Peakwalker",
+   "characterType": "NPC",
+   "factionId": "keepers",
+   "socialClassId": "burdened",
+   "state": "Forgotten",
+   "pressure": 0,
+   "conviction": 85,
+   "influence": 5,
+   "impressionable": 25,
+   "doubtDirection": null,
+   "values": {
+    "a": 0.3333,
+    "b": 0.3333,
+    "c": 0.3334
+   },
+   "locationId": null,
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "f1c5240f-56f4-4c91-9374-88ea57f04d29",
+   "name": "P\u00e9p\u00e9 Sylvya",
+   "characterType": "NPC",
+   "factionId": null,
+   "socialClassId": "burdened",
+   "state": "Forgotten",
+   "pressure": 0,
+   "conviction": 50,
+   "influence": 100,
+   "impressionable": 50,
+   "doubtDirection": "c",
+   "values": {
+    "a": 0.13099776982388064,
+    "b": 0.7458292400880596,
+    "c": 0.12317299008805971
+   },
+   "locationId": null,
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  },
+  {
+   "id": "47b1088e-b4e8-4231-8b79-c6d317b2a17a",
+   "name": "Gressa Peakwalker",
+   "characterType": "NPC",
+   "factionId": null,
+   "socialClassId": "fractured",
+   "state": "Alive",
+   "pressure": 0,
+   "conviction": 50,
+   "influence": 0,
+   "impressionable": 100,
+   "doubtDirection": "c",
+   "values": {
+    "a": 0.7596439827237468,
+    "b": 0.056790224547217535,
+    "c": 0.18356579272903567
+   },
+   "locationId": "21165f06-d416-4f5a-a8f8-cac77c63b312",
+   "beliefa": null,
+   "beliefb": null,
+   "beliefc": null
+  }
+ ],
+ "assets": [
+  {
+   "id": "e2098a9c-6c31-4b4b-8a16-1041a2d69d91",
+   "name": "Book of Names",
+   "type": "Artifact",
+   "role": "Covert",
+   "tier": 5,
+   "keystone": true,
+   "status": "Stable",
+   "controllingFactionId": "keepers",
+   "locationId": "28acb662-af23-457d-bfdb-15c9c3a1b2c3",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "3f58aca7-10ad-4fdd-ac80-b37f473f910b",
+   "name": "The Ritual Chamber",
+   "type": "Infrastructure",
+   "role": "Covert",
+   "tier": 4,
+   "keystone": false,
+   "status": "Stable",
+   "controllingFactionId": "keepers",
+   "locationId": "3bace93c-baaa-4502-af40-f1580f2a1a12",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "955837b4-5ecc-491f-b4d7-de1702e63792",
+   "name": "Hall of the Keepers",
+   "type": "Infrastructure",
+   "role": "Operational",
+   "tier": 4,
+   "keystone": false,
+   "status": "Stable",
+   "controllingFactionId": "keepers",
+   "locationId": "2ea04a14-7b36-4e41-b009-b4a99b9992f4",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "12f6d2e8-4695-42e9-ac44-a2e6742b9d02",
+   "name": "Bell of the Sun",
+   "type": "Artifact",
+   "role": "Mandate",
+   "tier": 4,
+   "keystone": false,
+   "status": "Stable",
+   "controllingFactionId": "keepers",
+   "locationId": "40f85e0b-3f01-48a9-bfb0-a6cebda409b1",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "6403e2f2-5bc3-4a15-8b54-748b492869e5",
+   "name": "Hall of Remembrance",
+   "type": "Infrastructure",
+   "role": "Operational",
+   "tier": 4,
+   "keystone": false,
+   "status": "Stable",
+   "controllingFactionId": "witnesses",
+   "locationId": "137dd3dd-a6c2-4fb2-b13f-f26c484f4b58",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "5c3cdd5c-0321-47e3-9cdc-e8652163190d",
+   "name": "House of Abiding",
+   "type": "Infrastructure",
+   "role": "Strategic",
+   "tier": 4,
+   "keystone": false,
+   "status": "Stable",
+   "controllingFactionId": "witnesses",
+   "locationId": "137dd3dd-a6c2-4fb2-b13f-f26c484f4b58",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "92220b6d-3523-4d91-85e8-491c20d9ed12",
+   "name": "The Ledger",
+   "type": "Artifact",
+   "role": "Covert",
+   "tier": 5,
+   "keystone": true,
+   "status": "Stable",
+   "controllingFactionId": "witnesses",
+   "locationId": "3bace93c-baaa-4502-af40-f1580f2a1a12",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "ff0d5870-c94c-443f-957e-0d872373366f",
+   "name": "The Empty Lectern",
+   "type": "Artifact",
+   "role": "Symbolic",
+   "tier": 3,
+   "keystone": false,
+   "status": "Stable",
+   "controllingFactionId": "witnesses",
+   "locationId": "3bace93c-baaa-4502-af40-f1580f2a1a12",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "ced96c5d-670a-42ed-b736-9bb04164d20f",
+   "name": "Assembly Hall",
+   "type": "Infrastructure",
+   "role": "Operational",
+   "tier": 4,
+   "keystone": false,
+   "status": "Stable",
+   "controllingFactionId": "seekers",
+   "locationId": "ccdf7263-f204-44fc-a3ee-2d2e2c7c3551",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "6f59c91b-b1d7-4735-92c1-fe027dd36388",
+   "name": "Public Works Yard",
+   "type": "Infrastructure",
+   "role": "Strategic",
+   "tier": 4,
+   "keystone": false,
+   "status": "Stable",
+   "controllingFactionId": "seekers",
+   "locationId": "0b8edc49-b03f-48cb-a234-d1abca75b0c0",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "c727a048-4fa3-42bf-9e33-fde7ca5e5ed2",
+   "name": "Dawn Charter",
+   "type": "Artifact",
+   "role": "Mandate",
+   "tier": 5,
+   "keystone": true,
+   "status": "Stable",
+   "controllingFactionId": "seekers",
+   "locationId": "bf1d35e4-4f0e-4a28-bf73-4143b9984168",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "6d139ecc-e99f-4344-8816-61b5810786c3",
+   "name": "Civic Improvement Fund",
+   "type": "Resource",
+   "role": "Strategic",
+   "tier": 4,
+   "keystone": false,
+   "status": "Stable",
+   "controllingFactionId": "seekers",
+   "locationId": "bf1d35e4-4f0e-4a28-bf73-4143b9984168",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "79a685aa-ec5d-4c49-b888-2317218c75da",
+   "name": "Hidden Stockpiles",
+   "type": "Resource",
+   "role": "Covert",
+   "tier": 4,
+   "keystone": false,
+   "status": "Stable",
+   "controllingFactionId": "shattered",
+   "locationId": null,
+   "statusActorFactionId": null
+  },
+  {
+   "id": "4b676579-8dd9-4512-b875-ae0db97bcbe9",
+   "name": "The Broken Bell",
+   "type": "Infrastructure",
+   "role": "Covert",
+   "tier": 4,
+   "keystone": false,
+   "status": "Stable",
+   "controllingFactionId": "shattered",
+   "locationId": "c8e30dfb-46c9-4aac-9d8f-1005df955c99",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "d789ddfd-d031-4059-bf9c-5660840aa883",
+   "name": "Dead Drop Network",
+   "type": "Intelligence",
+   "role": "Covert",
+   "tier": 3,
+   "keystone": false,
+   "status": "Stable",
+   "controllingFactionId": "shattered",
+   "locationId": null,
+   "statusActorFactionId": null
+  },
+  {
+   "id": "7056739c-bf04-4dc5-b65f-56a500572fab",
+   "name": "Fractured Objects",
+   "type": "Artifact",
+   "role": "Covert",
+   "tier": 5,
+   "keystone": true,
+   "status": "Stable",
+   "controllingFactionId": "shattered",
+   "locationId": null,
+   "statusActorFactionId": null
+  },
+  {
+   "id": "8d9f7f95-2b4f-40ba-863a-a2310da29cb8",
+   "name": "Duskwood Shrine",
+   "type": "Infrastructure",
+   "role": "Symbolic",
+   "tier": 4,
+   "keystone": false,
+   "status": "Stable",
+   "controllingFactionId": "cult",
+   "locationId": "ca5d2bb8-3ab5-4e88-9e6d-9986e4afb0b4",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "38b3bff9-b15f-4064-b2c0-dfa2b861bacb",
+   "name": "The Offering Chest",
+   "type": "Resource",
+   "role": "Strategic",
+   "tier": 3,
+   "keystone": false,
+   "status": "Stable",
+   "controllingFactionId": "cult",
+   "locationId": "215ebd7a-3cf8-43e1-991e-a5e8cbb23dae",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "2d1a8b50-3459-456a-baab-f938e29ae276",
+   "name": "Pilgrim's Rest",
+   "type": "Infrastructure",
+   "role": "Operational",
+   "tier": 4,
+   "keystone": false,
+   "status": "Stable",
+   "controllingFactionId": "cult",
+   "locationId": "30134375-d2d3-4707-8a29-9eed622bfd91",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "d48b3e73-ed16-4314-a000-ff6da0007143",
+   "name": "Face of the Unknown",
+   "type": "Artifact",
+   "role": "Symbolic",
+   "tier": 5,
+   "keystone": true,
+   "status": "Stable",
+   "controllingFactionId": "cult",
+   "locationId": "30134375-d2d3-4707-8a29-9eed622bfd91",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "78c2d44e-1b60-4381-82d6-9e9acee6b0d2",
+   "name": "EGRESS Institute",
+   "type": "Infrastructure",
+   "role": "Operational",
+   "tier": 4,
+   "keystone": false,
+   "status": "Stable",
+   "controllingFactionId": "institute",
+   "locationId": "21165f06-d416-4f5a-a8f8-cac77c63b312",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "64f51360-de07-43b7-b050-7ef7456bad52",
+   "name": "Engram Vault",
+   "type": "Artifact",
+   "role": "Covert",
+   "tier": 5,
+   "keystone": true,
+   "status": "Stable",
+   "controllingFactionId": "institute",
+   "locationId": "64656156-633a-459b-b4ae-6eb6145ab132",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "5067a1b0-1fa1-4209-8d49-cfb47689fb7d",
+   "name": "Occlusion Containment",
+   "type": "Infrastructure",
+   "role": "Covert",
+   "tier": 5,
+   "keystone": false,
+   "status": "Stable",
+   "controllingFactionId": "institute",
+   "locationId": "64656156-633a-459b-b4ae-6eb6145ab132",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "55a9d695-2144-4d5a-8137-05efb024be5d",
+   "name": "Research Archive",
+   "type": "Intelligence",
+   "role": "Covert",
+   "tier": 4,
+   "keystone": false,
+   "status": "Stable",
+   "controllingFactionId": "institute",
+   "locationId": "64656156-633a-459b-b4ae-6eb6145ab132",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "0caa5f7d-bda7-4af4-bb5a-0e0f093db6e1",
+   "name": "Claims Registry",
+   "type": "Intelligence",
+   "role": "Covert",
+   "tier": 4,
+   "keystone": false,
+   "status": "Stable",
+   "controllingFactionId": "aspis",
+   "locationId": "0d8dedbe-c082-4f9b-b1b4-4f54be3b92bc",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "c9e342d5-e48e-471d-a7b3-a896d2d0af17",
+   "name": "River Exchange",
+   "type": "Infrastructure",
+   "role": "Operational",
+   "tier": 5,
+   "keystone": true,
+   "status": "Stable",
+   "controllingFactionId": "aspis",
+   "locationId": "7fdd0357-e615-4263-b4b2-56c8b2e50b5a",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "16d9508f-5b59-4efc-aca8-01b789b63f51",
+   "name": "Docks",
+   "type": "Infrastructure",
+   "role": "Strategic",
+   "tier": 4,
+   "keystone": false,
+   "status": "Stable",
+   "controllingFactionId": "aspis",
+   "locationId": "d9a59066-55a9-4623-a6fa-0082da2d05fa",
+   "statusActorFactionId": null
+  },
+  {
+   "id": "d4a31538-5f7c-48c6-bce4-3e9c52a4eaad",
+   "name": "Clearing House",
+   "type": "Infrastructure",
+   "role": "Strategic",
+   "tier": 4,
+   "keystone": false,
+   "status": "Stable",
+   "controllingFactionId": "aspis",
+   "locationId": "2ea04a14-7b36-4e41-b009-b4a99b9992f4",
+   "statusActorFactionId": null
+  }
+ ],
+ "goals": [
+  {
+   "id": "5a3c3c08-e4e0-4c07-8975-04bd6a5d9d6a",
+   "factionId": "shattered",
+   "title": "Steal the Ledger",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Critical",
+   "visibility": "Known",
+   "targetEntityType": "Asset",
+   "targetEntityId": "92220b6d-3523-4d91-85e8-491c20d9ed12",
+   "targetState": null,
+   "targetOwnerFactionId": "shattered",
+   "championId": "1279beb4-17b6-4360-bd3e-7c8cdd4d7549",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "615abbae-2fec-4270-b502-29c1637c6ab5",
+   "factionId": "keepers",
+   "title": "Maintain the Book of Names",
+   "status": "Progressing",
+   "conditionType": "Maintain",
+   "priority": "Major",
+   "visibility": "Known",
+   "targetEntityType": "Asset",
+   "targetEntityId": "e2098a9c-6c31-4b4b-8a16-1041a2d69d91",
+   "targetState": "Stable",
+   "targetOwnerFactionId": null,
+   "championId": "acf97ca5-db51-4c47-bca8-22f6c5788115",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "dbfad034-d981-4aee-9f6a-57d2dea8605a",
+   "factionId": "witnesses",
+   "title": "Protect the Ledger",
+   "status": "Progressing",
+   "conditionType": "Maintain",
+   "priority": "Major",
+   "visibility": "Known",
+   "targetEntityType": "Asset",
+   "targetEntityId": "92220b6d-3523-4d91-85e8-491c20d9ed12",
+   "targetState": "Stable",
+   "targetOwnerFactionId": null,
+   "championId": "ba38bcd2-f397-477e-b490-cedf4b6eb54f",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "2976ada1-5124-4dad-8af8-66eaa5308060",
+   "factionId": "seekers",
+   "title": "Sunset the Order",
+   "status": "Progressing",
+   "conditionType": "Achieve",
+   "priority": "Major",
+   "visibility": "Known",
+   "targetEntityType": "Faction",
+   "targetEntityId": "keepers",
+   "targetState": null,
+   "targetOwnerFactionId": null,
+   "championId": "7b74e337-3c4b-4ffc-955c-90aaaf3dfded",
+   "targetProperty": "influence",
+   "targetOperator": "lte",
+   "targetThreshold": 35
+  },
+  {
+   "id": "4021df52-2e6d-4af3-bb75-b982a9373a5e",
+   "factionId": "institute",
+   "title": "Protect Occlusion Containment",
+   "status": "Progressing",
+   "conditionType": "Maintain",
+   "priority": "Major",
+   "visibility": "Secret",
+   "targetEntityType": "Asset",
+   "targetEntityId": "5067a1b0-1fa1-4209-8d49-cfb47689fb7d",
+   "targetState": "Stable",
+   "targetOwnerFactionId": null,
+   "championId": "f374dad1-d495-4d8d-9564-02f553511325",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "5406a0cc-c198-4ebc-b719-30a2561563e4",
+   "factionId": "cult",
+   "title": "Await the Pilgrims",
+   "status": "Progressing",
+   "conditionType": "Maintain",
+   "priority": "Critical",
+   "visibility": "Known",
+   "targetEntityType": "Asset",
+   "targetEntityId": "2d1a8b50-3459-456a-baab-f938e29ae276",
+   "targetState": "Stable",
+   "targetOwnerFactionId": null,
+   "championId": "929d26ed-789d-4694-97c0-27ac7340bf12",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "67fe02c3-330a-4563-b685-3a9e68bbfac8",
+   "factionId": "keepers",
+   "title": "Complete the Ritual",
+   "status": "Progressing",
+   "conditionType": "Achieve",
+   "priority": "Critical",
+   "visibility": "Open",
+   "targetEntityType": "Character",
+   "targetEntityId": null,
+   "targetState": "Forgotten",
+   "targetOwnerFactionId": null,
+   "championId": "41c59623-27a2-4143-8900-67dee1fb8c8c",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "2c16e93c-87d4-4262-92d8-6f16ad192876",
+   "factionId": "keepers",
+   "title": "Sunset the Dawn",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Minor",
+   "visibility": "Open",
+   "targetEntityType": "Faction",
+   "targetEntityId": "seekers",
+   "targetState": null,
+   "targetOwnerFactionId": null,
+   "championId": "c505299f-4241-492e-8d26-c229a16d10c6",
+   "targetProperty": "momentum",
+   "targetOperator": "lte",
+   "targetThreshold": -20
+  },
+  {
+   "id": "783de804-d426-4f67-a3a3-e93beb35ea47",
+   "factionId": "shattered",
+   "title": "Steal Fractured Objects",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Major",
+   "visibility": "Open",
+   "targetEntityType": "Asset",
+   "targetEntityId": "6403e2f2-5bc3-4a15-8b54-748b492869e5",
+   "targetState": null,
+   "targetOwnerFactionId": "shattered",
+   "championId": "1517a791-7574-43ff-90d9-2c820c6d4afd",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "d678b8fd-41bb-4542-801f-68d3fc3e17c3",
+   "factionId": "aspis",
+   "title": "Patrol the Docks",
+   "status": "Progressing",
+   "conditionType": "Maintain",
+   "priority": "Minor",
+   "visibility": "Open",
+   "targetEntityType": "Asset",
+   "targetEntityId": "16d9508f-5b59-4efc-aca8-01b789b63f51",
+   "targetState": "Stable",
+   "targetOwnerFactionId": null,
+   "championId": "34f53539-4873-4ba5-875e-d0fc73e6ba17",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "4cc27044-cc37-45a0-a91f-ccd33910aeec",
+   "factionId": "keepers",
+   "title": "Contain Anomalies",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Major",
+   "visibility": "Open",
+   "targetEntityType": "Asset",
+   "targetEntityId": "7056739c-bf04-4dc5-b65f-56a500572fab",
+   "targetState": "Destroyed",
+   "targetOwnerFactionId": null,
+   "championId": "0d7a238d-28e3-463f-9ea3-c74eb81ae543",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "9ae89441-9b41-4f7c-85ad-a92a4eeacd8f",
+   "factionId": "witnesses",
+   "title": "Recover Fractured Objects",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Major",
+   "visibility": "Open",
+   "targetEntityType": "Asset",
+   "targetEntityId": "7056739c-bf04-4dc5-b65f-56a500572fab",
+   "targetState": null,
+   "targetOwnerFactionId": "witnesses",
+   "championId": "1f710eca-bcd1-47ad-aed7-f7fbd391ff2c",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "2822c497-2c2a-4b72-81a6-5decaa299974",
+   "factionId": "witnesses",
+   "title": "Twilight the Dawn",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Minor",
+   "visibility": "Known",
+   "targetEntityType": "Faction",
+   "targetEntityId": "seekers",
+   "targetState": null,
+   "targetOwnerFactionId": null,
+   "championId": "3c6db2ca-0084-4377-952c-1cbba95e4ca9",
+   "targetProperty": "power",
+   "targetOperator": "lte",
+   "targetThreshold": 40
+  },
+  {
+   "id": "6336b6ac-68a6-4e5f-bede-cc83828f6a75",
+   "factionId": "witnesses",
+   "title": "Empty the Reform Treasury",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Major",
+   "visibility": "Secret",
+   "targetEntityType": "Asset",
+   "targetEntityId": "6d139ecc-e99f-4344-8816-61b5810786c3",
+   "targetState": null,
+   "targetOwnerFactionId": "witnesses",
+   "championId": "df312f8a-613e-4a21-bfc3-8abad84d0c31",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "7aa79d6e-661f-40ad-a14b-cd6906f4b49b",
+   "factionId": "seekers",
+   "title": "Open the Book of Names",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Major",
+   "visibility": "Secret",
+   "targetEntityType": "Asset",
+   "targetEntityId": "e2098a9c-6c31-4b4b-8a16-1041a2d69d91",
+   "targetState": null,
+   "targetOwnerFactionId": "seekers",
+   "championId": "2f14bfd9-63c7-4a63-9679-6e254123e6e6",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "91941b95-331e-497c-b2a0-e1e8a54013da",
+   "factionId": "seekers",
+   "title": "Gain Momentum",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Minor",
+   "visibility": "Known",
+   "targetEntityType": "Faction",
+   "targetEntityId": "seekers",
+   "targetState": null,
+   "targetOwnerFactionId": null,
+   "championId": "e0342897-9617-4b11-8ba2-b755a0bda7d0",
+   "targetProperty": "momentum",
+   "targetOperator": "gte",
+   "targetThreshold": 30
+  },
+  {
+   "id": "8bd0a0cb-8930-491c-9361-4d0aa26d413f",
+   "factionId": "seekers",
+   "title": "Stop the Ritual",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Critical",
+   "visibility": "Open",
+   "targetEntityType": "Character",
+   "targetEntityId": null,
+   "targetState": null,
+   "targetOwnerFactionId": null,
+   "championId": "7b74e337-3c4b-4ffc-955c-90aaaf3dfded",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "5d3026c0-09a7-47e0-9306-55ca93911bfe",
+   "factionId": "seekers",
+   "title": "Secure the Hall of Keepers",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Major",
+   "visibility": "Secret",
+   "targetEntityType": "Asset",
+   "targetEntityId": "955837b4-5ecc-491f-b4d7-de1702e63792",
+   "targetState": null,
+   "targetOwnerFactionId": "seekers",
+   "championId": "3fb42f2a-e015-46c7-969f-0772d4bcfbd9",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "eb6229a5-92a6-44e4-82d6-cc791b63064a",
+   "factionId": "shattered",
+   "title": "Silence the Bell",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Major",
+   "visibility": "Secret",
+   "targetEntityType": "Asset",
+   "targetEntityId": "12f6d2e8-4695-42e9-ac44-a2e6742b9d02",
+   "targetState": "Destroyed",
+   "targetOwnerFactionId": null,
+   "championId": "e9e37787-07f9-4af9-9378-d4a68db9159c",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "6735b150-58fb-4cfe-9256-d124a46fdbc8",
+   "factionId": "shattered",
+   "title": "Break the Lectern",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Major",
+   "visibility": "Secret",
+   "targetEntityType": "Asset",
+   "targetEntityId": "ff0d5870-c94c-443f-957e-0d872373366f",
+   "targetState": "Destroyed",
+   "targetOwnerFactionId": null,
+   "championId": "a08579f1-5a6f-46fb-a608-99fe672caf53",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "927aa7b6-d391-484b-9f58-145d45d9421e",
+   "factionId": "institute",
+   "title": "Recover Fractured Objects",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Major",
+   "visibility": "Open",
+   "targetEntityType": "Asset",
+   "targetEntityId": "7056739c-bf04-4dc5-b65f-56a500572fab",
+   "targetState": null,
+   "targetOwnerFactionId": "institute",
+   "championId": "905068c3-3c8d-4c31-921e-cca768788529",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "42da29be-19bc-4fb7-93e1-f2abe8aa637a",
+   "factionId": "institute",
+   "title": "Freeze the Civic Improvement Fund",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Major",
+   "visibility": "Secret",
+   "targetEntityType": "Asset",
+   "targetEntityId": "6d139ecc-e99f-4344-8816-61b5810786c3",
+   "targetState": null,
+   "targetOwnerFactionId": "institute",
+   "championId": "8aeb7ad6-b29e-4913-960e-870a68f82804",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "65d6e10e-dbc6-4b35-9e2c-2526421cae1d",
+   "factionId": "institute",
+   "title": "Stop the Reckoning",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Minor",
+   "visibility": "Open",
+   "targetEntityType": "Faction",
+   "targetEntityId": "shattered",
+   "targetState": null,
+   "targetOwnerFactionId": null,
+   "championId": "cf8bb609-c41c-4b21-b1e9-e0e1d30567b4",
+   "targetProperty": "momentum",
+   "targetOperator": "lte",
+   "targetThreshold": -20
+  },
+  {
+   "id": "d92ad42a-77b8-47dd-bb0c-4c1599548839",
+   "factionId": "cult",
+   "title": "Abide",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Major",
+   "visibility": "Secret",
+   "targetEntityType": "Asset",
+   "targetEntityId": "5c3cdd5c-0321-47e3-9cdc-e8652163190d",
+   "targetState": null,
+   "targetOwnerFactionId": "cult",
+   "championId": "941d9464-6097-4983-b19b-5b77e37064ef",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "cbfba392-9945-40b2-a216-eda8c286f560",
+   "factionId": "keepers",
+   "title": "Break the Shattered",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Minor",
+   "visibility": "Open",
+   "targetEntityType": "Asset",
+   "targetEntityId": "d789ddfd-d031-4059-bf9c-5660840aa883",
+   "targetState": "Damaged",
+   "targetOwnerFactionId": null,
+   "championId": "8977963a-19cd-4794-a7dc-bff9944e8b15",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "0cf3f25e-3eab-4024-a712-1a6a68455823",
+   "factionId": "cult",
+   "title": "Connect",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Major",
+   "visibility": "Secret",
+   "targetEntityType": "Asset",
+   "targetEntityId": "0caa5f7d-bda7-4af4-bb5a-0e0f093db6e1",
+   "targetState": null,
+   "targetOwnerFactionId": "cult",
+   "championId": "886bf28e-b0bd-4a7e-8376-0821872b5b8a",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "f55c28b3-d9dd-489c-b431-54a2598ad0ee",
+   "factionId": "cult",
+   "title": "Reveal",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Major",
+   "visibility": "Known",
+   "targetEntityType": "Asset",
+   "targetEntityId": "7056739c-bf04-4dc5-b65f-56a500572fab",
+   "targetState": null,
+   "targetOwnerFactionId": "cult",
+   "championId": "c2d2c764-712a-440d-b598-4ff66c3ec558",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "f7b1c7a6-865f-44c4-9fbf-be233fea2533",
+   "factionId": "cult",
+   "title": "Understand",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Major",
+   "visibility": "Known",
+   "targetEntityType": "Asset",
+   "targetEntityId": "92220b6d-3523-4d91-85e8-491c20d9ed12",
+   "targetState": null,
+   "targetOwnerFactionId": "cult",
+   "championId": "32fe9cb1-a645-478e-a0ea-7e7297ff31c8",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "5e6312a0-21e3-40ef-8a83-aab7612a351f",
+   "factionId": "aspis",
+   "title": "Acquire the Book of Names",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Major",
+   "visibility": "Open",
+   "targetEntityType": "Asset",
+   "targetEntityId": "e2098a9c-6c31-4b4b-8a16-1041a2d69d91",
+   "targetState": null,
+   "targetOwnerFactionId": "aspis",
+   "championId": "2d9e30d1-663b-4985-ae56-a1e460fb00a6",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "c33d87ec-d377-451b-9456-12bec77fbe8d",
+   "factionId": "aspis",
+   "title": "Balance the Books",
+   "status": "Progressing",
+   "conditionType": "Maintain",
+   "priority": "Critical",
+   "visibility": "Known",
+   "targetEntityType": "Asset",
+   "targetEntityId": "0caa5f7d-bda7-4af4-bb5a-0e0f093db6e1",
+   "targetState": "Stable",
+   "targetOwnerFactionId": null,
+   "championId": "1e7dc50c-b814-404c-b211-4f3dba516e7e",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "8ec2638b-d7cc-474b-9a66-2739ffc29194",
+   "factionId": "aspis",
+   "title": "Audit the Offering Chest",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Minor",
+   "visibility": "Known",
+   "targetEntityType": "Asset",
+   "targetEntityId": "38b3bff9-b15f-4064-b2c0-dfa2b861bacb",
+   "targetState": null,
+   "targetOwnerFactionId": "aspis",
+   "championId": "9ab1feac-4302-4795-babf-93e20ff6b35c",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "3f168448-0881-4d03-a9de-22fb1bad9405",
+   "factionId": "seekers",
+   "title": "Manage Reform Funds",
+   "status": "Progressing",
+   "conditionType": "Maintain",
+   "priority": "Major",
+   "visibility": "Known",
+   "targetEntityType": "Asset",
+   "targetEntityId": "6d139ecc-e99f-4344-8816-61b5810786c3",
+   "targetState": "Stable",
+   "targetOwnerFactionId": null,
+   "championId": "04018319-5c04-42df-ad5f-7ab1a0dd6671",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "065d690d-ee2e-4d7c-909b-0af0b7d61b84",
+   "factionId": "institute",
+   "title": "Do Science",
+   "status": "Progressing",
+   "conditionType": "Maintain",
+   "priority": "Critical",
+   "visibility": "Known",
+   "targetEntityType": "Asset",
+   "targetEntityId": "64f51360-de07-43b7-b050-7ef7456bad52",
+   "targetState": "Stable",
+   "targetOwnerFactionId": null,
+   "championId": "96e8ae60-735a-4df5-aa8b-35e001980594",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "5c099723-da62-4032-9fe2-66fd55020e90",
+   "factionId": "aspis",
+   "title": "Facilitate Trade",
+   "status": "Progressing",
+   "conditionType": "Maintain",
+   "priority": "Major",
+   "visibility": "Open",
+   "targetEntityType": "Asset",
+   "targetEntityId": "c9e342d5-e48e-471d-a7b3-a896d2d0af17",
+   "targetState": "Stable",
+   "targetOwnerFactionId": null,
+   "championId": "dc4f8ff5-683f-4808-8bf8-6f0ae77e5eb9",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "e7677617-78b9-4e15-ac94-e29ce65c4935",
+   "factionId": "witnesses",
+   "title": "Prepare the Chosen",
+   "status": "Progressing",
+   "conditionType": "Maintain",
+   "priority": "Critical",
+   "visibility": "Known",
+   "targetEntityType": "Asset",
+   "targetEntityId": "5c3cdd5c-0321-47e3-9cdc-e8652163190d",
+   "targetState": "Stable",
+   "targetOwnerFactionId": null,
+   "championId": "8564d584-3ee7-4ac1-b5dc-2a9d428acbf5",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  },
+  {
+   "id": "6c8fbe28-6183-4309-9ac8-2a2217ed4178",
+   "factionId": "shattered",
+   "title": "Take out the Keeper",
+   "status": "Plotting",
+   "conditionType": "Achieve",
+   "priority": "Major",
+   "visibility": "Secret",
+   "targetEntityType": "Character",
+   "targetEntityId": "65dff6f5-4be0-4a8e-b400-a3927dddb00c",
+   "targetState": "Dead",
+   "targetOwnerFactionId": null,
+   "championId": "00463e27-e42c-4058-bc10-cfe3de8bda9f",
+   "targetProperty": null,
+   "targetOperator": null,
+   "targetThreshold": null
+  }
+ ],
+ "locations": [
+  {
+   "id": "21165f06-d416-4f5a-a8f8-cac77c63b312",
+   "name": "The Colony",
+   "state": "Active"
+  },
+  {
+   "id": "bf1d35e4-4f0e-4a28-bf73-4143b9984168",
+   "name": "Assembly Hall",
+   "state": "Active"
+  },
+  {
+   "id": "40f85e0b-3f01-48a9-bfb0-a6cebda409b1",
+   "name": "Town Square",
+   "state": "Active"
+  },
+  {
+   "id": "457752e2-da90-4b9f-a1cd-60cf0ca0b7ca",
+   "name": "The Broken Bell",
+   "state": "Active"
+  },
+  {
+   "id": "d959ee52-18d5-413a-8631-60a50db15252",
+   "name": "The Garrison",
+   "state": "Active"
+  },
+  {
+   "id": "f41367c8-263a-4bfa-a149-6cbaaba6cf54",
+   "name": "Darkmoon Plains",
+   "state": "Active"
+  },
+  {
+   "id": "ca5d2bb8-3ab5-4e88-9e6d-9986e4afb0b4",
+   "name": "The Duskwood",
+   "state": "Abandoned"
+  },
+  {
+   "id": "215ebd7a-3cf8-43e1-991e-a5e8cbb23dae",
+   "name": "Pilgrim's Rest",
+   "state": "Active"
+  },
+  {
+   "id": "52c51d5d-1fb8-4884-a1c5-ef2ffc571d04",
+   "name": "House of Abiding",
+   "state": "Active"
+  },
+  {
+   "id": "59896d52-8d20-442d-bec9-83ff9324735c",
+   "name": "Hall of Remembrance",
+   "state": "Active"
+  },
+  {
+   "id": "740b42a7-5317-48f4-9fb1-2093726065ac",
+   "name": "Engram Vault",
+   "state": "Active"
+  },
+  {
+   "id": "64656156-633a-459b-b4ae-6eb6145ab132",
+   "name": "EGRESS Institute",
+   "state": "Active"
+  },
+  {
+   "id": "7bc5a284-690c-47e5-87ee-0f6abb9acc6d",
+   "name": "Old Town",
+   "state": "Ruined"
+  },
+  {
+   "id": "0d8dedbe-c082-4f9b-b1b4-4f54be3b92bc",
+   "name": "Clearing House",
+   "state": "Active"
+  },
+  {
+   "id": "3bace93c-baaa-4502-af40-f1580f2a1a12",
+   "name": "Memorial Building",
+   "state": "Active"
+  },
+  {
+   "id": "30134375-d2d3-4707-8a29-9eed622bfd91",
+   "name": "Pilgrim Quarter",
+   "state": "Active"
+  },
+  {
+   "id": "137dd3dd-a6c2-4fb2-b13f-f26c484f4b58",
+   "name": "Abiding Way",
+   "state": "Active"
+  },
+  {
+   "id": "08906af5-c3e7-4411-a2ee-11a2d9da5519",
+   "name": "The Manor",
+   "state": "Abandoned"
+  },
+  {
+   "id": "d9a59066-55a9-4623-a6fa-0082da2d05fa",
+   "name": "Mercantile District",
+   "state": "Active"
+  },
+  {
+   "id": "0b8edc49-b03f-48cb-a234-d1abca75b0c0",
+   "name": "West District",
+   "state": "Active"
+  },
+  {
+   "id": "5688583c-b89e-4d50-a912-198a90abef84",
+   "name": "Hall of Keepers",
+   "state": "Active"
+  },
+  {
+   "id": "9b80eed0-533a-4f1d-ac29-7c7555d99422",
+   "name": "Monument of the First Keeper",
+   "state": "Active"
+  },
+  {
+   "id": "d7777b1b-6002-4420-b34c-787bf80e4851",
+   "name": "Candlestone Caverns",
+   "state": "Ruined"
+  },
+  {
+   "id": "28acb662-af23-457d-bfdb-15c9c3a1b2c3",
+   "name": "Ritual Chamber",
+   "state": "Active"
+  },
+  {
+   "id": "ccdf7263-f204-44fc-a3ee-2d2e2c7c3551",
+   "name": "Dawn District",
+   "state": "Active"
+  },
+  {
+   "id": "7fdd0357-e615-4263-b4b2-56c8b2e50b5a",
+   "name": "The Riverfront",
+   "state": "Active"
+  },
+  {
+   "id": "02152a64-000f-46d4-b7ac-c9fa996636f4",
+   "name": "High Bank",
+   "state": "Active"
+  },
+  {
+   "id": "3cf68c5a-352c-459c-85fd-349a4fda9771",
+   "name": "Lower Bank",
+   "state": "Active"
+  },
+  {
+   "id": "c8e30dfb-46c9-4aac-9d8f-1005df955c99",
+   "name": "The Duskway",
+   "state": "Active"
+  },
+  {
+   "id": "2ea04a14-7b36-4e41-b009-b4a99b9992f4",
+   "name": "Keeper District",
+   "state": "Active"
+  },
+  {
+   "id": "67ec2b91-9429-47ae-9399-8a65c7073d7e",
+   "name": "Milltown",
+   "state": "Active"
+  },
+  {
+   "id": "3af23a75-08f8-4e13-ba1c-7187c8428aad",
+   "name": "Occlusion Containment",
+   "state": "Active"
+  },
+  {
+   "id": "657f67f0-4646-4397-829d-5fd9e4e89420",
+   "name": "Dead Drop Network",
+   "state": "Active"
+  },
+  {
+   "id": "7a491a9e-7894-424e-beaa-de0b70255cad",
+   "name": "Crescent Island",
+   "state": "Abandoned"
+  },
+  {
+   "id": "2632471e-0044-4512-bf80-6029150f7cff",
+   "name": "Hidden Tunnel",
+   "state": "Abandoned"
+  },
+  {
+   "id": "e80a6222-c4f5-4302-8288-254aa055c9bd",
+   "name": "Veiled House",
+   "state": "Abandoned"
+  },
+  {
+   "id": "5400bc94-36c5-4ec9-acfb-1822667d7788",
+   "name": "Old Cemetery",
+   "state": "Ruined"
+  }
+ ],
+ "sessions": [
+  {
+   "id": "5a0b639f-7479-4f68-8b48-656576219651",
+   "number": 1,
+   "title": "The Introduction",
+   "act": 1,
+   "week": 1,
+   "events": [
+    {
+     "id": "876ab10b-7ecb-4190-ae74-1b638a8daec7",
+     "sessionId": "5a0b639f-7479-4f68-8b48-656576219651",
+     "title": "An Event Name",
+     "sortOrder": 0,
+     "isSynthetic": false,
+     "effects": [
+      {
+       "id": "00e7c15a-8083-42ed-abbb-a0c0722f7df0",
+       "eventId": "876ab10b-7ecb-4190-ae74-1b638a8daec7",
+       "targetType": "faction",
+       "targetId": "keepers",
+       "property": "momentum",
+       "delta": -20.0,
+       "value": null,
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "676578b0-5951-4548-892b-be925da60a6a",
+       "eventId": "876ab10b-7ecb-4190-ae74-1b638a8daec7",
+       "targetType": "faction",
+       "targetId": "shattered",
+       "property": "momentum",
+       "delta": 10.0,
+       "value": null,
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    },
+    {
+     "id": "99ca74ce-19a1-446d-aff4-6d7d5342507d",
+     "sessionId": "5a0b639f-7479-4f68-8b48-656576219651",
+     "title": "Test",
+     "sortOrder": 1,
+     "isSynthetic": false,
+     "effects": [
+      {
+       "id": "73dce7a7-8124-4c8e-b44a-a39212645510",
+       "eventId": "99ca74ce-19a1-446d-aff4-6d7d5342507d",
+       "targetType": "colony",
+       "targetId": "colony",
+       "property": "stress",
+       "delta": -1.0,
+       "value": null,
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "ba17e99e-5c3f-4dc0-95a4-32a27842646f",
+       "eventId": "99ca74ce-19a1-446d-aff4-6d7d5342507d",
+       "targetType": "faction",
+       "targetId": "institute",
+       "property": "momentum",
+       "delta": -20.0,
+       "value": null,
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "d535452a-0efc-4c93-962a-1f5df9d63f90",
+       "eventId": "99ca74ce-19a1-446d-aff4-6d7d5342507d",
+       "targetType": "character",
+       "targetId": "905068c3-3c8d-4c31-921e-cca768788529",
+       "property": "state",
+       "delta": 0.0,
+       "value": "Dead",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    },
+    {
+     "id": "c75b1830-ad2c-4f0d-858d-3a07e6a0889d",
+     "sessionId": "5a0b639f-7479-4f68-8b48-656576219651",
+     "title": "MapEdits",
+     "sortOrder": 0,
+     "isSynthetic": true,
+     "effects": [
+      {
+       "id": "73d33cd6-18e5-4e02-a82e-8c1563c3d61d",
+       "eventId": "c75b1830-ad2c-4f0d-858d-3a07e6a0889d",
+       "targetType": "character",
+       "targetId": "363c7a9c-092d-473f-92a1-d4ffb18f9c6a",
+       "property": "locationChange",
+       "delta": 0.0,
+       "value": "7bc5a284-690c-47e5-87ee-0f6abb9acc6d",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "24ce0951-43f7-4ddc-9d2d-a72b99bbcff8",
+       "eventId": "c75b1830-ad2c-4f0d-858d-3a07e6a0889d",
+       "targetType": "character",
+       "targetId": "363c7a9c-092d-473f-92a1-d4ffb18f9c6a",
+       "property": "mapPlacement",
+       "delta": 0.0,
+       "value": "{\"mapId\":\"297a23bb-fe3b-45e2-93d7-5872ae0adccd\",\"geometryType\":\"Point\",\"geometryData\":\"[0.4183674568965517,0.6714682112068965]\"}",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    },
+    {
+     "id": "1e948a8e-4b0e-4244-a025-c96282346cfd",
+     "sessionId": "5a0b639f-7479-4f68-8b48-656576219651",
+     "title": "MapEdits",
+     "sortOrder": 0,
+     "isSynthetic": true,
+     "effects": [
+      {
+       "id": "001f8f97-31a5-4f49-b1f0-bf8f406f603e",
+       "eventId": "1e948a8e-4b0e-4244-a025-c96282346cfd",
+       "targetType": "character",
+       "targetId": "363c7a9c-092d-473f-92a1-d4ffb18f9c6a",
+       "property": "mapPlacement",
+       "delta": 0.0,
+       "value": "{\"mapId\":\"297a23bb-fe3b-45e2-93d7-5872ae0adccd\",\"geometryType\":\"Point\",\"geometryData\":\"[0.38600754310344826,0.6240840517241378]\"}",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "687783a9-a5f1-4662-b4c5-ce38a47a75f8",
+   "number": 2,
+   "title": "The Secret",
+   "act": 1,
+   "week": 2,
+   "events": [
+    {
+     "id": "60c40c1e-c35a-424d-ad85-13cca67e1b08",
+     "sessionId": "687783a9-a5f1-4662-b4c5-ce38a47a75f8",
+     "title": "Oh No",
+     "sortOrder": 0,
+     "isSynthetic": false,
+     "effects": [
+      {
+       "id": "20dc404f-7519-42bf-91af-5aec81988d03",
+       "eventId": "60c40c1e-c35a-424d-ad85-13cca67e1b08",
+       "targetType": "character",
+       "targetId": "e0342897-9617-4b11-8ba2-b755a0bda7d0",
+       "property": "influence",
+       "delta": 20.0,
+       "value": null,
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "95a9958b-b65d-4701-bdb3-a6f8bbef7d22",
+       "eventId": "60c40c1e-c35a-424d-ad85-13cca67e1b08",
+       "targetType": "colony",
+       "targetId": "colony",
+       "property": "stress",
+       "delta": 1.0,
+       "value": null,
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "a6f99b7c-408e-4355-b467-386db93c269f",
+       "eventId": "60c40c1e-c35a-424d-ad85-13cca67e1b08",
+       "targetType": "faction",
+       "targetId": "institute",
+       "property": "momentum",
+       "delta": -20.0,
+       "value": null,
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "e8382e3e-6a04-4d99-ab98-8b6c7b56bbe3",
+       "eventId": "60c40c1e-c35a-424d-ad85-13cca67e1b08",
+       "targetType": "faction",
+       "targetId": "keepers",
+       "property": "momentum",
+       "delta": -20.0,
+       "value": null,
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    },
+    {
+     "id": "e1c328f1-0da3-4677-96c4-962779226111",
+     "sessionId": "687783a9-a5f1-4662-b4c5-ce38a47a75f8",
+     "title": "New Event",
+     "sortOrder": 1,
+     "isSynthetic": false,
+     "effects": [
+      {
+       "id": "67fb883e-ca6c-4d8c-a5d7-80397a274440",
+       "eventId": "e1c328f1-0da3-4677-96c4-962779226111",
+       "targetType": "faction",
+       "targetId": "aspis",
+       "property": "momentum",
+       "delta": -10.0,
+       "value": null,
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "796cc6d9-638e-466a-b441-4d723e7b343c",
+       "eventId": "e1c328f1-0da3-4677-96c4-962779226111",
+       "targetType": "character",
+       "targetId": "3c6db2ca-0084-4377-952c-1cbba95e4ca9",
+       "property": "state",
+       "delta": 0.0,
+       "value": "Forgotten",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "9d5bf5f9-f495-4a2e-aa02-f5a4d9006b84",
+       "eventId": "e1c328f1-0da3-4677-96c4-962779226111",
+       "targetType": "faction",
+       "targetId": "institute",
+       "property": "momentum",
+       "delta": 10.0,
+       "value": null,
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "d51b9144-375e-47e3-81fc-e46f6c72a31f",
+       "eventId": "e1c328f1-0da3-4677-96c4-962779226111",
+       "targetType": "faction",
+       "targetId": "shattered",
+       "property": "momentum",
+       "delta": 10.0,
+       "value": null,
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    },
+    {
+     "id": "e5fb1cea-b798-45a0-beda-c59710c23f76",
+     "sessionId": "687783a9-a5f1-4662-b4c5-ce38a47a75f8",
+     "title": "MapEdits",
+     "sortOrder": 0,
+     "isSynthetic": true,
+     "effects": [
+      {
+       "id": "068ed9dd-12bc-4793-bbed-06c891553708",
+       "eventId": "e5fb1cea-b798-45a0-beda-c59710c23f76",
+       "targetType": "character",
+       "targetId": "363c7a9c-092d-473f-92a1-d4ffb18f9c6a",
+       "property": "locationChange",
+       "delta": 0.0,
+       "value": "7bc5a284-690c-47e5-87ee-0f6abb9acc6d",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    },
+    {
+     "id": "a93f47a4-b5a7-40cc-b331-0bd9a1cdea86",
+     "sessionId": "687783a9-a5f1-4662-b4c5-ce38a47a75f8",
+     "title": "MapEdits",
+     "sortOrder": 0,
+     "isSynthetic": true,
+     "effects": [
+      {
+       "id": "a18dee92-c662-4895-9c0d-6d22397d30b5",
+       "eventId": "a93f47a4-b5a7-40cc-b331-0bd9a1cdea86",
+       "targetType": "character",
+       "targetId": "363c7a9c-092d-473f-92a1-d4ffb18f9c6a",
+       "property": "mapPlacement",
+       "delta": 0.0,
+       "value": "{\"mapId\":\"297a23bb-fe3b-45e2-93d7-5872ae0adccd\",\"geometryType\":\"Point\",\"geometryData\":\"[0.45997306034482754,0.6263954741379311]\"}",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "598e8e92-53f3-44e7-bb41-042d1464faf2",
+   "number": 3,
+   "title": "The Unknown",
+   "act": 1,
+   "week": 3,
+   "events": [
+    {
+     "id": "045206fe-8669-4f4c-9ce4-6413e882f506",
+     "sessionId": "598e8e92-53f3-44e7-bb41-042d1464faf2",
+     "title": "Test",
+     "sortOrder": 0,
+     "isSynthetic": false,
+     "effects": [
+      {
+       "id": "b01c088a-78ba-45bb-b6a6-9d464f7dccf9",
+       "eventId": "045206fe-8669-4f4c-9ce4-6413e882f506",
+       "targetType": "character",
+       "targetId": "3fb42f2a-e015-46c7-969f-0772d4bcfbd9",
+       "property": "influence",
+       "delta": 10.0,
+       "value": null,
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "d6f97b9e-49a2-453e-99e3-7d8dbb1ed42a",
+       "eventId": "045206fe-8669-4f4c-9ce4-6413e882f506",
+       "targetType": "faction",
+       "targetId": "seekers",
+       "property": "momentum",
+       "delta": 20.0,
+       "value": null,
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    },
+    {
+     "id": "831561e5-3bd4-4298-867d-1107cf9eece9",
+     "sessionId": "598e8e92-53f3-44e7-bb41-042d1464faf2",
+     "title": "Another",
+     "sortOrder": 1,
+     "isSynthetic": false,
+     "effects": [
+      {
+       "id": "972ff700-56ba-4a79-b895-418cf5184968",
+       "eventId": "831561e5-3bd4-4298-867d-1107cf9eece9",
+       "targetType": "character",
+       "targetId": "dc4f8ff5-683f-4808-8bf8-6f0ae77e5eb9",
+       "property": "state",
+       "delta": 0.0,
+       "value": "Dead",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "c657be1d-b1a0-4473-81fe-878402c16263",
+       "eventId": "831561e5-3bd4-4298-867d-1107cf9eece9",
+       "targetType": "faction",
+       "targetId": "keepers",
+       "property": "momentum",
+       "delta": -10.0,
+       "value": null,
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    },
+    {
+     "id": "c7a7aa33-0fda-4731-a29c-956691f11b36",
+     "sessionId": "598e8e92-53f3-44e7-bb41-042d1464faf2",
+     "title": "MapEdits",
+     "sortOrder": 0,
+     "isSynthetic": true,
+     "effects": [
+      {
+       "id": "acf55d46-bb3c-47ac-aa57-427eec9211ca",
+       "eventId": "c7a7aa33-0fda-4731-a29c-956691f11b36",
+       "targetType": "character",
+       "targetId": "363c7a9c-092d-473f-92a1-d4ffb18f9c6a",
+       "property": "mapPlacement",
+       "delta": 0.0,
+       "value": "{\"mapId\":\"297a23bb-fe3b-45e2-93d7-5872ae0adccd\",\"geometryType\":\"Point\",\"geometryData\":\"[0.368671875,0.5836341594827585]\"}",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    },
+    {
+     "id": "d26c9572-5fc6-40d9-b0eb-fc717ba13333",
+     "sessionId": "598e8e92-53f3-44e7-bb41-042d1464faf2",
+     "title": "MapEdits",
+     "sortOrder": 0,
+     "isSynthetic": true,
+     "effects": [
+      {
+       "id": "a2550dc7-9e29-4213-acd1-4ca976d9185b",
+       "eventId": "d26c9572-5fc6-40d9-b0eb-fc717ba13333",
+       "targetType": "character",
+       "targetId": "363c7a9c-092d-473f-92a1-d4ffb18f9c6a",
+       "property": "locationChange",
+       "delta": 0.0,
+       "value": "7bc5a284-690c-47e5-87ee-0f6abb9acc6d",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "b9e99c80-c51b-4364-9b97-a6c4149aeb97",
+   "number": 4,
+   "title": "The Test",
+   "act": 1,
+   "week": 4,
+   "events": [
+    {
+     "id": "ce0f39b3-f10a-4df4-87e2-ef5c7f864c80",
+     "sessionId": "b9e99c80-c51b-4364-9b97-a6c4149aeb97",
+     "title": "New Event",
+     "sortOrder": 0,
+     "isSynthetic": false,
+     "effects": [
+      {
+       "id": "5068311c-62a8-465c-99e4-51c088601837",
+       "eventId": "ce0f39b3-f10a-4df4-87e2-ef5c7f864c80",
+       "targetType": "character",
+       "targetId": "c2d2c764-712a-440d-b598-4ff66c3ec558",
+       "property": "state",
+       "delta": 0.0,
+       "value": "Dead",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "5e559e7a-1819-4a21-9ba2-289df89df94a",
+       "eventId": "ce0f39b3-f10a-4df4-87e2-ef5c7f864c80",
+       "targetType": "character",
+       "targetId": "32fe9cb1-a645-478e-a0ea-7e7297ff31c8",
+       "property": "state",
+       "delta": 0.0,
+       "value": "Dead",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "9b7b4603-5489-4d83-90a7-aa01fafca437",
+       "eventId": "ce0f39b3-f10a-4df4-87e2-ef5c7f864c80",
+       "targetType": "character",
+       "targetId": "8aeb7ad6-b29e-4913-960e-870a68f82804",
+       "property": "state",
+       "delta": 0.0,
+       "value": "Forgotten",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "bd96b538-6934-4932-bf7b-6ed57a7fbbce",
+       "eventId": "ce0f39b3-f10a-4df4-87e2-ef5c7f864c80",
+       "targetType": "colony",
+       "targetId": "colony",
+       "property": "stress",
+       "delta": 2.0,
+       "value": null,
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "bfcef4c1-d5aa-419e-bbc2-a7bd9a1c5be5",
+       "eventId": "ce0f39b3-f10a-4df4-87e2-ef5c7f864c80",
+       "targetType": "character",
+       "targetId": "cf8bb609-c41c-4b21-b1e9-e0e1d30567b4",
+       "property": "factionChange",
+       "delta": 0.0,
+       "value": "aspis",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    },
+    {
+     "id": "25792df5-4fdd-411a-9614-e3ef33bdd98c",
+     "sessionId": "b9e99c80-c51b-4364-9b97-a6c4149aeb97",
+     "title": "MapEdits",
+     "sortOrder": 0,
+     "isSynthetic": true,
+     "effects": [
+      {
+       "id": "caec7656-6dc6-446e-9a0c-7bc9377c0a88",
+       "eventId": "25792df5-4fdd-411a-9614-e3ef33bdd98c",
+       "targetType": "character",
+       "targetId": "363c7a9c-092d-473f-92a1-d4ffb18f9c6a",
+       "property": "mapPlacement",
+       "delta": 0.0,
+       "value": "{\"mapId\":\"297a23bb-fe3b-45e2-93d7-5872ae0adccd\",\"geometryType\":\"Point\",\"geometryData\":\"[0.2981734913793103,0.6344854525862068]\"}",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    },
+    {
+     "id": "39c97c9e-a52c-4b48-8d88-1bc91754f9ef",
+     "sessionId": "b9e99c80-c51b-4364-9b97-a6c4149aeb97",
+     "title": "MapEdits",
+     "sortOrder": 0,
+     "isSynthetic": true,
+     "effects": [
+      {
+       "id": "a510cd09-128a-4887-8ba0-abff607cfc0b",
+       "eventId": "39c97c9e-a52c-4b48-8d88-1bc91754f9ef",
+       "targetType": "character",
+       "targetId": "363c7a9c-092d-473f-92a1-d4ffb18f9c6a",
+       "property": "locationChange",
+       "delta": 0.0,
+       "value": "7bc5a284-690c-47e5-87ee-0f6abb9acc6d",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "6b1114bc-9d7b-4b5c-9a39-2c06d9fbb59b",
+   "number": 5,
+   "title": "The Thing",
+   "act": 2,
+   "week": 1,
+   "events": [
+    {
+     "id": "e4d28a6d-48f5-4abb-825c-c17e7443998f",
+     "sessionId": "6b1114bc-9d7b-4b5c-9a39-2c06d9fbb59b",
+     "title": "New Event",
+     "sortOrder": 0,
+     "isSynthetic": false,
+     "effects": [
+      {
+       "id": "dbca44ec-8df5-4738-9dd6-2b09835ac8a6",
+       "eventId": "e4d28a6d-48f5-4abb-825c-c17e7443998f",
+       "targetType": "colony",
+       "targetId": "colony",
+       "property": "stress",
+       "delta": 1.0,
+       "value": null,
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    },
+    {
+     "id": "66c33352-2eec-4df8-88aa-0ec71a9b6325",
+     "sessionId": "6b1114bc-9d7b-4b5c-9a39-2c06d9fbb59b",
+     "title": "MapEdits",
+     "sortOrder": 0,
+     "isSynthetic": true,
+     "effects": [
+      {
+       "id": "d9c0089d-a076-4b96-ab4a-5e6c7047c90e",
+       "eventId": "66c33352-2eec-4df8-88aa-0ec71a9b6325",
+       "targetType": "character",
+       "targetId": "363c7a9c-092d-473f-92a1-d4ffb18f9c6a",
+       "property": "locationChange",
+       "delta": 0.0,
+       "value": "7bc5a284-690c-47e5-87ee-0f6abb9acc6d",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    },
+    {
+     "id": "453253e4-d470-40c2-971e-f50edb3bc6fd",
+     "sessionId": "6b1114bc-9d7b-4b5c-9a39-2c06d9fbb59b",
+     "title": "MapEdits",
+     "sortOrder": 0,
+     "isSynthetic": true,
+     "effects": [
+      {
+       "id": "af61dee4-0b22-4bc8-b627-63871efc01f3",
+       "eventId": "453253e4-d470-40c2-971e-f50edb3bc6fd",
+       "targetType": "character",
+       "targetId": "363c7a9c-092d-473f-92a1-d4ffb18f9c6a",
+       "property": "mapPlacement",
+       "delta": 0.0,
+       "value": "{\"mapId\":\"297a23bb-fe3b-45e2-93d7-5872ae0adccd\",\"geometryType\":\"Point\",\"geometryData\":\"[0.37560614224137934,0.6691567887931035]\"}",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2c1e50af-730b-40ff-933c-6c25e7759370",
+   "number": 6,
+   "title": "The Secret",
+   "act": 2,
+   "week": 2,
+   "events": [
+    {
+     "id": "11fe8751-a9f6-4b9e-bc50-b21492720f49",
+     "sessionId": "2c1e50af-730b-40ff-933c-6c25e7759370",
+     "title": "New Event",
+     "sortOrder": 0,
+     "isSynthetic": false,
+     "effects": [
+      {
+       "id": "328f00ea-1cf8-4123-a0d0-b2cb813222ea",
+       "eventId": "11fe8751-a9f6-4b9e-bc50-b21492720f49",
+       "targetType": "colony",
+       "targetId": "colony",
+       "property": "stress",
+       "delta": 1.0,
+       "value": null,
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    },
+    {
+     "id": "efcbeb3d-9fb0-4034-9180-2ec3fffc5e7a",
+     "sessionId": "2c1e50af-730b-40ff-933c-6c25e7759370",
+     "title": "MapEdits",
+     "sortOrder": 0,
+     "isSynthetic": true,
+     "effects": [
+      {
+       "id": "58fa58d5-109d-4f1f-aaae-fea7697a73b0",
+       "eventId": "efcbeb3d-9fb0-4034-9180-2ec3fffc5e7a",
+       "targetType": "character",
+       "targetId": "363c7a9c-092d-473f-92a1-d4ffb18f9c6a",
+       "property": "mapPlacement",
+       "delta": 0.0,
+       "value": "{\"mapId\":\"297a23bb-fe3b-45e2-93d7-5872ae0adccd\",\"geometryType\":\"Point\",\"geometryData\":\"[0.39756465517241374,0.5478071120689655]\"}",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    },
+    {
+     "id": "f16db489-9b4d-437d-8ab5-58a85084d971",
+     "sessionId": "2c1e50af-730b-40ff-933c-6c25e7759370",
+     "title": "MapEdits",
+     "sortOrder": 0,
+     "isSynthetic": true,
+     "effects": [
+      {
+       "id": "816c2e18-a834-4064-827d-456c22c60951",
+       "eventId": "f16db489-9b4d-437d-8ab5-58a85084d971",
+       "targetType": "character",
+       "targetId": "363c7a9c-092d-473f-92a1-d4ffb18f9c6a",
+       "property": "locationChange",
+       "delta": 0.0,
+       "value": "7bc5a284-690c-47e5-87ee-0f6abb9acc6d",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "35921cf9-d803-4f0e-8616-c7196a3af00a",
+   "number": 7,
+   "title": "The Unknown",
+   "act": 2,
+   "week": 3,
+   "events": [
+    {
+     "id": "c2f3116b-0db9-4e76-9a34-140f9f8ee378",
+     "sessionId": "35921cf9-d803-4f0e-8616-c7196a3af00a",
+     "title": "New Event",
+     "sortOrder": 0,
+     "isSynthetic": false,
+     "effects": [
+      {
+       "id": "109b767f-470d-4774-84e3-b84578e9bb72",
+       "eventId": "c2f3116b-0db9-4e76-9a34-140f9f8ee378",
+       "targetType": "asset",
+       "targetId": "e2098a9c-6c31-4b4b-8a16-1041a2d69d91",
+       "property": "status",
+       "delta": 0.0,
+       "value": "Contested",
+       "secondaryTargetId": null,
+       "actorFactionId": "shattered"
+      },
+      {
+       "id": "1115ab1f-1fb8-4f8e-a9db-66d7d854f16d",
+       "eventId": "c2f3116b-0db9-4e76-9a34-140f9f8ee378",
+       "targetType": "colony",
+       "targetId": "colony",
+       "property": "stress",
+       "delta": 1.0,
+       "value": null,
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    },
+    {
+     "id": "638c9f38-b3a9-4c9c-83cd-8645f787f974",
+     "sessionId": "35921cf9-d803-4f0e-8616-c7196a3af00a",
+     "title": "MapEdits",
+     "sortOrder": 0,
+     "isSynthetic": true,
+     "effects": [
+      {
+       "id": "93dbec90-97c4-45bc-a296-6e407d9386b1",
+       "eventId": "638c9f38-b3a9-4c9c-83cd-8645f787f974",
+       "targetType": "character",
+       "targetId": "363c7a9c-092d-473f-92a1-d4ffb18f9c6a",
+       "property": "mapPlacement",
+       "delta": 0.0,
+       "value": "{\"mapId\":\"297a23bb-fe3b-45e2-93d7-5872ae0adccd\",\"geometryType\":\"Point\",\"geometryData\":\"[0.4053049735266225,0.5504141615793638]\"}",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "131b0c05-93bd-4681-bf55-eb5c53bd7520",
+       "eventId": "638c9f38-b3a9-4c9c-83cd-8645f787f974",
+       "targetType": "character",
+       "targetId": "ba38bcd2-f397-477e-b490-cedf4b6eb54f",
+       "property": "locationChange",
+       "delta": 0.0,
+       "value": "137dd3dd-a6c2-4fb2-b13f-f26c484f4b58",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "13c850c5-2e63-40dd-88de-db22a5d00595",
+       "eventId": "638c9f38-b3a9-4c9c-83cd-8645f787f974",
+       "targetType": "character",
+       "targetId": "ba38bcd2-f397-477e-b490-cedf4b6eb54f",
+       "property": "mapPlacement",
+       "delta": 0.0,
+       "value": "{\"mapId\":\"297a23bb-fe3b-45e2-93d7-5872ae0adccd\",\"geometryType\":\"Point\",\"geometryData\":\"[0.608108537812934,0.5463452596487346]\"}",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "bb7e2290-a779-45e2-9a74-200a093784c5",
+       "eventId": "638c9f38-b3a9-4c9c-83cd-8645f787f974",
+       "targetType": "character",
+       "targetId": "597e2c44-1101-44b5-9147-8b1ac805b679",
+       "property": "locationChange",
+       "delta": 0.0,
+       "value": "137dd3dd-a6c2-4fb2-b13f-f26c484f4b58",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "6ca7f198-816f-4d18-b90e-d3d090525af1",
+       "eventId": "638c9f38-b3a9-4c9c-83cd-8645f787f974",
+       "targetType": "character",
+       "targetId": "597e2c44-1101-44b5-9147-8b1ac805b679",
+       "property": "mapPlacement",
+       "delta": 0.0,
+       "value": "{\"mapId\":\"297a23bb-fe3b-45e2-93d7-5872ae0adccd\",\"geometryType\":\"Point\",\"geometryData\":\"[0.6023362688256256,0.5454794193006384]\"}",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "8d0e7d9b-82eb-43bd-b135-612f4c2d523f",
+       "eventId": "638c9f38-b3a9-4c9c-83cd-8645f787f974",
+       "targetType": "character",
+       "targetId": "c505299f-4241-492e-8d26-c229a16d10c6",
+       "property": "locationChange",
+       "delta": 0.0,
+       "value": "137dd3dd-a6c2-4fb2-b13f-f26c484f4b58",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      },
+      {
+       "id": "8f9db19c-5bf6-4e53-9ce7-ae217d27022a",
+       "eventId": "638c9f38-b3a9-4c9c-83cd-8645f787f974",
+       "targetType": "character",
+       "targetId": "c505299f-4241-492e-8d26-c229a16d10c6",
+       "property": "mapPlacement",
+       "delta": 0.0,
+       "value": "{\"mapId\":\"297a23bb-fe3b-45e2-93d7-5872ae0adccd\",\"geometryType\":\"Point\",\"geometryData\":\"[0.7390686427805575,0.6174876585954253]\"}",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    },
+    {
+     "id": "941dc814-2d4f-4fb7-a71b-c8644aacca3f",
+     "sessionId": "35921cf9-d803-4f0e-8616-c7196a3af00a",
+     "title": "MapEdits",
+     "sortOrder": 0,
+     "isSynthetic": true,
+     "effects": [
+      {
+       "id": "b0c8a8ec-f566-4079-834d-9845a6e214d7",
+       "eventId": "941dc814-2d4f-4fb7-a71b-c8644aacca3f",
+       "targetType": "character",
+       "targetId": "363c7a9c-092d-473f-92a1-d4ffb18f9c6a",
+       "property": "locationChange",
+       "delta": 0.0,
+       "value": "7bc5a284-690c-47e5-87ee-0f6abb9acc6d",
+       "secondaryTargetId": null,
+       "actorFactionId": null
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "rules": {
+  "id": "singleton",
+  "beliefMatch": 3.0,
+  "beliefConflict": -2.0,
+  "valueAlignmentScale": 5.5,
+  "valueConflictScale": 3.0,
+  "stressPositiveMultiplierPerPoint": 0.25,
+  "stressNegativeMultiplierPerPoint": 0.2,
+  "positiveEnabled": true,
+  "negativeEnabled": true,
+  "thresholdsJson": "[{\"label\":\"Aligned\",\"minScore\":6},{\"label\":\"Cooperative\",\"minScore\":4},{\"label\":\"Friendly\",\"minScore\":2},{\"label\":\"Tolerated\",\"minScore\":-1},{\"label\":\"Strained\",\"minScore\":-3},{\"label\":\"Opposed\",\"minScore\":-6},{\"label\":\"Hostile\",\"minScore\":-20}]",
+  "beliefAxisLabelsJson": "{\"a\":{\"axisName\":\"Knowledge\",\"type\":\"opinion\",\"positiveAligns\":true,\"positive\":\"Revealed\",\"neutral\":\"Controlled\",\"negative\":\"Hidden\",\"statusQuoIsPositive\":true},\"b\":{\"axisName\":\"Change\",\"type\":\"boolean\",\"positiveAligns\":false,\"positive\":\"Yes\",\"neutral\":\"Neutral\",\"negative\":\"No\",\"statusQuoIsPositive\":false},\"c\":{\"axisName\":\"The Ritual\",\"type\":\"opinion\",\"positiveAligns\":false,\"positive\":\"Good\",\"neutral\":\"Necessary\",\"negative\":\"Bad\",\"statusQuoIsPositive\":true}}",
+  "stressWeightEnabled": true,
+  "stressWeightCurve": "Cubic",
+  "stressWeightIntensity": 0.7,
+  "cascadeRulesJson": "[{\"id\":\"neg-2\",\"label\":\"Momentum Streak x2\",\"triggerType\":\"streak\",\"sourceEntityType\":\"faction\",\"sourceProperty\":\"momentum\",\"direction\":\"either\",\"minConsecutiveWeeks\":2,\"effectType\":\"multiplier\",\"targetEntityType\":\"faction\",\"targetProperty\":\"legitimacy\",\"multiplier\":1.5},{\"id\":\"neg-3\",\"label\":\"Momentum Streak x3\",\"triggerType\":\"streak\",\"sourceEntityType\":\"faction\",\"sourceProperty\":\"momentum\",\"direction\":\"either\",\"minConsecutiveWeeks\":3,\"effectType\":\"multiplier\",\"targetEntityType\":\"faction\",\"targetProperty\":\"legitimacy\",\"multiplier\":2},{\"id\":\"e95cc2fc-9694-4135-b795-dbeff180f5b8\",\"label\":\"Leaderless\",\"triggerType\":\"event\",\"sourceEntityType\":\"character\",\"sourceProperty\":\"state\",\"direction\":\"negative\",\"minConsecutiveWeeks\":2,\"effectType\":\"flat\",\"targetEntityType\":\"faction\",\"targetProperty\":\"momentum\",\"multiplier\":2,\"sourceEntitySubtype\":\"FactionLeader\",\"sourcePropertyValue\":[\"Dead\",\"Missing\"],\"flatDelta\":-30}]",
+  "stressTriggersJson": "[{\"id\":\"fe515f3f-0752-4f55-8bfd-20682251b9ac\",\"label\":\"Test\",\"sourceEntityType\":\"asset\",\"sourceProperty\":\"status\",\"sourcePropertyValue\":[\"Destroyed\"],\"flatDelta\":1,\"oneShot\":true}]",
+  "formulasJson": "{\"memberAvgWeight\":0.6,\"memberMaxWeight\":0.4,\"baseInfluenceWeight\":0.45,\"charInfluenceWeight\":0.35,\"momentumInfluenceWeight\":0.2,\"assetInfluenceWeight\":0.4,\"legitimacyBase\":0.5,\"legitimacyScale\":100,\"leaderlessPowerMultiplier\":0.75,\"beliefDerivationThreshold\":0.5}",
+  "influenceConvictionScale": 0.5
+ },
+ "colonyState": {
+  "colonyStress": 0
+ }
+}

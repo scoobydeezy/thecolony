@@ -1,13 +1,15 @@
+import { InstabilityBadgeComponent } from '../../shared/instability-badge/instability-badge.component';
 import { Component, inject, signal, computed } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { DecimalPipe, NgClass } from '@angular/common';
 import { FormField, form, required } from '@angular/forms/signals';
-import { forkJoin, of } from 'rxjs';
+import { firstValueFrom, forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AppStore } from '../../store/app.store';
+import { ToastService, ImportTally } from '../../core/services/toast.service';
 import { ApiService } from '../../core/services/api.service';
 import { Character, CharacterType, CharacterState, NarrativeTier, NARRATIVE_TIER_OPTIONS, ValueVector, driftScore, effectivePressure, influenceConvictionBonus, CharacterNarrativeProfile, CharacterDetail, CharacterRelationship, NarrativeVisibility, RelationshipState } from '../../core/models/types';
-import { downloadCsv, parseCsv, csvHeaderMap } from '../../core/utils/csv-export';
+import { downloadCsv, downloadCsvZip, parseCsv, csvHeaderMap } from '../../core/utils/csv-export';
 import { oneOf, clampedInt, sanitizeValueVector } from '../../core/utils/validation';
 
 interface AddCharacterFormModel {
@@ -24,12 +26,13 @@ const emptyAddForm = (): AddCharacterFormModel => ({ name: '', characterType: 'N
 @Component({
   selector: 'app-characters',
   standalone: true,
-  imports: [RouterLink, DecimalPipe, NgClass, FormField],
+  imports: [InstabilityBadgeComponent, RouterLink, DecimalPipe, NgClass, FormField],
   templateUrl: './characters.component.html',
   styleUrl: './characters.component.scss'
 })
 export class CharactersComponent {
   store  = inject(AppStore);
+  private readonly toast = inject(ToastService);
   router = inject(Router);
   api    = inject(ApiService);
 
@@ -138,7 +141,7 @@ export class CharactersComponent {
     const peers = this.store.viewCharacters().filter(p => p.state === 'Alive' && p.factionId && p.factionId === c.factionId && p.id !== c.id);
     const scale = this.store.rules()?.influenceConvictionScale ?? 0.5;
     const effConv = c.conviction + influenceConvictionBonus(c, peers, scale);
-    return effectivePressure(c, this.colonyStress()) - effConv;
+    return effectivePressure(c, this.colonyStress(), this.store.formulas().stressPressureCoefficient) - effConv;
   }
 
   private readonly stateIconMap: Record<CharacterState, string> = {
@@ -208,9 +211,10 @@ export class CharactersComponent {
       if (h.has('characterid') && h.has('relationshiptype')) {
         // Relationships file
         const characterIds = new Set(this.store.characters().map(c => c.id));
+        const tally = new ImportTally();
         for (const row of rows.slice(1)) {
           const sourceCharacterId = get(row, 'characterid');
-          if (!characterIds.has(sourceCharacterId)) continue;
+          if (!characterIds.has(sourceCharacterId)) { tally.count('skipped'); continue; }
           const rel: Omit<CharacterRelationship, 'id' | 'sourceCharacterId'> = {
             targetCharacterId: get(row, 'targetcharacterid') || undefined,
             relationshipType:  get(row, 'relationshiptype'),
@@ -219,14 +223,16 @@ export class CharactersComponent {
             visibility:        oneOf(get(row, 'visibility'), ['GMOnly', 'Public', 'Revealed'] as const)              ?? 'GMOnly' as NarrativeVisibility,
             sortOrder:         parseInt(get(row, 'sortorder')) || 0,
           };
-          this.api.createCharacterRelationship(sourceCharacterId, rel).subscribe();
+          tally.track('added', firstValueFrom(this.api.createCharacterRelationship(sourceCharacterId, rel)));
         }
+        tally.report(this.toast, 'Character relationships');
       } else if (h.has('characterid') && h.has('heading')) {
         // Details file
         const characterIds = new Set(this.store.characters().map(c => c.id));
+        const tally = new ImportTally();
         for (const row of rows.slice(1)) {
           const characterId = get(row, 'characterid');
-          if (!characterIds.has(characterId)) continue;
+          if (!characterIds.has(characterId)) { tally.count('skipped'); continue; }
           const detail: Omit<CharacterDetail, 'id' | 'characterId'> = {
             key:        get(row, 'key') || get(row, 'heading').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''),
             heading:    get(row, 'heading'),
@@ -234,14 +240,16 @@ export class CharactersComponent {
             sortOrder:  parseInt(get(row, 'sortorder')) || 0,
             visibility: oneOf(get(row, 'visibility'), ['GMOnly', 'Public', 'Revealed'] as const) ?? 'GMOnly' as NarrativeVisibility,
           };
-          this.api.createCharacterDetail(characterId, detail).subscribe();
+          tally.track('added', firstValueFrom(this.api.createCharacterDetail(characterId, detail)));
         }
+        tally.report(this.toast, 'Character details');
       } else if (h.has('characterid') && h.has('overview')) {
         // Narrative profiles file
         const characterIds = new Set(this.store.characters().map(c => c.id));
+        const tally = new ImportTally();
         for (const row of rows.slice(1)) {
           const characterId = get(row, 'characterid');
-          if (!characterIds.has(characterId)) continue;
+          if (!characterIds.has(characterId)) { tally.count('skipped'); continue; }
           const profile: CharacterNarrativeProfile = {
             characterId,
             overview:               get(row, 'overview')               || undefined,
@@ -258,11 +266,13 @@ export class CharactersComponent {
             signatureObject:        get(row, 'signatureobject')        || undefined,
             notes:                  get(row, 'notes')                  || undefined,
           };
-          this.api.upsertNarrativeProfile(profile).subscribe();
+          tally.track('imported', firstValueFrom(this.api.upsertNarrativeProfile(profile)));   // an upsert: created or replaced
         }
+        tally.report(this.toast, 'Narrative profiles');
       } else if (h.has('narrativetier')) {
         // Characters file
         const existingById = new Map(this.store.characters().map(c => [c.id, c]));
+        const tally = new ImportTally();
         for (const row of rows.slice(1)) {
           const id = get(row, 'id');
           const character: Character = {
@@ -304,8 +314,9 @@ export class CharactersComponent {
             ),
             summary: get(row, 'summary') || undefined,
           };
-          this.store.saveCharacter(character);
+          tally.track(existingById.has(id) ? 'replaced' : 'added', this.store.saveCharacter(character));
         }
+        tally.report(this.toast, 'Characters');
       } else {
         alert(`Unrecognized file format. Expected a characters, profiles, details, or relationships export.`);
       }
@@ -340,11 +351,11 @@ export class CharactersComponent {
       c.values.a.toFixed(4), c.values.b.toFixed(4), c.values.c.toFixed(4),
       c.summary ?? '',
     ]);
-    downloadCsv([charHeader, ...charRows], 'characters.csv');
-
-    // narrative profiles, details, relationships — async batch fetch
+    // One download per click (a second, or one started after the fetch below as a separate file, is refused): the
+    // characters file and the narrative profiles, details and relationships travel together in one .zip.
+    const files: { name: string; rows: unknown[][] }[] = [{ name: 'characters.csv', rows: [charHeader, ...charRows] }];
     const ids = characters.map(c => c.id);
-    if (ids.length === 0) return;
+    if (ids.length === 0) { downloadCsv(files[0].rows, files[0].name); return; }
 
     forkJoin({
       profiles:      forkJoin(ids.map(id => this.api.getNarrativeProfile(id).pipe(catchError(() => of(null))))),
@@ -368,7 +379,7 @@ export class CharactersComponent {
           p.performanceInspiration ?? '', p.portrayalNotes ?? '', p.pressureResponse ?? '',
           p.signatureQuote ?? '', p.signatureObject ?? '', p.notes ?? '',
         ]);
-        downloadCsv([profileHeader, ...profileRows], 'character-profiles.csv');
+        files.push({ name: 'character-profiles.csv', rows: [profileHeader, ...profileRows] });
       }
 
       // Details
@@ -379,7 +390,7 @@ export class CharactersComponent {
           d.characterId, charNameById.get(d.characterId) ?? '',
           d.key, d.heading, d.body ?? '', d.sortOrder, d.visibility,
         ]);
-        downloadCsv([detailHeader, ...detailRows], 'character-details.csv');
+        files.push({ name: 'character-details.csv', rows: [detailHeader, ...detailRows] });
       }
 
       // Relationships
@@ -392,8 +403,10 @@ export class CharactersComponent {
           r.targetCharacterId ?? '', charNameById.get(r.targetCharacterId ?? '') ?? '',
           r.summary ?? '', r.state, r.visibility, r.sortOrder,
         ]);
-        downloadCsv([relHeader, ...relRows], 'character-relationships.csv');
+        files.push({ name: 'character-relationships.csv', rows: [relHeader, ...relRows] });
       }
+      if (files.length === 1) downloadCsv(files[0].rows, files[0].name);
+      else downloadCsvZip(files, 'characters-export.zip');
     });
   }
 

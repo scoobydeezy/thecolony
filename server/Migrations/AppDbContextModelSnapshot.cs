@@ -48,6 +48,9 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("IntroducedAtEventId")
+                        .HasColumnType("TEXT");
+
                     b.Property<bool>("Keystone")
                         .HasColumnType("INTEGER");
 
@@ -83,11 +86,20 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("ActivatedAt")
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
                         .HasColumnType("TEXT");
+
+                    b.Property<long>("HistoryVersion")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Mode")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -161,6 +173,12 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<int>("Influence")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("Instability")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("IntroducedAtEventId")
+                        .HasColumnType("TEXT");
+
                     b.Property<int?>("Level")
                         .HasColumnType("INTEGER");
 
@@ -184,6 +202,9 @@ namespace ColonyTracker.Api.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Pronouns")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ReaffirmedFactionId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("SocialClassId")
@@ -364,9 +385,6 @@ namespace ColonyTracker.Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("ColonyStress")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("DominantFactions")
                         .HasColumnType("TEXT");
 
@@ -409,6 +427,91 @@ namespace ColonyTracker.Api.Migrations
                     b.ToTable("ColonyStates");
                 });
 
+            modelBuilder.Entity("ColonyTracker.Api.Models.ColonyTurn", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CampaignId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("CommittedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EngineVersion")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EventId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RulesVersionId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("Seed")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("SessionId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ColonyTurns");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.ColonyTurnPhase", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ColonyTurnId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CommittedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FrozenInputsHash")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FrozenInputsJson")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("HistoryVersion")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Ordinal")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("ResultsJson")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ColonyTurnId", "Ordinal")
+                        .IsUnique();
+
+                    b.ToTable("ColonyTurnPhases");
+                });
+
             modelBuilder.Entity("ColonyTracker.Api.Models.Event", b =>
                 {
                     b.Property<string>("Id")
@@ -418,6 +521,9 @@ namespace ColonyTracker.Api.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsSynthetic")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Kind")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("SessionId")
@@ -451,6 +557,15 @@ namespace ColonyTracker.Api.Migrations
 
                     b.Property<string>("EventId")
                         .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Ordinal")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Origin")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("PhaseId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Property")
@@ -560,9 +675,6 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<bool>("Active")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("AdditionalMemberCount")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("AfraidOf")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -572,9 +684,6 @@ namespace ColonyTracker.Api.Migrations
 
                     b.Property<string>("BannerShape")
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("BaseLegitimacy")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Became")
                         .HasColumnType("TEXT");
@@ -600,6 +709,9 @@ namespace ColonyTracker.Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("FactionSize")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Focus")
                         .HasColumnType("TEXT");
 
@@ -615,10 +727,16 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<string>("IconPath")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("IntroducedAtEventId")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("LeaderId")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Momentum")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("MomentumTier")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Motto")
@@ -689,6 +807,10 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("AccomplishedEffectsJson")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("CampaignId")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -699,12 +821,25 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<int>("ConditionType")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("EarliestAct")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("FactionId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("IntroducedAtEventId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("OutcomeMode")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("Priority")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("ProgressingEffectsJson")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
@@ -752,6 +887,9 @@ namespace ColonyTracker.Api.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("IntroducedAtEventId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LinkedAssetId")
@@ -1139,6 +1277,9 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
+                    b.Property<double>("BeliefAdjacent")
+                        .HasColumnType("REAL");
+
                     b.Property<string>("BeliefAxisLabelsJson")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -1147,6 +1288,9 @@ namespace ColonyTracker.Api.Migrations
                         .HasColumnType("REAL");
 
                     b.Property<double>("BeliefMatch")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("BeliefWeightBlend")
                         .HasColumnType("REAL");
 
                     b.Property<string>("CampaignId")
@@ -1203,9 +1347,49 @@ namespace ColonyTracker.Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<double>("ValueOppositionScale")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("ValueSimilarityScale")
+                        .HasColumnType("REAL");
+
                     b.HasKey("Id");
 
                     b.ToTable("RulesConfigs");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.RulesVersion", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CampaignId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EffectiveFromEventId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("EngineVersion")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RulesJson")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CampaignId", "Version")
+                        .IsUnique();
+
+                    b.ToTable("RulesVersions");
                 });
 
             modelBuilder.Entity("ColonyTracker.Api.Models.Session", b =>
@@ -1253,9 +1437,6 @@ namespace ColonyTracker.Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("ColonyStressChange")
-                        .HasColumnType("INTEGER");
-
                     b.Property<DateTime>("Date")
                         .HasColumnType("TEXT");
 
@@ -1282,6 +1463,47 @@ namespace ColonyTracker.Api.Migrations
                     b.ToTable("SessionLog");
                 });
 
+            modelBuilder.Entity("ColonyTracker.Api.Models.WorldCondition", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("ActiveAtStart")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CampaignId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RequirementsJson")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Rule")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("RuleOtherwise")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("StressContribution")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("VariesByJson")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WorldConditions");
+                });
+
             modelBuilder.Entity("ColonyTracker.Api.Models.AppSettings", b =>
                 {
                     b.HasOne("ColonyTracker.Api.Models.Campaign", "ActiveCampaign")
@@ -1291,6 +1513,15 @@ namespace ColonyTracker.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("ActiveCampaign");
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.ColonyTurnPhase", b =>
+                {
+                    b.HasOne("ColonyTracker.Api.Models.ColonyTurn", null)
+                        .WithMany("Phases")
+                        .HasForeignKey("ColonyTurnId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ColonyTracker.Api.Models.Event", b =>
@@ -1391,6 +1622,11 @@ namespace ColonyTracker.Api.Migrations
                         .HasForeignKey("PathSetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("ColonyTracker.Api.Models.ColonyTurn", b =>
+                {
+                    b.Navigation("Phases");
                 });
 
             modelBuilder.Entity("ColonyTracker.Api.Models.Event", b =>

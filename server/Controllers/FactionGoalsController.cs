@@ -41,8 +41,11 @@ public class FactionGoalsController(AppDbContext db, ICampaignContext campaign) 
     public async Task<IActionResult> Create([FromBody] FactionGoal goal)
     {
         var cid = await campaign.GetActiveIdAsync();
-        goal.Id = Guid.NewGuid().ToString();
+        goal.Id = await EntityIds.ForCreateAsync(db.FactionGoals, goal.Id);   // keep an imported id when it is free
         goal.CampaignId = cid;
+        if (GoalAdvanceRules.Issue(goal) is { } bad) return BadRequest(bad);
+        var conflict = await ChampionRules.ConflictAsync(db, goal, null);
+        if (conflict is not null) return Conflict(conflict);
         db.FactionGoals.Add(goal);
         await db.SaveChangesAsync();
         return CreatedAtAction(nameof(GetById), new { id = goal.Id }, goal);
@@ -53,6 +56,10 @@ public class FactionGoalsController(AppDbContext db, ICampaignContext campaign) 
     {
         if (id != goal.Id) return BadRequest();
         goal.CampaignId = await campaign.GetActiveIdAsync();
+        var previous = await db.FactionGoals.AsNoTracking().FirstOrDefaultAsync(g => g.Id == id);
+        if (GoalAdvanceRules.Issue(goal) is { } bad) return BadRequest(bad);
+        var conflict = await ChampionRules.ConflictAsync(db, goal, previous);
+        if (conflict is not null) return Conflict(conflict);
         db.Entry(goal).State = EntityState.Modified;
         await db.SaveChangesAsync();
         return Ok(goal);

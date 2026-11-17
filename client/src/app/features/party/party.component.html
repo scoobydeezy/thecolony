@@ -116,7 +116,7 @@
   </table>
 </div>
 
-@if (!store.isViewingSnapshot()) {
+@if (!store.isViewingSnapshot() && !store.isLive()) {
   <div class="save-bar">
     <button class="btn btn-primary" (click)="save()">Save Party</button>
     @if (saved()) {

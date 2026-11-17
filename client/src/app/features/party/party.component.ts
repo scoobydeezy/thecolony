@@ -1,7 +1,7 @@
 import { Component, inject, signal, effect, computed } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AppStore } from '../../store/app.store';
-import { ColonyState, BeliefPosition, ValueVector, primaryValue, secondaryValue, sacrificedValue, beliefAxisOptions, beliefPositionLabel, deriveBeliefs, beliefConflicts as computeBeliefConflicts } from '../../core/models/types';
+import { ColonyState, BeliefAxisLabels, BeliefPosition, ValueVector, primaryValue, secondaryValue, sacrificedValue, beliefAxisOptions, beliefPositionLabel, deriveBeliefs, beliefConflicts as computeBeliefConflicts } from '../../core/models/types';
 import { FormField, form } from '@angular/forms/signals';
 import { downloadCsv } from '../../core/utils/csv-export';
 import { TernaryPlotComponent } from '../../shared/ternary-plot/ternary-plot.component';
@@ -14,8 +14,8 @@ interface PartyFormModel {
 }
 
 // '' means "use derived" — set to '' when stored belief matches derived to avoid showing spurious overrides
-const toFormModel = (cs: ColonyState): PartyFormModel => {
-  const derived = deriveBeliefs(cs.partyValues);
+const toFormModel = (cs: ColonyState, threshold: number, axisLabels: BeliefAxisLabels): PartyFormModel => {
+  const derived = deriveBeliefs(cs.partyValues, threshold, axisLabels);   // D12: configured threshold
   return {
     partyName:    cs.partyName,
     partyBeliefc: cs.partyBeliefc === derived.beliefc ? '' : cs.partyBeliefc,
@@ -50,7 +50,7 @@ export class PartyComponent {
   readonly beliefaOptions = computed(() => beliefAxisOptions(this.store.beliefAxisLabels().a));
   readonly beliefbOptions = computed(() => beliefAxisOptions(this.store.beliefAxisLabels().b));
 
-  readonly derivedBeliefs = computed(() => deriveBeliefs(this.editValues(), undefined, this.store.beliefAxisLabels()));
+  readonly derivedBeliefs = computed(() => deriveBeliefs(this.editValues(), this.store.formulas().beliefDerivationThreshold, this.store.beliefAxisLabels()));
 
   readonly beliefConflicts = computed(() => {
     const f = this.editForm();
@@ -111,7 +111,7 @@ export class PartyComponent {
     effect(() => {
       const cs = this.store.colonyState();
       if (cs) {
-        this.editForm.set(toFormModel(cs));
+        this.editForm.set(toFormModel(cs, this.store.formulas().beliefDerivationThreshold, this.store.beliefAxisLabels()));
         this.editValues.set({ ...cs.partyValues });
       }
     });
@@ -127,14 +127,14 @@ export class PartyComponent {
     const f = this.editForm();
     const v = this.editValues();
     const header = [
-      'Party Name', 'Act', 'Week', 'Colony Stress',
+      'Party Name', 'Act', 'Week',
       'BeliefC', 'BeliefA', 'BeliefB',
       'Primary Value', 'Secondary Value', 'Sacrificed Value',
       'ValueA', 'ValueB', 'ValueC',
       'Session Summary', 'Dominant Factions', 'Influence Notes', 'Major Consequences'
     ];
     const row = [
-      f.partyName, cs.act ?? '', cs.week ?? '', cs.colonyStress ?? '',
+      f.partyName, cs.act ?? '', cs.week ?? '',
       f.partyBeliefc, f.partyBeliefa, f.partyBeliefb,
       primaryValue(v), secondaryValue(v), sacrificedValue(v),
       v.a.toFixed(3), v.b.toFixed(3), v.c.toFixed(3),
