@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.the-empty-lectern
+slug: the-empty-lectern
+name: The Empty Lectern
+variesBy:
+  subject:
+    kind: assetStatus
+    id: asset.empty-lectern
+  rows:
+    - state: Stable
+      text: ""
+      stress: 0
+    - state: Contested
+      text: ""
+      stress: 0
+    - state: Damaged
+      text: The Empty Lectern is unsafe for remembrance ceremonies.
+      stress: 0
+    - state: Destroyed
+      text: Remembrance ceremonies require another site or lectern.
+      stress: 0
+status: draft

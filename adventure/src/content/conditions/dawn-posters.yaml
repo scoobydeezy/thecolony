@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.dawn-posters
+slug: dawn-posters
+name: Dawn Posters
+variesBy:
+  subject:
+    kind: goalStage
+    id: goal.gain-momentum
+  rows:
+    - state: Planning
+      text: ""
+      stress: 0
+    - state: Progressing
+      text: Dawn campaign posters appear throughout the Assembly district.
+      stress: 0
+    - state: Ready
+      text: ""
+      stress: 0
+    - state: Accomplished
+      text: Dawn campaign posters cover the Colony, giving residents clear organizing contacts and public meeting notices.
+      stress: 0
+    - state: Failed
+      text: ""
+      stress: 0
+    - state: Retired
+      text: ""
+      stress: 0
+status: draft

@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.witness-specimen
+slug: witness-specimen
+name: Witness Specimen
+rule: When the Unclaimed Object has been brought to the Hall, the Witnesses offer supervised examination of it; custody alone does not establish its physical location.
+requires:
+  - kind: assetController
+    assetId: asset.unclaimed-object
+    factionId: faction.witnesses
+status: draft

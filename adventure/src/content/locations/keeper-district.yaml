@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.keeper-district
+slug: keeper-district
+name: Keeper District
+type: Zone
+summary: The center of the Colony.
+parent: location.colony
+status: draft
+start:
+  state: Stable

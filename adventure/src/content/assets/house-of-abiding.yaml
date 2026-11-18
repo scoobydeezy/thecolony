@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.house-of-abiding
+slug: house-of-abiding
+name: House of Abiding
+type: Infrastructure
+role: Strategic
+tier: 4
+keystone: false
+summary: A quiet residence where Those Who Abide spend their final days before the ritual. Their belongings are carefully gathered here so they may be preserved once memory has passed from the world.
+status: draft
+start:
+  controller: faction.witnesses
+  status: Stable

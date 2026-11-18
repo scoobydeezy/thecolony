@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.engram-vault
+slug: engram-vault
+name: Engram Vault
+type: Artifact
+role: Covert
+tier: 5
+keystone: true
+summary: A secure archive containing generations of preserved memory engrams recovered before the ritual. Though stripped of names and disconnected from identity, these records preserve fragments of the Forgotten's thoughts, experiences, and personalities, offering EGRESS an unparalleled opportunity to study the nature of memory itself.
+status: draft
+start:
+  controller: faction.egress-institute
+  status: Stable

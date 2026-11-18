@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../../../schemas/thread.schema.json
+id: thread.the-dusk-of-the-dawn
+slug: the-dusk-of-the-dawn
+name: The Dusk of the Dawn
+summary: A forgotten rescue operation reveals what transformed Dawn from revolutionaries into reformers.
+status: draft
+provenance:
+  - doc: Campaign Outline
+    heading: Manor Route 4 — Dawn Assembly > The Way Out → Revolutionaries > The Historical Operation
+  - doc: Campaign Outline
+    heading: Manor Route 4 — Dawn Assembly > The Way Out → Revolutionaries > Historical Consequence

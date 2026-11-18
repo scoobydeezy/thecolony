@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.old-cemetery
+slug: old-cemetery
+name: Old Cemetery
+summary: The Colony's original cemetery.
+parent: location.old-town
+status: draft
+start:
+  state: Unstable

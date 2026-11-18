@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.preserve-the-ledger
+slug: preserve-the-ledger
+name: Preserve the Ledger
+faction: faction.witnesses
+type: Achieve
+priority: Critical
+visibility: Known
+outcome: Adjudicated
+earliestAct: 3
+target:
+  type: Asset
+  id: asset.ledger
+status: draft
+start:
+  status: Plotting

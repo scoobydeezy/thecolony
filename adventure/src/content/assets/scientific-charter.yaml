@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.scientific-charter
+slug: scientific-charter
+name: Scientific Charter
+type: Artifact
+role: Mandate
+tier: 5
+keystone: false
+summary: A formal grant recognizing EGRESS’s authority to investigate mnemonic phenomena and conduct research in service of the Colony.
+status: draft
+start:
+  controller: faction.egress-institute
+  status: Stable

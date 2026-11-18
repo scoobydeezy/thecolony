@@ -1,7 +1,6 @@
 namespace ColonyTracker.Api.Models;
 
-// One record per Path required to activate an override.
-// Multiple records for the same EventOverrideId form a conjunction.
+// One path a version requires (its `when`). Several form a conjunction. Not a table.
 public class EventOverridePath
 {
     public string EventOverrideId { get; set; } = string.Empty;

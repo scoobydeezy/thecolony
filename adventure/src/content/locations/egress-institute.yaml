@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.egress-institute
+slug: egress-institute
+name: EGRESS Institute
+summary: The Engram Generation, Restoration, Evaluation, and Storage Systems Institute campus.
+parent: location.colony
+asset: asset.egress-institute
+status: draft
+start:
+  state: Stable

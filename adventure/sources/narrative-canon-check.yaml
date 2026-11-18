@@ -1,0 +1,841 @@
+# Narrative canon check (2026-11-17): the app's narrative text against the source documents.
+# HISTORICAL RECORD: every ruling below was applied by the narrative and branching merges (2026-11-18); the
+# text now lives in the event / encounter files. Kept for provenance; editing it changes nothing.
+# Four reviewers checked all 52 items; every quote below was verified verbatim against the item and the cited line,
+# and every provenance heading resolves.
+#
+# For each conflict, set `use:`
+#   canon   apply `proposed` (the source documents win)
+#   app     keep the app's text
+#   decide  still open: the app's text stays until ruled
+# Ruled 2026-11-18 (the planning agent's review, accepted by the user, with "Pépé Sylvya" everywhere), then the three open
+# items ruled by the user: 22 canon, 3 app (The Observer, Eclipse on the Succeeds path, The Thin Place's demonstration).
+# Reviewer confidence no longer picks the default. The texts the review flagged as reassembled from obsolete
+# mechanics were rewritten whole from Encounters.md (A Life, The Shape of Someone, Revolutionaries, Witness Me).
+# You can also edit `proposed` before it is applied. Fields named variant:<path>:... are per-path versions; their
+# fixes are applied with branching (step 2), the rest at this switch. `combined` holds one text for a field with
+# several canon fixes; it matches the default choices, so if you change them there, it gets recomposed. `provenance` goes into each item's file.
+items:
+  - id: event.the-calling
+    provenance:
+      - doc: Campaign Outline
+        heading: Session 1 — The Calling
+      - doc: Character Briefs
+        heading: Aspis Administrator - Perrik Tallow
+    conflicts:
+      - field: synopsis
+        kind: contradiction
+        confidence: medium
+        use: canon
+        app: new to the Colony and approaching his first Reading
+        canon: >-
+          The Consortium’s senior representative in the Colony is an obsessive administrator drowning in impossible paperwork. Debts have no
+          debtors. Houses have no owners. Contracts bear signatures no one recognizes. He has spent years trying to prove that the errors
+          are connected.
+        source: Character Briefs:115
+        note: >-
+          Canon has Perrik spending years on the Colony's impossible records (only his first Reading, per Campaign Outline), so calling him
+          'new to the Colony' conflicts; the outline itself only says he is approaching his first Reading.
+        proposed: >-
+          The Aspis Administrator walks the Party through debts without debtors, homes without remembered owners, and recurring accounting
+          discontinuities he cannot explain. Before he can follow the pattern to its next lead, bells and commotion outside announce that a
+          new Keeper has just been recognized. The House of Abiding is next door, and the Administrator—approaching his first Reading—is as
+          curious as the Party.
+  - id: event.the-house-of-abiding
+    provenance:
+      - doc: Campaign Outline
+        heading: Session 1 — The Calling
+  - id: encounter.bad-maps
+    provenance:
+      - doc: Campaign Outline
+        heading: Session 2 — Bad Maps
+      - doc: Encounters
+        heading: 1. Bad Maps — Evin Peakwalker Baby Reconstruction
+  - id: event.prisoners
+    provenance:
+      - doc: Campaign Outline
+        heading: Session 2 — Bad Maps
+      - doc: Campaign Outline
+        heading: Session 3 — Dusk
+  - id: encounter.a-life
+    provenance:
+      - doc: Campaign Outline
+        heading: Session 3 — Dusk > Witness Route — A Life
+      - doc: Encounters
+        heading: 2. A Life — Evin Peakwalker Life Reconstruction
+    conflicts:
+      - field: synopsis
+        kind: contradiction
+        confidence: low
+        use: canon
+        app: >-
+          Using the Ledger, the Caretaker traces the cloth toy to other holdings from progressively later stages of the same person's life.
+          When those true but incompatible fragments begin reconstructing several versions of one person at once, the Party encounters
+          another Veiled manifestation.
+        canon: >-
+          1. **Ordinary processing creates the accident.** The newly arrived cloth toy is placed near the childhood object during normal
+          Hall procedure. Their compatible Relationship fragments recognize the same absent center.
+        source: Encounters:118
+        note: >-
+          In Encounters the manifestation starts by accident during routine processing and the Ledger is used later (step 8) to find the
+          shaving case; Campaign Outline's looser 'Using the Ledger and the Hall's holdings, several genuine but incomplete relationships
+          begin reconstructing' is compatible with the app's ordering, so this is a sequencing nuance.
+        proposed: >-
+          The Witnesses begin with an almost boring tour of the Hall's archival and quarantine procedures. During ordinary processing, the
+          newly arrived cloth toy is placed near a childhood object from the same forgotten life, and the two begin reconstructing it: an
+          Infant and a Child manifest first. Finding the Child brings an archived bow into the active network, and an Adult manifests,
+          hostile. Violence creates safety but does not resolve it. The Caretaker recognizes one continuous life in the matching initials,
+          then uses the Ledger to identify a fourth Source, a shaving case, which the Party deliberately brings into the resonance. The
+          exaggerated reconstructions collapse into one ordinary person, and restoring his true relationship to his mother ends the
+          encounter. The Ledger cannot recover his name, but it proves that the infant was only one piece of an entire life.
+  - id: encounter.containment
+    provenance:
+      - doc: Campaign Outline
+        heading: Session 3 — Dusk > EGRESS Route — Containment
+      - doc: Encounters
+        heading: 3. Containment — Gressa Peakwalker
+  - id: encounter.duskwood
+    provenance:
+      - doc: Campaign Outline
+        heading: Session 3 — Dusk > Cult Route — Duskwood
+      - doc: Encounters
+        heading: 4. Duskwood — Golarion / Darklands Threat
+  - id: event.an-opportunity
+    provenance:
+      - doc: Campaign Outline
+        heading: Session 3 — Dusk > Convergence — Dawn and the Agency Stance
+  - id: encounter.the-reading
+    provenance:
+      - doc: Campaign Outline
+        heading: Session 4 — Eclipse
+      - doc: Encounters
+        heading: 5. The Reading — Ritual Chamber
+  - id: event.the-morning-after
+    provenance:
+      - doc: Campaign Outline
+        heading: Session 5 — Dawn / The Morning After
+  - id: event.the-manor
+    provenance:
+      - doc: Campaign Outline
+        heading: Session 5 — Dawn / The Morning After
+      - doc: Campaign Outline
+        heading: The Manor Investigation Model
+      - doc: Character Briefs
+        heading: The Observer - Silas Venn > The Manor
+  - id: event.the-broken-bell
+    provenance:
+      - doc: Campaign Outline
+        heading: Manor Route 1 — The Shattered > The Broken Bell → Old Town > The Broken Bell
+  - id: encounter.old-town
+    provenance:
+      - doc: Campaign Outline
+        heading: Manor Route 1 — The Shattered
+      - doc: Encounters
+        heading: 6. Old Town — Shattered Route
+    conflicts:
+      - field: synopsis
+        kind: contradiction
+        confidence: low
+        use: canon
+        app: >-
+          Possessions from six forgotten lives recombine into an unstable Chorus whose fragments migrate between bodies whenever they are
+          dispersed.
+        canon: >-
+          During the Act II investigation, the cemetery's unresolved **Chorus** manifests six authentic but misassembled lives, normally one
+          Corpus per PC. Silhouettes, skills, limbs, and other identity Fragments migrate across the wrong Shells when a Corpus is
+          Dispersed.
+        source: Campaign Outline:953
+        note: >-
+          Canon's Chorus is built from the cemetery's distributed grave Source field (bodily Head/Arms/Back Fragments), not from recombined
+          possessions.
+        proposed: >-
+          The Party enters abandoned Old Town expecting the ruins of a Duskwood attack and instead finds details that refuse to fit the
+          story. At the old cemetery they meet Tom, who calls everyone “Sunny” despite remembering people, places, objects, and
+          relationships with remarkable precision. The cemetery's unresolved graves manifest six misassembled lives as an unstable Chorus
+          whose fragments migrate between bodies whenever they are dispersed. The Party learns to recognize each person's recurring Pattern,
+          find the grave and history it belongs to, and give that life a truthful Name; each Named Boundary restores one life and Anchors
+          its grave. Old Town's buried truth becomes clear: its catastrophe began within the Colony, and the Shattered's habit of exposing
+          evidence without preserving provenance risks repeating it. Tom is briefly relieved, but whoever he calls “Sunny” remains unfound.
+  - id: event.the-thin-place
+    provenance:
+      - doc: Campaign Outline
+        heading: Manor Route 2 — Cult of the Unknown > The Thin Place → The Shape of Someone > The Thin Place
+      - doc: Campaign Outline
+        heading: Manor Route 2 — Cult of the Unknown > The Thin Place → The Shape of Someone > Darkwing's Rite
+    conflicts:
+      - field: synopsis
+        kind: contradiction
+        confidence: medium
+        use: canon
+        app: Maelyn then invites the Party to repeat the process using observations of Veiled the Party has encountered themselves.
+        canon: >-
+          A collection of small artworks or illustrated cards is placed before the Party. Each character selects one image that draws their
+          attention and answers a simple prompt such as:
+        source: Campaign Outline:1093
+        note: >-
+          Canon's rite has each PC pick a Cult artwork/card and interpret it (also Encounters §7 Opening State), not supply their own Veiled
+          observations.
+        proposed: >-
+          The Party follows the Manor map to Pilgrim’s Rest, where Maelyn invites them to observe how the Cult receives the beings it calls
+          Pilgrims. The Party discovers an enormous devotional archive of paintings, sculptures, carvings, and other attempted likenesses of
+          Veiled manifestations, all centered around a smooth featureless mask called the Face of the Unknown. A pilgrim uses a resonant
+          object and accumulated visual impressions to give one manifestation a coherent shape; the resulting Veiled appears calmly and
+          behaves more like a guest than an attacker. The ritual seems to prove the Cult’s belief that willing reception gives the Unknown
+          permission to reveal itself. Maelyn then invites the Party to perform the rite themselves, each choosing one of the Cult's small
+          artworks and saying what it reveals to them.
+      - field: synopsis
+        kind: contradiction
+        confidence: low
+        use: app
+        # User ruling, 2026-11-18: the introductory demonstration uses an ordinary object as a second Source; the Face's own
+        # manifestation (The Shape of Someone) is the special case. The app text stands.
+        app: A pilgrim uses a resonant object and accumulated visual impressions to give one manifestation a coherent shape
+        canon: The Face is itself the Source.
+        source: Campaign Outline:1068
+        note: >-
+          Canon makes the Face itself the Source of the rite (the mature rite uses selected artworks); a separate 'resonant object' is not
+          described.
+        proposed: >-
+          The Party follows the Manor map to Pilgrim’s Rest, where Maelyn invites them to observe how the Cult receives the beings it calls
+          Pilgrims. The Party discovers an enormous devotional archive of paintings, sculptures, carvings, and other attempted likenesses of
+          Veiled manifestations, all centered around a smooth featureless mask called the Face of the Unknown. Pilgrims use the Face and
+          selected artworks from the archive to give one manifestation a coherent shape; the resulting Veiled appears calmly and behaves
+          more like a guest than an attacker. The ritual seems to prove the Cult’s belief that willing reception gives the Unknown
+          permission to reveal itself. Maelyn then invites the Party to repeat the process using observations of Veiled the Party has
+          encountered themselves.
+  - id: encounter.the-shape-of-someone
+    provenance:
+      - doc: Campaign Outline
+        heading: Manor Route 2 — Cult of the Unknown
+      - doc: Encounters
+        heading: 7. The Shape of Someone — Cult Route
+    conflicts:
+      - field: synopsis
+        kind: contradiction
+        confidence: medium
+        use: canon
+        app: >-
+          The Party supplies the Face of the Unknown with conflicting observations, assumptions, and artistic interpretations drawn from
+          previous Veiled encounters.
+        canon: >-
+          A collection of small artworks or illustrated cards is placed before the Party. Each character selects one image that draws their
+          attention and answers a simple prompt such as:
+        source: Campaign Outline:1093
+        note: Canon's projections come from each PC's interpretation of a selected Cult artwork/card, not from prior Veiled encounters.
+        proposed: >-
+          The Party supplies the Face of the Unknown with conflicting interpretations of artworks chosen from the Cult's archive. The mask
+          accepts them all. A Composite manifestation forms and begins borrowing features from the Cult’s surrounding artwork, changing
+          shape as paintings, sculptures, and inherited iconography feed its reconstruction. The Party must protect the resonant source
+          object, trace which depictions are genuinely independent observations, and separate truthful Form from copied tradition and
+          projection. Dispersing the Veiled creates opportunities to test competing shapes against the Face and prevent false features from
+          returning. The Party ultimately discovers that the Cult has not been summoning Pilgrims through belief alone: existing mnemonic
+          pressure is responding to the Forms its observers provide, and generations of Cult imagery have partly taught later manifestations
+          what they are expected to look like. Maelyn entrusts the Party with the blank mask, turning the Face into a reusable tool for
+          testing Form without the accumulated expectations of the Cult’s archive.
+      - field: synopsis
+        kind: contradiction
+        confidence: medium
+        use: canon
+        app: >-
+          The Party must protect the resonant source object, trace which depictions are genuinely independent observations, and separate
+          truthful Form from copied tradition and projection.
+        canon: There is no hidden correct portrait to discover.
+        source: Campaign Outline:1127
+        note: >-
+          Canon: the Face is the Source, there is no truthful Form to recover, and the resolution is Releasing the observers' projections
+          back to the Face (Outline line 1137).
+        proposed: >-
+          The Party supplies the Face of the Unknown with conflicting observations, assumptions, and artistic interpretations drawn from
+          previous Veiled encounters. The mask accepts them all. A Composite manifestation forms and begins borrowing features from the
+          Cult’s surrounding artwork, changing shape as paintings, sculptures, and inherited iconography feed its reconstruction. The Party
+          must take each projected Form out of the ritual and return it to the Face, relinquishing the claim that it describes an external
+          Someone. Dispersing the Veiled creates opportunities to test competing shapes against the Face and prevent false features from
+          returning. The Party ultimately discovers that the Cult has not been summoning Pilgrims through belief alone: existing mnemonic
+          pressure is responding to the Forms its observers provide, and generations of Cult imagery have partly taught later manifestations
+          what they are expected to look like. Maelyn entrusts the Party with the blank mask, turning the Face into a reusable tool for
+          testing Form without the accumulated expectations of the Cult’s archive.
+      - field: synopsis
+        kind: contradiction
+        confidence: low
+        use: canon
+        app: turning the Face into a reusable tool for testing Form without the accumulated expectations of the Cult’s archive.
+        canon: >-
+          It has centuries of accumulated experience with projection and imposed representation. It can help Darkwing test whether a feature
+          in another reconstruction is intrinsic to the available mnemonic evidence or being supplied by an observer, institution, image,
+          role, or expectation.
+        source: Campaign Outline:1219
+        note: Canon's Keystone value comes from the Face's accumulated projection Weight, now carried truthfully, not from being free of it.
+        proposed: >-
+          The Party supplies the Face of the Unknown with conflicting observations, assumptions, and artistic interpretations drawn from
+          previous Veiled encounters. The mask accepts them all. A Composite manifestation forms and begins borrowing features from the
+          Cult’s surrounding artwork, changing shape as paintings, sculptures, and inherited iconography feed its reconstruction. The Party
+          must protect the resonant source object, trace which depictions are genuinely independent observations, and separate truthful Form
+          from copied tradition and projection. Dispersing the Veiled creates opportunities to test competing shapes against the Face and
+          prevent false features from returning. The Party ultimately discovers that the Cult has not been summoning Pilgrims through belief
+          alone: existing mnemonic pressure is responding to the Forms its observers provide, and generations of Cult imagery have partly
+          taught later manifestations what they are expected to look like. Maelyn entrusts the Party with the blank mask, turning the Face,
+          now a truthful Anchor for its accumulated Weight of projection, into a reusable tool for testing Form.
+    # Rewritten whole from Encounters §7 (planning review, 2026-11-18): the raid design, not a Dispersal-and-test loop, and the Face
+    # keeps its accumulated Weight (the revelation changes what it means, not whether it exists).
+    combined:
+      synopsis: >-
+        The Party participates in the Cult's ritual by selecting artworks from its archive and describing what each image reveals. Their
+        interpretations supply Forms to the Face of the Unknown, which has become a Source through generations of accumulated projections.
+        A Composite manifestation assembles itself from those interpretations, taking Forms from stations around the battlefield. Darkwing
+        contests the stations, removes Form Totems, and suppresses the Face's Ward by controlling two stations at once. Returning a Totem to
+        the Face and relinquishing the assumption that it describes an external being permanently Releases that Form. After three
+        Releases, the remaining projected Forms collapse. The Formless Shape reveals that the underlying Weight belongs to generations of
+        people imagining the Unknown, not to a hidden person. Darkwing guides that Weight back into the Face; the Source becomes a
+        truthful Anchor, and Maelyn can entrust it to Darkwing as a reusable Form Keystone. Exceptional early recognition can prevent the hostile Composite from forming.
+  - id: event.the-institute
+    provenance:
+      - doc: Campaign Outline
+        heading: Manor Route 3 — EGRESS Institute > The Institute → Playing for Keeps > Manor Hook — The Damaged OCC Reference
+  - id: encounter.playing-for-keeps
+    provenance:
+      - doc: Campaign Outline
+        heading: Manor Route 3 — EGRESS Institute
+      - doc: Encounters
+        heading: 8. Playing for Keeps — EGRESS Engram Vault
+  - id: event.the-way-out
+    provenance:
+      - doc: Campaign Outline
+        heading: Manor Route 4 — Dawn Assembly > The Way Out → Revolutionaries > Manor Hook
+      - doc: Campaign Outline
+        heading: Manor Route 4 — Dawn Assembly > The Way Out → Revolutionaries > The Historical Operation
+    conflicts:
+      - field: synopsis
+        kind: contradiction
+        confidence: high
+        use: canon
+        app: Miriel's father led the operation, and the Keeper they intended to rescue knew about and participated in the plan.
+        canon: "- Her **grandfather led the rescue team**."
+        source: Campaign Outline:1531
+        note: >-
+          Outline line 1530-1531 and Encounters line 1084 make the grandfather the rescue leader and the grandmother (Willow Stoutfoot,
+          Character Briefs line 813) the Keeper.
+        proposed: >-
+          A notation near the Crescent Island X matches a mark or handwriting Miriel recognizes from her father's annotated Dawn Charter.
+          Beneath the ruined wall, the Party discovers a concealed extraction route built by a more revolutionary generation of Dawn. The
+          tunnel reached toward the Ritual Chamber with river access for immediate escape. Miriel's grandfather led the operation, and the
+          Keeper they intended to rescue, his wife and Miriel's grandmother, knew about and participated in the plan.
+      - field: synopsis
+        kind: contradiction
+        confidence: medium
+        use: canon
+        app: matches a mark or handwriting Miriel recognizes from her father's annotated Dawn Charter
+        canon: >-
+          A mark on **Crescent Island** uses an old Stoutfoot family sign / early Dawn notation that Miriel recognizes from the inherited
+          Charter in her possession.
+        source: Campaign Outline:1519
+        note: >-
+          Canon calls it the inherited Charter in a founder's hand (Character Briefs line 554); the tunnel-era generation is her
+          grandparents, so 'her father's' carries the same parent/grandparent error.
+        proposed: >-
+          A notation near the Crescent Island X matches an old Stoutfoot family sign Miriel recognizes from her inherited, annotated Dawn
+          Charter. Beneath the ruined wall, the Party discovers a concealed extraction route built by a more revolutionary generation of
+          Dawn. The tunnel reached toward the Ritual Chamber with river access for immediate escape. Miriel's father led the operation, and
+          the Keeper they intended to rescue knew about and participated in the plan.
+    combined:
+      synopsis: >-
+        A notation near the Crescent Island X matches an old Stoutfoot family sign Miriel recognizes from her inherited, annotated Dawn
+        Charter. Beneath the ruined wall, the Party discovers a concealed extraction route built by a more revolutionary generation of Dawn.
+        The tunnel reached toward the Ritual Chamber with river access for immediate escape. Miriel's grandfather led the operation, and the
+        Keeper they intended to rescue, his wife and Miriel's grandmother, knew about and participated in the plan.
+  - id: encounter.revolutionaries
+    provenance:
+      - doc: Campaign Outline
+        heading: Manor Route 4 — Dawn Assembly
+      - doc: Encounters
+        heading: 9. Revolutionaries — Dawn Route
+    conflicts:
+      - field: variant:The Reading is Stopped:description
+        kind: contradiction
+        confidence: high
+        use: canon
+        app: Miriel discovers her father's handwriting and an operational copy of the Dawn Charter.
+        canon: "- letters between her grandparents demonstrating that **both were fully committed to the rescue** before the Reading;"
+        source: Campaign Outline:1591
+        note: >-
+          The rescue-era hands are her grandparents'; 'Miriel's father respected that refusal' in the same field is also corrected to
+          grandfather (Outline line 1531).
+        # Rewritten from Encounters §9 (planning review, 2026-11-18): the six rescuers are Veiled that resemble Darkwing, with subtly
+        # wrong anatomy, in the historical team's roles; the Party is not cast as the rescuers. Resolution is Choice: drop the rope.
+        proposed: >-
+          Miriel discovers her grandparents' letters and an operational copy of the Dawn Charter; the evidence proves that the historical
+          rescue succeeded at everything except bringing the Keeper out. When the Party reopens the sealed breach into the Ritual Chamber,
+          the tunnel's Wound recognizes living Vara as the Keeper to be extracted. Six remembered rescuers manifest in the historical team's
+          roles, each unmistakably resembling a member of Darkwing but with subtly wrong anatomy, and begin hauling Vara toward the river.
+          Pulling her back toward the Chamber is the same mistake with a different answer: neither end of the tug is victory. When Vara
+          demands that the contest stop, Darkwing wins only by voluntarily abandoning it; the remembered Captain orders the stand-down and
+          Choice is Restored. The truth surfaces in full: the Keeper chose to stay, and Miriel's grandfather respected her choice. The
+          encounter forces the Party to confront whether stopping Vara's Reading preserved her agency or substituted the Party's choice for
+          hers.
+      - field: variant:The Reading Succeeds:description
+        kind: contradiction
+        confidence: high
+        use: canon
+        app: Miriel discovers her father's handwriting and an operational copy of the Dawn Charter.
+        canon: "- Her **grandfather led the rescue team**."
+        source: Campaign Outline:1531
+        note: >-
+          Grandfather, not father, led the rescue and ordered the stand-down; the proposed text fixes both occurrences ('father's
+          handwriting', 'Miriel's father ordered').
+        proposed: >-
+          The tunnel's Wound assigns the Party the roles of the historical rescue party and gives an incomplete Keeper-shaped manifestation
+          the role of the person to be extracted. Old signals, staging rooms, and evacuation procedures repeatedly push the encounter toward
+          the river. Miriel discovers her grandparents' handwriting and an operational copy of the Dawn Charter. The evidence eventually
+          proves that the historical rescue succeeded mechanically: Dawn reached the Keeper and the escape route was open. The Keeper
+          knowingly refused to leave after encountering enough lives in the Book, and Miriel's grandfather ordered his people to respect
+          that refusal. The Party learns that honoring a Keeper's choice does not require accepting the system that made the choice
+          necessary.
+      - field: variant:The Reading Succeeds:description
+        kind: contradiction
+        confidence: high
+        use: canon
+        app: gives an incomplete Keeper-shaped manifestation the role of the person to be extracted
+        canon: >-
+          If Vara is unavailable or forgotten, the Wound recognizes **Miriel** through the combined lineage of the original Keeper and
+          rescue captain and assigns the old objective to her.
+        source: Campaign Outline:1642
+        note: "Encounters §9 Extraction Target (line 1146) agrees: with Vara forgotten, Miriel is the target."
+        proposed: >-
+          The tunnel's Wound assigns the Party the roles of the historical rescue party and recognizes Miriel, descendant of both the Keeper
+          and the rescue captain, as the person to be extracted. Old signals, staging rooms, and evacuation procedures repeatedly push the
+          encounter toward the river. Miriel discovers her grandparents' handwriting and an operational copy of the Dawn Charter. The
+          evidence eventually proves that the historical rescue succeeded mechanically: Dawn reached the Keeper and the escape route was
+          open. The Keeper knowingly refused to leave after encountering enough lives in the Book, and Miriel's grandfather ordered his
+          people to respect that refusal. The Party learns that honoring a Keeper's choice does not require accepting the system that made
+          the choice necessary.
+    # Rewritten from Encounters §9 (planning review, 2026-11-18): Mirror Squad presentation, Miriel as the target, Choice resolution.
+    combined:
+      variant:The Reading Succeeds:description: >-
+        Miriel discovers her grandparents' letters and an operational copy of the Dawn Charter; the evidence proves that the historical
+        rescue succeeded at everything except bringing the Keeper out. When the Party reopens the sealed breach into the empty Ritual
+        Chamber, the tunnel's Wound recognizes Miriel, descendant of both the Keeper and the rescue captain, as the person to be extracted.
+        Six remembered rescuers manifest in the historical team's roles, each unmistakably resembling a member of Darkwing but with subtly
+        wrong anatomy, and begin hauling her toward the river. Pulling her back is the same mistake with a different answer: neither end of
+        the tug is victory. When Miriel demands that the contest stop, Darkwing wins only by voluntarily abandoning it; the remembered
+        Captain orders the stand-down and Choice is Restored. The truth surfaces in full: after encountering enough lives in the Book, the
+        Keeper chose to finish the Reading, and Miriel's grandfather ordered his people to respect that choice. The Party learns that
+        honoring a Keeper's choice does not require accepting the system that made the choice necessary.
+  - id: event.the-veiled-house
+    provenance:
+      - doc: Campaign Outline
+        heading: Manor Route 5 — Witnesses > The Veiled House → Witness Me > The Veiled House
+    conflicts:
+      - field: synopsis
+        kind: contradiction
+        confidence: low
+        use: canon
+        app: The failure eventually helped produce the Witnesses' practice of preserving relationships and the later House of Abiding.
+        canon: >-
+          The early Witnesses argued that the Order was destroying information by stripping true objects from the circumstances in which
+          their meaning had existed. Eventually the Order suspended extraction and allowed Witness custodians to return objects and preserve
+          the site in place.
+        source: Campaign Outline:1754
+        note: >-
+          In canon the Witnesses' preservation practice predates the house (the Keeper argued against it); the failure vindicated it and
+          produced the Order–Witness compromise (line 1760).
+        proposed: >-
+          The Crescent Island lead brings the Party to an old Keeper residence from before the House of Abiding existed. After its Keeper
+          completed a Reading, the household remained full of emotionally resonant possessions arranged around a life no one remembered.
+          Early attempts to remove and archive those objects made the manifestations worse. The failure vindicated the early Witnesses'
+          practice of preserving relationships, won them sanctioned custodial authority, and eventually helped produce the Hall of
+          Remembrance and the House of Abiding.
+  - id: encounter.witness-me
+    provenance:
+      - doc: Campaign Outline
+        heading: Manor Route 5 — Witnesses
+      - doc: Encounters
+        heading: 10. Witness Me — Veiled House
+    conflicts:
+      - field: synopsis
+        kind: contradiction
+        confidence: medium
+        use: canon
+        app: Rooms, routines, and arrangements begin collapsing into one another when objects are moved or isolated.
+        canon: The house's topology changes once, at the moment of rupture.
+        source: Campaign Outline:1786
+        note: >-
+          Canon: one rupture when the Knocker is removed, then a maze that is 'impossible but not mutable'; Encounters line 1378: 'The maze
+          never changes after the rupture.'
+        proposed: >-
+          Darkwing applies the Hall of Remembrance lesson by identifying which possessions belong together, but the Veiled House
+          demonstrates that those relationships remain incomplete without context. Removing the one object still where it belongs ruptures
+          the house into an impossible but fixed maze of repeated Hearths. Resolution requires restoring not only which things were
+          connected, but where and how those relationships existed.
+      - field: variant:The Reading is Stopped:description
+        kind: contradiction
+        confidence: low
+        use: canon
+        app: Living Vara is repeatedly cast into the household's missing “Keeper” position even though none of its relationships belong to her.
+        canon: The hostile manifestation is the same forgotten Order Keeper every time.
+        source: Campaign Outline:1949
+        note: >-
+          Canon's Wound reconstructs the house's own forgotten Order Keeper and its object Context; neither Outline nor Encounters casts
+          Vara into the role, so this may be invented rather than contradicted.
+        # Rewritten from Encounters §10 (planning review, 2026-11-18): one trigger (the Knocker), one transformation into a fixed
+        # maze, and the house's own forgotten Order Keeper; nothing in canon casts Vara into the role.
+        proposed: >-
+          The Party initially applies the lesson learned at the Hall of Remembrance, identifying which possessions belong together. But
+          removing the Greater Insistent Door Knocker, the last object still in its historically correct place, ruptures the house once
+          into an impossible but fixed labyrinth of repeated Hearths. The house's hostile manifestation is always the same forgotten Order
+          Keeper who lived there, an overzealous custodian rather than a killer, and every wrong arrangement of its Context objects calls
+          it up again. The Party must map the maze and
+          restore not only which things were connected, but where and how those relationships existed. The encounter demonstrates that
+          correct fragments placed in the wrong context can still produce a false identity.
+  - id: event.the-confluence
+    provenance:
+      - doc: Campaign Outline
+        heading: Session 8 — The Confluence
+  - id: encounter.the-confluence
+    provenance:
+      - doc: Campaign Outline
+        heading: Session 8 — The Confluence
+      - doc: Encounters
+        heading: 11. The Confluence — Faction Pileup
+  - id: event.eclipse
+    provenance:
+      - doc: Campaign Outline
+        heading: Session 8 — The Confluence > If the Reading Was Stopped
+      - doc: Campaign Outline
+        heading: Session 8 — The Confluence > If the Reading Succeeded
+      - doc: Campaign Outline
+        heading: Session 9 — Totality
+      - doc: Character Briefs
+        heading: The Observer - Silas Venn > The Manor
+    conflicts:
+      - field: variant:The Reading Succeeds:description
+        kind: contradiction
+        confidence: high
+        use: app
+        # User ruling, 2026-11-18: on this path the anchors converge at the Manor, the Observer reveals himself first, and then the
+        # eclipse begins. The app text is right; the Character Briefs line is now path-specific.
+        app: While the Party is occupied with the Observer, the eclipse begins again.
+        canon: The eclipse has already begun at the Confluence; the Observer invites Darkwing through an impossible threshold back to the Manor
+        source: Character Briefs:56
+        note: >-
+          Standing ruling (Confluence → Eclipse → Observer, Character Briefs wins) puts the eclipse before the Observer; the app follows the
+          superseded Campaign Outline order (CO line 2169: the eclipse begins after the Observer's question).
+        proposed: >-
+          No new Keeper begins a Reading. Instead, the pieces of Vara preserved across the Party's, records, objects, and other anchors have
+          become coherent enough to reestablish a living relationship with the Book's supposedly closed inheritance. In the aftermath of the
+          Confluence, before the Observer reveals himself, the eclipse begins again. The returning shadow is the first undeniable sign that
+          reconstructing the forgotten Keeper has reopened a transfer the Colony believed complete.
+      - field: variant:The Reading is Stopped:description
+        kind: contradiction
+        confidence: medium
+        use: canon
+        # User ruling, 2026-11-18: on this path the eclipse begins at the Confluence, before the Observer calls the Party back; the
+        # Campaign Outline's Stopped section is corrected to match.
+        app: While the Party is occupied with the Observer, Vara disappears.
+        canon: Darkwing has already attempted to broker the Confluence and the eclipse has begun
+        source: Character Briefs:80
+        note: >-
+          Campaign Outline line 2120 ('During or immediately after that conversation, Vara disappears') supports the app, but under the
+          ruling the returning eclipse (which follows her disappearance) precedes the Observer, so her disappearance cannot occur while the
+          Party is with him.
+        proposed: >-
+          In the aftermath of the Confluence, Vara disappears. Depending on the Colony state and her relationship with the Party, she may
+          return willingly to the Book, be persuaded, manipulated, pressured, or taken. The Party does not initially know what happened. The
+          returning eclipse provides the answer: Vara is once again reading names in the Ritual Chamber, and the interrupted transfer has
+          resumed.
+  - id: event.the-observer
+    provenance:
+      - doc: Campaign Outline
+        heading: The Observer Reveal
+      - doc: Character Briefs
+        heading: The Observer - Silas Venn > Relationship to the Party
+    conflicts:
+      - field: synopsis
+        kind: contradiction
+        confidence: low
+        use: app
+        app: The faction crisis finally brings The Party face to face with the Manor's unseen resident.
+        canon: Darkwing has already attempted to broker the Confluence and the eclipse has begun
+        source: Character Briefs:80
+        note: >-
+          Per the standing ruling the Observer reveals himself in response to the eclipse/Totality rather than the faction crisis
+          (Confluence); 'faction crisis' may be read loosely, hence low confidence. Superseded (user, 2026-11-18): The Observer is the
+          end of Act II and holds the reveal in either order, so the app text stands.
+        proposed: >-
+          The returning eclipse finally brings The Party face to face with the Manor's unseen resident. The Observer admits that the
+          annotated map and institutional questions are his work. He has not been directing the Colony's crisis; he has been studying how
+          institutions preserve answers after forgetting the questions that produced them. The Party is the variable he could not already
+          model: outsiders capable of refusing the inherited terms.
+  - id: event.totality
+    provenance:
+      - doc: Campaign Outline
+        heading: Session 9 — Totality
+      - doc: Campaign Outline
+        heading: Session 9 — Totality > Shared Totality
+  - id: encounter.totality
+    provenance:
+      - doc: Encounters
+        heading: 12. Totality — Race Against the Eclipse
+      - doc: Campaign Outline
+        heading: Session 9 — Totality
+      - doc: Faction Goals
+        heading: IV. Act III — Totality and the Five Fronts
+  - id: encounter.sunny
+    provenance:
+      - doc: Campaign Outline
+        heading: Session 10 — Shattered > Sunny — Old Town / Shattered
+      - doc: Encounters
+        heading: 13. Sunny — Old Town / Cemetery Crisis
+  - id: encounter.the-breach
+    provenance:
+      - doc: Campaign Outline
+        heading: Session 10 — Shattered > The Breach — EGRESS Institute
+      - doc: Encounters
+        heading: 14. The Breach — EGRESS Crisis
+    conflicts:
+      - field: synopsis
+        kind: source-conflict
+        confidence: high
+        use: canon
+        app: the Sheep punishes unbroken observation
+        canon: If the sole observer blinks or loses sight, the last watcher dies.
+        source: Encounters:1956
+        alsoSource: Campaign Outline:2337
+        alsoCanon: the Sheep punishes unbroken observation
+        note: >-
+          The app copies Campaign Outline's phrasing, but Encounters.md (and Creatures.md line 3533: 'completely harmless while any one
+          creature maintains uninterrupted direct visual observation') say the Sheep kills when observation breaks; the proposal follows
+          Encounters/Creatures, which own encounter mechanics per the Document Contract.
+        proposed: >-
+          Under Totality, the boundaries between containment, Source, and reconstructed Pattern fail at Occlusion Containment. A great
+          Veiled Dragon erupts from its prison and leaves carrying its own mobile Source. Other Incursions threaten staff and the city, the
+          Sheep punishes broken observation, and an apparent Mother with her aquatic brood exposes a real Relationship that EGRESS's return
+          plumbing has misunderstood. Restoring the mother–brood return circuit can reestablish containment for cell-bound Sources, leaving
+          the Dragon, some escapees, damaged research, and the central Scar as unresolved truths. The Breach is the EGRESS front: its one
+          outcome sets the Engram Vault's finale condition, its Finale Pressure, and the Memory Frames EGRESS can bring to The Burden.
+  - id: encounter.milltown
+    provenance:
+      - doc: Campaign Outline
+        heading: Session 10 — Shattered > Milltown — The Flood Without Water / Dawn Civilian Crisis
+      - doc: Encounters
+        heading: 15. Milltown — The Flood Without Water
+  - id: encounter.the-tangled-web
+    provenance:
+      - doc: Campaign Outline
+        heading: Session 10 — Shattered > The Tangled Web — Hall of Remembrance / Witnesses
+      - doc: Encounters
+        heading: 16. The Tangled Web — Hall of Remembrance / Witnesses Crisis
+  - id: encounter.the-open-door
+    provenance:
+      - doc: Campaign Outline
+        heading: Session 10 — Shattered > The Open Door — Pilgrim's Rest / Cult of the Unknown
+      - doc: Encounters
+        heading: 17. The Open Door — Pilgrim's Rest / Cult Crisis
+  - id: encounter.the-burden
+    provenance:
+      - doc: Encounters
+        heading: 18. The Burden — First Keeper Reconstruction
+      - doc: Campaign Outline
+        heading: Session 11 — The Burden
+      - doc: The Burden — Final Veiled Encounter
+        heading: 4. Governing Encounter Rules
+    conflicts:
+      - field: synopsis
+        kind: contradiction
+        confidence: high
+        use: canon
+        app: When the final Memory is restored, the black silhouette resolves into a recognizable woman.
+        canon: The finale ends on Name.
+        source: The Burden — Final Veiled Encounter:107
+        note: >-
+          The finale's last truth is Name (Aletheia's Named Boundary in Phase IV); Campaign Outline line 2468 agrees: 'The final mechanical
+          revelation is **Name**, not Memory.'
+        proposed: >-
+          The Party confronts the final Veiled manifestation: centuries of Keepers, ritual imagery, institutional doctrine, and forgotten
+          history reconstructed around the missing shape of the First Keeper. The encounter forces the Party to use every component of
+          Identity it has learned—Name, Relationship, Form, Context, Pattern, Choice, and Memory—while the five front results, Perrik's
+          access to the Claims Registry, Kelda, and each faction's relationship with the Party determine which help arrives and whether it
+          assists or interferes. Each successful stabilization strips away another false reconstruction, forcing the manifestation to become
+          smaller, more specific, and more human. When the final Name is restored, the black silhouette resolves into a recognizable woman.
+          The Veiled manifestation is gone. Aletheia remains.
+  - id: event.aletheia
+    provenance:
+      - doc: Campaign Outline
+        heading: Event — Aletheia
+      - doc: The Burden — Final Veiled Encounter
+        heading: 11. Aletheia and the Weight
+  - id: event.the-light-remains
+    provenance:
+      - doc: Campaign Outline
+        heading: Session 12 — The Light Remains
+      - doc: Campaign Outline
+        heading: What Will You Carry? > The Return of Light
+  - id: thread.bad-maps
+    provenance:
+      - doc: Character Briefs
+        heading: The Keeper - Varenya “Vara” Cairn > Bad Maps
+      - doc: Campaign Outline
+        heading: Act I — The Secret > Session 2 — Bad Maps
+  - id: thread.crescent-island
+    provenance:
+      - doc: Campaign Outline
+        heading: Act II — The Cost > Session 5 — Dawn / The Morning After > Shared Manor Discovery
+      - doc: Campaign Outline
+        heading: Manor Route 4 — Dawn Assembly > The Way Out → Revolutionaries > Manor Hook
+      - doc: Campaign Outline
+        heading: Manor Route 5 — Witnesses > The Veiled House → Witness Me > The Veiled House
+  - id: thread.egress
+    provenance:
+      - doc: Campaign Outline
+        heading: Manor Route 3 — EGRESS Institute > The Institute → Playing for Keeps > Manor Hook — The Damaged OCC Reference
+      - doc: Campaign Outline
+        heading: Manor Route 3 — EGRESS Institute > The Institute → Playing for Keeps > Authentic Engrams
+  - id: thread.faction-conflict
+    provenance:
+      - doc: Campaign Outline
+        heading: The Manor Investigation Model > The Confluence Begins When Investigation Becomes Implementation
+      - doc: Campaign Outline
+        heading: Campaign Causal Spines > Act III — Shared
+  - id: thread.old-town
+    provenance:
+      - doc: Campaign Outline
+        heading: Campaign-Wide Promises and Narrative Threads > Old Town, Sunny, and Sundara
+      - doc: Campaign Outline
+        heading: Manor Route 1 — The Shattered > The Broken Bell → Old Town > Tomlin Cobb, Sundara, and the Quiet That Followed
+      - doc: Campaign Outline
+        heading: Session 10 — Shattered > Sunny — Old Town / Shattered
+  - id: thread.pepe-sylvya
+    provenance:
+      - doc: Character Briefs
+        heading: Major Narrative Characters > Aspis Administrator - Perrik Tallow
+      - doc: Character Briefs
+        heading: Keepers > Pépé Sylvya
+      - doc: Campaign Outline
+        heading: Act II — The Cost > Session 5 — Dawn / The Morning After > If the Reading Succeeded
+    conflicts:
+      - field: title
+        kind: outdated-name
+        confidence: medium
+        use: canon
+        app: Pépé Silvia
+        canon: "## Pépé Sylvya"
+        source: Character Briefs:809
+        note: >-
+          Canon (Character Briefs, Campaign Outline line 1434, npcs/pepe-sylvya.md) spells the character Pépé Sylvya; the 'Silvia' spelling
+          appears only as Perrik's flavor reference 'Charlie Day (Pepe Silvia)' (Character Briefs line 113), so the title may be a
+          deliberate in-joke.
+        proposed: Pépé Sylvya
+  - id: thread.the-cloth-toy
+    provenance:
+      - doc: Campaign Outline
+        heading: Campaign-Wide Promises and Narrative Threads > The Cloth Toy
+      - doc: Campaign Outline
+        heading: Act I — The Secret > Session 3 — Dusk > Witness Route — A Life
+  - id: thread.the-dusk-of-the-dawn
+    provenance:
+      - doc: Campaign Outline
+        heading: Manor Route 4 — Dawn Assembly > The Way Out → Revolutionaries > The Historical Operation
+      - doc: Campaign Outline
+        heading: Manor Route 4 — Dawn Assembly > The Way Out → Revolutionaries > Historical Consequence
+  - id: thread.the-face-of-the-unknown
+    provenance:
+      - doc: Campaign Outline
+        heading: Manor Route 2 — Cult of the Unknown > The Thin Place → The Shape of Someone > What the Cult Believes
+      - doc: Campaign Outline
+        heading: Manor Route 2 — Cult of the Unknown > The Thin Place → The Shape of Someone > What Is Actually Happening
+      - doc: The Veiled
+        heading: Form — Face of the Unknown
+    conflicts:
+      - field: summary
+        kind: contradiction
+        confidence: low
+        use: canon
+        app: The Cult uses the Face to give incomplete memory enough shape to be perceived.
+        canon: The Unknown already exists beyond perception. The Face allows many witnesses to receive different pieces of its true Form.
+        source: Campaign Outline:1061
+        note: >-
+          Canon says the Cult believes it receives Form from an external Unknown and doesn't know it supplies Form (line 1056: wrong about
+          'which direction the information is flowing'); the Face also holds accumulated projection, not one incomplete memory.
+        proposed: The Cult uses the Face to receive the Unknown's many Forms, not realizing that its pilgrims are the ones supplying that shape.
+  - id: thread.the-first-witnesses
+    provenance:
+      - doc: Campaign Outline
+        heading: Manor Route 5 — Witnesses > The Veiled House → Witness Me > The Veiled House
+      - doc: Campaign Outline
+        heading: Manor Route 5 — Witnesses > The Veiled House → Witness Me > The Last Correct Context
+    conflicts:
+      - field: summary
+        kind: contradiction
+        confidence: low
+        use: canon
+        app: The Veiled House preserves the failure that taught the early Witnesses to preserve context, not merely possessions.
+        canon: >-
+          The early Witnesses argued that the Order was destroying information by stripping true objects from the circumstances in which
+          their meaning had existed.
+        source: Campaign Outline:1754
+        note: >-
+          In canon the early Witnesses already held the context principle and the failure was the Order's, which 'forced the Order to
+          preserve their method' (line 1764); the Witnesses did, however, learn the narrower rule 'Do not move the thing that is still where
+          it belongs.'
+        proposed: >-
+          The Veiled House preserves the failure that proved the early Witnesses right and forced the Order to preserve context, not merely
+          possessions.
+  - id: thread.the-keeper
+    provenance:
+      - doc: Campaign Outline
+        heading: Campaign-Wide Promises and Narrative Threads > Vara Cairn — The Keeper
+      - doc: Character Briefs
+        heading: Major Narrative Characters > The Keeper - Varenya “Vara” Cairn
+  - id: thread.the-manor
+    provenance:
+      - doc: Campaign Outline
+        heading: Act II — The Cost > Session 5 — Dawn / The Morning After
+      - doc: Character Briefs
+        heading: Major Narrative Characters > The Observer - Silas Venn > The Manor
+  - id: thread.the-missing-father
+    provenance:
+      - doc: Campaign Outline
+        heading: Campaign-Wide Promises and Narrative Threads > Marek Cairn — The Missing Father
+      - doc: Character Briefs
+        heading: Major Narrative Characters > The Keeper’s Father - Marek Cairn
+  - id: thread.the-observer
+    provenance:
+      - doc: Campaign Outline
+        heading: Campaign-Wide Promises and Narrative Threads > The Observer and the Manor Map
+      - doc: Campaign Outline
+        heading: The Observer Reveal
+      - doc: Character Briefs
+        heading: Major Narrative Characters > The Observer - Silas Venn
+  - id: thread.the-official-duskwood-story
+    provenance:
+      - doc: Campaign Outline
+        heading: Campaign-Wide Promises and Narrative Threads > The Official Duskwood Story
+      - doc: Campaign Outline
+        heading: Act I — The Secret > Session 3 — Dusk > Cult Route — Duskwood
+    conflicts:
+      - field: summary
+        kind: contradiction
+        confidence: low
+        use: canon
+        app: Act I disproves the origin story; later revelations show why the politically useful explanation persisted.
+        canon: The false external-threat narrative is challenged in Act I and demolished by Old Town.
+        source: Campaign Outline:258
+        note: >-
+          Canon gives a two-stage arc (challenged in Act I, demolished in Act II's Old Town route), though the Session 3 Cult route Answer
+          does state 'the Veiled do not come from there'; separately, Candlestone is not named in any source document's description of the
+          official story (an addition, not reported as a conflict).
+        # Planning review, 2026-11-18: Candlestone dropped (no source ties it to the official story).
+        proposed: >-
+          The Colony blames the Duskwood for the Veiled, though its dangers are ordinary Golarion ones and the Veiled do not originate
+          there. Act I challenges the origin story and Old Town demolishes it; later revelations show why the politically useful
+          explanation persisted.
+  - id: thread.the-reading
+    provenance:
+      - doc: Campaign Outline
+        heading: Foundational Narrative Truths > The Reading
+  - id: thread.the-reckoning-is-coming
+    provenance:
+      - doc: Campaign Outline
+        heading: Manor Route 1 — The Shattered > The Broken Bell → Old Town > The Broken Bell
+      - doc: Campaign Outline
+        heading: Act II — The Cost > Session 5 — Dawn / The Morning After > Shared Manor Discovery
+      - doc: Campaign Outline
+        heading: Session 10 — Shattered > Sunny — Old Town / Shattered

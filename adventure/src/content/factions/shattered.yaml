@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=../../../schemas/faction.schema.json
+id: faction.shattered
+slug: shattered
+name: Shattered
+type: Faction
+summary: The youngest faction in the Colony, the Shattered are a clandestine movement of the disillusioned, using hidden shelters, dead drops, and fractured objects to reopen wounds the Colony has learned to ignore.
+motto: The Reckoning is coming.
+represents: Revolt, Rejection
+publicFace: Dangerous extremists and vandals.
+selfImage: The only people honest enough to stop bargaining with evil.
+coreTenet: A system built on sacrifice has no legitimacy.
+focus: Judgement, Collapse
+certainOf: No institution in the Colony can redeem itself.
+rightAbout: The system is morally abhorrent, and generations of reform have failed to end it.
+afraidOf: False hope, co-option, and becoming complicit.
+wrongAbout: They mistake destruction for liberation.
+response: Destroy it. The price isn't worth it.
+origin: Generations of stalled reform convinced younger citizens that the Assembly had become part of the machine it once opposed. Idealists became radicals when hope curdled into proof that the whole system must break.
+foundedAs: Disillusioned Idealists
+became: Radicals
+history: |-
+  The Shattered are the youngest faction in the Colony, born from the same wound that once created the Dawn Assembly. Where the Dawn looked at the Witnesses and said, "Mourning is not enough," the Shattered looked at the Dawn and said, "Reform is not enough." They grew up surrounded by public hearings, revised charters, and promises of change, yet watched the ritual continue year after year. To them, the Assembly did not fail because it lacked good intentions. It failed because the system learned how to survive reform.
+
+  Many of the earliest Shattered were former Dawn organizers, frustrated apprentices, grieving families, and members of the Fractured whose lives had been shaped by absences no one else could explain. They began not as a formal movement, but as conversations held after meetings ended—in back rooms, abandoned cellars, and forgotten corners of the Colony. The Broken Bell became their refuge: public enough to hide in plain sight, disreputable enough to be ignored, and broken enough to feel honest. Rejecting councils, charters, and institutions, they instead built hidden stockpiles, dead drops, and whispered networks that could survive without leaders.
+
+  Their greatest discovery was not political, but personal. It came through the Fractured Objects left behind by the Forgotten. They learned that certain belongings carried more than sentimental value; returned to the right place, they could awaken grief without memory and certainty without explanation. The Shattered realized the Colony could ignore arguments and absorb reform, but it struggled to ignore the wounds it had buried. Rather than persuading people with ideology, they learned to recruit through absence, placing forgotten echoes where they would be felt most deeply.
+
+  Today, the Shattered remain a decentralized movement of saboteurs, smugglers, and disillusioned idealists convinced that every institution eventually forgets why it was created. They reject compromise as another form of surrender, believing that every hidden cost must eventually be brought into the light. When they speak of the Reckoning, they do not mean vengeance. They mean that every burden comes due, every compromise demands payment, and every wound the Colony refuses to heal will one day reopen on its own.
+heraldry:
+  glyph: /uploads/factions/shattered-glyph.png?v=1785375391667
+  icon: /uploads/factions/shattered-icon.svg?v=1785375397915
+  primaryColor: "#7a0000"
+  secondaryColor: "#d7d1bc"
+  bannerShape: pennant
+status: draft
+start:
+  active: true
+  leader: npc.tavia-rusk
+  momentum: -1
+  size: 100
+  values:
+    truth: 0.234
+    stability: 0
+    agency: 0.766
+  beliefs:
+    a: Positive
+    b: Positive
+    c: Negative

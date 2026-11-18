@@ -14,10 +14,9 @@ public class FactionsController(AppDbContext db, ICampaignContext campaign, IWeb
     public async Task<IActionResult> GetAll()
     {
         var cid = await campaign.GetActiveIdAsync();
-        return Ok(await db.Factions
-            .Where(f => f.CampaignId == cid)
-            .OrderBy(f => f.SortOrder).ThenBy(f => f.Name)
-            .ToListAsync());
+        // Name is file-backed (ADVENTURE-BOOK-PLAN.md §10), so sort after loading.
+        var factions = await db.Factions.Where(f => f.CampaignId == cid).ToListAsync();
+        return Ok(factions.OrderBy(f => f.SortOrder).ThenBy(f => f.Name, StringComparer.CurrentCulture).ToList());
     }
 
     [HttpGet("{id}")]
@@ -32,6 +31,7 @@ public class FactionsController(AppDbContext db, ICampaignContext campaign, IWeb
     {
         var cid = await campaign.GetActiveIdAsync();
         faction.Id = await EntityIds.ForCreateAsync(db.Factions, faction.Id);   // keep an imported id when it is free
+        faction.CanonId = null;   // a new entity gets a new canonical file
         faction.CampaignId = cid;
         if (faction.MomentumTier is < -2 or > 2) return BadRequest("momentumTier must be between -2 and +2.");
         if (faction.SortOrder == 0)
@@ -45,6 +45,10 @@ public class FactionsController(AppDbContext db, ICampaignContext campaign, IWeb
     public async Task<IActionResult> Update(string id, [FromBody] Faction faction)
     {
         if (id != faction.Id) return BadRequest();
+        // The link to the faction's file is the server's, never the request's (ADVENTURE-BOOK-PLAN.md §10).
+        var link = await db.Factions.AsNoTracking().Where(x => x.Id == id).Select(x => new { x.CanonId }).FirstOrDefaultAsync();
+        if (link is null) return NotFound();
+        faction.CanonId = link.CanonId;
         if (faction.MomentumTier is < -2 or > 2) return BadRequest("momentumTier must be between -2 and +2.");
         var cid = await campaign.GetActiveIdAsync();
         faction.CampaignId = cid;

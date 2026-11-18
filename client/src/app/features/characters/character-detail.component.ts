@@ -544,7 +544,8 @@ export class CharacterDetailComponent implements OnInit {
         if (isNew) {
           this.characterRelationships.update(r => [...r, saved]);
         } else {
-          this.characterRelationships.update(r => r.map(x => x.id === saved.id ? saved : x));
+          // The id comes from the two characters and the type (ADVENTURE-BOOK-PLAN.md §15), so an edit can change it.
+          this.characterRelationships.update(r => r.map(x => x.id === src?.id ? saved : x));
         }
         this.editingRelId.set(null);
       },

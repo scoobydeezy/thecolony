@@ -8,7 +8,7 @@ namespace ColonyTracker.Api.Models;
 /// value that depends on Colony Stress. An in-force condition may add to Colony Stress. Evaluated by client replay
 /// (core/sim/conditions.ts).
 /// </summary>
-public class WorldCondition
+public class WorldCondition : ICanonEntity
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string CampaignId { get; set; } = "";
@@ -21,5 +21,12 @@ public class WorldCondition
     /// [{"kind":"assetController","assetId":"…","factionId":"aspis"},{"kind":"condition","conditionId":"…","inForce":true}].</summary>
     public string RequirementsJson { get; set; } = "[]";
     public int StressContribution { get; set; }          // added to Colony Stress while in force (may be negative)
-    public int SortOrder { get; set; }
+    public int SortOrder { get; set; }                   // presentation order: stays in the row
+
+    // ADVENTURE-BOOK-PLAN.md §15: the canonical file (condition.<slug> under adventure/src/content/conditions/).
+    // Every property in CanonEntityMapping is read from and saved to it; ids in RequirementsJson and
+    // VariesByJson are row ids here and canonical ids in the file.
+    public string? CanonId { get; set; }
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped] public string? CanonVersion { get; set; }
+    [System.ComponentModel.DataAnnotations.Schema.NotMapped] public bool CanonMissing { get; set; }
 }

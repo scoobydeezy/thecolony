@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.dawn-charter
+slug: dawn-charter
+name: Dawn Charter
+type: Artifact
+role: Mandate
+tier: 5
+keystone: true
+summary: A living document that records every reform ever proposed by the Dawn Assembly. Amendments, revisions, and generations of commentary fill its pages, reflecting the belief that no society is ever truly finished and every generation should leave the Colony better than they found it.
+status: draft
+start:
+  controller: faction.dawn-assembly
+  location: location.assembly-hall
+  status: Stable

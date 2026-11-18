@@ -1,0 +1,308 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^npc\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string"
+    },
+    "status": {
+      "default": "draft",
+      "type": "string",
+      "enum": [
+        "stub",
+        "draft",
+        "canonical"
+      ]
+    },
+    "previousSlugs": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      }
+    },
+    "aliases": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "provenance": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "doc": {
+            "type": "string"
+          },
+          "heading": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "doc",
+          "heading"
+        ]
+      }
+    },
+    "design": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string"
+    },
+    "ancestry": {
+      "type": "string"
+    },
+    "heritage": {
+      "type": "string"
+    },
+    "class": {
+      "type": "string"
+    },
+    "background": {
+      "type": "string"
+    },
+    "level": {
+      "type": "integer",
+      "minimum": -1,
+      "maximum": 25
+    },
+    "gender": {
+      "type": "string"
+    },
+    "pronouns": {
+      "type": "string"
+    },
+    "age": {
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+    },
+    "portrait": {
+      "type": "string"
+    },
+    "narrativeTier": {
+      "default": "Minor",
+      "type": "string",
+      "enum": [
+        "Major",
+        "Supporting",
+        "Minor",
+        "Background"
+      ]
+    },
+    "origin": {
+      "default": "prepared",
+      "type": "string",
+      "enum": [
+        "prepared",
+        "improvised"
+      ]
+    },
+    "start": {
+      "type": "object",
+      "properties": {
+        "faction": {
+          "type": "string",
+          "pattern": "^faction\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+        },
+        "socialClass": {
+          "type": "string",
+          "pattern": "^faction\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+        },
+        "location": {
+          "type": "string",
+          "pattern": "^location\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+        },
+        "state": {
+          "default": "Alive",
+          "type": "string",
+          "enum": [
+            "Alive",
+            "Dead",
+            "Missing",
+            "Forgotten"
+          ]
+        },
+        "instability": {
+          "default": "Stable",
+          "type": "string",
+          "enum": [
+            "Stable",
+            "Conflicted",
+            "Compromised"
+          ]
+        },
+        "reaffirmedFaction": {
+          "type": "string",
+          "pattern": "^faction\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+        },
+        "values": {
+          "type": "object",
+          "properties": {
+            "truth": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "stability": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "agency": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "required": [
+            "truth",
+            "stability",
+            "agency"
+          ],
+          "additionalProperties": false
+        },
+        "beliefs": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "a": {
+              "type": "string",
+              "enum": [
+                "Positive",
+                "Neutral",
+                "Negative"
+              ]
+            },
+            "b": {
+              "type": "string",
+              "enum": [
+                "Positive",
+                "Neutral",
+                "Negative"
+              ]
+            },
+            "c": {
+              "type": "string",
+              "enum": [
+                "Positive",
+                "Neutral",
+                "Negative"
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "doubt": {
+          "type": "string",
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "AB",
+            "AC",
+            "BC"
+          ]
+        },
+        "conviction": {
+          "default": 50,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "pressure": {
+          "default": 0,
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        "influence": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "impressionable": {
+          "default": 50,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100
+        }
+      },
+      "required": [
+        "values"
+      ],
+      "additionalProperties": false
+    },
+    "relationships": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "string",
+            "pattern": "^(npc|pc)\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+          },
+          "type": {
+            "type": "string",
+            "minLength": 1
+          },
+          "summary": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "Active",
+              "Estranged",
+              "Severed",
+              "Unknown"
+            ]
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "Public",
+              "GMOnly",
+              "Revealed"
+            ]
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "id",
+    "slug",
+    "name"
+  ],
+  "additionalProperties": false
+}

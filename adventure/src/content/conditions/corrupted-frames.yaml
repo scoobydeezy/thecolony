@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.corrupted-frames
+slug: corrupted-frames
+name: Corrupted Frames
+variesBy:
+  subject:
+    kind: goalStage
+    id: goal.disable-corrupted-frames
+  rows:
+    - state: Planning
+      text: ""
+      stress: 0
+    - state: Progressing
+      text: EGRESS isolates compromised Frame control channels and begins shutting down unstable Proxies.
+      stress: 0
+    - state: Ready
+      text: ""
+      stress: 0
+    - state: Accomplished
+      text: The targeted EGRESS Frames are switched off and unavailable for security or research labor.
+      stress: 0
+    - state: Failed
+      text: ""
+      stress: 0
+    - state: Retired
+      text: ""
+      stress: 0
+status: draft

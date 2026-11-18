@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.secure-the-hall-of-keepers
+slug: secure-the-hall-of-keepers
+name: Secure the Hall of Keepers
+faction: faction.dawn-assembly
+type: Achieve
+priority: Major
+visibility: Secret
+outcome: Automatic
+earliestAct: 3
+champion: npc.tobin-marsh
+target:
+  type: Asset
+  id: asset.hall-of-the-keepers
+  owner: faction.dawn-assembly
+effects:
+  progressing:
+    - targetType: asset
+      targetId: asset.hall-of-the-keepers
+      property: status
+      delta: 0
+      value: Contested
+  accomplished:
+    - targetType: asset
+      targetId: asset.hall-of-the-keepers
+      property: status
+      delta: 0
+      value: Stable
+status: draft
+start:
+  status: Plotting

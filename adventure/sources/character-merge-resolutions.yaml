@@ -1,0 +1,95 @@
+# Decisions on scripts/merge-characters.mjs conflicts (staging/characters/MERGE-REPORT.md).
+# The merge tool applies these on every run, so the staged files always reflect them.
+#
+#   field: book | brief | app   keep that source's value
+#   field: keep                 keep the value chosen by precedence (book → brief → app)
+#   field: { text: ... }        use this consolidated text instead of any source
+#   field: { value: ... }       use this value (e.g. a list of aliases)
+# A resolution applies to the field whether or not it was a conflict.
+#
+# Field names match the report: identity fields by name, sections as "§ Heading".
+
+decided: 2026-11-17
+
+npc.kivren-quozot:
+  role: app
+  # App version, with the typo "identifed" corrected (user, 2026-11-17).
+  § Methods:
+    text: |-
+      The Instigator finds people carrying grief the Colony refuses to recognize, then returns the fractured objects capable of giving that grief shape if such an object can be identified.
+      Their first operation reunites a Fractured woman with a worn cloth toy that belonged to her forgotten child. She remembers only flashes of the child as an infant, while the child’s later life—and eventual service as a Keeper—has disappeared.
+      The resulting Veiled manifestation reconstructs the child as they exist within her surviving memory: an enormous, helpless infant seeking its mother.
+      The Instigator expected danger. They did not know precisely what form it would take or who would die.
+npc.marek-cairn:
+  role: app
+npc.tarn:
+  role: app
+npc.vara-cairn:
+  role: brief
+
+# "Where descriptions differ, combine them into a single consolidated entry."
+# Role and age are not descriptions: kept as suggested.
+npc.serevan-ilvar:
+  role: keep
+  age: keep
+  § Overview:
+    text: |-
+      His Prominence is the leader of the Order of Theia and one of the few people in the Colony who understands the full cost and function of the Reading.
+      He knows the Keeper will be forgotten. He knows the sacrifice is concealed. He also knows the Ritual genuinely prevents catastrophic mnemonic collapse.
+      To him, allowing it to fail is unthinkable.
+  § Personality:
+    text: |-
+      Controlled, formal, compassionate, and absolute. He rarely raises his voice, explains himself defensively, or acknowledges uncertainty in public.
+      He does not present the Reading as a belief or proposal. He presents it as reality.
+      His authority conceals a profound fear: that one moment of hesitation will doom the Colony he was entrusted to preserve.
+  § Narrative Role:
+    text: |-
+      His Prominence embodies the strongest possible defense of the inherited answer: a compassionate authority who understands that the Reading is unjust and knows that it genuinely works.
+      He is not defending a lie. He is defending an incomplete answer, with full knowledge of its injustice and complete certainty that the alternative is catastrophe.
+      If the Reading is interrupted, he is the final obstacle between the Party and the Chamber, and later represents the Order's attempt to restore its authority. His defeat removes one of the only people who understood what the Party has stopped, fractures the Order's leadership, and forces the Colony to confront the consequences without its most prepared defender.
+      If the Reading succeeds, he recognizes the Party's reconstruction of the Keeper as a dangerous second anchor and orders the emergency Closure intended to preserve the completed transfer.
+  § Relationship to the Ritual:
+    text: |-
+      He understands exactly what the Reading costs and believes that knowledge obligates him to ensure it continues.
+      He does not consider the sacrifice good. He considers it necessary.
+      Because the Ritual works, he believes the Order possesses both the duty and the authority to administer it. Change may someday be conceivable, but only after an alternative has already been proven safe—an impossible standard that prevents meaningful experimentation.
+
+# "On all others, keep suggested."
+npc.celia-harthwright:
+  role: keep
+npc.julian-arrett:
+  role: keep
+npc.kelda-varruk:
+  level: keep
+npc.miriel-stoutfoot:
+  role: keep
+npc.orlombuthalde-nix:
+  § Overview: keep
+npc.perrik-tallow:
+  role: keep
+  § Motivation: keep
+  § Performance Inspiration: keep
+npc.veyra-kess:
+  age: keep
+  § Science and Transcendence: keep
+
+# 2026-11-17: "Take Silas Venn, alias The Observer, role GM Stand-in; ignore small wording differences."
+npc.silas-venn:
+  name: brief
+  # The app had "Human?"; the user removed the question mark (2026-11-17).
+  ancestry:
+    value: Human
+  aliases:
+    value: [The Observer]
+  role:
+    text: GM Stand-in
+  § Overview: keep
+  § The Manor: keep
+
+# 2026-11-17: "Tomlin Cobb: take brief."
+npc.tomlin-cobb:
+  age: brief
+  § Blind Spot: brief
+  § Narrative Role: brief
+  § Performance Inspiration: brief
+  § The Name — GM Truth, Hidden Until Sunny: brief

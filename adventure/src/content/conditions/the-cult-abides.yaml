@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.the-cult-abides
+slug: the-cult-abides
+name: The Cult Abides
+variesBy:
+  subject:
+    kind: goalStage
+    id: goal.abide
+  rows:
+    - state: Planning
+      text: ""
+      stress: 0
+    - state: Progressing
+      text: Cult attendants may accompany the upcoming Keeper Procession.
+      stress: 0
+    - state: Ready
+      text: ""
+      stress: 0
+    - state: Accomplished
+      text: Cult attendants demand custody of House of Abiding; its access may be contested in play.
+      stress: 0
+    - state: Failed
+      text: ""
+      stress: 0
+    - state: Retired
+      text: ""
+      stress: 0
+status: draft

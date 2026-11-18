@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.high-bank
+slug: high-bank
+name: High Bank
+type: Zone
+summary: Older, more established part of The Colony
+parent: location.colony
+markerColor: "#60fb96"
+status: draft
+start:
+  state: Stable

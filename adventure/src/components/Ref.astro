@@ -1,0 +1,11 @@
+---
+// A link to another entry by canonical id. A reference to an entry that no longer exists is
+// flagged (§12) instead of linked, so a delete through the app shows up on every page that named it.
+import { loadRegistry, entityUrl } from '../lib/registry.mjs';
+interface Props { id: string }
+const { id } = Astro.props;
+const e = loadRegistry().byId.get(id);
+const name = e ? (e.view.fullName ?? e.view.name) : null;
+const href = e ? entityUrl(e) : null;
+---
+{e ? (href ? <a href={href}>{name}</a> : <span>{name}</span>) : <span class="rp-ref-missing" title={`No entry ${id}: stale reference`}>{id} (missing)</span>}

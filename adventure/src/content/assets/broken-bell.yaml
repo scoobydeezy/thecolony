@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.broken-bell
+slug: broken-bell
+name: The Broken Bell
+type: Infrastructure
+role: Covert
+tier: 4
+keystone: false
+summary: An aging tavern on the edge of respectability whose faded sign depicts a bell long since broken away. Its common room welcomes anyone, but those who know to ask are quietly shown to the back, where the Shattered exchange information, plan operations, and offer sanctuary to those who have lost faith in the Colony.
+status: draft
+start:
+  controller: faction.shattered
+  status: Stable

@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.milltown-rescue
+slug: milltown-rescue
+name: Milltown Rescue
+variesBy:
+  subject:
+    kind: goalStage
+    id: goal.evacuate-milltown
+  rows:
+    - state: Planning
+      text: ""
+      stress: 0
+    - state: Progressing
+      text: Dawn organizers map Milltown's surviving shelters and stage rescue teams on the north shore of the River Foam.
+      stress: 0
+    - state: Ready
+      text: Dawn rescue teams are inside Milltown, holding shelters and routes while residents are dragged by currents no one can see.
+      stress: 0
+    - state: Accomplished
+      text: Dawn's organized response holds in Milltown; the residents it reached are sheltered while the remembered flood persists (the Assembly Hall's status records how much survived).
+      stress: 0
+    - state: Failed
+      text: Dawn's Milltown response has collapsed; its rescue teams are scattered or lost.
+      stress: 0
+    - state: Retired
+      text: ""
+      stress: 0
+status: draft

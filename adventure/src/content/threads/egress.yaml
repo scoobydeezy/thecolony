@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../../../schemas/thread.schema.json
+id: thread.egress
+slug: egress
+name: EGRESS
+summary: A mark on the Manor map leads to the Engram Vault, where pre-Reading memories survive their subjects.
+status: draft
+provenance:
+  - doc: Campaign Outline
+    heading: Manor Route 3 — EGRESS Institute > The Institute → Playing for Keeps > Manor Hook — The Damaged OCC Reference
+  - doc: Campaign Outline
+    heading: Manor Route 3 — EGRESS Institute > The Institute → Playing for Keeps > Authentic Engrams

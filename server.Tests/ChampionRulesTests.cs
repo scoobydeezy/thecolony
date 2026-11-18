@@ -19,6 +19,7 @@ public class ChampionRulesTests : IDisposable
         using var db = Db();
         db.Database.EnsureCreated();
         db.Campaigns.Add(new Campaign { Id = Cid, Name = "Test" });
+        db.Factions.Add(new Faction { Id = "seekers", CampaignId = Cid, Name = "Seekers" });
         db.Characters.Add(new Character { Id = "julian", CampaignId = Cid, Name = "Julian Arrett", FactionId = "seekers" });
         db.Characters.Add(new Character { Id = "asha", CampaignId = Cid, Name = "Asha Weaver", FactionId = "seekers" });
         // legacy data: Julian champions two active goals
@@ -31,7 +32,9 @@ public class ChampionRulesTests : IDisposable
 
     private static FactionGoal Goal(string id, string title, string? champ, GoalStatus status, GoalConditionType type = GoalConditionType.Achieve) =>
         new() { Id = id, CampaignId = Cid, FactionId = "seekers", Title = title, ChampionId = champ, Status = status, ConditionType = type };
-    private AppDbContext Db() => new(new DbContextOptionsBuilder<AppDbContext>().UseSqlite(_conn).Options);
+    // Characters are canonical files now (ADVENTURE-BOOK-PLAN.md §9); each test gets its own store.
+    private readonly TestCanon _canon = new();
+    private AppDbContext Db() => _canon.Db(_conn);
     private FactionGoal Stored(string id) { using var db = Db(); return db.FactionGoals.AsNoTracking().Single(g => g.Id == id); }
     private async Task<string?> Check(FactionGoal g, FactionGoal? prev) { using var db = Db(); return await ChampionRules.ConflictAsync(db, g, prev); }
 
@@ -77,5 +80,5 @@ public class ChampionRulesTests : IDisposable
         Assert.False(ChampionRules.IsActive(GoalStatus.Retired));
     }
 
-    public void Dispose() => _conn.Dispose();
+    public void Dispose() { _conn.Dispose(); _canon.Dispose(); }
 }

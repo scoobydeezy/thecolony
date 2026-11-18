@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=../../../schemas/faction.schema.json
+id: faction.civilians
+slug: civilians
+name: Civilians
+type: SocialClass
+represents: Endurance
+coreTenet: Life must continue
+certainOf: Tomorrow still comes
+rightAbout: Somebody has to keep society functioning
+afraidOf: Instability
+wrongAbout: Survival is sufficient
+status: draft
+start:
+  active: true
+  momentum: 0
+  size: 0
+  values:
+    truth: 0.1387
+    stability: 0.4988
+    agency: 0.3625
+  beliefs: {}

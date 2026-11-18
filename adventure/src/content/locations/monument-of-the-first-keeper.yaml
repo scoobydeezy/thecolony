@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.monument-of-the-first-keeper
+slug: monument-of-the-first-keeper
+name: Monument of the First Keeper
+summary: A monument honoring the First Keeper.
+parent: location.abiding-way
+status: draft
+start:
+  state: Stable

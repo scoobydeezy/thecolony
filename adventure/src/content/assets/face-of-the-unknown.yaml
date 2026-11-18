@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.face-of-the-unknown
+slug: face-of-the-unknown
+name: Face of the Unknown
+type: Artifact
+role: Symbolic
+tier: 5
+keystone: true
+summary: A growing collection of sculptures, paintings, carvings, tapestries, and other works created by pilgrims attempting to depict what they have witnessed beyond the veil. No two representations agree, yet the Cult believes each reveals a fragment of a greater truth. Together, they are known simply as the Face of the Unknown.
+status: draft
+start:
+  controller: faction.cult-of-the-unknown
+  location: location.pilgrim-quarter
+  status: Stable

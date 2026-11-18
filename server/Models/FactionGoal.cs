@@ -1,6 +1,8 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace ColonyTracker.Api.Models;
 
-public class FactionGoal
+public class FactionGoal : ICanonEntity
 {
     public string Id { get; set; } = "";
     public string CampaignId { get; set; } = "";
@@ -41,4 +43,10 @@ public class FactionGoal
     // §18.6: the first Act in which the faction may pursue it in the Faction Phase (1–3). Eligibility only: Session
     // Events, the Goal Detector and GM resolutions are never restricted by it.
     public int EarliestAct { get; set; } = 2;
+
+    // ADVENTURE-BOOK-PLAN.md §11: the canonical file (goal.<slug> under adventure/src/content/goals/).
+    // Every property in CanonEntityMapping is read from and saved to that file.
+    public string? CanonId { get; set; }
+    [NotMapped] public string? CanonVersion { get; set; }
+    [NotMapped] public bool CanonMissing { get; set; }
 }

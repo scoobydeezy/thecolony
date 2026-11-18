@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.recover-the-registry-tentative
+slug: recover-the-registry-tentative
+name: Recover the Registry (tentative)
+faction: faction.aspis
+type: Achieve
+priority: Minor
+visibility: Known
+outcome: Automatic
+earliestAct: 3
+target:
+  type: Asset
+  id: asset.claims-registry
+status: draft
+start:
+  status: Plotting

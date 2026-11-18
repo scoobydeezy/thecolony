@@ -216,6 +216,11 @@ export type BannerShape =
   | 'pennant';
 
 export interface Faction {
+  /** ADVENTURE-BOOK-PLAN.md §9–12: the entity's canonical file. Set by the server. */
+  canonId?: string;
+  canonVersion?: string;
+  /** True when the canonical file is missing or unreadable: shown flagged, and can't be saved until restored. */
+  canonMissing?: boolean;
   id: string;
   name: string;
   represents: string;
@@ -599,6 +604,11 @@ export const LOCATION_TYPE_OPTIONS: { value: LocationType; label: string }[] = [
 ];
 
 export interface Location {
+  /** ADVENTURE-BOOK-PLAN.md §9–12: the entity's canonical file. Set by the server. */
+  canonId?: string;
+  canonVersion?: string;
+  /** True when the canonical file is missing or unreadable: shown flagged, and can't be saved until restored. */
+  canonMissing?: boolean;
   id: string;
   campaignId: string;
   name: string;
@@ -680,6 +690,11 @@ export const ASSET_ROLE_CHANNEL: Record<AssetRole, AssetChannel> = {
 };
 
 export interface Asset {
+  /** ADVENTURE-BOOK-PLAN.md §9–12: the entity's canonical file. Set by the server. */
+  canonId?: string;
+  canonVersion?: string;
+  /** True when the canonical file is missing or unreadable: shown flagged, and can't be saved until restored. */
+  canonMissing?: boolean;
   id: string;
   campaignId: string;
   name: string;
@@ -767,6 +782,9 @@ export interface WorldCondition {
   requirementsJson: string;         // §18.9: ConditionRequirement[] (core/sim/conditions.ts), all must hold
   stressContribution: number;       // §18.9: added to Colony Stress while in force (may be negative)
   sortOrder: number;
+  canonId?: string;        // the condition's file (condition.<slug>), ADVENTURE-BOOK-PLAN.md §15
+  canonVersion?: string;
+  canonMissing?: boolean;
 }
 /** The latest Event that established or ended a condition (replay). */
 export interface ConditionEstablishment { active: boolean; session: number; eventId: string; eventTitle: string }
@@ -785,6 +803,11 @@ export const ASSET_TARGET_STATES     = ['Stable', 'Contested', 'Damaged', 'Destr
 export const FACTION_TARGET_PROPS    = ['influence', 'power', 'momentum'] as const;
 
 export interface FactionGoal {
+  /** ADVENTURE-BOOK-PLAN.md §9–12: the entity's canonical file. Set by the server. */
+  canonId?: string;
+  canonVersion?: string;
+  /** True when the canonical file is missing or unreadable: shown flagged, and can't be saved until restored. */
+  canonMissing?: boolean;
   id: string;
   campaignId: string;
   factionId: string;
@@ -898,6 +921,11 @@ export type CharacterState = 'Alive' | 'Dead' | 'Missing' | 'Forgotten';
 export type CharacterInstability = 'Stable' | 'Conflicted' | 'Compromised';
 
 export interface Character {
+  /** ADVENTURE-BOOK-PLAN.md §9–12: the entity's canonical file. Set by the server. */
+  canonId?: string;
+  canonVersion?: string;
+  /** True when the canonical file is missing or unreadable: shown flagged, and can't be saved until restored. */
+  canonMissing?: boolean;
   id: string;
   name: string;
   characterType: CharacterType;
@@ -1110,6 +1138,9 @@ export interface PathSet {
   name: string;
   originEventId?: string;
   convergenceEventId?: string;
+  canonId?: string;      // the branch file (branch.<slug>)
+  canonVersion?: string;
+  canonMissing?: boolean;
 }
 
 export interface NarrativePath {
@@ -1139,6 +1170,7 @@ export interface NarrativeEventVariantParticipation {
 export interface NarrativeEventOverride {
   id: string;
   narrativeEventId: string;
+  key?: string;   // the version's key in the event's file (ADVENTURE-BOOK-PLAN.md §14); the id is derived from it
   overridesSummary: boolean;
   summary?: string;
   overridesDescription: boolean;
@@ -1183,7 +1215,19 @@ export interface NarrativeThread {
   summary?: string;
   state: NarrativeThreadState;
   color?: string;
+  // ADVENTURE-BOOK-PLAN.md §13: the thread's canonical file (thread.<slug>).
+  canonId?: string;
+  canonVersion?: string;
+  canonMissing?: boolean;
 }
+
+// An event is a narrative container; an encounter a complex scenario (maps, stat blocks, clocks).
+// Each is its own canonical file (event.<slug> / encounter.<slug>); the kind is chosen at creation.
+export type NarrativeKind = 'Event' | 'Encounter';
+export const NARRATIVE_KIND_OPTIONS: { value: NarrativeKind; label: string }[] = [
+  { value: 'Event', label: 'Event' },
+  { value: 'Encounter', label: 'Encounter' },
+];
 
 export interface NarrativeEvent {
   id: string;
@@ -1195,6 +1239,11 @@ export interface NarrativeEvent {
   status: NarrativeEventStatus;
   visibility: NarrativeVisibility;
   sortOrder: number;
+  kind?: NarrativeKind;          // absent means Event
+  parentEventId?: string | null; // an encounter's event, if it belongs to one
+  canonId?: string;
+  canonVersion?: string;
+  canonMissing?: boolean;
 }
 
 export interface NarrativeEventConnection {

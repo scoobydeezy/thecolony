@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.garrison
+slug: garrison
+name: The Garrison
+type: Zone
+summary: Housing, Training, Armory, and Munitions for the Colony Guard.
+parent: location.colony
+status: draft
+start:
+  state: Stable

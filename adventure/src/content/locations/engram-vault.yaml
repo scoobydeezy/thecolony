@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.engram-vault
+slug: engram-vault
+name: Engram Vault
+summary: Long-term storage for memory-containing Engrams.
+parent: location.egress-institute
+asset: asset.engram-vault
+status: draft
+start:
+  state: Stable

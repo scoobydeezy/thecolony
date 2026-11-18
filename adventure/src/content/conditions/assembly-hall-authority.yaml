@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.assembly-hall-authority
+slug: assembly-hall-authority
+name: Assembly Hall Authority
+rule: Order officials cannot enter Assembly Hall as authorities without a Dawn invitation.
+requires:
+  - kind: assetController
+    assetId: asset.assembly-hall
+    factionId: faction.dawn-assembly
+status: draft

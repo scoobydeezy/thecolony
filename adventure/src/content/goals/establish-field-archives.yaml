@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.establish-field-archives
+slug: establish-field-archives
+name: Establish Field Archives
+faction: faction.witnesses
+type: Achieve
+priority: Major
+visibility: Known
+outcome: Automatic
+earliestAct: 3
+champion: npc.orrister-fenbottom
+status: draft
+start:
+  status: Plotting

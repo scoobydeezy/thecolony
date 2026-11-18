@@ -1,0 +1,35 @@
+---
+// §12: every reference to an entry that no longer exists. Usually something was deleted through
+// the app while other entries still name it. Never removed automatically: fix the entry that
+// names it, or restore what it names.
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { loadRegistry, staleReferences, entityUrl } from '../lib/registry.mjs';
+const stale = staleReferences(loadRegistry());
+---
+
+<StarlightPage frontmatter={{ title: 'Stale references', description: 'References to entries that no longer exist.' }}>
+  {stale.length === 0 ? (
+    <p>None. Every reference between entries resolves.</p>
+  ) : (
+    <>
+      <p>
+        {stale.length} {stale.length === 1 ? 'reference names an entry' : 'references name entries'} that no longer exist. Each is flagged
+        on its page. Edit the entry to point elsewhere, or restore what it names. Nothing is removed automatically.
+      </p>
+      <div class="rp-table-wrap">
+        <table>
+          <thead><tr><th>Entry</th><th>Field</th><th>Names</th></tr></thead>
+          <tbody>
+            {stale.map((r) => (
+              <tr>
+                <td>{entityUrl(r.entity) ? <a href={entityUrl(r.entity)}>{r.entity.view.fullName ?? r.entity.view.name}</a> : r.from}</td>
+                <td><code>{r.path}</code></td>
+                <td><span class="rp-ref-missing">{r.to}</span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </>
+  )}
+</StarlightPage>

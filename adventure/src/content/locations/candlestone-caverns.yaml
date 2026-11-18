@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.candlestone-caverns
+slug: candlestone-caverns
+name: Candlestone Caverns
+summary: Caverns in the foothills of the Aspodell mountains the lead into the Darklands.
+parent: location.darkmoon-plains
+status: draft
+start:
+  state: Stable

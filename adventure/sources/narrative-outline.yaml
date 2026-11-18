@@ -1,0 +1,121 @@
+# Narrative outline, revision 4 (2026-11-18): the planning agent's review and the user's rulings applied; The Observer ends Act II.
+#
+# Every item on the app's Narrative page, sorted into chapters as an event or an encounter. This was
+# the input for converting narrative content into canon files (scripts/merge-narrative.mjs, retired).
+# HISTORICAL RECORD since the switch (2026-11-18): the chapters, sections and items now live in the
+# chapter pages (src/content/docs/*/index.md) and the event / encounter files. Edit those, not this.
+# Superseded here: encounter.the-confluence and encounter.totality were removed (user, 2026-11-18: those are
+# narrative events, not encounters).
+#
+#   event      a narrative container
+#   encounter  a complex scenario (maps, stat blocks, clocks). Its optional `event:` names the event it
+#              belongs to (the link is stored once, on the encounter).
+#
+# The 18 encounters are the canonical roster in Encounters.md (#1 Bad Maps ... #18 The Burden).
+#
+# Sections: each chapter is divided into sections, and each section says how its items relate.
+#   sequence      one after another, in the order listed
+#   alternatives  routes selected by state and player choice; normally only some are played
+#   concurrent    happening at the same time, independently (own deadlines; can be delegated or ignored)
+#   optional      independent and optional, in any order
+# The order inside an alternatives, concurrent or optional section is presentation order only, not
+# chronology: "the narrative graph describes what can happen; navigation describes where to find it".
+#
+# Identity: `id` is the permanent canonical id; `appId` is the app record it takes over (title matching
+# was only for drafting). `appId: new` means no app record exists yet: the file creates one.
+#
+# Prose (user, 2026-11-17): the source documents win where an item's app text contradicts them, as in the
+# character merge. Every difference is reported for review; nothing is chosen silently.
+
+chapters:
+  - id: chapter.running-the-campaign
+    title: Running Results Pending
+    # General information: campaign introduction, GM procedures, reference. No events or encounters.
+    sections: []
+
+  - id: chapter.act-1
+    title: Act I — The Secret
+    sections:
+      - title: Arrival and the first Incursion
+        arrangement: sequence
+        items:
+          - { id: event.the-calling, kind: event, title: The Calling, appId: eee24d85-55d2-4f79-8c79-d106bc5da92e }
+          - { id: event.the-house-of-abiding, kind: event, title: The House of Abiding, appId: c4aff6ca-c9a3-48ce-af47-bbb397e9ca43 }
+          - { id: encounter.bad-maps, kind: encounter, title: Bad Maps, appId: 07cda0c1-c1bc-44d2-a106-78a00b5ac20f }
+          - { id: event.prisoners, kind: event, title: Prisoners, appId: d0b2e471-f2a7-4b36-a7fe-59f68063b7ac }
+      - title: Session 3 investigations
+        arrangement: alternatives
+        # Selected by current Source state and Darkwing's choices (Campaign Outline, Session 3).
+        items:
+          - { id: encounter.a-life, kind: encounter, title: A Life, route: Witnesses, appId: 0083b759-7f7d-43d5-9f45-be172a453d5c }
+          - { id: encounter.containment, kind: encounter, title: Containment, route: EGRESS, appId: 1a5d8d7f-678c-4c2e-a064-ae7be7d9e854 }
+          - { id: encounter.duskwood, kind: encounter, title: Duskwood, route: Cult, appId: ff39c143-4ecd-4845-9b6c-26f3622af638 }
+      - title: Act I climax
+        arrangement: sequence
+        items:
+          - { id: event.an-opportunity, kind: event, title: An Opportunity, appId: f60a04e1-2f1a-42ed-b4de-34e03b49d51c }
+          # Its own encounter: An Opportunity is a lead-in, not the only route to the Reading.
+          - { id: encounter.the-reading, kind: encounter, title: The Reading, appId: cca59dd3-91ef-453f-ba53-91364cd64b7b }
+
+  - id: chapter.act-2
+    title: Act II — The Cost
+    sections:
+      - title: Opening
+        arrangement: sequence
+        items:
+          - { id: event.the-morning-after, kind: event, title: The Morning After, appId: 48bb5a3f-09c6-451d-8ca7-a98c28670bf3 }
+          - { id: event.the-manor, kind: event, title: The Manor, appId: 79d430a2-f8a4-4d67-bb60-6b3a096a254a }
+      - title: The Manor routes
+        arrangement: optional
+        # Five independent, optional routes; about two are expected (Campaign Outline, Manor Investigation Model).
+        items:
+          - { id: event.the-broken-bell, kind: event, title: The Broken Bell, route: Shattered, appId: d932a076-fc2a-4f98-8e1e-8bcbcc0763b6 }
+          - { id: encounter.old-town, kind: encounter, title: Old Town, event: event.the-broken-bell, appId: 75476309-ba60-4567-91b0-351abf851061 }
+          - { id: event.the-thin-place, kind: event, title: The Thin Place, route: Cult, appId: e756e5d3-9be3-41b8-baca-d6b2fcccf19d }
+          - { id: encounter.the-shape-of-someone, kind: encounter, title: The Shape of Someone, event: event.the-thin-place, appId: 0320f766-c0df-419c-ac5e-6b0f8b870b92 }
+          - { id: event.the-institute, kind: event, title: The Institute, route: EGRESS, appId: 92ff33bd-760d-4b04-8e24-a63c533e816d }
+          - { id: encounter.playing-for-keeps, kind: encounter, title: Playing for Keeps, event: event.the-institute, appId: 58b28707-f7db-48ea-8278-469a27a456f6 }
+          - { id: event.the-way-out, kind: event, title: The Way Out, route: Dawn, appId: aefc9e2c-88d6-499a-be4c-ffdff05c02af }
+          - { id: encounter.revolutionaries, kind: encounter, title: Revolutionaries, event: event.the-way-out, appId: 802147bb-1f1f-438d-802a-820beaf96224 }
+          - { id: event.the-veiled-house, kind: event, title: The Veiled House, route: Witnesses, appId: bf9a37ec-701f-4c49-98ee-385b7e1e07c2 }
+          - { id: encounter.witness-me, kind: encounter, title: Witness Me, event: event.the-veiled-house, appId: 3cb768dd-5e43-408b-8ee0-4bd4a80f2534 }
+      - title: Convergence
+        arrangement: sequence
+        items:
+          - { id: event.the-confluence, kind: event, title: The Confluence, appId: e8bade4f-7215-4cd5-8b99-2611e1a35f00 }
+          # Encounter #11, the state-generated faction pile-up. Under your one-source rule it becomes an app record too.
+          - { id: encounter.the-confluence, kind: encounter, title: The Confluence — Faction Pileup, event: event.the-confluence, appId: new }
+          # User, 2026-11-18 (replaces the 2026-11-17 ruling): The Observer ends Act II and holds the whole reveal, in whichever
+          # order the path puts it. Reading stopped: the eclipse begins at the Confluence, then the Observer calls the Party back.
+          # Reading succeeded: the anchors converge at the Manor, the Observer reveals himself, then the eclipse begins.
+          # Eclipse opens Act III with the eclipse already begun. Connections: Confluence -> Observer -> Eclipse -> Totality.
+          - { id: event.the-observer, kind: event, title: The Observer, appId: 6e2cbd25-411c-462e-8b7c-838c5c26ec4f }
+
+  - id: chapter.act-3
+    title: Act III — The Reckoning
+    sections:
+      - title: Catastrophe
+        arrangement: sequence
+        items:
+          - { id: event.eclipse, kind: event, title: Eclipse, appId: 63813803-cdd3-4637-ba2a-ddd0bc0c3a02 }
+          - { id: event.totality, kind: event, title: Totality, appId: 4fe26086-3144-4141-992c-77c268f62eed }
+          # Encounter #12, the race against the eclipse. Under your one-source rule it becomes an app record too.
+          - { id: encounter.totality, kind: encounter, title: Totality — Race Against the Eclipse, event: event.totality, appId: new }
+      - title: The five fronts
+        arrangement: concurrent
+        # Independent, simultaneous crises under Totality, each feeding the Stable/Damaged/Lost front score.
+        # `event: event.totality` associates them with Totality; they are not phases of its encounter.
+        items:
+          - { id: encounter.sunny, kind: encounter, title: Sunny, route: Shattered, event: event.totality, appId: b7b9d99c-8b72-4b3e-b3d7-afafd7234ba8 }
+          - { id: encounter.the-breach, kind: encounter, title: The Breach, route: EGRESS, event: event.totality, appId: 3645d191-82dd-4451-9c02-2cf55e386c86 }
+          - { id: encounter.milltown, kind: encounter, title: Milltown, route: Dawn, event: event.totality, appId: 26e71f20-85d2-40f6-ae91-e189a8ad78c7 }
+          - { id: encounter.the-tangled-web, kind: encounter, title: The Tangled Web, route: Witnesses, event: event.totality, appId: 9786e1ec-1aef-4fee-9c31-f5ec7db88913 }
+          - { id: encounter.the-open-door, kind: encounter, title: The Open Door, route: Cult, event: event.totality, appId: 4ccffd48-0494-47ae-83c3-7ba21597fdf9 }
+      - title: Finale
+        arrangement: sequence
+        items:
+          - { id: encounter.the-burden, kind: encounter, title: The Burden, appId: eaa79e6d-f049-4f34-9b9d-2ff1486aadf9 }
+          - { id: event.aletheia, kind: event, title: Aletheia, appId: 05d06704-f850-4a68-880a-64ab0be477fd }
+          # User, 2026-11-17: the Final Reading / Enacting the Answer (Campaign Outline, Session 12) is prose
+          # inside The Light Remains, not an entity of its own.
+          - { id: event.the-light-remains, kind: event, title: The Light Remains, appId: b964d024-30c6-4da9-9929-9506de4e83aa }

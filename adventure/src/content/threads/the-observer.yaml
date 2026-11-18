@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/thread.schema.json
+id: thread.the-observer
+slug: the-observer
+name: The Observer
+summary: A hidden scholar studies how institutions turn answers into certainty. The Manor frames Act II, and the Observer eventually reveals that the Party—not the Colony—is the variable he is watching.
+status: draft
+provenance:
+  - doc: Campaign Outline
+    heading: Campaign-Wide Promises and Narrative Threads > The Observer and the Manor Map
+  - doc: Campaign Outline
+    heading: The Observer Reveal
+  - doc: Character Briefs
+    heading: Major Narrative Characters > The Observer - Silas Venn

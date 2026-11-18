@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../../../schemas/thread.schema.json
+id: thread.the-cloth-toy
+slug: the-cloth-toy
+name: The Cloth Toy
+summary: One resonant toy links the first Veiled incursion to the Witnesses' first lesson in reconstructing identity.
+status: draft
+provenance:
+  - doc: Campaign Outline
+    heading: Campaign-Wide Promises and Narrative Threads > The Cloth Toy
+  - doc: Campaign Outline
+    heading: Act I — The Secret > Session 3 — Dusk > Witness Route — A Life

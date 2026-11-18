@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.public-works-yard
+slug: public-works-yard
+name: Public Works Yard
+type: Infrastructure
+role: Strategic
+tier: 4
+keystone: false
+summary: Workshops, warehouses, and planning offices dedicated to the continual improvement of the Colony. From road repairs and irrigation projects to new public buildings, nearly every civic improvement begins here before spreading into the streets beyond.
+status: draft
+start:
+  controller: faction.dawn-assembly
+  location: location.west-district
+  status: Stable

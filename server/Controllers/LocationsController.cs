@@ -14,10 +14,9 @@ public class LocationsController(AppDbContext db, ICampaignContext campaign) : C
     public async Task<IActionResult> GetAll()
     {
         var cid = await campaign.GetActiveIdAsync();
-        return Ok(await db.Locations
-            .Where(l => l.CampaignId == cid)
-            .OrderBy(l => l.Name)
-            .ToListAsync());
+        // Name is file-backed (ADVENTURE-BOOK-PLAN.md §10), so sort after loading.
+        var all = await db.Locations.Where(l => l.CampaignId == cid).ToListAsync();
+        return Ok(all.OrderBy(l => l.Name, StringComparer.CurrentCulture).ToList());
     }
 
     [HttpGet("{id}")]
@@ -32,6 +31,7 @@ public class LocationsController(AppDbContext db, ICampaignContext campaign) : C
     {
         var cid = await campaign.GetActiveIdAsync();
         location.Id = await EntityIds.ForCreateAsync(db.Locations, location.Id);   // keep an imported id when it is free
+        location.CanonId = null;   // a new entity gets a new canonical file
         location.CampaignId = cid;
         db.Locations.Add(location);
         await db.SaveChangesAsync();
@@ -42,6 +42,10 @@ public class LocationsController(AppDbContext db, ICampaignContext campaign) : C
     public async Task<IActionResult> Update(string id, [FromBody] Location location)
     {
         if (id != location.Id) return BadRequest();
+        // The link to the location's file is the server's, never the request's (ADVENTURE-BOOK-PLAN.md §10).
+        var link = await db.Locations.AsNoTracking().Where(x => x.Id == id).Select(x => new { x.CanonId }).FirstOrDefaultAsync();
+        if (link is null) return NotFound();
+        location.CanonId = link.CanonId;
         location.CampaignId = await campaign.GetActiveIdAsync();
         db.Entry(location).State = EntityState.Modified;
 

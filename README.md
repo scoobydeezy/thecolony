@@ -53,7 +53,29 @@ colony-tracker/
 
 ## Running the Application
 
-## Dev Mode (Recommended)
+## Quick Start (Recommended)
+
+From `colony-tracker/`, start everything in one terminal:
+
+```bash
+nvm use      # Node 24 (.nvmrc); the Angular CLI needs 22.22.3+ or 24.15+
+npm start
+```
+
+This does the following:
+- installs `client/` and `adventure/` packages on first run;
+- starts the API in Docker;
+- runs the app and the adventure book together, with labelled `[app]` and `[book]` output.
+
+When it prints **Ready**:
+
+- App: http://localhost:4200/
+- Adventure book: http://localhost:4200/docs/
+- API: http://localhost:5000/
+
+Ctrl+C stops the app and the book. The API container keeps running; `npm run stop` stops it too. If you run the API yourself (`cd server && dotnet run`), use `npm run start:web` instead.
+
+## Dev Mode (separate terminals)
 
 Runs the API in Docker while Angular runs locally with hot reload.
 
@@ -71,6 +93,22 @@ Available at:
 
 - Frontend: http://localhost:4200
 - API: http://localhost:5000
+
+### With the adventure book
+
+Run the book in a third terminal:
+
+```bash
+cd adventure
+npm install      # first time only
+npm run serve
+```
+
+The book is then at http://localhost:4200/docs/, on the same origin as the app. The Angular dev server proxies `/docs` to the book server on port 4321. Saving any book file rebuilds it in about 2 seconds; refresh the page to see the change. If a build fails, the terminal shows why and the last good build stays up.
+
+To write with live reload instead, use `npm run dev` (http://localhost:4322/docs/). That runs on its own port, outside the app, and search only works in `serve`. See `adventure/README.md`.
+
+Node: the Angular CLI needs Node 22.22.3+ or 24.15+.
 
 ---
 

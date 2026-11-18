@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.the-open-door
+slug: the-open-door
+name: The Open Door
+variesBy:
+  subject:
+    kind: goalStage
+    id: goal.open-the-door
+  rows:
+    - state: Planning
+      text: ""
+      stress: 0
+    - state: Progressing
+      text: Cult hosts light lanterns through the Pilgrim Quarter and ready Pilgrim's Rest to shelter anyone fleeing Totality.
+      stress: 0
+    - state: Ready
+      text: Pilgrim's Rest opens to all. Its welcome becomes a pull no guest wants to leave, and the Cult's own hosts are among those held.
+      stress: 0
+    - state: Accomplished
+      text: Cult hosts and shelters again operate beyond Pilgrim's Rest, welcoming the displaced without asking them to stay (Pilgrim's Rest's status records how much survived).
+      stress: 0
+    - state: Failed
+      text: Pilgrim's Rest still holds its guests and staff; the Cult cannot act beyond its walls.
+      stress: 0
+    - state: Retired
+      text: ""
+      stress: 0
+status: draft

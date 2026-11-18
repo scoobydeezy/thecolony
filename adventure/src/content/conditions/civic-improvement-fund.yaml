@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.civic-improvement-fund
+slug: civic-improvement-fund
+name: Civic Improvement Fund
+variesBy:
+  subject:
+    kind: assetController
+    id: asset.civic-improvement-fund
+  rows:
+    - state: aspis
+      text: ""
+      stress: 0
+    - state: burdened
+      text: ""
+      stress: 0
+    - state: civilians
+      text: ""
+      stress: 0
+    - state: cult
+      text: ""
+      stress: 0
+    - state: fractured
+      text: ""
+      stress: 0
+    - state: heirs
+      text: ""
+      stress: 0
+    - state: institute
+      text: Dawn-funded work remains halted until refinanced.
+      stress: 0
+    - state: keepers
+      text: ""
+      stress: 0
+    - state: seekers
+      text: ""
+      stress: 0
+    - state: shattered
+      text: ""
+      stress: 0
+    - state: witnesses
+      text: The Fund's resources go toward preservation; Dawn-funded work is halted.
+      stress: 0
+    - state: ""
+      text: Dawn-funded work is halted until the Fund is refinanced.
+      stress: 0
+status: draft

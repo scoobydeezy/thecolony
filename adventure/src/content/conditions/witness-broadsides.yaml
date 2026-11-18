@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.witness-broadsides
+slug: witness-broadsides
+name: Witness Broadsides
+variesBy:
+  subject:
+    kind: goalStage
+    id: goal.twilight-the-dawn
+  rows:
+    - state: Planning
+      text: ""
+      stress: 0
+    - state: Progressing
+      text: ""
+      stress: 0
+    - state: Ready
+      text: ""
+      stress: 0
+    - state: Accomplished
+      text: Witness-authenticated historical accounts appear on broadsides covering or accompanying Dawn posters, and remain usable as evidence.
+      stress: 0
+    - state: Failed
+      text: ""
+      stress: 0
+    - state: Retired
+      text: ""
+      stress: 0
+status: draft

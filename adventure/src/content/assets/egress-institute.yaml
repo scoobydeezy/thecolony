@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.egress-institute
+slug: egress-institute
+name: EGRESS Institute
+type: Infrastructure
+role: Operational
+tier: 4
+keystone: false
+summary: The headquarters of the Engram Generation, Restoration, Evaluation, and Storage Systems Institute. Laboratories, lecture halls, workshops, and research facilities fill its halls, serving as the Colony's foremost center for the study of memory, identity, and the metaphysical phenomena surrounding the Veil. Its integrated Research Archive preserves two centuries of field reports, experimental results, recovered observations, failed hypotheses, and unanswered questions.
+status: draft
+start:
+  controller: faction.egress-institute
+  status: Stable

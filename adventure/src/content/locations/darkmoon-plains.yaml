@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.darkmoon-plains
+slug: darkmoon-plains
+name: Darkmoon Plains
+summary: A flood plain in northern Andoran along the Isger border. The River Foam runs from the Five Kings Mountains through it.
+status: draft
+start:
+  state: Stable

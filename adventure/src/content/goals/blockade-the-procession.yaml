@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.blockade-the-procession
+slug: blockade-the-procession
+name: Blockade the Procession
+faction: faction.dawn-assembly
+type: Achieve
+priority: Critical
+visibility: Open
+outcome: Automatic
+earliestAct: 1
+champion: npc.julian-arrett
+status: draft
+start:
+  status: Plotting

@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.hidden-caches
+slug: hidden-caches
+name: Hidden Caches
+variesBy:
+  subject:
+    kind: assetStatus
+    id: asset.dead-drop-network
+  rows:
+    - state: Stable
+      text: All caches hold loot
+      stress: 0
+    - state: Contested
+      text: Caches hold loot on 4–6 (d6)
+      stress: 0
+    - state: Damaged
+      text: Caches hold loot on 6 only (d6)
+      stress: 0
+    - state: Destroyed
+      text: No Loot
+      stress: 0
+status: draft

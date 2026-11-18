@@ -1,0 +1,155 @@
+---
+// Designer-only pages. In the GM build getStaticPaths returns nothing, so these
+// pages are never generated and can never reach the search index.
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { isDesigner } from '../../lib/target.mjs';
+import { loadRegistry, entityUrl } from '../../lib/registry.mjs';
+import fs from 'node:fs';
+import path from 'node:path';
+import yaml from 'js-yaml';
+import { listSourceDocs, loadMigrationMap } from '../../lib/source-docs.mjs';
+import { ROOT } from '../../lib/registry.mjs';
+
+export function getStaticPaths() {
+  // getStaticPaths runs on its own: it can't see the STUBS constant below, so the stub pages are named here too.
+  return isDesigner ? ['migration', 'source-docs', 'coverage', 'readiness', 'decisions', 'fabrication', 'playtest'].map((page) => ({ params: { page } })) : [];
+}
+
+// Designer pages still to build (BOOK-STRUCTURE.md §1.7, §5).
+const STUBS = {
+  readiness: ['Readiness', 'The five readiness measures (canon, authored, run-ready, production, validated) for every chapter page, event and encounter.'],
+  decisions: ['Open decisions', 'Every open question recorded in the entries and pages, in one list.'],
+  fabrication: ['Fabrication', 'The production status of every prop, deck, map and handout.'],
+  playtest: ['Playtest log', 'Playtest sessions and their findings, by page.'],
+};
+const { page } = Astro.params;
+const map = loadMigrationMap();
+const concepts = Object.entries(map.concepts ?? {});
+const reg = loadRegistry();
+const counts = concepts.reduce((acc, [, c]) => ({ ...acc, [c.status]: (acc[c.status] ?? 0) + 1 }), {});
+const docs = listSourceDocs();
+const title = STUBS[page]?.[0] ?? (page === 'migration' ? 'Migration status' : page === 'coverage' ? 'Coverage inventory' : 'Source documents');
+// BOOK-STRUCTURE.md §8: every source section's provisional home (sources/coverage.yaml, generated).
+const coverageFile = path.join(ROOT, 'sources/coverage.yaml');
+const coverage = page === 'coverage' && fs.existsSync(coverageFile) ? yaml.load(fs.readFileSync(coverageFile, 'utf8')) : null;
+const homeLabel = (h) => coverage?.planned?.[h] ?? (reg.byId.get(h) ? `${reg.byId.get(h).view?.name ?? h} (${h})` : h);
+const homeHref = (h) => (reg.byId.get(h) ? entityUrl(reg.byId.get(h)) : null);
+const partOfHome = (h) => (h === 'designer' ? 'Designer area' : coverage?.planned?.[h]?.split(' · ')[0] ?? (reg.byId.get(h) ? 'Entries' : 'Unclassified'));
+const byPart = coverage
+  ? Object.values(coverage.documents).flat().reduce((acc, r) => {
+      for (const h of r.home) acc[partOfHome(h)] = (acc[partOfHome(h)] ?? 0) + 1;
+      return acc;
+    }, {})
+  : {};
+---
+
+<StarlightPage frontmatter={{ title, description: 'Designer build only.' }}>
+  {page === 'source-docs' && (
+    <div data-private="designer">
+      <p>The original source documents, read-only. Sections that have moved into the book show a banner under their heading.</p>
+      <ul class="rp-entity-list">
+        {docs.map((d) => (
+          <li>
+            <a href={`/docs/designer/source-docs/${d.id}/`}>{d.name}</a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )}
+
+  {STUBS[page] && (
+    <div data-private="designer">
+      <p>{STUBS[page][1]}</p>
+      <p><em>Not built yet.</em></p>
+    </div>
+  )}
+
+  {page === 'coverage' && (
+    <div data-private="designer">
+      {!coverage && <p>No inventory yet: run <code>node scripts/coverage-inventory.mjs</code>.</p>}
+      {coverage && (
+        <>
+          <p>
+            Every section of the source documents and its provisional home (generated {coverage.generated}). Homes are confirmed when their
+            chapter is migrated; a confirmed row says so. Subheadings stay inside the section that owns them.
+          </p>
+          <h2>By document</h2>
+          <div class="rp-table-wrap">
+            <table>
+              <thead><tr><th>Document</th><th>Sections</th><th>In progress</th><th>Migrated</th><th>Unclassified</th></tr></thead>
+              <tbody>{coverage.summary.map((s) => <tr><td><a href={`#${s.doc.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>{s.doc}</a></td><td>{s.sections}</td><td>{s.inProgress}</td><td>{s.migrated}</td><td>{s.unclassified}</td></tr>)}</tbody>
+            </table>
+          </div>
+          <h2>By destination</h2>
+          <p>{Object.entries(byPart).sort().map(([p, n]) => <span class="rp-badge">{p}: {n}</span>)}</p>
+          {Object.entries(coverage.documents).map(([doc, rows]) => (
+            <>
+              <h2 id={doc.toLowerCase().replace(/[^a-z0-9]+/g, '-')}>{doc}</h2>
+              <div class="rp-table-wrap">
+                <table>
+                  <thead><tr><th>Section</th><th>Lines</th><th>Home</th><th>Basis</th><th>Status</th></tr></thead>
+                  <tbody>
+                    {rows.map((r) => (
+                      <tr>
+                        <td>{r.heading}{r.confirmed && <span class="rp-badge">confirmed</span>}</td>
+                        <td>{r.line}–{r.line + r.lines - 1}</td>
+                        <td>{r.home.map((h, i) => <>{i > 0 && <br />}{homeHref(h) ? <a href={homeHref(h)}>{homeLabel(h)}</a> : homeLabel(h)}</>)}{r.dependsOn && <><br /><span class="rp-muted">depends on: {r.dependsOn.join(', ')}</span></>}</td>
+                        <td>{r.basis}</td>
+                        <td>{r.status}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          ))}
+        </>
+      )}
+    </div>
+  )}
+
+  {page === 'migration' && (
+    <div data-private="designer">
+      <p>
+        {Object.entries(counts).map(([status, n]) => <span class="rp-badge">{status}: {n}</span>)}
+      </p>
+      {concepts.map(([id, c]) => {
+        const targets = (c.targets ?? []).map((t) => ({ id: t, entity: reg.byId.get(t) }));
+        return (
+          <section>
+            <h2 id={id}>{id}</h2>
+            <p>
+              <span class="rp-badge">{c.status}</span>{' '}
+              {targets.map((t) => (t.entity && entityUrl(t.entity) ? <a href={entityUrl(t.entity)}>{t.id}</a> : <code>{t.id}</code>))}
+            </p>
+            <h3>Provenance</h3>
+            <ul>
+              {(c.provenance ?? []).map((p) => {
+                const d = docs.find((x) => x.name === p.doc);
+                return (
+                  <li>
+                    {d ? <a href={`/docs/designer/source-docs/${d.id}/`}>{p.doc}</a> : <strong>{p.doc}</strong>} — {p.heading}{' '}
+                    <span class="rp-badge">{p.role ?? 'states'}</span> <span class="rp-badge">{p.reconciled ? 'reconciled' : 'pending'}</span>
+                    {p.note && <div class="rp-muted">{p.note}</div>}
+                  </li>
+                );
+              })}
+            </ul>
+            {c.reconciliation?.length > 0 && (
+              <>
+                <h3>Reconciliation</h3>
+                <ul>{c.reconciliation.map((r) => <li>{r}</li>)}</ul>
+              </>
+            )}
+            {c.open?.length > 0 && (
+              <>
+                <h3>Open questions</h3>
+                <ul>{c.open.map((r) => <li>{r}</li>)}</ul>
+              </>
+            )}
+          </section>
+        );
+      })}
+    </div>
+  )}
+</StarlightPage>

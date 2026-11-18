@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.clear-the-clearing-house
+slug: clear-the-clearing-house
+name: Clear the Clearing House
+faction: faction.cult-of-the-unknown
+type: Achieve
+priority: Major
+visibility: Known
+outcome: Automatic
+earliestAct: 3
+target:
+  type: Asset
+  id: asset.clearing-house
+  owner: faction.cult-of-the-unknown
+status: draft
+start:
+  status: Plotting

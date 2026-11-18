@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.steal-the-offering-chest
+slug: steal-the-offering-chest
+name: Steal the Offering Chest
+faction: faction.aspis
+type: Achieve
+priority: Minor
+visibility: Known
+outcome: Automatic
+earliestAct: 2
+champion: npc.rinna-tealeaf
+target:
+  type: Asset
+  id: asset.offering-chest
+  owner: faction.aspis
+effects:
+  progressing:
+    - targetType: asset
+      targetId: asset.offering-chest
+      property: status
+      delta: 0
+      value: Contested
+  accomplished:
+    - targetType: asset
+      targetId: asset.offering-chest
+      property: status
+      delta: 0
+      value: Stable
+status: draft
+start:
+  status: Plotting

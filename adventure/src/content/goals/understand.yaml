@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.understand
+slug: understand
+name: Understand
+faction: faction.cult-of-the-unknown
+type: Achieve
+priority: Major
+visibility: Known
+outcome: Automatic
+earliestAct: 2
+champion: npc.brother-kesh
+target:
+  type: Asset
+  id: asset.ledger
+  owner: faction.cult-of-the-unknown
+status: draft
+start:
+  status: Plotting

@@ -1,0 +1,117 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^inventory\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string"
+    },
+    "status": {
+      "default": "draft",
+      "type": "string",
+      "enum": [
+        "stub",
+        "draft",
+        "canonical"
+      ]
+    },
+    "previousSlugs": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      }
+    },
+    "aliases": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z]+\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+      }
+    },
+    "provenance": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "doc": {
+            "type": "string"
+          },
+          "heading": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "doc",
+          "heading"
+        ]
+      }
+    },
+    "design": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string",
+      "enum": [
+        "prop",
+        "miniature",
+        "token",
+        "card",
+        "map",
+        "handout",
+        "reference-sheet",
+        "other"
+      ]
+    },
+    "quantity": {
+      "default": 1,
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+    },
+    "fabrication": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "needed",
+            "designed",
+            "in-progress",
+            "done"
+          ]
+        },
+        "notes": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "status"
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "slug",
+    "name",
+    "kind"
+  ],
+  "additionalProperties": false
+}

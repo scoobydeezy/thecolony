@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.occlusion-containment
+slug: occlusion-containment
+name: Occlusion Containment
+type: Point
+summary: Institute containment and testing facility for Veiled phenomena.
+parent: location.egress-institute
+asset: asset.occlusion-containment
+status: draft
+start:
+  state: Stable

@@ -1,0 +1,14 @@
+---
+// Events and encounters that name no chapter (or a chapter or section that doesn't exist), e.g.
+// created in the app and not yet placed. Each still has its page at /unplaced/<slug>/.
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { loadRegistry, unplacedItems, entityUrl, ENTITY_TYPES } from '../../lib/registry.mjs';
+const items = unplacedItems(loadRegistry()).sort((a, b) => a.view.name.localeCompare(b.view.name));
+---
+<StarlightPage frontmatter={{ title: 'Unplaced events and encounters' }}>
+  <p>Give each a <code>part</code>, <code>chapter</code> and <code>order</code> to place it in the book.</p>
+  {items.length === 0 && <p>None.</p>}
+  <ul class="rp-entity-list">
+    {items.map((e) => <li><a href={entityUrl(e)}>{e.view.name}</a><span class="rp-muted"> · {ENTITY_TYPES[e.type].label}{e.data.part && ` · names ${e.data.part}`}</span></li>)}
+  </ul>
+</StarlightPage>

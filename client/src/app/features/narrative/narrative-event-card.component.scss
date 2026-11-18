@@ -304,3 +304,17 @@
   color: var(--text-muted);
   margin: 0 0 0.75rem;
 }
+
+// Encounter badge (ADVENTURE-BOOK-PLAN.md §13): an outlined chip, so it reads apart from the status.
+.ev-kind {
+  font-size: var(--text-size-badge);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-radius: 3px;
+  padding: 0.08rem 0.36rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  border: 1px solid currentColor;
+  opacity: 0.75;
+}

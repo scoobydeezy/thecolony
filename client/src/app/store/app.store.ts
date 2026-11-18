@@ -1528,6 +1528,9 @@ export const AppStore = signalStore(
       patchState(store, {
         narrativeEventOverrides: store.narrativeEventOverrides().filter(o => o.id !== id),
         eventOverridePaths: store.eventOverridePaths().filter(op => op.eventOverrideId !== id),
+        // The version's connections and links were part of it (one entry in the event's file).
+        eventOverrideConnections: store.eventOverrideConnections().filter(c => c.eventOverrideId !== id),
+        eventOverrideEntityLinks: store.eventOverrideEntityLinks().filter(l => l.eventOverrideId !== id),
       });
     },
 
@@ -1581,8 +1584,9 @@ export const AppStore = signalStore(
         ? await api.put<NarrativeEventConnection>(`narrative/connections/${conn.id}`, conn)
         : await api.post<NarrativeEventConnection>('narrative/connections', conn);
       patchState(store, {
+        // A connection's id comes from its source, target and thread, so an edit can change it.
         narrativeConnections: conn.id
-          ? store.narrativeConnections().map(c => c.id === saved.id ? saved : c)
+          ? store.narrativeConnections().map(c => c.id === conn.id ? saved : c)
           : [...store.narrativeConnections(), saved],
       });
       return saved;
@@ -1615,8 +1619,9 @@ export const AppStore = signalStore(
         ? await api.put<EventOverrideConnection>(`narrative/event-override-connections/${conn.id}`, conn)
         : await api.post<EventOverrideConnection>('narrative/event-override-connections', conn);
       patchState(store, {
+        // The id comes from the version, target and thread, so an edit can change it.
         eventOverrideConnections: conn.id
-          ? store.eventOverrideConnections().map(c => c.id === saved.id ? saved : c)
+          ? store.eventOverrideConnections().map(c => c.id === conn.id ? saved : c)
           : [...store.eventOverrideConnections(), saved],
       });
       return saved;
@@ -1634,8 +1639,9 @@ export const AppStore = signalStore(
         ? await api.put<EventOverrideEntityLink>(`narrative/event-override-entity-links/${link.id}`, link)
         : await api.post<EventOverrideEntityLink>('narrative/event-override-entity-links', link);
       patchState(store, {
+        // The id comes from the version and the entity, so an edit can change it.
         eventOverrideEntityLinks: link.id
-          ? store.eventOverrideEntityLinks().map(l => l.id === saved.id ? saved : l)
+          ? store.eventOverrideEntityLinks().map(l => l.id === link.id ? saved : l)
           : [...store.eventOverrideEntityLinks(), saved],
       });
       return saved;

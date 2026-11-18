@@ -57,6 +57,36 @@
               </select>
             </div>
           </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Kind</label>
+              @if (event().id) {
+                <!-- The kind is the item's file (event. or encounter.), chosen when it is created. -->
+                <p class="form-static">{{ baseKind() }}</p>
+              } @else {
+                <select class="form-select"
+                        [ngModel]="baseKind()"
+                        (ngModelChange)="baseKind.set($event); markDirty()">
+                  @for (o of kindOptions; track o.value) {
+                    <option [value]="o.value">{{ o.label }}</option>
+                  }
+                </select>
+              }
+            </div>
+            @if (baseKind() === 'Encounter') {
+              <div class="form-group">
+                <label class="form-label">Part of event</label>
+                <select class="form-select"
+                        [ngModel]="baseParentEventId()"
+                        (ngModelChange)="baseParentEventId.set($event); markDirty()">
+                  <option value="">None</option>
+                  @for (e of parentEventOptions(); track e.id) {
+                    <option [value]="e.id">{{ e.title }}</option>
+                  }
+                </select>
+              </div>
+            }
+          </div>
           <div class="form-group">
             <label class="form-label">Narrative Role</label>
             <input class="form-input" type="text"

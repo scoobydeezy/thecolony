@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.break-the-lectern
+slug: break-the-lectern
+name: Break the Lectern
+faction: faction.shattered
+type: Achieve
+priority: Minor
+visibility: Secret
+outcome: Automatic
+earliestAct: 3
+champion: npc.korga-flint
+target:
+  type: Asset
+  id: asset.empty-lectern
+  state: Destroyed
+effects:
+  progressing:
+    - targetType: asset
+      targetId: asset.empty-lectern
+      property: status
+      delta: 0
+      value: Damaged
+status: draft
+start:
+  status: Plotting

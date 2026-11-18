@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.milltown
+slug: milltown
+name: Milltown
+summary: The heavily populated upper portion of the River.
+parent: location.colony
+status: draft
+start:
+  state: Unstable

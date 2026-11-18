@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.break-the-shattered
+slug: break-the-shattered
+name: Break the Shattered
+faction: faction.order-of-theia
+type: Achieve
+priority: Minor
+visibility: Open
+outcome: Automatic
+earliestAct: 2
+champion: npc.jorren-vale
+target:
+  type: Asset
+  id: asset.dead-drop-network
+  state: Damaged
+effects:
+  progressing:
+    - targetType: asset
+      targetId: asset.dead-drop-network
+      property: status
+      delta: 0
+      value: Contested
+status: draft
+start:
+  status: Plotting

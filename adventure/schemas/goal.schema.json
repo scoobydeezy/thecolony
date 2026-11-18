@@ -1,0 +1,258 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^goal\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string"
+    },
+    "status": {
+      "default": "draft",
+      "type": "string",
+      "enum": [
+        "stub",
+        "draft",
+        "canonical"
+      ]
+    },
+    "previousSlugs": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      }
+    },
+    "aliases": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z]+\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+      }
+    },
+    "provenance": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "doc": {
+            "type": "string"
+          },
+          "heading": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "doc",
+          "heading"
+        ]
+      }
+    },
+    "design": {
+      "type": "string"
+    },
+    "faction": {
+      "type": "string",
+      "pattern": "^faction\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "type": {
+      "default": "Achieve",
+      "type": "string",
+      "enum": [
+        "Achieve",
+        "Maintain"
+      ]
+    },
+    "priority": {
+      "default": "Major",
+      "type": "string",
+      "enum": [
+        "Critical",
+        "Major",
+        "Minor"
+      ]
+    },
+    "visibility": {
+      "default": "Known",
+      "type": "string",
+      "enum": [
+        "Open",
+        "Known",
+        "Secret"
+      ]
+    },
+    "outcome": {
+      "default": "Automatic",
+      "type": "string",
+      "enum": [
+        "Automatic",
+        "Adjudicated"
+      ]
+    },
+    "earliestAct": {
+      "default": 2,
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 3
+    },
+    "champion": {
+      "type": "string",
+      "pattern": "^(npc|pc)\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "target": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "Faction",
+            "Character",
+            "Asset"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z]+\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+        },
+        "state": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string",
+          "pattern": "^faction\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+        },
+        "property": {
+          "type": "string"
+        },
+        "operator": {
+          "type": "string"
+        },
+        "threshold": {
+          "type": "integer",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        }
+      },
+      "additionalProperties": false
+    },
+    "effects": {
+      "type": "object",
+      "properties": {
+        "progressing": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "targetType": {
+                "type": "string",
+                "enum": [
+                  "asset",
+                  "character",
+                  "faction",
+                  "location"
+                ]
+              },
+              "targetId": {
+                "type": "string",
+                "pattern": "^[a-z]+\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+              },
+              "property": {
+                "type": "string"
+              },
+              "delta": {
+                "type": "number"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "targetType",
+              "targetId",
+              "property"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "accomplished": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "targetType": {
+                "type": "string",
+                "enum": [
+                  "asset",
+                  "character",
+                  "faction",
+                  "location"
+                ]
+              },
+              "targetId": {
+                "type": "string",
+                "pattern": "^[a-z]+\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+              },
+              "property": {
+                "type": "string"
+              },
+              "delta": {
+                "type": "number"
+              },
+              "value": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "targetType",
+              "targetId",
+              "property"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "start": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "default": "Plotting",
+          "type": "string",
+          "enum": [
+            "Plotting",
+            "Progressing",
+            "Stalled",
+            "Accomplished",
+            "Failed",
+            "Retired"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "id",
+    "slug",
+    "name",
+    "faction"
+  ],
+  "additionalProperties": false
+}

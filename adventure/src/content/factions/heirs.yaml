@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=../../../schemas/faction.schema.json
+id: faction.heirs
+slug: heirs
+name: Heirs
+type: SocialClass
+represents: Inherited Moral Debt
+coreTenet: We inherited this burden
+certainOf: The old generation failed them
+rightAbout: The compromise was imposed on them
+afraidOf: Becoming the next generation of caretakers
+wrongAbout: The past can simply be discarded
+status: draft
+start:
+  active: true
+  momentum: 0
+  size: 0
+  values:
+    truth: 0.2907
+    stability: 0.1592
+    agency: 0.5502
+  beliefs: {}

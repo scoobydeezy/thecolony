@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.empty-lectern
+slug: empty-lectern
+name: The Empty Lectern
+type: Artifact
+role: Symbolic
+tier: 3
+keystone: false
+summary: During each remembrance, the Ledger is placed upon this lectern and passages describing the recovered belongings of the Forgotten are read aloud. When the ceremony concludes, the Ledger is returned to the Hall, leaving the lectern empty until the next ritual.
+status: draft
+start:
+  controller: faction.witnesses
+  location: location.memorial-building
+  status: Stable

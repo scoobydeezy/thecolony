@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.protect-the-network
+slug: protect-the-network
+name: Protect the Network
+faction: faction.shattered
+type: Maintain
+priority: Major
+visibility: Known
+outcome: Automatic
+earliestAct: 1
+target:
+  type: Asset
+  id: asset.dead-drop-network
+  state: Stable
+status: draft
+start:
+  status: Progressing

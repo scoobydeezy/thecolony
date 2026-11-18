@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.secure-the-procession
+slug: secure-the-procession
+name: Secure the Procession
+faction: faction.order-of-theia
+type: Achieve
+priority: Critical
+visibility: Open
+outcome: Automatic
+earliestAct: 1
+champion: npc.serevan-ilvar
+status: draft
+start:
+  status: Plotting

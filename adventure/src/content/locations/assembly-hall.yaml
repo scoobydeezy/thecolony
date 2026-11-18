@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.assembly-hall
+slug: assembly-hall
+name: Assembly Hall
+summary: The Civic headquarters of the Dawn Assembly.
+parent: location.dawn-district
+asset: asset.assembly-hall
+status: draft
+start:
+  state: Stable

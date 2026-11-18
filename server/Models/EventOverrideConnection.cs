@@ -1,10 +1,10 @@
 namespace ColonyTracker.Api.Models;
 
-// Outgoing connection from an event when a specific override is active.
-// Only used when the parent NarrativeEventOverride.OverridesConnections = true.
+// One entry of a version's `leadsTo` (used when the version's OverridesConnections is true). Not a
+// table: the id is derived from the version, target and thread.
 public class EventOverrideConnection
 {
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string Id { get; set; } = string.Empty;
     public string EventOverrideId { get; set; } = string.Empty;
     public string TargetNarrativeEventId { get; set; } = string.Empty;
     public string ThreadId { get; set; } = string.Empty;

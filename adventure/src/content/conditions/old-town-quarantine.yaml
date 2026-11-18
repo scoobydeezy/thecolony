@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.old-town-quarantine
+slug: old-town-quarantine
+name: Old Town Quarantine
+variesBy:
+  subject:
+    kind: goalStage
+    id: goal.quarantine-old-town
+  rows:
+    - state: Planning
+      text: ""
+      stress: 0
+    - state: Progressing
+      text: Order patrols establish checkpoints along Old Town's remaining accessible routes.
+      stress: 0
+    - state: Ready
+      text: ""
+      stress: 0
+    - state: Accomplished
+      text: Armed checkpoints restrict entry to and exit from Old Town without Order permission or an alternate route.
+      stress: 0
+    - state: Failed
+      text: ""
+      stress: 0
+    - state: Retired
+      text: ""
+      stress: 0
+status: draft

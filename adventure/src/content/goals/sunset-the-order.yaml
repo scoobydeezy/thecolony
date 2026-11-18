@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.sunset-the-order
+slug: sunset-the-order
+name: Sunset the Order
+faction: faction.dawn-assembly
+type: Achieve
+priority: Critical
+visibility: Known
+outcome: Automatic
+earliestAct: 2
+status: draft
+start:
+  status: Progressing

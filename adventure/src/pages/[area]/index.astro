@@ -1,0 +1,37 @@
+---
+// Appendix index pages (Bestiary, NPCs, Gazetteer, ...), generated from entities.
+import fs from 'node:fs';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { getCollection } from 'astro:content';
+import { ENTITY_TYPES, loadRegistry, PART } from '../../lib/registry.mjs';
+import { BASE as BASE } from '../../lib/target.mjs';
+
+export async function getStaticPaths() {
+  return Object.entries(ENTITY_TYPES)
+    .filter(([, spec]) => spec.area && spec.area !== PART && fs.existsSync(`./src/content/${spec.dir}`))
+    .map(([type, spec]) => ({ params: { area: spec.area }, props: { type } }));
+}
+
+const { type } = Astro.props;
+const spec = ENTITY_TYPES[type];
+const reg = loadRegistry();
+// Show derived names (a stat block linked to an NPC is listed under the NPC's name).
+const entries = (await getCollection(spec.collection).catch(() => []))
+  .map((e) => ({ ...e, data: { ...e.data, ...reg.byId.get(e.data.id).view } }))
+  .sort((a, b) => a.data.name.localeCompare(b.data.name));
+---
+
+<StarlightPage frontmatter={{ title: spec.plural, rpNew: type }}>
+  {entries.length === 0 && <p>No entries yet.</p>}
+  <ul class="rp-entity-list">
+    {entries.map((e) => (
+      <li>
+        <a href={`${BASE}/${spec.area}/${e.data.slug}/`}>{e.data.fullName ?? e.data.name}</a>
+        {e.data.variant && <span class="rp-muted"> ({e.data.variant})</span>}
+        {e.data.levelLabel && <span class="rp-muted"> · {e.data.levelLabel}</span>}
+        {e.data.role && <span class="rp-muted"> · {e.data.role}</span>}
+        {e.data.status === 'stub' && <span class="rp-muted"> · not yet written</span>}
+      </li>
+    ))}
+  </ul>
+</StarlightPage>

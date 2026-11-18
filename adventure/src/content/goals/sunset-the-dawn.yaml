@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.sunset-the-dawn
+slug: sunset-the-dawn
+name: Sunset the Dawn
+faction: faction.order-of-theia
+type: Achieve
+priority: Major
+visibility: Open
+outcome: Automatic
+earliestAct: 2
+champion: npc.pip-quickstep
+target:
+  type: Asset
+  id: asset.dawn-charter
+  owner: faction.order-of-theia
+effects:
+  progressing:
+    - targetType: faction
+      targetId: faction.dawn-assembly
+      property: factionSize
+      delta: -30
+  accomplished:
+    - targetType: faction
+      targetId: faction.dawn-assembly
+      property: factionSize
+      delta: -40
+status: draft
+start:
+  status: Plotting

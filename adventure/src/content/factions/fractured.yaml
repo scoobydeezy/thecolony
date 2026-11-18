@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=../../../schemas/faction.schema.json
+id: faction.fractured
+slug: fractured
+name: Fractured
+type: SocialClass
+represents: Oppressed
+coreTenet: Something is missing
+certainOf: The official story is incomplete
+rightAbout: They perceive cracks others ignore
+afraidOf: Being silenced
+wrongAbout: Their conclusions are often distorted by incomplete information
+origin: They are often created by unresolved contact with emotionally resonant belongings, especially practical objects redistributed after the ritual that accidentally return to people or places connected to the Forgotten.
+status: draft
+start:
+  active: true
+  momentum: 0
+  size: 0
+  values:
+    truth: 0.6404
+    stability: 0
+    agency: 0.3596
+  beliefs: {}

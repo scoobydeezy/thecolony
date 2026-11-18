@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.raid-the-armory
+slug: raid-the-armory
+name: Raid the Armory
+faction: faction.dawn-assembly
+type: Achieve
+priority: Minor
+visibility: Known
+outcome: Automatic
+earliestAct: 3
+target:
+  type: Asset
+  id: asset.order-watch-garrison
+  owner: faction.dawn-assembly
+status: draft
+start:
+  status: Plotting

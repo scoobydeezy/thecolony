@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/thread.schema.json
+id: thread.pepe-sylvya
+slug: pepe-sylvya
+name: Pépé Sylvya
+summary: The Administrator's impossible-records investigation is interrupted by Vara's Calling—and waits for the Reading to make sense.
+status: draft
+provenance:
+  - doc: Character Briefs
+    heading: Major Narrative Characters > Aspis Administrator - Perrik Tallow
+  - doc: Character Briefs
+    heading: Keepers > Pépé Sylvya
+  - doc: Campaign Outline
+    heading: Act II — The Cost > Session 5 — Dawn / The Morning After > If the Reading Succeeded

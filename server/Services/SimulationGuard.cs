@@ -2,6 +2,7 @@ using ColonyTracker.Api.Data;
 using ColonyTracker.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using ColonyTracker.Api.Services.Canon;
 
 namespace ColonyTracker.Api.Services;
 
@@ -80,10 +81,18 @@ public static class SimulationGuard
             return;
         }
 
-        // Modified: compare against the database, because PUT handlers attach the incoming entity as Modified.
+        // Modified: compare against what is stored (the database, or for file-backed properties the
+        // entity's file), because PUT handlers attach the incoming entity as Modified.
         var stored = await e.GetDatabaseValuesAsync(ct);
         if (stored is null) return;
-        var changed = Locked[type].Where(p => e.Metadata.FindProperty(p) is not null && !Equals(stored[p], e.Property(p).CurrentValue)).ToList();
+        // A detached update may not carry its file link; the database row has it.
+        var canonEntity = e.Entity as ICanonEntity;
+        var canonId = canonEntity is null ? null : canonEntity.CanonId ?? stored[nameof(ICanonEntity.CanonId)] as string;
+        var fileValues = canonId is not null && db.Canon is not null && db.Canon.TryGet(canonId, out var file)
+            ? CanonMapping.FileValues(type, file, db.Refs, canonEntity!.CampaignId, db.Canon) : null;
+        var changed = Locked[type].Where(p => CanonMapping.IsCanon(type, p)
+                ? fileValues is not null && !Equals(fileValues[p], CanonMapping.Normalize(type.GetProperty(p)!.GetValue(e.Entity)))
+                : e.Metadata.FindProperty(p) is not null && !Equals(stored[p], e.Property(p).CurrentValue)).ToList();
         if (changed.Count > 0)
             throw new LiveCampaignViolationException($"Locked in a Live campaign: {name}.{string.Join(", ", changed)}. Record the change as an Event instead.");
     }

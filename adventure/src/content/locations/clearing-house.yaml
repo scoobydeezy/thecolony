@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.clearing-house
+slug: clearing-house
+name: Clearing House
+summary: Aspis administrative building dedicated to reconciling the Colony's debts.
+parent: location.keeper-district
+asset: asset.clearing-house
+status: draft
+start:
+  state: Stable

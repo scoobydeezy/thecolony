@@ -1,63 +1,38 @@
 using ColonyTracker.Api.Data;
 using ColonyTracker.Api.Models;
+using ColonyTracker.Api.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ColonyTracker.Api.Controllers;
 
+// An override is one of an event's `variants` (§14); its id comes from the event and the version's key.
 [ApiController]
 [Route("api/narrative/event-overrides")]
-public class NarrativeEventOverridesController(AppDbContext db) : ControllerBase
+public class NarrativeEventOverridesController(AppDbContext db, ICampaignContext campaign) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] string? eventId = null)
-    {
-        var query = db.NarrativeEventOverrides.AsQueryable();
-        if (eventId is not null)
-            query = query.Where(o => o.NarrativeEventId == eventId);
-        return Ok(await query.ToListAsync());
-    }
+    public async Task<IActionResult> GetAll([FromQuery] string? eventId = null) =>
+        Ok((await NarrativeBranches.VersionsAsync(db, await campaign.GetActiveIdAsync())).Select(v => v.Override).Where(o => eventId is null || o.NarrativeEventId == eventId));
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(string id)
-    {
-        var o = await db.NarrativeEventOverrides.FindAsync(id);
-        if (o is null) return NotFound();
-        return Ok(o);
-    }
+    public async Task<IActionResult> GetById(string id) =>
+        (await NarrativeBranches.VersionsAsync(db, await campaign.GetActiveIdAsync())).FirstOrDefault(v => v.Override.Id == id) is { } v ? Ok(v.Override) : NotFound();
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] NarrativeEventOverride o)
     {
-        o.Id = Guid.NewGuid().ToString();
-        db.NarrativeEventOverrides.Add(o);
-        await db.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetById), new { id = o.Id }, o);
+        var saved = await NarrativeBranches.AddVersionAsync(db, await campaign.GetActiveIdAsync(), o);
+        return CreatedAtAction(nameof(GetById), new { id = saved.Id }, saved);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(string id, [FromBody] NarrativeEventOverride o)
-    {
-        if (id != o.Id) return BadRequest();
-        var existing = await db.NarrativeEventOverrides.FindAsync(id);
-        if (existing is null) return NotFound();
-        existing.OverridesSummary = o.OverridesSummary;
-        existing.Summary = o.Summary;
-        existing.OverridesDescription = o.OverridesDescription;
-        existing.Description = o.Description;
-        existing.OverridesConnections = o.OverridesConnections;
-        existing.OverridesAssets = o.OverridesAssets;
-        await db.SaveChangesAsync();
-        return Ok(existing);
-    }
+    public async Task<IActionResult> Update(string id, [FromBody] NarrativeEventOverride o) =>
+        id != o.Id ? BadRequest() : Ok(await NarrativeBranches.UpdateVersionAsync(db, await campaign.GetActiveIdAsync(), id, o));
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var o = await db.NarrativeEventOverrides.FindAsync(id);
-        if (o is null) return NotFound();
-        db.NarrativeEventOverrides.Remove(o);
-        await db.SaveChangesAsync();
+        await NarrativeBranches.RemoveVersionAsync(db, await campaign.GetActiveIdAsync(), id);
         return NoContent();
     }
 }

@@ -2,8 +2,8 @@ import { Component, inject, signal, computed } from '@angular/core';
 import { FormField, form, required } from '@angular/forms/signals';
 import { AppStore } from '../../store/app.store';
 import {
-  NarrativeEvent, NarrativeEventStatus,
-  NARRATIVE_EVENT_STATUS_OPTIONS, NARRATIVE_VISIBILITY_OPTIONS,
+  NarrativeEvent, NarrativeEventStatus, NarrativeKind,
+  NARRATIVE_EVENT_STATUS_OPTIONS, NARRATIVE_VISIBILITY_OPTIONS, NARRATIVE_KIND_OPTIONS,
 } from '../../core/models/types';
 import { NarrativeEventDetailComponent } from './narrative-event-detail.component';
 
@@ -16,12 +16,13 @@ interface EventFormModel {
   narrativeFunction: string;
   status: string;
   visibility: string;
+  kind: string;
 }
 
 const emptyEventForm = (): EventFormModel => ({
   id: '', campaignId: '',
   title: '', summary: '', description: '', narrativeFunction: '',
-  status: 'Planned', visibility: 'GMOnly',
+  status: 'Planned', visibility: 'GMOnly', kind: 'Event',
 });
 
 @Component({
@@ -36,6 +37,7 @@ export class NarrativeEventsListComponent {
 
   readonly statusOptions     = NARRATIVE_EVENT_STATUS_OPTIONS;
   readonly visibilityOptions = NARRATIVE_VISIBILITY_OPTIONS;
+  readonly kindOptions       = NARRATIVE_KIND_OPTIONS;
 
   // ── Filters ───────────────────────────────────────────────────────────────
 
@@ -95,6 +97,7 @@ export class NarrativeEventsListComponent {
       narrativeFunction: ev.narrativeFunction ?? '',
       status:            ev.status,
       visibility:        ev.visibility,
+      kind:              ev.kind ?? 'Event',
     });
     this.showModal.set(true);
   }
@@ -105,7 +108,10 @@ export class NarrativeEventsListComponent {
     if (this.f().invalid()) return;
     const m = this.editModel();
     const existing = m.id ? this.store.narrativeEvents().find(e => e.id === m.id) : undefined;
+    // Start from the saved record so fields this form doesn't show (kind, parent event) are kept.
     const ev: NarrativeEvent = {
+      ...existing,
+      kind:      (existing?.kind ?? m.kind) as NarrativeKind,
       id:        m.id,
       campaignId: m.campaignId,
       title:     m.title.trim(),

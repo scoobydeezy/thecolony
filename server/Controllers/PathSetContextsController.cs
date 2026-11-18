@@ -1,44 +1,24 @@
 using ColonyTracker.Api.Data;
 using ColonyTracker.Api.Models;
+using ColonyTracker.Api.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ColonyTracker.Api.Controllers;
 
+// A branch's `requires` (§14).
 [ApiController]
 [Route("api/narrative/path-set-contexts")]
-public class PathSetContextsController(AppDbContext db) : ControllerBase
+public class PathSetContextsController(AppDbContext db, ICampaignContext campaign) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] string? pathSetId = null)
-    {
-        var query = db.PathSetContexts.AsQueryable();
-        if (pathSetId is not null)
-            query = query.Where(c => c.PathSetId == pathSetId);
-        return Ok(await query.ToListAsync());
-    }
+    public async Task<IActionResult> GetAll([FromQuery] string? pathSetId = null) =>
+        Ok((await NarrativeBranches.ContextsAsync(db, await campaign.GetActiveIdAsync())).Where(c => pathSetId is null || c.PathSetId == pathSetId));
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] PathSetContext ctx)
-    {
-        var exists = await db.PathSetContexts
-            .AnyAsync(c => c.PathSetId == ctx.PathSetId && c.RequiredPathId == ctx.RequiredPathId);
-        if (exists) return Conflict();
-        db.PathSetContexts.Add(ctx);
-        await db.SaveChangesAsync();
-        return Ok(ctx);
-    }
+    public async Task<IActionResult> Create([FromBody] PathSetContext ctx) =>
+        await NarrativeBranches.SetContextAsync(db, await campaign.GetActiveIdAsync(), ctx.PathSetId, ctx.RequiredPathId, on: true) ? Ok(ctx) : Conflict();
 
     [HttpDelete]
-    public async Task<IActionResult> Delete(
-        [FromQuery] string pathSetId,
-        [FromQuery] string requiredPathId)
-    {
-        var existing = await db.PathSetContexts
-            .FindAsync(pathSetId, requiredPathId);
-        if (existing is null) return NotFound();
-        db.PathSetContexts.Remove(existing);
-        await db.SaveChangesAsync();
-        return NoContent();
-    }
+    public async Task<IActionResult> Delete([FromQuery] string pathSetId, [FromQuery] string requiredPathId) =>
+        await NarrativeBranches.SetContextAsync(db, await campaign.GetActiveIdAsync(), pathSetId, requiredPathId, on: false) ? NoContent() : NotFound();
 }

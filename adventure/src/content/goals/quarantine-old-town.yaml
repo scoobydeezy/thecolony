@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.quarantine-old-town
+slug: quarantine-old-town
+name: Quarantine Old Town
+faction: faction.order-of-theia
+type: Achieve
+priority: Critical
+visibility: Known
+outcome: Automatic
+earliestAct: 3
+champion: npc.boruk-stonehand
+status: draft
+start:
+  status: Plotting

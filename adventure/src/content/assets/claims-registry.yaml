@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.claims-registry
+slug: claims-registry
+name: Claims Registry
+type: Intelligence
+role: Mandate
+tier: 5
+keystone: true
+summary: A confidential archive documenting property ownership, contractual obligations, inheritance disputes, and centuries of unresolved commercial anomalies. Though created to keep the Consortium's books balanced, the Registry has become one of the most complete records of how the ritual quietly reshapes the Colony's legal and economic foundations.
+status: draft
+start:
+  controller: faction.aspis
+  location: location.clearing-house
+  status: Stable

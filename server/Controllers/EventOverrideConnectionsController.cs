@@ -1,60 +1,39 @@
 using ColonyTracker.Api.Data;
 using ColonyTracker.Api.Models;
+using ColonyTracker.Api.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ColonyTracker.Api.Controllers;
 
+// A version's `leadsTo` (§14). The id comes from the version, target and thread, so changing the
+// target or thread changes it: the response carries the new one.
 [ApiController]
 [Route("api/narrative/event-override-connections")]
-public class EventOverrideConnectionsController(AppDbContext db) : ControllerBase
+public class EventOverrideConnectionsController(AppDbContext db, ICampaignContext campaign) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] string? overrideId = null)
-    {
-        var query = db.EventOverrideConnections.AsQueryable();
-        if (overrideId is not null)
-            query = query.Where(c => c.EventOverrideId == overrideId);
-        return Ok(await query.ToListAsync());
-    }
+    public async Task<IActionResult> GetAll([FromQuery] string? overrideId = null) =>
+        Ok((await NarrativeBranches.VersionsAsync(db, await campaign.GetActiveIdAsync())).SelectMany(v => v.Connections).Where(c => overrideId is null || c.EventOverrideId == overrideId));
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(string id)
-    {
-        var c = await db.EventOverrideConnections.FindAsync(id);
-        if (c is null) return NotFound();
-        return Ok(c);
-    }
+    public async Task<IActionResult> GetById(string id) =>
+        (await NarrativeBranches.VersionsAsync(db, await campaign.GetActiveIdAsync())).SelectMany(v => v.Connections).FirstOrDefault(c => c.Id == id) is { } c ? Ok(c) : NotFound();
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] EventOverrideConnection conn)
     {
-        conn.Id = Guid.NewGuid().ToString();
-        db.EventOverrideConnections.Add(conn);
-        await db.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetById), new { id = conn.Id }, conn);
+        var saved = await NarrativeBranches.AddVersionConnectionAsync(db, await campaign.GetActiveIdAsync(), conn);
+        return CreatedAtAction(nameof(GetById), new { id = saved.Id }, saved);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(string id, [FromBody] EventOverrideConnection conn)
-    {
-        if (id != conn.Id) return BadRequest();
-        var existing = await db.EventOverrideConnections.FindAsync(id);
-        if (existing is null) return NotFound();
-        existing.TargetNarrativeEventId = conn.TargetNarrativeEventId;
-        existing.ThreadId = conn.ThreadId;
-        existing.Visibility = conn.Visibility;
-        await db.SaveChangesAsync();
-        return Ok(existing);
-    }
+    public async Task<IActionResult> Update(string id, [FromBody] EventOverrideConnection conn) =>
+        id != conn.Id ? BadRequest() : Ok(await NarrativeBranches.UpdateVersionConnectionAsync(db, await campaign.GetActiveIdAsync(), id, conn));
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var c = await db.EventOverrideConnections.FindAsync(id);
-        if (c is null) return NotFound();
-        db.EventOverrideConnections.Remove(c);
-        await db.SaveChangesAsync();
+        await NarrativeBranches.RemoveVersionConnectionAsync(db, await campaign.GetActiveIdAsync(), id);
         return NoContent();
     }
 }

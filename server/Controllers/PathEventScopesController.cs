@@ -1,61 +1,33 @@
 using ColonyTracker.Api.Data;
 using ColonyTracker.Api.Models;
+using ColonyTracker.Api.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ColonyTracker.Api.Controllers;
 
+// An event's `onPaths` (§14).
 [ApiController]
 [Route("api/narrative/path-event-scopes")]
-public class PathEventScopesController(AppDbContext db) : ControllerBase
+public class PathEventScopesController(AppDbContext db, ICampaignContext campaign) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetAll(
-        [FromQuery] string? pathId = null,
-        [FromQuery] string? eventId = null)
-    {
-        var query = db.PathEventScopes.AsQueryable();
-        if (pathId is not null)  query = query.Where(s => s.PathId == pathId);
-        if (eventId is not null) query = query.Where(s => s.NarrativeEventId == eventId);
-        return Ok(await query.ToListAsync());
-    }
+    public async Task<IActionResult> GetAll([FromQuery] string? pathId = null, [FromQuery] string? eventId = null) =>
+        Ok((await NarrativeBranches.ScopesAsync(db, await campaign.GetActiveIdAsync()))
+            .Where(s => (pathId is null || s.PathId == pathId) && (eventId is null || s.NarrativeEventId == eventId)));
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] PathEventScope scope)
-    {
-        var exists = await db.PathEventScopes
-            .AnyAsync(s => s.PathId == scope.PathId && s.NarrativeEventId == scope.NarrativeEventId);
-        if (exists) return Conflict();
-        db.PathEventScopes.Add(scope);
-        await db.SaveChangesAsync();
-        return Ok(scope);
-    }
+    public async Task<IActionResult> Create([FromBody] PathEventScope scope) =>
+        await NarrativeBranches.SetScopeAsync(db, await campaign.GetActiveIdAsync(), scope.PathId, scope.NarrativeEventId, on: true) ? Ok(scope) : Conflict();
 
-    // Bulk upsert: PUT replaces the full scope list for a given pathId.
+    // Bulk replace: exactly these events are in the path's scope.
     [HttpPut]
-    public async Task<IActionResult> BulkReplace(
-        [FromQuery] string pathId,
-        [FromBody] List<string> eventIds)
+    public async Task<IActionResult> BulkReplace([FromQuery] string pathId, [FromBody] List<string> eventIds)
     {
-        var existing = await db.PathEventScopes
-            .Where(s => s.PathId == pathId)
-            .ToListAsync();
-        db.PathEventScopes.RemoveRange(existing);
-        var newScopes = eventIds.Select(eid => new PathEventScope { PathId = pathId, NarrativeEventId = eid });
-        db.PathEventScopes.AddRange(newScopes);
-        await db.SaveChangesAsync();
-        return Ok(newScopes);
+        await NarrativeBranches.ReplaceScopeAsync(db, await campaign.GetActiveIdAsync(), pathId, eventIds);
+        return Ok(eventIds.Select(eid => new PathEventScope { PathId = pathId, NarrativeEventId = eid }));
     }
 
     [HttpDelete]
-    public async Task<IActionResult> Delete(
-        [FromQuery] string pathId,
-        [FromQuery] string eventId)
-    {
-        var existing = await db.PathEventScopes.FindAsync(pathId, eventId);
-        if (existing is null) return NotFound();
-        db.PathEventScopes.Remove(existing);
-        await db.SaveChangesAsync();
-        return NoContent();
-    }
+    public async Task<IActionResult> Delete([FromQuery] string pathId, [FromQuery] string eventId) =>
+        await NarrativeBranches.SetScopeAsync(db, await campaign.GetActiveIdAsync(), pathId, eventId, on: false) ? NoContent() : NotFound();
 }

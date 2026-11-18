@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.divest
+slug: divest
+name: Divest
+faction: faction.aspis
+type: Achieve
+priority: Major
+visibility: Known
+outcome: Automatic
+earliestAct: 3
+status: draft
+start:
+  status: Plotting

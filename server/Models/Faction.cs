@@ -1,6 +1,8 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace ColonyTracker.Api.Models;
 
-public class Faction
+public class Faction : ICanonEntity
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string Name { get; set; } = string.Empty;
@@ -48,4 +50,10 @@ public class Faction
     public string CampaignId { get; set; } = string.Empty;
     // M1: Live campaigns record when an entity enters the world (absent from replay before this Event).
     public string? IntroducedAtEventId { get; set; }
+
+    // ADVENTURE-BOOK-PLAN.md §10: the canonical file (faction.<slug> under adventure/src/content/factions/).
+    // Every property in CanonEntityMapping is read from and saved to that file.
+    public string? CanonId { get; set; }
+    [NotMapped] public string? CanonVersion { get; set; }
+    [NotMapped] public bool CanonMissing { get; set; }
 }

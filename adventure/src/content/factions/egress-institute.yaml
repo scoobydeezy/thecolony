@@ -1,0 +1,51 @@
+# yaml-language-server: $schema=../../../schemas/faction.schema.json
+id: faction.egress-institute
+slug: egress-institute
+name: EGRESS Institute
+type: Faction
+summary: The EGRESS Institute studies memory, ritual, and reality distortion through engram storage, controlled experimentation, and long-term observation, pursuing mastery over the mechanism even when its ethical consequences are ignored.
+motto: Transcending the Limits of the Mind
+represents: Transcendence, Escape
+publicFace: Brilliant but unsettling scholars with dangerous equipment and better funding than restraint.
+selfImage: The only adults trying to solve the actual problem.
+coreTenet: No burden is immutable if it can be understood.
+focus: Outward, Transcendence
+certainOf: The solution has not yet been discovered.
+rightAbout: The phenomenon has rules, and those rules can be observed, tested, and partially understood.
+afraidOf: Intellectual stagnation, accepting limits.
+wrongAbout: They mistake measurement for mastery and knowledge for wisdom.
+response: "Surpass the cost. The burden is not a moral condition to be accepted, but a technical problem to be solved. "
+origin: Scholars concluded that theology, politics, and remembrance alone could not resolve the Colony's metaphysical crisis. Only disciplined inquiry could reveal the laws governing memory itself. Over generations, understanding ceased to be the goal. Instead, knowledge became merely the means through which power was pursued.
+foundedAs: Researchers
+became: Visionaries
+history: |-
+  A loose fellowship of scholars, physicians, natural philosophers, and curious minds began gathering to study the strange phenomena surrounding the Colony long before the EGRESS Institute existed. While others sought to preserve, reform, or escape the burden, these early researchers treated it as a puzzle waiting to be solved. They catalogued memory disturbances, investigated fractured objects, interviewed survivors of Veiled encounters, and documented the subtle ways reality shifted around the Forgotten. They believed the ritual was not beyond understanding—only beyond current knowledge.
+
+  Everything changed with the discovery of the first Engrams: preserved fragments of memory captured before the ritual dispersed them completely. Though incapable of preserving identity or names, these fragments retained thoughts, sensations, habits, and emotional impressions, proving that memory itself could be isolated, stored, and studied. The discovery transformed an informal community of investigators into a dedicated institution. They named it EGRESS—Engram Generation, Restoration, Evaluation, and Storage Systems—reflecting a new conviction that the burden could eventually be understood through disciplined observation and experimentation.
+
+  Over the generations, discovery gave way to accumulation. The Engram Vault grew into a hidden archive containing centuries of preserved memories, while the Research Archive expanded into the Colony's largest collection of experiments, observations, and theoretical work on the ritual and the Veiled. As the Institute's understanding deepened, Veiled Containment transformed rare manifestations from inexplicable encounters into controlled subjects of study. EGRESS gradually became the foremost authority on the mechanics of memory, reality, and the burden itself.
+
+  Today, the Institute may understand more about the Colony's hidden truths than any other faction. Its researchers possess generations of evidence, preserved memories, and experimental results that could reshape the Colony's understanding of itself. Yet EGRESS remains reluctant to act on what it has learned. The Institute was founded in the belief that understanding would become the Colony's egress—its way out of the burden. Over generations, that purpose quietly inverted.
+
+  Once, they pursued understanding in order to find an exit. Now, they preserve the exit in order to pursue understanding. The work is never finished, because there is always one more observation to make, one more variable to isolate, one more unanswered question that might finally complete the picture. The Institute still believes understanding is the way out. It has simply forgotten that 'out' was ever the destination.
+notes: EGRESS stands for "Engram Generation, Restoration, Evaluation, and Storage Systems."
+heraldry:
+  glyph: /uploads/factions/institute-glyph.png?v=1785375929612
+  icon: /uploads/factions/institute-icon.svg?v=1785375933958
+  primaryColor: "#ffffff"
+  secondaryColor: "#15a27f"
+  bannerShape: rectangle
+status: draft
+start:
+  active: true
+  leader: npc.veyra-kess
+  momentum: 0
+  size: 120
+  values:
+    truth: 0.4427
+    stability: 0.338
+    agency: 0.2193
+  beliefs:
+    a: Neutral
+    b: Negative
+    c: Neutral

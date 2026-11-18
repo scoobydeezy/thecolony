@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.recovery-notices
+slug: recovery-notices
+name: Recovery Notices
+variesBy:
+  subject:
+    kind: goalStage
+    id: goal.recover-the-unclaimed-object
+  rows:
+    - state: Planning
+      text: ""
+      stress: 0
+    - state: Progressing
+      text: Witness recovery notices identify the missing resonant object and offer a reward for its return.
+      stress: 0
+    - state: Ready
+      text: ""
+      stress: 0
+    - state: Accomplished
+      text: ""
+      stress: 0
+    - state: Failed
+      text: ""
+      stress: 0
+    - state: Retired
+      text: ""
+      stress: 0
+status: draft

@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.witness-field-archives
+slug: witness-field-archives
+name: Witness Field Archives
+variesBy:
+  subject:
+    kind: goalStage
+    id: goal.establish-field-archives
+  rows:
+    - state: Planning
+      text: ""
+      stress: 0
+    - state: Progressing
+      text: Witnesses deploy their Recovery Wagons to collect displaced belongings and testimony from affected districts.
+      stress: 0
+    - state: Ready
+      text: ""
+      stress: 0
+    - state: Accomplished
+      text: Mobile archive stations provide recovered Relationship and Context evidence without requiring access to the Hall of Remembrance.
+      stress: 0
+    - state: Failed
+      text: ""
+      stress: 0
+    - state: Retired
+      text: ""
+      stress: 0
+status: draft

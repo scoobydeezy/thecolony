@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.procession-watch
+slug: procession-watch
+name: Procession Watch
+variesBy:
+  subject:
+    kind: goalStage
+    id: goal.secure-the-procession
+  rows:
+    - state: Planning
+      text: ""
+      stress: 0
+    - state: Progressing
+      text: Order checkpoints restrict access to the Keeper Procession route.
+      stress: 0
+    - state: Ready
+      text: ""
+      stress: 0
+    - state: Accomplished
+      text: Armed Order guards control approaches to the Procession.
+      stress: 0
+    - state: Failed
+      text: ""
+      stress: 0
+    - state: Retired
+      text: ""
+      stress: 0
+status: draft

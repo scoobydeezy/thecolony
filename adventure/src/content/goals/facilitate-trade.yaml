@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.facilitate-trade
+slug: facilitate-trade
+name: Facilitate Trade
+faction: faction.aspis
+type: Maintain
+priority: Major
+visibility: Open
+outcome: Automatic
+earliestAct: 1
+champion: npc.lysa-trent
+target:
+  type: Asset
+  id: asset.river-exchange
+  state: Stable
+status: draft
+start:
+  status: Progressing

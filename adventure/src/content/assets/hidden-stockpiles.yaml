@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.hidden-stockpiles
+slug: hidden-stockpiles
+name: Hidden Stockpiles
+type: Resource
+role: Covert
+tier: 4
+keystone: false
+summary: A decentralized network of caches hidden throughout abandoned buildings, forgotten cellars, and secluded ruins. Stocked with food, medicine, tools, and other necessities.
+status: draft
+start:
+  controller: faction.shattered
+  status: Stable

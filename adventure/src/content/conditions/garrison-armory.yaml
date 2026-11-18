@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.garrison-armory
+slug: garrison-armory
+name: Garrison Armory
+variesBy:
+  subject:
+    kind: goalStage
+    id: goal.raid-the-armory
+  rows:
+    - state: Planning
+      text: ""
+      stress: 0
+    - state: Progressing
+      text: Dawn raiders penetrate the Order Watch Garrison armory and stage weapons for removal.
+      stress: 0
+    - state: Ready
+      text: ""
+      stress: 0
+    - state: Accomplished
+      text: Dawn can equip an armed contingent using weapons taken from the Order Watch Garrison until those supplies are expended, returned, or recaptured.
+      stress: 0
+    - state: Failed
+      text: ""
+      stress: 0
+    - state: Retired
+      text: ""
+      stress: 0
+status: draft

@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.fortify-the-assembly-hall
+slug: fortify-the-assembly-hall
+name: Fortify the Assembly Hall
+faction: faction.dawn-assembly
+type: Maintain
+priority: Major
+visibility: Known
+outcome: Automatic
+earliestAct: 2
+target:
+  type: Asset
+  id: asset.assembly-hall
+  state: Stable
+status: draft
+start:
+  status: Progressing

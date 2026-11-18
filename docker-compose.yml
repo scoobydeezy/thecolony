@@ -9,9 +9,22 @@ services:
     volumes:
       - ./colony-data:/app/data
       - ./colony-uploads:/app/uploads
+      # Canonical content (ADVENTURE-BOOK-PLAN.md §9–11): characters, factions, Assets, locations and
+      # goals are read from and saved to adventure/src/content, validated against adventure/schemas. Read-write.
+      - ./adventure:/app/adventure
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5000
       - ConnectionStrings__Default=Data Source=/app/data/colony.db
       - UploadsPath=/app/uploads
+      - Canon__ContentPath=/app/adventure/src/content
+      - Canon__SchemaPath=/app/adventure/schemas
+      # The switches' link maps (archived): only read if a database copy from before a switch is
+      # restored, so CanonLinks can link its rows to their files (CanonLinks.Backfill).
+      - Canon__LinkMapPath=/app/data/canon-switch-archive/staging/characters/id-map.yaml
+      - Canon__EntityLinkMapPath=/app/data/canon-switch-archive/staging/entities/id-map.yaml
+      - Canon__GoalLinkMapPath=/app/data/canon-switch-archive/staging/goals/id-map.yaml
+      - Canon__NarrativeLinkMapPath=/app/data/canon-switch-archive/staging/narrative/id-map.yaml
+      - Canon__BranchLinkMapPath=/app/data/canon-switch-archive/staging/branches/id-map.yaml
+      - Canon__ConditionLinkMapPath=/app/data/canon-switch-archive/staging/conditions/id-map.yaml
     restart: unless-stopped

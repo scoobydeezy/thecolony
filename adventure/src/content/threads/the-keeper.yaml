@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../../../schemas/thread.schema.json
+id: thread.the-keeper
+slug: the-keeper
+name: The Keeper
+summary: "The human center of the campaign: from newly Called teenager, to living survivor or person-shaped absence, to the question of what respecting a Keeper's agency actually requires."
+status: draft
+provenance:
+  - doc: Campaign Outline
+    heading: Campaign-Wide Promises and Narrative Threads > Vara Cairn — The Keeper
+  - doc: Character Briefs
+    heading: Major Narrative Characters > The Keeper - Varenya “Vara” Cairn

@@ -137,6 +137,12 @@ html, body {
   &-hostile    { background: var(--label-hostile-bg);   color: var(--label-hostile-text); }
 }
 
+// A value shown read-only where a field would be (e.g. an event's kind once it exists).
+.form-static {
+  margin: 0;
+  padding: 0.4rem 0;
+}
+
 .form-group {
   margin-bottom: 0.25rem;
 

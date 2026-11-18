@@ -15,7 +15,8 @@ public class RelationshipsController(AppDbContext db, IScoringEngine scoring, IC
     public async Task<IActionResult> GetAll()
     {
         var cid = await campaign.GetActiveIdAsync();
-        var factions = await db.Factions.Where(f => f.CampaignId == cid && f.Active).ToListAsync();
+        // Active is file-backed (ADVENTURE-BOOK-PLAN.md §10), so filter after loading.
+        var factions = (await db.Factions.Where(f => f.CampaignId == cid).ToListAsync()).Where(f => f.Active).ToList();
         var colonyState = await db.ColonyStates.FirstOrDefaultAsync(s => s.CampaignId == cid);
         var rules = await db.RulesConfigs.FirstOrDefaultAsync(r => r.CampaignId == cid);
         var overrides = await db.RelationshipOverrides.Where(o => o.CampaignId == cid).ToListAsync();

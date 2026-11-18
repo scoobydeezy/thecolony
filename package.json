@@ -1,0 +1,12 @@
+{
+  "name": "colony-tracker-workspace",
+  "private": true,
+  "description": "One-command dev workspace: API (Docker), Angular app and the adventure book.",
+  "scripts": {
+    "start": "node tools/dev.mjs",
+    "start:web": "node tools/dev.mjs --no-api",
+    "stop": "docker compose down",
+    "build:book": "npm --prefix adventure run build",
+    "test": "npm --prefix client run test:unit"
+  }
+}

@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../../../schemas/thread.schema.json
+id: thread.bad-maps
+slug: bad-maps
+name: Bad Maps
+summary: Vara's bad-map obsession warns that an incomplete representation can be true and still dangerously wrong.
+status: draft
+provenance:
+  - doc: Character Briefs
+    heading: The Keeper - Varenya “Vara” Cairn > Bad Maps
+  - doc: Campaign Outline
+    heading: Act I — The Secret > Session 2 — Bad Maps

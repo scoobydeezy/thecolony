@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.hall-of-remembrance
+slug: hall-of-remembrance
+name: Hall of Remembrance
+type: Infrastructure
+role: Operational
+tier: 4
+keystone: false
+summary: A sanctuary where the belongings of the Forgotten are preserved with reverence. Here the Witnesses catalog, safeguard, and honor the traces of lives that can no longer be remembered.
+status: draft
+start:
+  controller: faction.witnesses
+  status: Stable

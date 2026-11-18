@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.evacuate-milltown
+slug: evacuate-milltown
+name: Evacuate Milltown
+faction: faction.dawn-assembly
+type: Achieve
+priority: Critical
+visibility: Known
+outcome: Adjudicated
+earliestAct: 3
+target:
+  type: Asset
+  id: asset.assembly-hall
+status: draft
+start:
+  status: Plotting

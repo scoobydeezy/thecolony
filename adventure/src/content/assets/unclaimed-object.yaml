@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.unclaimed-object
+slug: unclaimed-object
+name: The Unclaimed Object
+type: Artifact
+role: Covert
+tier: 1
+keystone: false
+summary: A newly-identified Fractured Object. It originally belonged to [Party member]; its mnemonic weight comes from its connection to someone subsequently Forgotten. Its form and the identities involved remain to be established by the GM. Initially no faction controls it.
+status: draft
+start:
+  status: Stable

@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.gain-momentum
+slug: gain-momentum
+name: Gain Momentum
+faction: faction.dawn-assembly
+type: Achieve
+priority: Minor
+visibility: Known
+outcome: Automatic
+earliestAct: 1
+champion: npc.asha-weaver
+status: draft
+start:
+  status: Plotting

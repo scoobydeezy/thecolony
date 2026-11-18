@@ -15,7 +15,8 @@ public class WorldConditionsController(AppDbContext db, ICampaignContext campaig
     public async Task<IActionResult> GetAll()
     {
         var cid = await campaign.GetActiveIdAsync();
-        return Ok(await db.WorldConditions.Where(c => c.CampaignId == cid).OrderBy(c => c.SortOrder).ThenBy(c => c.Title).ToListAsync());
+        // Title is file-backed (§15): order in memory.
+        return Ok((await db.WorldConditions.Where(c => c.CampaignId == cid).ToListAsync()).OrderBy(c => c.SortOrder).ThenBy(c => c.Title));
     }
 
     [HttpGet("{id}")]
@@ -31,6 +32,7 @@ public class WorldConditionsController(AppDbContext db, ICampaignContext campaig
         if (string.IsNullOrWhiteSpace(c.Title)) return BadRequest("title is required.");
         c.Id = await EntityIds.ForCreateAsync(db.WorldConditions, c.Id);   // keep an imported id when it is free
         c.CampaignId = await campaign.GetActiveIdAsync();
+        c.CanonId = null;
         db.WorldConditions.Add(c);
         await db.SaveChangesAsync();
         return CreatedAtAction(nameof(GetById), new { id = c.Id }, c);
@@ -42,8 +44,18 @@ public class WorldConditionsController(AppDbContext db, ICampaignContext campaig
         if (id != c.Id) return BadRequest();
         if (string.IsNullOrWhiteSpace(c.Title)) return BadRequest("title is required.");
         if (c.RequirementsJson.Contains($"\"{c.Id}\"")) return BadRequest("a condition cannot depend on itself.");
-        c.CampaignId = await campaign.GetActiveIdAsync();
-        db.Entry(c).State = EntityState.Modified;
+        var cid = await campaign.GetActiveIdAsync();
+        var existing = await db.WorldConditions.FirstOrDefaultAsync(x => x.Id == id && x.CampaignId == cid);
+        if (existing is null) return NotFound();
+        existing.Title = c.Title;
+        existing.Rule = c.Rule;
+        existing.RuleOtherwise = c.RuleOtherwise;
+        existing.VariesByJson = c.VariesByJson;
+        existing.ActiveAtStart = c.ActiveAtStart;
+        existing.RequirementsJson = c.RequirementsJson;
+        existing.StressContribution = c.StressContribution;
+        existing.SortOrder = c.SortOrder;
+        c = existing;
         await db.SaveChangesAsync();
         return Ok(c);
     }

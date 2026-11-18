@@ -14,20 +14,17 @@ public class FactionGoalsController(AppDbContext db, ICampaignContext campaign) 
     public async Task<IActionResult> GetAll()
     {
         var cid = await campaign.GetActiveIdAsync();
-        return Ok(await db.FactionGoals
-            .Where(g => g.CampaignId == cid)
-            .OrderBy(g => g.FactionId).ThenBy(g => g.Title)
-            .ToListAsync());
+        // Goals are file-backed (ADVENTURE-BOOK-PLAN.md §11), so sort and filter after loading.
+        var goals = await db.FactionGoals.Where(g => g.CampaignId == cid).ToListAsync();
+        return Ok(goals.OrderBy(g => g.FactionId, StringComparer.Ordinal).ThenBy(g => g.Title, StringComparer.Ordinal).ToList());
     }
 
     [HttpGet("by-faction/{factionId}")]
     public async Task<IActionResult> GetByFaction(string factionId)
     {
         var cid = await campaign.GetActiveIdAsync();
-        return Ok(await db.FactionGoals
-            .Where(g => g.CampaignId == cid && g.FactionId == factionId)
-            .OrderBy(g => g.Title)
-            .ToListAsync());
+        var goals = await db.FactionGoals.Where(g => g.CampaignId == cid).ToListAsync();
+        return Ok(goals.Where(g => g.FactionId == factionId).OrderBy(g => g.Title, StringComparer.Ordinal).ToList());
     }
 
     [HttpGet("{id}")]
@@ -42,6 +39,7 @@ public class FactionGoalsController(AppDbContext db, ICampaignContext campaign) 
     {
         var cid = await campaign.GetActiveIdAsync();
         goal.Id = await EntityIds.ForCreateAsync(db.FactionGoals, goal.Id);   // keep an imported id when it is free
+        goal.CanonId = null;   // a new goal gets a new canonical file
         goal.CampaignId = cid;
         if (GoalAdvanceRules.Issue(goal) is { } bad) return BadRequest(bad);
         var conflict = await ChampionRules.ConflictAsync(db, goal, null);
@@ -57,6 +55,8 @@ public class FactionGoalsController(AppDbContext db, ICampaignContext campaign) 
         if (id != goal.Id) return BadRequest();
         goal.CampaignId = await campaign.GetActiveIdAsync();
         var previous = await db.FactionGoals.AsNoTracking().FirstOrDefaultAsync(g => g.Id == id);
+        if (previous is null) return NotFound();
+        goal.CanonId = previous.CanonId;   // the link to the goal's file is the server's, never the request's
         if (GoalAdvanceRules.Issue(goal) is { } bad) return BadRequest(bad);
         var conflict = await ChampionRules.ConflictAsync(db, goal, previous);
         if (conflict is not null) return Conflict(conflict);

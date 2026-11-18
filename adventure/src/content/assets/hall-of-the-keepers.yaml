@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.hall-of-the-keepers
+slug: hall-of-the-keepers
+name: Hall of the Keepers
+type: Infrastructure
+role: Operational
+tier: 4
+keystone: false
+summary: The administrative heart of the Colony, where the Order governs, adjudicates disputes, and oversees the countless duties required to preserve two centuries of continuity.
+status: draft
+start:
+  controller: faction.order-of-theia
+  status: Stable

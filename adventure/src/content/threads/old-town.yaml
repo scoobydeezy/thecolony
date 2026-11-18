@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/thread.schema.json
+id: thread.old-town
+slug: old-town
+name: Old Town
+summary: “Sunny” becomes the key to separating one forgotten life from Old Town’s tangled remains.
+status: draft
+provenance:
+  - doc: Campaign Outline
+    heading: Campaign-Wide Promises and Narrative Threads > Old Town, Sunny, and Sundara
+  - doc: Campaign Outline
+    heading: Manor Route 1 — The Shattered > The Broken Bell → Old Town > Tomlin Cobb, Sundara, and the Quiet That Followed
+  - doc: Campaign Outline
+    heading: Session 10 — Shattered > Sunny — Old Town / Shattered

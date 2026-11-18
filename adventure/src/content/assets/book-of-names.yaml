@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.book-of-names
+slug: book-of-names
+name: Book of Names
+type: Artifact
+role: Mandate
+tier: 5
+keystone: true
+summary: The oldest and most closely guarded artifact in the Colony. It records those who have borne the burden, preserving the continuity of the ritual across generations.
+status: draft
+start:
+  controller: faction.order-of-theia
+  location: location.ritual-chamber
+  status: Stable

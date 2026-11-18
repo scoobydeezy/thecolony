@@ -1,0 +1,30 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.reveal
+slug: reveal
+name: Reveal
+faction: faction.cult-of-the-unknown
+type: Achieve
+priority: Major
+visibility: Known
+outcome: Automatic
+earliestAct: 1
+champion: npc.sarith-dawnsong
+target:
+  type: Asset
+  id: asset.unclaimed-object
+  owner: faction.cult-of-the-unknown
+effects:
+  accomplished:
+    - targetType: asset
+      targetId: asset.unclaimed-object
+      property: locationChange
+      delta: 0
+      value: location.pilgrim-s-rest
+    - targetType: location
+      targetId: location.pilgrim-s-rest
+      property: state
+      delta: 0
+      value: ActiveIncursion
+status: draft
+start:
+  status: Plotting

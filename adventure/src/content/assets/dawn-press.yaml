@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.dawn-press
+slug: dawn-press
+name: Dawn Press
+type: Infrastructure
+role: Operational
+tier: 3
+keystone: false
+summary: Printing presses and organizing offices producing the Dawn Assembly’s notices, petitions, campaign materials, and reform publications.
+status: draft
+start:
+  controller: faction.dawn-assembly
+  status: Stable

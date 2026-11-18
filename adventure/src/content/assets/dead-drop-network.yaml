@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.dead-drop-network
+slug: dead-drop-network
+name: Dead Drop Network
+type: Intelligence
+role: Covert
+tier: 3
+keystone: false
+summary: A distributed network of concealed message caches hidden throughout the Colony. Loose stones, hollow beams, forgotten wells, and other unremarkable places serve as silent exchanges for information, allowing the Shattered to communicate without relying on any single courier or meeting place.
+status: draft
+start:
+  controller: faction.shattered
+  status: Stable

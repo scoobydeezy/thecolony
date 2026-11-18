@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../../../schemas/thread.schema.json
+id: thread.the-missing-father
+slug: the-missing-father
+name: The Missing Father
+summary: Vara's mapmaking inheritance and EGRESS records may reveal that the previous Keeper was her forgotten father.
+status: draft
+provenance:
+  - doc: Campaign Outline
+    heading: Campaign-Wide Promises and Narrative Threads > Marek Cairn — The Missing Father
+  - doc: Character Briefs
+    heading: Major Narrative Characters > The Keeper’s Father - Marek Cairn

@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.requisition-the-specimen
+slug: requisition-the-specimen
+name: Requisition the Specimen
+faction: faction.egress-institute
+type: Achieve
+priority: Critical
+visibility: Open
+outcome: Automatic
+earliestAct: 2
+champion: npc.elias-thorn
+target:
+  type: Asset
+  id: asset.unclaimed-object
+  owner: faction.egress-institute
+effects:
+  accomplished:
+    - targetType: asset
+      targetId: asset.unclaimed-object
+      property: locationChange
+      delta: 0
+      value: location.occlusion-containment
+status: draft
+start:
+  status: Plotting

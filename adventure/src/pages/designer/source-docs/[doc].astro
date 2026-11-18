@@ -1,0 +1,69 @@
+---
+// The original source documents, rendered read-only in the designer build with
+// a banner under every heading the migration map lists. GM build: no pages.
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { getCollection, render } from 'astro:content';
+import { isDesigner } from '../../../lib/target.mjs';
+import { listSourceDocs, headingsOf, resolveHeadingPath, loadMigrationMap } from '../../../lib/source-docs.mjs';
+
+export async function getStaticPaths() {
+  if (!isDesigner) return [];
+  const entries = await getCollection('sourceDocs');
+  return entries.map((entry) => ({ params: { doc: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const doc = listSourceDocs().find((d) => d.id === entry.id);
+const headings = headingsOf(doc.file);
+const map = loadMigrationMap();
+const banners = [];
+for (const [concept, c] of Object.entries(map.concepts ?? {})) {
+  for (const p of c.provenance ?? []) {
+    if (p.doc !== doc.name) continue;
+    const h = resolveHeadingPath(headings, p.heading);
+    if (h) banners.push({ anchor: h.anchor, concept, status: c.status, role: p.role ?? 'states', reconciled: !!p.reconciled });
+  }
+}
+const { Content } = await render(entry);
+---
+
+<StarlightPage frontmatter={{ title: doc.name, description: 'Original source document (read-only design history).' }}>
+  <aside class="rp-block rp-design" data-private="designer">
+    <p class="rp-label">Source document</p>
+    <p>
+      Read-only. Sections listed below have moved, or are moving, into the book. Never edit a superseded section; edit its
+      canonical entry instead.
+    </p>
+    {banners.length > 0 && (
+      <ul>
+        {banners.map((b) => (
+          <li>
+            <a href={`#${b.anchor}`}>{b.anchor}</a> → <a href={`/docs/designer/migration/#${b.concept}`}>{b.concept}</a> ({b.status}, {b.role})
+          </li>
+        ))}
+      </ul>
+    )}
+  </aside>
+  <div data-private="designer" data-banners={JSON.stringify(banners)} id="rp-source-doc">
+    <Content />
+  </div>
+</StarlightPage>
+
+<script>
+  // Insert a "Superseded by" banner directly under each listed heading.
+  const root = document.getElementById('rp-source-doc');
+  const banners = JSON.parse(root?.dataset.banners ?? '[]');
+  for (const b of banners) {
+    const heading = document.getElementById(b.anchor);
+    const anchorTarget = heading?.closest('.sl-heading-wrapper') ?? heading;
+    if (!anchorTarget) continue;
+    const el = document.createElement('aside');
+    el.className = 'rp-block rp-design';
+    el.innerHTML = `<p class="rp-label">${b.status === 'migrated' ? 'Superseded by' : 'Migrating to'}</p>`;
+    const link = document.createElement('a');
+    link.href = `/docs/designer/migration/#${b.concept}`;
+    link.textContent = b.concept;
+    el.querySelector('p').append(' ', link, ` · ${b.role}${b.reconciled ? ' · reconciled' : ' · pending'}`);
+    anchorTarget.after(el);
+  }
+</script>

@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.duskwood
+slug: duskwood
+name: The Duskwood
+summary: A large forest on Andoran's northern border between the Aspodell Mountains and the River Foam. Situated just north of the Candlestone Caverns, it's filled with unknown dangers.
+parent: location.darkmoon-plains
+status: draft
+start:
+  state: Stable

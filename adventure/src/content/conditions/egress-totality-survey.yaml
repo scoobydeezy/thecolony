@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.egress-totality-survey
+slug: egress-totality-survey
+name: EGRESS Totality Survey
+variesBy:
+  subject:
+    kind: goalStage
+    id: goal.gather-data
+  rows:
+    - state: Planning
+      text: ""
+      stress: 0
+    - state: Progressing
+      text: EGRESS deploys field instruments to measure Totality pressure and Source activity at accessible sites.
+      stress: 0
+    - state: Ready
+      text: ""
+      stress: 0
+    - state: Accomplished
+      text: Investigators can consult an EGRESS survey of measured Source activity, pressure gradients, and accessible routes. The survey does not reveal unverified personal identities.
+      stress: 0
+    - state: Failed
+      text: ""
+      stress: 0
+    - state: Retired
+      text: ""
+      stress: 0
+status: draft

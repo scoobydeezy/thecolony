@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.offering-chest
+slug: offering-chest
+name: The Offering Chest
+type: Resource
+role: Symbolic
+tier: 2
+keystone: false
+summary: A collection of deeply personal possessions voluntarily surrendered by those seeking communion with the Unknown. The Cult believes that relinquishing something precious creates space within the soul for revelation, though whether these offerings possess any greater significance remains a matter of faith.
+status: draft
+start:
+  controller: faction.cult-of-the-unknown
+  location: location.pilgrim-s-rest
+  status: Stable

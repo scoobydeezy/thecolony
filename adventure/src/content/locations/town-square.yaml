@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.town-square
+slug: town-square
+name: Town Square
+parent: location.keeper-district
+status: draft
+start:
+  state: Stable

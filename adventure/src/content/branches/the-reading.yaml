@@ -1,0 +1,12 @@
+# yaml-language-server: $schema=../../../schemas/branch.schema.json
+id: branch.the-reading
+slug: the-reading
+name: The Reading
+origin: encounter.the-reading
+convergence: event.totality
+paths:
+  - id: path.the-reading-succeeds
+    name: The Reading Succeeds
+  - id: path.the-reading-is-stopped
+    name: The Reading is Stopped
+status: draft

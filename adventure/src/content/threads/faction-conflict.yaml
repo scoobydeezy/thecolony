@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../../../schemas/thread.schema.json
+id: thread.faction-conflict
+slug: faction-conflict
+name: Faction Conflict
+summary: While Darkwing investigates, every faction advances its own partial answer until those answers collide.
+status: draft
+provenance:
+  - doc: Campaign Outline
+    heading: The Manor Investigation Model > The Confluence Begins When Investigation Becomes Implementation
+  - doc: Campaign Outline
+    heading: Campaign Causal Spines > Act III — Shared

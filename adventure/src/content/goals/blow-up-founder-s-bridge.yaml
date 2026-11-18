@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.blow-up-founder-s-bridge
+slug: blow-up-founder-s-bridge
+name: Blow Up Founder's Bridge
+faction: faction.shattered
+type: Achieve
+priority: Major
+visibility: Known
+outcome: Automatic
+earliestAct: 3
+status: draft
+start:
+  status: Plotting

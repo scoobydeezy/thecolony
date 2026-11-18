@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.clearing-house-occupation
+slug: clearing-house-occupation
+name: Clearing House Occupation
+variesBy:
+  subject:
+    kind: goalStage
+    id: goal.clear-the-clearing-house
+  rows:
+    - state: Planning
+      text: ""
+      stress: 0
+    - state: Progressing
+      text: Cult attendants occupy the Clearing House entrances and suspend the settlement of new claims.
+      stress: 0
+    - state: Ready
+      text: ""
+      stress: 0
+    - state: Accomplished
+      text: ""
+      stress: 0
+    - state: Failed
+      text: ""
+      stress: 0
+    - state: Retired
+      text: ""
+      stress: 0
+status: draft

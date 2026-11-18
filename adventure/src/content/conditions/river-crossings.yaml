@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.river-crossings
+slug: river-crossings
+name: River Crossings
+variesBy:
+  subject:
+    kind: goalStage
+    id: goal.secure-the-crossings
+  rows:
+    - state: Planning
+      text: ""
+      stress: 0
+    - state: Progressing
+      text: Aspis establishes guarded supply and transit routes through the remaining usable river crossings.
+      stress: 0
+    - state: Ready
+      text: ""
+      stress: 0
+    - state: Accomplished
+      text: Major supply convoys use designated river crossings only with Aspis authorization, though independent bypasses remain possible.
+      stress: 0
+    - state: Failed
+      text: ""
+      stress: 0
+    - state: Retired
+      text: ""
+      stress: 0
+status: draft

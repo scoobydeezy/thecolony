@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.secure-the-crossings
+slug: secure-the-crossings
+name: Secure the Crossings
+faction: faction.aspis
+type: Achieve
+priority: Critical
+visibility: Known
+outcome: Automatic
+earliestAct: 3
+status: draft
+start:
+  status: Plotting

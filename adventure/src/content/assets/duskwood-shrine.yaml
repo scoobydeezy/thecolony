@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.duskwood-shrine
+slug: duskwood-shrine
+name: Duskwood Shrine
+type: Infrastructure
+role: Symbolic
+tier: 4
+keystone: false
+summary: A secluded shrine hidden deep within the Duskwood, where the boundary between the familiar and the unknown is believed to grow thin. Adherents journey here to meditate, leave offerings, and seek moments of quiet communion with the mysteries beyond the Colony.
+status: draft
+start:
+  controller: faction.cult-of-the-unknown
+  location: location.duskwood
+  status: Stable

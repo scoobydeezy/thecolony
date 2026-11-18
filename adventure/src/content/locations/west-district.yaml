@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.west-district
+slug: west-district
+name: West District
+type: Zone
+summary: Expansion occupied mostly by construction efforts and support for the logging industry.
+parent: location.colony
+markerColor: "#dd4ba7"
+status: draft
+start:
+  state: Stable

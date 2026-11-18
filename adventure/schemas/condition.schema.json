@@ -1,0 +1,373 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^condition\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string"
+    },
+    "status": {
+      "default": "draft",
+      "type": "string",
+      "enum": [
+        "stub",
+        "draft",
+        "canonical"
+      ]
+    },
+    "previousSlugs": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      }
+    },
+    "aliases": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z]+\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+      }
+    },
+    "provenance": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "doc": {
+            "type": "string"
+          },
+          "heading": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "doc",
+          "heading"
+        ]
+      }
+    },
+    "design": {
+      "type": "string"
+    },
+    "rule": {
+      "type": "string"
+    },
+    "otherwise": {
+      "type": "string"
+    },
+    "stress": {
+      "default": 0,
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+    },
+    "requires": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "assetController"
+              },
+              "assetId": {
+                "type": "string",
+                "pattern": "^asset\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+              },
+              "factionId": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^faction\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+                  },
+                  {
+                    "type": "string",
+                    "const": ""
+                  }
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "assetId",
+              "factionId"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "assetStatus"
+              },
+              "assetId": {
+                "type": "string",
+                "pattern": "^asset\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+              },
+              "statuses": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "kind",
+              "assetId",
+              "statuses"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "characterState"
+              },
+              "characterId": {
+                "type": "string",
+                "pattern": "^(npc|pc)\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+              },
+              "states": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "kind",
+              "characterId",
+              "states"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "characterFaction"
+              },
+              "characterId": {
+                "type": "string",
+                "pattern": "^(npc|pc)\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+              },
+              "factionId": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^faction\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+                  },
+                  {
+                    "type": "string",
+                    "const": ""
+                  }
+                ]
+              }
+            },
+            "required": [
+              "kind",
+              "characterId",
+              "factionId"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "leaderCapable"
+              },
+              "factionId": {
+                "type": "string",
+                "pattern": "^faction\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+              },
+              "capable": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "kind",
+              "factionId",
+              "capable"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "locationState"
+              },
+              "locationId": {
+                "type": "string",
+                "pattern": "^location\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+              },
+              "states": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "kind",
+              "locationId",
+              "states"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "condition"
+              },
+              "conditionId": {
+                "type": "string",
+                "pattern": "^condition\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+              },
+              "inForce": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "kind",
+              "conditionId",
+              "inForce"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "kind": {
+                "type": "string",
+                "const": "goalStage"
+              },
+              "goalId": {
+                "type": "string",
+                "pattern": "^goal\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+              },
+              "stages": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "kind",
+              "goalId",
+              "stages"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "variesBy": {
+      "type": "object",
+      "properties": {
+        "subject": {
+          "type": "object",
+          "properties": {
+            "kind": {
+              "type": "string",
+              "enum": [
+                "assetStatus",
+                "assetController",
+                "characterState",
+                "characterFaction",
+                "locationState",
+                "goalStage"
+              ]
+            },
+            "id": {
+              "type": "string",
+              "pattern": "^[a-z]+\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+            }
+          },
+          "required": [
+            "kind",
+            "id"
+          ],
+          "additionalProperties": false
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "state": {
+                "type": "string"
+              },
+              "text": {
+                "type": "string"
+              },
+              "stress": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "state",
+              "text",
+              "stress"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "required": [
+        "subject",
+        "rows"
+      ],
+      "additionalProperties": false
+    },
+    "start": {
+      "type": "object",
+      "properties": {
+        "established": {
+          "default": true,
+          "type": "boolean"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "id",
+    "slug",
+    "name"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,241 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^faction\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string"
+    },
+    "status": {
+      "default": "draft",
+      "type": "string",
+      "enum": [
+        "stub",
+        "draft",
+        "canonical"
+      ]
+    },
+    "previousSlugs": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      }
+    },
+    "aliases": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z]+\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+      }
+    },
+    "provenance": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "doc": {
+            "type": "string"
+          },
+          "heading": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "doc",
+          "heading"
+        ]
+      }
+    },
+    "design": {
+      "type": "string"
+    },
+    "type": {
+      "default": "Faction",
+      "type": "string",
+      "enum": [
+        "Faction",
+        "SocialClass"
+      ]
+    },
+    "motto": {
+      "type": "string"
+    },
+    "represents": {
+      "type": "string"
+    },
+    "publicFace": {
+      "type": "string"
+    },
+    "selfImage": {
+      "type": "string"
+    },
+    "coreTenet": {
+      "type": "string"
+    },
+    "focus": {
+      "type": "string"
+    },
+    "certainOf": {
+      "type": "string"
+    },
+    "rightAbout": {
+      "type": "string"
+    },
+    "afraidOf": {
+      "type": "string"
+    },
+    "wrongAbout": {
+      "type": "string"
+    },
+    "response": {
+      "type": "string"
+    },
+    "origin": {
+      "type": "string"
+    },
+    "foundedAs": {
+      "type": "string"
+    },
+    "became": {
+      "type": "string"
+    },
+    "history": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    },
+    "heraldry": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "glyph": {
+          "type": "string"
+        },
+        "icon": {
+          "type": "string"
+        },
+        "primaryColor": {
+          "type": "string"
+        },
+        "secondaryColor": {
+          "type": "string"
+        },
+        "bannerShape": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "start": {
+      "type": "object",
+      "properties": {
+        "active": {
+          "default": true,
+          "type": "boolean"
+        },
+        "leader": {
+          "type": "string",
+          "pattern": "^(npc|pc)\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+        },
+        "momentum": {
+          "default": 0,
+          "type": "integer",
+          "minimum": -2,
+          "maximum": 2
+        },
+        "size": {
+          "default": 0,
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "values": {
+          "type": "object",
+          "properties": {
+            "truth": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "stability": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            },
+            "agency": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1
+            }
+          },
+          "required": [
+            "truth",
+            "stability",
+            "agency"
+          ],
+          "additionalProperties": false
+        },
+        "beliefs": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "a": {
+              "type": "string",
+              "enum": [
+                "Positive",
+                "Neutral",
+                "Negative"
+              ]
+            },
+            "b": {
+              "type": "string",
+              "enum": [
+                "Positive",
+                "Neutral",
+                "Negative"
+              ]
+            },
+            "c": {
+              "type": "string",
+              "enum": [
+                "Positive",
+                "Neutral",
+                "Negative"
+              ]
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "values"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "id",
+    "slug",
+    "name"
+  ],
+  "additionalProperties": false
+}

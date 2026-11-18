@@ -6,6 +6,9 @@
   <div class="ev-header">
     <div class="ev-header-main">
       <span class="ev-title">{{ effectiveEvent().title }}</span>
+      @if (effectiveEvent().kind === 'Encounter') {
+        <span class="ev-kind" title="Encounter: a complex scenario (maps, stat blocks, clocks)">Encounter</span>
+      }
       <span class="ev-status ev-status--{{ effectiveEvent().status | lowercase }}">
         {{ effectiveEvent().status }}
       </span>

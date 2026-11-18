@@ -15,7 +15,7 @@ namespace ColonyTracker.Api.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.9");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.14");
 
             modelBuilder.Entity("ColonyTracker.Api.Models.AppSettings", b =>
                 {
@@ -42,41 +42,18 @@ namespace ColonyTracker.Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ControllingFactionId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Description")
+                    b.Property<string>("CanonId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("IntroducedAtEventId")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("Keystone")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("LocationId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Role")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("StatusActorFactionId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Tier")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("CanonId");
+
+                    b.HasIndex("CampaignId", "CanonId")
+                        .IsUnique();
 
                     b.ToTable("Assets");
                 });
@@ -118,226 +95,37 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("Age")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<double>("AgencyValue")
-                        .HasColumnType("REAL");
-
-                    b.Property<string>("Aliases")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Ancestry")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Background")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("BeliefA")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("BeliefB")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("BeliefC")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("CampaignId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("CharacterType")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Class")
+                    b.Property<string>("CanonId")
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("Conviction")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("DoubtDirection")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("FactionId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Gender")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Heritage")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Impressionable")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Influence")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Instability")
-                        .HasColumnType("INTEGER");
 
                     b.Property<string>("IntroducedAtEventId")
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("Level")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("LocationId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("NarrativeTier")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Occupation")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PortraitPath")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Pressure")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Pronouns")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ReaffirmedFactionId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SocialClassId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<double>("StabilityValue")
-                        .HasColumnType("REAL");
-
-                    b.Property<int>("State")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Summary")
-                        .HasColumnType("TEXT");
-
-                    b.Property<double>("TruthValue")
-                        .HasColumnType("REAL");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("CanonId");
+
+                    b.HasIndex("CampaignId", "CanonId")
+                        .IsUnique();
 
                     b.ToTable("Characters");
                 });
 
-            modelBuilder.Entity("ColonyTracker.Api.Models.CharacterDetail", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Body")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CharacterId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Heading")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Key")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Visibility")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CharacterDetails");
-                });
-
-            modelBuilder.Entity("ColonyTracker.Api.Models.CharacterNarrativeProfile", b =>
+            modelBuilder.Entity("ColonyTracker.Api.Models.CharacterSectionReveal", b =>
                 {
                     b.Property<string>("CharacterId")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("BlindSpot")
+                    b.Property<string>("SectionKey")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Fears")
-                        .HasColumnType("TEXT");
+                    b.HasKey("CharacterId", "SectionKey");
 
-                    b.Property<string>("Motivation")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NarrativeRole")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Overview")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PerformanceInspiration")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Personality")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PortrayalNotes")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PressureResponse")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PrimaryProtection")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SignatureObject")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SignatureQuote")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("CharacterId");
-
-                    b.ToTable("CharacterNarrativeProfiles");
-                });
-
-            modelBuilder.Entity("ColonyTracker.Api.Models.CharacterRelationship", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("RelationshipType")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("SourceCharacterId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("State")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Summary")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TargetCharacterId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Visibility")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CharacterRelationships");
+                    b.ToTable("CharacterSectionReveals");
                 });
 
             modelBuilder.Entity("ColonyTracker.Api.Models.ColonyMap", b =>
@@ -593,211 +381,36 @@ namespace ColonyTracker.Api.Migrations
                     b.ToTable("EventEffects");
                 });
 
-            modelBuilder.Entity("ColonyTracker.Api.Models.EventOverrideConnection", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("EventOverrideId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TargetNarrativeEventId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ThreadId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Visibility")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EventOverrideId");
-
-                    b.ToTable("EventOverrideConnections");
-                });
-
-            modelBuilder.Entity("ColonyTracker.Api.Models.EventOverrideEntityLink", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("EntityId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("EntityType")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("EventOverrideId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("IsPrimary")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Role")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Visibility")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EventOverrideId");
-
-                    b.ToTable("EventOverrideEntityLinks");
-                });
-
-            modelBuilder.Entity("ColonyTracker.Api.Models.EventOverridePath", b =>
-                {
-                    b.Property<string>("EventOverrideId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PathId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("EventOverrideId", "PathId");
-
-                    b.HasIndex("PathId");
-
-                    b.ToTable("EventOverridePaths");
-                });
-
             modelBuilder.Entity("ColonyTracker.Api.Models.Faction", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("Active")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("AfraidOf")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<double>("AgencyValue")
-                        .HasColumnType("REAL");
-
-                    b.Property<string>("BannerShape")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Became")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("BeliefA")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("BeliefB")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("BeliefC")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("CampaignId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("CertainOf")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CoreTenet")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("FactionSize")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Focus")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("FoundedAs")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("GlyphPath")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("History")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("IconPath")
+                    b.Property<string>("CanonId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("IntroducedAtEventId")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("LeaderId")
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("Momentum")
                         .HasColumnType("INTEGER");
-
-                    b.Property<int>("MomentumTier")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Motto")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Origin")
-                        .HasColumnType("TEXT");
 
                     b.Property<int>("PowerModifier")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("PrimaryColor")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PublicFace")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Represents")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Response")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("RightAbout")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SecondaryColor")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SelfImage")
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("SortOrder")
                         .HasColumnType("INTEGER");
 
-                    b.Property<double>("StabilityValue")
-                        .HasColumnType("REAL");
-
-                    b.Property<string>("Summary")
-                        .HasColumnType("TEXT");
-
-                    b.Property<double>("TruthValue")
-                        .HasColumnType("REAL");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("WrongAbout")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("CanonId");
+
+                    b.HasIndex("CampaignId", "CanonId")
+                        .IsUnique();
 
                     b.ToTable("Factions");
                 });
@@ -807,72 +420,22 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("AccomplishedEffectsJson")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("CampaignId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ChampionId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("ConditionType")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("EarliestAct")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("FactionId")
-                        .IsRequired()
+                    b.Property<string>("CanonId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("IntroducedAtEventId")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("OutcomeMode")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Priority")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("ProgressingEffectsJson")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("TargetEntityId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("TargetEntityType")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("TargetOperator")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TargetOwnerFactionId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TargetProperty")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TargetState")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int?>("TargetThreshold")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Visibility")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("CanonId");
+
+                    b.HasIndex("CampaignId", "CanonId")
+                        .IsUnique();
 
                     b.ToTable("FactionGoals");
                 });
@@ -886,32 +449,18 @@ namespace ColonyTracker.Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("CanonId")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("IntroducedAtEventId")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("LinkedAssetId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("LocationType")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("MarkerColor")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ParentLocationId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("State")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("CanonId");
+
+                    b.HasIndex("CampaignId", "CanonId")
+                        .IsUnique();
 
                     b.ToTable("Locations");
                 });
@@ -998,10 +547,7 @@ namespace ColonyTracker.Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NarrativeFunction")
+                    b.Property<string>("CanonId")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("SortOrder")
@@ -1010,80 +556,14 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Summary")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Visibility")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("CanonId");
+
+                    b.HasIndex("CampaignId", "CanonId")
+                        .IsUnique();
 
                     b.ToTable("NarrativeEvents");
-                });
-
-            modelBuilder.Entity("ColonyTracker.Api.Models.NarrativeEventConnection", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CampaignId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("SourceNarrativeEventId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("TargetNarrativeEventId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("ThreadId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Visibility")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("NarrativeEventConnections");
-                });
-
-            modelBuilder.Entity("ColonyTracker.Api.Models.NarrativeEventOverride", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NarrativeEventId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("OverridesAssets")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("OverridesConnections")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("OverridesDescription")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<bool>("OverridesSummary")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Summary")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("NarrativeEventOverrides");
                 });
 
             modelBuilder.Entity("ColonyTracker.Api.Models.NarrativeEventPlacement", b =>
@@ -1129,44 +609,6 @@ namespace ColonyTracker.Api.Migrations
                     b.ToTable("NarrativeEventRealizations");
                 });
 
-            modelBuilder.Entity("ColonyTracker.Api.Models.NarrativeEventVariantParticipation", b =>
-                {
-                    b.Property<string>("NarrativeEventId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PathSetId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("NarrativeEventId", "PathSetId");
-
-                    b.HasIndex("PathSetId");
-
-                    b.ToTable("NarrativeEventVariantParticipations");
-                });
-
-            modelBuilder.Entity("ColonyTracker.Api.Models.NarrativePath", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("PathSetId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PathSetId");
-
-                    b.ToTable("NarrativePaths");
-                });
-
             modelBuilder.Entity("ColonyTracker.Api.Models.NarrativeThread", b =>
                 {
                     b.Property<string>("Id")
@@ -1176,35 +618,20 @@ namespace ColonyTracker.Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Color")
+                    b.Property<string>("CanonId")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("State")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Summary")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
+                    b.HasIndex("CanonId");
+
+                    b.HasIndex("CampaignId", "CanonId")
+                        .IsUnique();
+
                     b.ToTable("NarrativeThreads");
-                });
-
-            modelBuilder.Entity("ColonyTracker.Api.Models.PathEventScope", b =>
-                {
-                    b.Property<string>("PathId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NarrativeEventId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("PathId", "NarrativeEventId");
-
-                    b.ToTable("PathEventScopes");
                 });
 
             modelBuilder.Entity("ColonyTracker.Api.Models.PathSet", b =>
@@ -1216,32 +643,17 @@ namespace ColonyTracker.Api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ConvergenceEventId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("OriginEventId")
+                    b.Property<string>("CanonId")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CanonId");
+
+                    b.HasIndex("CampaignId", "CanonId")
+                        .IsUnique();
+
                     b.ToTable("PathSets");
-                });
-
-            modelBuilder.Entity("ColonyTracker.Api.Models.PathSetContext", b =>
-                {
-                    b.Property<string>("PathSetId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("RequiredPathId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("PathSetId", "RequiredPathId");
-
-                    b.ToTable("PathSetContexts");
                 });
 
             modelBuilder.Entity("ColonyTracker.Api.Models.RelationshipOverride", b =>
@@ -1468,38 +880,22 @@ namespace ColonyTracker.Api.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("TEXT");
 
-                    b.Property<bool>("ActiveAtStart")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("CampaignId")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("RequirementsJson")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Rule")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("RuleOtherwise")
+                    b.Property<string>("CanonId")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("SortOrder")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("StressContribution")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("VariesByJson")
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("CanonId");
+
+                    b.HasIndex("CampaignId", "CanonId")
+                        .IsUnique();
 
                     b.ToTable("WorldConditions");
                 });
@@ -1546,80 +942,11 @@ namespace ColonyTracker.Api.Migrations
                     b.Navigation("Event");
                 });
 
-            modelBuilder.Entity("ColonyTracker.Api.Models.EventOverrideConnection", b =>
-                {
-                    b.HasOne("ColonyTracker.Api.Models.NarrativeEventOverride", null)
-                        .WithMany()
-                        .HasForeignKey("EventOverrideId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ColonyTracker.Api.Models.EventOverrideEntityLink", b =>
-                {
-                    b.HasOne("ColonyTracker.Api.Models.NarrativeEventOverride", null)
-                        .WithMany()
-                        .HasForeignKey("EventOverrideId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ColonyTracker.Api.Models.EventOverridePath", b =>
-                {
-                    b.HasOne("ColonyTracker.Api.Models.NarrativeEventOverride", null)
-                        .WithMany()
-                        .HasForeignKey("EventOverrideId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ColonyTracker.Api.Models.NarrativePath", null)
-                        .WithMany()
-                        .HasForeignKey("PathId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("ColonyTracker.Api.Models.MapPlacement", b =>
                 {
                     b.HasOne("ColonyTracker.Api.Models.ColonyMap", null)
                         .WithMany()
                         .HasForeignKey("MapId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ColonyTracker.Api.Models.NarrativeEventVariantParticipation", b =>
-                {
-                    b.HasOne("ColonyTracker.Api.Models.PathSet", null)
-                        .WithMany()
-                        .HasForeignKey("PathSetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ColonyTracker.Api.Models.NarrativePath", b =>
-                {
-                    b.HasOne("ColonyTracker.Api.Models.PathSet", null)
-                        .WithMany()
-                        .HasForeignKey("PathSetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ColonyTracker.Api.Models.PathEventScope", b =>
-                {
-                    b.HasOne("ColonyTracker.Api.Models.NarrativePath", null)
-                        .WithMany()
-                        .HasForeignKey("PathId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("ColonyTracker.Api.Models.PathSetContext", b =>
-                {
-                    b.HasOne("ColonyTracker.Api.Models.PathSet", null)
-                        .WithMany()
-                        .HasForeignKey("PathSetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

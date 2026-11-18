@@ -1,6 +1,8 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace ColonyTracker.Api.Models;
 
-public class Character
+public class Character : ICanonEntity
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string Name { get; set; } = string.Empty;
@@ -64,4 +66,21 @@ public class Character
     // Settling, the Defection Check, or play). Reaffirmed: a lasting eligibility marker for the faction it was earned in.
     public CharacterInstability Instability { get; set; } = CharacterInstability.Stable;
     public string? ReaffirmedFactionId { get; set; }
+
+    // ADVENTURE-BOOK-PLAN.md §9: the character's canonical file (e.g. npc.kelda-varruk under
+    // adventure/src/content/npcs/). Every property listed in CanonCharacterMapping.CanonProperties
+    // is read from and saved to that file; this table keeps only Id, CampaignId, CanonId and
+    // IntroducedAtEventId. Several campaigns may link to the same file.
+    public string? CanonId { get; set; }
+
+    // Version of the file this character was loaded from. The client sends it back on save; a save
+    // is refused if the file changed in between (e.g. edited in VS Code).
+    [NotMapped] public string? CanonVersion { get; set; }
+
+    // True when CanonId points at a file that is missing or unreadable; such a character can't be saved.
+    [NotMapped] public bool CanonMissing { get; set; }
+
+    // ADVENTURE-BOOK-PLAN.md §15: the file's `relationships`, as JSON with row ids. Served as
+    // CharacterRelationship records (CharacterRelations).
+    [System.Text.Json.Serialization.JsonIgnore] public string? RelationshipsJson { get; set; }
 }

@@ -122,6 +122,42 @@
       </button>
     </header>
 
+    @if (missingCanon().length > 0) {
+      <div class="app-canon-missing" role="status">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span class="app-error-text">
+          <strong>{{ missingCanon().length }} {{ missingCanon().length === 1 ? 'record has' : 'records have' }} lost {{ missingCanon().length === 1 ? 'its' : 'their' }} canon file</strong>
+          (deleted or broken outside the app):
+          @for (m of missingCanon(); track m.id; let last = $last) {
+            <span class="canon-missing-item">{{ m.kind }} <code>{{ m.id }}</code></span>{{ last ? '.' : ', ' }}
+          }
+          They show default values and can't be saved until the file is restored (for example with git); to remove one, delete it in the app.
+        </span>
+      </div>
+    }
+
+    @if (staleRefs().length > 0) {
+      <div class="app-canon-missing" role="status">
+        <i class="fa-solid fa-link-slash"></i>
+        <span class="app-error-text">
+          <strong>{{ staleRefs().length }} stale {{ staleRefs().length === 1 ? 'reference' : 'references' }}</strong>
+          to {{ staleByTarget().length === 1 ? 'an entry' : staleByTarget().length + ' entries' }} that no longer exist:
+          @for (g of staleByTarget(); track g.to; let last = $last) {
+            <code>{{ g.to }}</code> ({{ g.count }}){{ last ? '.' : ', ' }}
+          }
+          Edit the entries that name them, or restore what they name.
+          <details class="canon-stale-details">
+            <summary>Show all {{ staleRefs().length }}</summary>
+            <ul>
+              @for (r of staleRefs(); track r.from + r.path) {
+                <li><code>{{ r.from }}</code> {{ r.path }} → <code>{{ r.to }}</code></li>
+              }
+            </ul>
+          </details>
+        </span>
+      </div>
+    }
+
     @if (store.error(); as message) {
       <div class="app-error" role="alert">
         <i class="fa-solid fa-circle-exclamation"></i>

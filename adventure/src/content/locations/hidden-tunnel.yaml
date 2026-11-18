@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.hidden-tunnel
+slug: hidden-tunnel
+name: Hidden Tunnel
+summary: A hidden tunnel leading to the Ritual Chamber.
+parent: location.crescent-island
+status: draft
+start:
+  state: Unstable

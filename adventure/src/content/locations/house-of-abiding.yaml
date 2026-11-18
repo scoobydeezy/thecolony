@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.house-of-abiding
+slug: house-of-abiding
+name: House of Abiding
+summary: The residence of the Keeper once Called.
+parent: location.abiding-way
+asset: asset.house-of-abiding
+status: stub
+start:
+  state: Stable
+provenance:
+  - doc: Campaign Outline
+    heading: Session 1 — The Calling

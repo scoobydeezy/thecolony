@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.pilgrim-quarter
+slug: pilgrim-quarter
+name: Pilgrim Quarter
+type: Zone
+summary: The southern portion of the Colony nearest the Duskwood.
+parent: location.colony
+markerColor: "#8e60fb"
+status: draft
+start:
+  state: Stable

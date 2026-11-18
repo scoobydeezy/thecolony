@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.protect-occlusion-containment
+slug: protect-occlusion-containment
+name: Protect Occlusion Containment
+faction: faction.egress-institute
+type: Maintain
+priority: Major
+visibility: Secret
+outcome: Automatic
+earliestAct: 1
+champion: npc.orlombuthalde-nix
+target:
+  type: Asset
+  id: asset.occlusion-containment
+  state: Stable
+status: draft
+start:
+  status: Progressing

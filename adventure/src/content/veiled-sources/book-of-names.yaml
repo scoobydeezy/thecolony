@@ -1,0 +1,19 @@
+# yaml-language-server: $schema=../../../schemas/source.schema.json
+id: source.book-of-names
+slug: book-of-names
+name: Book of Names
+summary: The Order's Keystone Source. Class and Source Level determine every generic Veiled value; nothing below is typed by hand.
+status: draft
+class: 5
+sourceLevel: 15
+keystone: true
+provenance:
+  - doc: The Burden — Final Veiled Encounter
+    heading: Book of Names — Source 15
+    note: the same block appears three times in The Burden
+  - doc: The Veiled
+    heading: Class > Class I–V
+design: >-
+  Pilot Source entity. Derived values reproduce The Burden's block exactly (Source DC 39, Ward AC 39, Ward HP 200,
+  Backlash 5d12 basic Will DC 39, threshold 6, radius 50 ft). The threshold is named
+  "Stability Threshold" (The Veiled); The Burden's "Reconstruction Threshold" is retired (user, 2026-11-17). Source Level 15 applies throughout the campaign (user, 2026-11-17).

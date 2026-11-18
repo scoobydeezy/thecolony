@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.public-access-to-the-book
+slug: public-access-to-the-book
+name: Public Access to the Book
+rule: Dawn makes the Book available for public inspection, without automatically identifying the people named.
+requires:
+  - kind: assetController
+    assetId: asset.book-of-names
+    factionId: faction.dawn-assembly
+status: draft

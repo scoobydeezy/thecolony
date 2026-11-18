@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.abiding-way
+slug: abiding-way
+name: Abiding Way
+type: Zone
+summary: District maintained by the Witnesses.
+parent: location.colony
+markerColor: "#175aab"
+status: draft
+start:
+  state: Stable

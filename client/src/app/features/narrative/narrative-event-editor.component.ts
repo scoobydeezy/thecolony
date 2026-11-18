@@ -11,7 +11,7 @@ import {
   NarrativeEventOverride, EventOverridePath, PathSet, NarrativePath,
   NarrativeEventVariantParticipation, NarrativeEntityLink, NarrativeEntityLinkType,
   EventOverrideEntityLink,
-  NARRATIVE_EVENT_STATUS_OPTIONS, NARRATIVE_VISIBILITY_OPTIONS,
+  NARRATIVE_EVENT_STATUS_OPTIONS, NARRATIVE_VISIBILITY_OPTIONS, NARRATIVE_KIND_OPTIONS, NarrativeKind,
 } from '../../core/models/types';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -81,6 +81,7 @@ export class NarrativeEventEditorComponent implements OnDestroy {
 
   readonly statusOptions     = NARRATIVE_EVENT_STATUS_OPTIONS;
   readonly visibilityOptions = NARRATIVE_VISIBILITY_OPTIONS;
+  readonly kindOptions       = NARRATIVE_KIND_OPTIONS;
 
   // ── Active tab ──────────────────────────────────────────────────────────
   activeTab = signal<EditorTab>('event');
@@ -111,6 +112,12 @@ export class NarrativeEventEditorComponent implements OnDestroy {
   readonly baseNarrativeFunction = signal('');
   readonly baseSummary           = signal('');
   readonly baseDescription       = signal('');
+  // Event or encounter (fixed once created) and, for an encounter, the event it belongs to.
+  readonly baseKind              = signal<NarrativeKind>('Event');
+  readonly baseParentEventId     = signal('');
+  readonly parentEventOptions    = computed(() =>
+    this.store.narrativeEvents().filter(e => (e.kind ?? 'Event') === 'Event' && e.id !== this.event().id)
+  );
 
   // ── Override draft (for overridable fields in variant context) ───────────
   readonly overrideDraft = signal<OverrideDraft>({
@@ -214,6 +221,8 @@ export class NarrativeEventEditorComponent implements OnDestroy {
       this.baseNarrativeFunction.set(ev.narrativeFunction ?? '');
       this.baseSummary.set(ev.summary ?? '');
       this.baseDescription.set(ev.description ?? '');
+      this.baseKind.set(ev.kind ?? 'Event');
+      this.baseParentEventId.set(ev.parentEventId ?? '');
 
       // Override draft
       this.overrideDraft.set({
@@ -540,6 +549,8 @@ export class NarrativeEventEditorComponent implements OnDestroy {
       status:            this.baseStatus() as NarrativeEventStatus,
       visibility:        this.baseVisibility() as NarrativeVisibility,
       narrativeFunction: this.baseNarrativeFunction().trim() || undefined,
+      kind:              ev.id ? (ev.kind ?? 'Event') : this.baseKind(),
+      parentEventId:     this.baseKind() === 'Encounter' ? (this.baseParentEventId() || null) : null,
       // Only write base summary/description when there is no variant context
       summary:     !this.hasVariantContext() ? (this.baseSummary().trim() || undefined) : ev.summary,
       description: !this.hasVariantContext() ? (this.baseDescription().trim() || undefined) : ev.description,

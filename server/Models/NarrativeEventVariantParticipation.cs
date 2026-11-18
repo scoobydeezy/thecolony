@@ -1,12 +1,7 @@
 namespace ColonyTracker.Api.Models;
 
-// Explicit record that a NarrativeEvent may resolve differently across Paths
-// belonging to a specific PathSet.
-//
-// Distinct from PathEventScope (the timeline passes through this event) and
-// from NarrativeEventOverride (a concrete property patch for a specific path context).
-// An event can be in scope and not participate in variation, or participate but
-// have no overrides yet (all paths still inheriting base values).
+// This event may resolve differently across the paths of a branch (§14: the event file's `variesBy`).
+// Distinct from scope (onPaths) and from versions (variants). Not a table.
 public class NarrativeEventVariantParticipation
 {
     public string NarrativeEventId { get; set; } = string.Empty;

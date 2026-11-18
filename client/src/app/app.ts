@@ -1,4 +1,5 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, effect, inject, signal } from '@angular/core';
+import { ApiService } from './core/services/api.service';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { AppStore } from './store/app.store';
 import { SettingsDrawerComponent } from './shared/settings-drawer/settings-drawer.component';
@@ -17,6 +18,34 @@ export class App implements OnInit {
   store = inject(AppStore);
 
   readonly partyName = computed(() => this.store.colonyState()?.partyName || 'Party');
+
+  // §12: records whose canonical file is missing (deleted or broken outside the app). Never deleted
+  // automatically: flagged here until the file is restored, or the record is deleted through the app.
+  readonly missingCanon = computed(() => [
+    ...this.store.characters().filter(x => x.canonMissing).map(x => ({ kind: 'Character', id: x.canonId })),
+    ...this.store.factions().filter(x => x.canonMissing).map(x => ({ kind: 'Faction', id: x.canonId })),
+    ...this.store.assets().filter(x => x.canonMissing).map(x => ({ kind: 'Asset', id: x.canonId })),
+    ...this.store.locations().filter(x => x.canonMissing).map(x => ({ kind: 'Location', id: x.canonId })),
+    ...this.store.factionGoals().filter(x => x.canonMissing).map(x => ({ kind: 'Goal', id: x.canonId })),
+  ]);
+
+  // §12: references to entries that no longer exist, from the server's canon status. Re-checked
+  // whenever an entity list changes (a delete through the app is the usual cause).
+  private readonly api = inject(ApiService);
+  readonly staleRefs = signal<{ from: string; path: string; to: string }[]>([]);
+  /** Stale references grouped by the missing entry they name, most-referenced first. */
+  readonly staleByTarget = computed(() => {
+    const groups = new Map<string, number>();
+    for (const r of this.staleRefs()) groups.set(r.to, (groups.get(r.to) ?? 0) + 1);
+    return [...groups.entries()].map(([to, count]) => ({ to, count })).sort((a, b) => b.count - a.count || a.to.localeCompare(b.to));
+  });
+
+  constructor() {
+    effect(() => {
+      this.store.characters(); this.store.factions(); this.store.assets(); this.store.locations(); this.store.factionGoals();
+      this.api.getCanonStatus().subscribe({ next: (s) => this.staleRefs.set(s.staleReferences ?? []), error: () => this.staleRefs.set([]) });
+    });
+  }
   readonly viewMenuOpen = signal(false);
   readonly settingsOpen = signal(false);
   readonly campaignManagerMode = signal<CampaignManagerMode>(null);

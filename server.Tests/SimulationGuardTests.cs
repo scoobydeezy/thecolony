@@ -26,11 +26,13 @@ public class SimulationGuardTests : IDisposable
         db.SaveChanges();
     }
 
-    private AppDbContext Db() => new(new DbContextOptionsBuilder<AppDbContext>().UseSqlite(_conn).Options);
+    // Characters are canonical files now (ADVENTURE-BOOK-PLAN.md §9); each test gets its own store.
+    private readonly TestCanon _canon = new();
+    private AppDbContext Db() => _canon.Db(_conn);
     private long Version() { using var db = Db(); return db.Campaigns.Single(c => c.Id == Cid).HistoryVersion; }
     private void GoLive() { using var db = Db(); db.Campaigns.Single().Mode = CampaignMode.Live; db.SaveChanges(); }
 
-    public void Dispose() => _conn.Dispose();
+    public void Dispose() { _conn.Dispose(); _canon.Dispose(); }
 
     [Fact]
     public void Simulation_writes_bump_history_version_including_effects_via_their_session()

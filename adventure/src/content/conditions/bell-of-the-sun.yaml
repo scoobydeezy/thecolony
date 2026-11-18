@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.bell-of-the-sun
+slug: bell-of-the-sun
+name: Bell of the Sun
+variesBy:
+  subject:
+    kind: assetStatus
+    id: asset.bell-of-the-sun
+  rows:
+    - state: Stable
+      text: ""
+      stress: 0
+    - state: Contested
+      text: ""
+      stress: 0
+    - state: Damaged
+      text: The Bell of the Sun is Damaged; its ringing is unreliable.
+      stress: 0
+    - state: Destroyed
+      text: Loss of the Colony's familiar civic alarm increases public unease.
+      stress: 1
+status: draft

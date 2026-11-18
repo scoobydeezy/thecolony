@@ -14,10 +14,9 @@ public class AssetsController(AppDbContext db, ICampaignContext campaign) : Cont
     public async Task<IActionResult> GetAll()
     {
         var cid = await campaign.GetActiveIdAsync();
-        return Ok(await db.Assets
-            .Where(a => a.CampaignId == cid)
-            .OrderBy(a => a.Name)
-            .ToListAsync());
+        // Name is file-backed (ADVENTURE-BOOK-PLAN.md §10), so sort after loading.
+        var all = await db.Assets.Where(a => a.CampaignId == cid).ToListAsync();
+        return Ok(all.OrderBy(a => a.Name, StringComparer.CurrentCulture).ToList());
     }
 
     [HttpGet("{id}")]
@@ -32,6 +31,7 @@ public class AssetsController(AppDbContext db, ICampaignContext campaign) : Cont
     {
         var cid = await campaign.GetActiveIdAsync();
         asset.Id = await EntityIds.ForCreateAsync(db.Assets, asset.Id);   // keep an imported id when it is free
+        asset.CanonId = null;   // a new entity gets a new canonical file
         asset.CampaignId = cid;
         db.Assets.Add(asset);
         await db.SaveChangesAsync();
@@ -42,11 +42,16 @@ public class AssetsController(AppDbContext db, ICampaignContext campaign) : Cont
     public async Task<IActionResult> Update(string id, [FromBody] Asset asset)
     {
         if (id != asset.Id) return BadRequest();
+        // The link to the asset's file is the server's, never the request's (ADVENTURE-BOOK-PLAN.md §10).
+        var link = await db.Assets.AsNoTracking().Where(x => x.Id == id).Select(x => new { x.CanonId }).FirstOrDefaultAsync();
+        if (link is null) return NotFound();
+        asset.CanonId = link.CanonId;
         asset.CampaignId = await campaign.GetActiveIdAsync();
         db.Entry(asset).State = EntityState.Modified;
 
         // Keep linked location's parentLocationId in sync with this asset's locationId.
-        var linkedLocation = await db.Locations.FirstOrDefaultAsync(l => l.LinkedAssetId == asset.Id);
+        // LinkedAssetId is file-backed, so match after loading.
+        var linkedLocation = (await db.Locations.Where(l => l.CampaignId == asset.CampaignId).ToListAsync()).FirstOrDefault(l => l.LinkedAssetId == asset.Id);
         if (linkedLocation is not null && linkedLocation.ParentLocationId != asset.LocationId)
         {
             linkedLocation.ParentLocationId = asset.LocationId;

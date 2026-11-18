@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=../../../schemas/thread.schema.json
+id: thread.the-reading
+slug: the-reading
+name: The Reading
+summary: The inherited ritual genuinely carries mnemonic weight while concentrating a society's responsibility into one willing bearer and then erasing the bearer from collective memory.
+status: draft
+provenance:
+  - doc: Campaign Outline
+    heading: Foundational Narrative Truths > The Reading

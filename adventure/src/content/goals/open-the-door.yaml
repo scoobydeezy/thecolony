@@ -1,0 +1,16 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.open-the-door
+slug: open-the-door
+name: Open the Door
+faction: faction.cult-of-the-unknown
+type: Achieve
+priority: Critical
+visibility: Known
+outcome: Adjudicated
+earliestAct: 3
+target:
+  type: Asset
+  id: asset.pilgrim-s-rest
+status: draft
+start:
+  status: Plotting

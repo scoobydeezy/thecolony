@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=../../../schemas/faction.schema.json
+id: faction.burdened
+slug: burdened
+name: Burdened
+type: SocialClass
+represents: Original Sin
+coreTenet: Someone must carry the knowledge
+certainOf: Ignorance would be worse.
+rightAbout: Most citizens underestimate the burden.
+afraidOf: Becoming the thing they hate.
+wrongAbout: Knowledge necessarily grants wisdom.
+status: draft
+start:
+  active: true
+  momentum: 0
+  size: 0
+  values:
+    truth: 0.3273
+    stability: 0.4999
+    agency: 0.1727
+  beliefs: {}

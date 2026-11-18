@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.hall-of-keepers
+slug: hall-of-keepers
+name: Hall of Keepers
+summary: The operational headquarters of the Order of Theia.
+parent: location.keeper-district
+asset: asset.hall-of-the-keepers
+status: draft
+start:
+  state: Stable

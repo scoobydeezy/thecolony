@@ -1,0 +1,383 @@
+---
+// One page per canonical entity that has a URL area (Bestiary, NPCs, ...).
+// Old slugs listed in previousSlugs render as redirects to the current URL.
+import fs from 'node:fs';
+import StarlightPage from '@astrojs/starlight/components/StarlightPage.astro';
+import { getCollection, render } from 'astro:content';
+import { toHtml } from 'hast-util-to-html';
+import { ENTITY_TYPES, loadRegistry, entityUrl, PART, partDir } from '../../lib/registry.mjs';
+import { statblockHast } from '../../lib/statblock.mjs';
+import { veiledDerived } from '../../lib/veiled.mjs';
+import { isDesigner } from '../../lib/target.mjs';
+import Ref from '../../components/Ref.astro';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const [type, spec] of Object.entries(ENTITY_TYPES)) {
+    if (!spec.area || !fs.existsSync(`./src/content/${spec.dir}`)) continue;
+    const entries = await getCollection(spec.collection).catch(() => []);
+    for (const entry of entries) {
+      // Events and encounters live under their part (/act-1/the-calling/), or /unplaced/.
+      const area = spec.area === PART ? partDir(entry.data.part) : spec.area;
+      paths.push({ params: { area, slug: entry.data.slug }, props: { type, entry } });
+      for (const old of entry.data.previousSlugs ?? []) {
+        paths.push({ params: { area, slug: old }, props: { type, entry, redirectTo: true } });
+      }
+    }
+  }
+  return paths;
+}
+
+const { type, entry, redirectTo } = Astro.props;
+const reg = loadRegistry();
+const self = reg.byId.get(entry.data.id);
+if (redirectTo) return Astro.redirect(entityUrl(self));
+// Schema-validated data (with defaults), overlaid with the derived view so a
+// stat block shows its NPC's name and ancestry, never a copy of them.
+const d = { ...entry.data, ...self.view };
+const statblocks = type === 'npc' ? reg.statblocksOf(d.id) : [];
+
+const { Content } = entry.body ? await render(entry) : { Content: null };
+const spec = ENTITY_TYPES[type];
+const link = (id) => {
+  const e = reg.byId.get(id);
+  return e ? { href: entityUrl(e), name: e.view.fullName ?? e.view.name } : { href: null, name: `${id} (missing)` };   // §12: flagged, not dropped
+};
+const derived = type === 'source' ? veiledDerived(d) : null;
+// Factions, Assets and locations: plain-text prose fields, split into paragraphs.
+const paras = (t) => String(t ?? '').split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+const FACTION_FIELDS = [
+  ['represents', 'Represents'], ['publicFace', 'Public face'], ['selfImage', 'Self-image'], ['coreTenet', 'Core tenet'],
+  ['focus', 'Focus'], ['certainOf', 'Certain of'], ['rightAbout', 'Right about'], ['afraidOf', 'Afraid of'],
+  ['wrongAbout', 'Wrong about'], ['response', 'Response'], ['foundedAs', 'Founded as'], ['became', 'Became'],
+];
+const byRef = (field, id) => reg.entities.filter((e) => field.split('.').reduce((o, k) => o?.[k], e.data) === id);
+const members = type === 'faction' ? [...byRef('start.faction', d.id), ...byRef('start.socialClass', d.id)].filter((e) => e.type === 'npc') : [];
+const holdings = type === 'faction' ? byRef('start.controller', d.id) : [];
+const children = type === 'location' ? byRef('parent', d.id) : [];
+const assetsHere = type === 'location' ? reg.entities.filter((e) => e.type === 'asset' && e.view.location === d.id) : [];
+const goals = type === 'faction' ? reg.entities.filter((e) => e.type === 'goal' && e.data.faction === d.id).sort((a, b) => a.view.name.localeCompare(b.view.name)) : [];
+const effectText = (fx) => {
+  const target = refLink(fx.targetId).name;
+  if (fx.property === 'factionSize') return `${target}: Faction Size ${fx.delta > 0 ? '+' : ''}${fx.delta}`;
+  if (fx.property === 'controllingFactionId') return `${target}: control passes to ${refLink(fx.value).name}`;
+  if (fx.property === 'locationChange') return `${target}: moves to ${refLink(fx.value).name}`;
+  return `${target}: ${fx.property} becomes ${fx.value}`;
+};
+const refLink = (id) => link(id);
+const statblockHtml = type === 'creature' ? toHtml(statblockHast(d)) : '';
+// Narrative (§13): connections are stored on their source, so "led from" is a reverse lookup.
+const narrative = type === 'event' || type === 'encounter';
+const linkIdOf = (l) => (typeof l === 'string' ? l : l.id);
+const nameOf = (id) => link(id).name;
+const ledFrom = narrative ? reg.entities.flatMap((e) => (e.data.leadsTo ?? []).filter((l) => l.to === d.id).map((l) => ({ from: e.data.id, thread: l.thread }))) : [];
+const encountersOf = type === 'event' ? reg.entities.filter((e) => e.type === 'encounter' && e.data.event === d.id).sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99)) : [];
+// §14: a version's heading names its paths ("If The Reading is Stopped").
+const ifPaths = (when) => (when?.length ? `If ${when.map((id) => nameOf(id)).join(' and ')}` : 'On every path');
+const branchItems = type === 'branch'
+  ? (d.paths ?? []).map((p) => ({ ...p, items: reg.entities.filter((e) => (e.type === 'event' || e.type === 'encounter') && ((e.data.variants ?? []).some((v) => (v.when ?? []).includes(p.id)) || (e.data.onPaths ?? []).includes(p.id))) }))
+  : [];
+const varying = type === 'branch' ? reg.entities.filter((e) => (e.type === 'event' || e.type === 'encounter') && (e.data.variesBy ?? []).includes(d.id)) : [];
+// §15: World Conditions. A requirement reads as a sentence; "" for a faction means no one.
+const factionOrNone = (id, none) => (id ? refLink(id).name : none);
+const requirementText = (r) => ({
+  assetController: () => `${refLink(r.assetId).name} is controlled by ${factionOrNone(r.factionId, 'no one')}`,
+  assetStatus: () => `${refLink(r.assetId).name} is ${r.statuses.join(' or ')}`,
+  characterState: () => `${refLink(r.characterId).name} is ${r.states.join(' or ')}`,
+  characterFaction: () => `${refLink(r.characterId).name} belongs to ${factionOrNone(r.factionId, 'no faction')}`,
+  leaderCapable: () => `the leader of ${refLink(r.factionId).name} is ${r.capable ? 'able' : 'not able'} to lead`,
+  locationState: () => `${refLink(r.locationId).name} is ${r.states.join(' or ')}`,
+  condition: () => `${refLink(r.conditionId).name} is ${r.inForce ? 'in force' : 'not in force'}`,
+  goalStage: () => `${refLink(r.goalId).name} is at ${r.stages.join(' or ')}`,
+})[r.kind]?.() ?? r.kind;
+const SUBJECT_LABEL = { assetStatus: 'status', assetController: 'controller', characterState: 'state', characterFaction: 'faction', locationState: 'state', goalStage: 'stage' };
+const relationships = (type === 'npc' || type === 'pc') ? (d.relationships ?? []) : [];
+const relatedFrom = (type === 'npc' || type === 'pc') ? reg.entities.flatMap((e) => (e.data.relationships ?? []).filter((r) => r.to === d.id).map((r) => ({ from: e.data.id, ...r }))) : [];
+const conditionsUsing = (['asset', 'faction', 'npc', 'pc', 'location', 'goal', 'condition'].includes(type))
+  ? reg.entities.filter((e) => e.type === 'condition' && e.data.id !== d.id && (JSON.stringify(e.data.requires ?? []).includes(`"${d.id}"`) || e.data.variesBy?.subject?.id === d.id))
+  : [];
+const onThread = type === 'thread'
+  ? reg.entities.flatMap((e) => (e.data.leadsTo ?? []).filter((l) => l.thread === d.id).map((l) => ({ from: e.data.id, to: l.to })))
+  : [];
+---
+
+<StarlightPage frontmatter={{ title: d.name, description: d.summary, rpSource: entry.filePath?.replace(/^src\/content\//, ''), rpEntity: d.id }}>
+  <p>
+    <span class="rp-badge">{spec.label}</span>
+    {d.version && <span class="rp-badge">Version {d.version}</span>}
+    {d.status === 'stub' && <span class="rp-badge">Entry not yet written</span>}
+  </p>
+
+  {d.summary && <p>{d.summary}</p>}
+
+  {type === 'npc' && (
+    <p>
+      {d.fullName !== d.name && <><strong>{d.fullName}</strong><br /></>}
+      {d.levelLabel && <><strong>{d.levelLabel}</strong>{d.heritage && <> ({d.heritage})</>}</>}
+      {d.role && <>{d.levelLabel && ' · '}<strong>Role:</strong> {d.role}</>}
+    </p>
+  )}
+
+  {type === 'npc' && statblocks.length > 0 && (
+    <p>
+      <strong>{statblocks.length === 1 ? 'Stat block' : 'Stat blocks'}:</strong>{' '}
+      {statblocks.map((sb, i) => (
+        <>
+          {i > 0 && ', '}
+          <a href={entityUrl(sb)}>
+            {sb.view.levelLabel}
+            {sb.view.variant && <> ({sb.view.variant})</>}
+          </a>
+        </>
+      ))}{' '}
+      <span class="rp-muted">in the Bestiary</span>
+    </p>
+  )}
+
+  {type === 'creature' && d.npc && (
+    <p>
+      NPC profile: <Ref id={d.npc} />
+    </p>
+  )}
+
+  {type === 'creature' && <Fragment set:html={statblockHtml} />}
+
+  {type === 'faction' && (
+    <>
+      <p>
+        <strong>{d.type === 'SocialClass' ? 'Social class' : 'Faction'}</strong>
+        {d.motto && <> · <em>“{d.motto}”</em></>}
+        {d.start?.leader && <> · <strong>Leader:</strong> <Ref id={d.start.leader} /></>}
+      </p>
+      <div class="rp-table-wrap">
+        <table>
+          <tbody>
+            {FACTION_FIELDS.filter(([k]) => d[k]).map(([k, label]) => <tr><th>{label}</th><td>{d[k]}</td></tr>)}
+          </tbody>
+        </table>
+      </div>
+      {d.origin && <><h2>Origin</h2>{paras(d.origin).map((p) => <p>{p}</p>)}</>}
+      {d.history && <><h2>History</h2>{paras(d.history).map((p) => <p>{p}</p>)}</>}
+      {d.notes && <aside class="rp-block rp-gm-note"><p class="rp-label">GM note</p>{paras(d.notes).map((p) => <p>{p}</p>)}</aside>}
+      {goals.length > 0 && <><h2>Goals</h2><ul>{goals.map((g) => <li><a href={entityUrl(g)}>{g.view.name}</a><span class="rp-muted"> · {g.data.priority ?? 'Major'} · {g.data.start?.status ?? 'Plotting'}{g.data.visibility === 'Secret' && ' · Secret'}</span></li>)}</ul></>}
+            {holdings.length > 0 && <><h2>Assets</h2><ul>{holdings.map((e) => <li><a href={entityUrl(e)}>{e.view.name}</a></li>)}</ul></>}
+      {members.length > 0 && <><h2>Notable members</h2><ul>{members.sort((a, b) => a.view.name.localeCompare(b.view.name)).map((e) => <li><a href={entityUrl(e)}>{e.view.fullName ?? e.view.name}</a>{e.data.role && <span class="rp-muted"> · {e.data.role}</span>}</li>)}</ul></>}
+    </>
+  )}
+
+  {type === 'asset' && (
+    <p>
+      <strong>{d.type}</strong> · {d.role} · Tier {d.tier}{d.keystone && <> · <strong>Keystone</strong></>}
+      {d.start?.controller && <><br /><strong>Controlled by:</strong> <Ref id={d.start.controller} /></>}
+      {d.location && <><br /><strong>Location:</strong> <Ref id={d.location} /></>}
+      {d.place && <><br /><strong>The place:</strong> <Ref id={d.place} /></>}
+    </p>
+  )}
+
+  {type === 'goal' && (
+    <>
+      <p>
+        <strong>{d.type ?? 'Achieve'}</strong> goal of <Ref id={d.faction} />
+        {' · '}{d.priority ?? 'Major'} priority · {d.visibility ?? 'Known'}{' · '}from Act {d.earliestAct ?? 2}
+        <br /><strong>Starts:</strong> {d.start?.status ?? 'Plotting'} · <strong>Resolves:</strong> {d.outcome === 'Adjudicated' ? 'by the GM' : 'automatically'}
+        {d.champion && <><br /><strong>Champion:</strong> <Ref id={d.champion} /></>}
+      </p>
+      {d.target && (d.target.id || d.target.property) && (
+        <p>
+          <strong>Target:</strong>{' '}
+          {d.target.id && <Ref id={d.target.id} />}
+          {d.target.state && <> is {d.target.state}</>}
+          {d.target.owner && <> held by <Ref id={d.target.owner} /></>}
+          {d.target.property && <> {d.target.property} {({ gte: '≥', lte: '≤', eq: '=' })[d.target.operator] ?? d.target.operator} {d.target.threshold}</>}
+        </p>
+      )}
+      {['progressing', 'accomplished'].map((when) => (d.effects?.[when]?.length ?? 0) > 0 && (
+        <><p><strong>{when === 'progressing' ? 'When it starts progressing' : 'When accomplished'}:</strong></p><ul>{d.effects[when].map((fx) => <li>{effectText(fx)}</li>)}</ul></>
+      ))}
+    </>
+  )}
+
+    {type === 'location' && (
+    <>
+      <p>
+        {d.type && <><strong>{d.type}</strong></>}
+        {d.parent && <>{d.type && ' · '}<strong>Within:</strong> <Ref id={d.parent} /></>}
+        {d.asset && <><br /><strong>Asset:</strong> <Ref id={d.asset} /></>}
+      </p>
+      {children.length > 0 && <><h2>Places within</h2><ul>{children.sort((a, b) => a.view.name.localeCompare(b.view.name)).map((e) => <li><a href={entityUrl(e)}>{e.view.name}</a></li>)}</ul></>}
+      {assetsHere.length > 0 && <><h2>Assets here</h2><ul>{assetsHere.map((e) => <li><a href={entityUrl(e)}>{e.view.name}</a></li>)}</ul></>}
+    </>
+  )}
+
+  {derived && (
+    <div class="rp-table-wrap">
+      <table>
+        <tbody>
+          <tr><th>Class</th><td>{derived.classLabel}</td></tr>
+          <tr><th>Source Level</th><td>{derived.sourceLevel}</td></tr>
+          <tr><th>Source DC</th><td>{derived.sourceDC}</td></tr>
+          <tr><th>Mnemonic Backlash</th><td>{derived.backlash}</td></tr>
+          <tr><th>Stability Threshold</th><td>{derived.stabilityThreshold}</td></tr>
+          <tr><th>Ward HP</th><td>{derived.wardHP}</td></tr>
+          <tr><th>Active Bulk Minimum</th><td>{derived.activeBulkMinimum}</td></tr>
+          <tr><th>Rupture Radius</th><td>{derived.ruptureRadius}</td></tr>
+        </tbody>
+      </table>
+      <p class="rp-muted">Derived from Class and Source Level using the Veiled Class formulas.</p>
+    </div>
+  )}
+
+  {type === 'rule' && d.appliesTo?.length > 0 && (
+    <p>
+      <strong>Applies to:</strong>{' '}
+      {d.appliesTo.map((id, i) => (
+        <>
+          {i > 0 && ', '}
+          <Ref id={id} />
+        </>
+      ))}
+    </p>
+  )}
+
+  {narrative && (
+    <>
+      <p>
+        {d.route && <><strong>Route:</strong> {d.route}</>}
+        {d.event && <>{d.route && ' · '}<strong>Part of:</strong> <Ref id={d.event} /></>}
+        {encountersOf.length > 0 && <>{(d.route || d.event) && <br />}<strong>{encountersOf.length === 1 ? 'Encounter' : 'Encounters'}:</strong> {encountersOf.map((e, i) => <>{i > 0 && ', '}<a href={entityUrl(e)}>{e.view.name}</a></>)}</>}
+        {d.function && <>{(d.route || d.event || encountersOf.length > 0) && <br />}<strong>Narrative function:</strong> {d.function}</>}
+      </p>
+      {d.synopsis && <><h2>Synopsis</h2>{paras(d.synopsis).map((p) => <p>{p}</p>)}</>}
+    </>
+  )}
+
+  {Content && <Content />}
+
+  {narrative && (ledFrom.length > 0 || d.leadsTo?.length > 0) && (
+    <>
+      <h2>Connections</h2>
+      {ledFrom.length > 0 && <><p><strong>Led from</strong></p><ul>{ledFrom.map((l) => <li><Ref id={l.from} /> <span class="rp-muted">· {nameOf(l.thread)}</span></li>)}</ul></>}
+      {d.leadsTo?.length > 0 && <><p><strong>Leads to</strong></p><ul>{d.leadsTo.map((l) => <li><Ref id={l.to} /> <span class="rp-muted">· {nameOf(l.thread)}{l.visibility && l.visibility !== 'GMOnly' && ` · ${l.visibility}`}</span></li>)}</ul></>}
+    </>
+  )}
+
+  {narrative && d.variesBy?.length > 0 && (
+    <p><strong>Varies by:</strong> {d.variesBy.map((id, i) => <>{i > 0 && ', '}<Ref id={id} /></>)}{d.onPaths?.length > 0 && <> · <strong>On:</strong> {d.onPaths.map((id, i) => <>{i > 0 && ', '}<Ref id={id} /></>)}</>}</p>
+  )}
+
+  {narrative && (d.variants ?? []).map((v) => (
+    <section class="rp-variant" data-paths={(v.when ?? []).join(' ')}>
+      <h2 id={`if-${v.key}`}>{ifPaths(v.when)}</h2>
+      {v.summary !== undefined && (v.summary ? <p><em>{v.summary}</em></p> : <p class="rp-muted">No summary on this path.</p>)}
+      {v.synopsis !== undefined && (v.synopsis ? paras(v.synopsis).map((p) => <p>{p}</p>) : <p class="rp-muted">No synopsis on this path.</p>)}
+      {v.leadsTo !== undefined && (
+        v.leadsTo.length
+          ? <><p><strong>Leads to</strong> <span class="rp-muted">(instead of the connections above)</span></p><ul>{v.leadsTo.map((l) => <li><Ref id={l.to} /> <span class="rp-muted">· {nameOf(l.thread)}{l.visibility && l.visibility !== 'GMOnly' && ` · ${l.visibility}`}</span></li>)}</ul></>
+          : <p class="rp-muted">No connections on this path.</p>
+      )}
+      {v.links !== undefined && (
+        v.links.length
+          ? <><p><strong>Involves</strong> <span class="rp-muted">(instead of the list below)</span></p><ul>{v.links.map((l) => <li><Ref id={linkIdOf(l)} />{typeof l !== 'string' && l.role && <span class="rp-muted"> · {l.role}</span>}</li>)}</ul></>
+          : <p class="rp-muted">Involves no one in particular on this path.</p>
+      )}
+    </section>
+  ))}
+
+  {type === 'branch' && (
+    <>
+      <p>
+        {d.origin && <><strong>Splits at:</strong> <Ref id={d.origin} /></>}
+        {d.convergence && <>{d.origin && ' · '}<strong>Rejoins at:</strong> <Ref id={d.convergence} /></>}
+        {d.requires?.length > 0 && <><br /><strong>Applies only on:</strong> {d.requires.map((id, i) => <>{i > 0 && ' and '}<Ref id={id} /></>)}</>}
+      </p>
+      {varying.length > 0 && <p><strong>Varies:</strong> {varying.map((e, i) => <>{i > 0 && ', '}<a href={entityUrl(e)}>{e.view.name}</a></>)}</p>}
+      {branchItems.map((p) => (
+        <>
+          <h2 id={p.id.slice('path.'.length)}>{p.name}</h2>
+          {p.items.length ? <ul>{p.items.map((e) => <li><a href={`${entityUrl(e)}${(e.data.variants ?? []).find((v) => (v.when ?? []).includes(p.id)) ? `#if-${(e.data.variants ?? []).find((v) => (v.when ?? []).includes(p.id)).key}` : ''}`}>{e.view.name}</a></li>)}</ul> : <p class="rp-muted">No event has its own version on this path yet.</p>}
+        </>
+      ))}
+    </>
+  )}
+
+  {type === 'condition' && (
+    <>
+      <p>
+        <strong>{d.start?.established === false ? 'Not established at the start' : 'Established at the start'}</strong>
+        {d.stress ? <> · <strong>Colony Stress:</strong> {d.stress > 0 ? '+' : ''}{d.stress} while in force</> : null}
+      </p>
+      {d.rule && <><h2>Rule</h2>{paras(d.rule).map((p) => <p>{p}</p>)}</>}
+      {d.otherwise && <><h2>Otherwise</h2>{paras(d.otherwise).map((p) => <p>{p}</p>)}</>}
+      {d.requires?.length > 0 && <><h2>In force only while</h2><ul>{d.requires.map((r) => <li>{requirementText(r)}</li>)}</ul></>}
+      {d.variesBy && (
+        <>
+          <h2>Varies by {refLink(d.variesBy.subject.id).name}’s {SUBJECT_LABEL[d.variesBy.subject.kind] ?? d.variesBy.subject.kind}</h2>
+          <div class="rp-table-wrap">
+            <table>
+              <thead><tr><th>When</th><th>At the table</th><th>Stress</th></tr></thead>
+              <tbody>{d.variesBy.rows.map((r) => <tr><td>{r.state}</td><td>{r.text || <span class="rp-muted">Not in force</span>}</td><td>{r.stress || ''}</td></tr>)}</tbody>
+            </table>
+          </div>
+          <p><Ref id={d.variesBy.subject.id} /></p>
+        </>
+      )}
+    </>
+  )}
+
+  {conditionsUsing.length > 0 && (
+    <><h2>World Conditions</h2><ul>{conditionsUsing.sort((a, b) => a.view.name.localeCompare(b.view.name)).map((e) => <li><a href={entityUrl(e)}>{e.view.name}</a></li>)}</ul></>
+  )}
+
+  {(relationships.length > 0 || relatedFrom.length > 0) && (
+    <>
+      <h2>Relationships</h2>
+      {relationships.length > 0 && (
+        <ul>
+          {relationships.map((r) => (
+            <li>
+              <strong>{r.type}</strong>{r.to && <>: <Ref id={r.to} /></>}
+              {r.state && r.state !== 'Active' && <span class="rp-muted"> · {r.state}</span>}
+              {r.summary && paras(r.summary).map((p) => <><br /><span>{p}</span></>)}
+            </li>
+          ))}
+        </ul>
+      )}
+      {relatedFrom.length > 0 && <p class="rp-muted">Named by: {relatedFrom.map((r, i) => <>{i > 0 && ', '}<Ref id={r.from} /> ({r.type})</>)}</p>}
+    </>
+  )}
+
+  {type === 'thread' && onThread.length > 0 && (
+    <><h2>Where it runs</h2><ul>{onThread.map((c) => <li><Ref id={c.from} /> → <Ref id={c.to} /></li>)}</ul></>
+  )}
+
+  {(narrative || type === 'thread') && d.links?.length > 0 && (
+    <>
+      <h2>Involves</h2>
+      <ul>
+        {d.links.map((l) => (
+          <li>
+            <Ref id={linkIdOf(l)} />
+            {reg.byId.get(linkIdOf(l)) && <span class="rp-muted"> · {ENTITY_TYPES[reg.byId.get(linkIdOf(l)).type].label}</span>}
+            {typeof l !== 'string' && (l.role || l.notes) && <span class="rp-muted"> · {[l.role, l.notes].filter(Boolean).join(' — ')}</span>}
+          </li>
+        ))}
+      </ul>
+    </>
+  )}
+
+  {isDesigner && d.provenance?.length > 0 && (
+    <aside class="rp-block rp-design" data-private="designer">
+      <p class="rp-label">Provenance (designer)</p>
+      <ul>
+        {d.provenance.map((p) => (
+          <li>
+            {p.doc} — {p.heading}
+            {p.note && <> ({p.note})</>}
+          </li>
+        ))}
+      </ul>
+      {d.design && <p>{d.design}</p>}
+      <p><code>{d.id}</code></p>
+    </aside>
+  )}
+</StarlightPage>

@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.broken-bell
+slug: broken-bell
+name: The Broken Bell
+summary: A Tavern at the edge of Old Town, under an iconic broken bell recovered from the ruins of the Old Wall.
+parent: location.duskway
+asset: asset.broken-bell
+status: draft
+start:
+  state: Stable

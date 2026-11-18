@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.tavia-s-hunt
+slug: tavia-s-hunt
+name: Tavia's Hunt
+variesBy:
+  subject:
+    kind: goalStage
+    id: goal.take-out-the-keeper
+  rows:
+    - state: Planning
+      text: ""
+      stress: 0
+    - state: Progressing
+      text: Tavia Rusk begins shadowing Darkwing, looking for access to Vara.
+      stress: 0
+    - state: Ready
+      text: During the next session, Tavia Rusk attempts to assassinate Vara; the attempt does not guarantee her death.
+      stress: 0
+    - state: Accomplished
+      text: ""
+      stress: 0
+    - state: Failed
+      text: ""
+      stress: 0
+    - state: Retired
+      text: ""
+      stress: 0
+status: draft

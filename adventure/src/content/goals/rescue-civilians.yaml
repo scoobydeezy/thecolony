@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.rescue-civilians
+slug: rescue-civilians
+name: Rescue Civilians
+faction: faction.order-of-theia
+type: Achieve
+priority: Minor
+visibility: Known
+outcome: Automatic
+earliestAct: 3
+status: draft
+start:
+  status: Plotting

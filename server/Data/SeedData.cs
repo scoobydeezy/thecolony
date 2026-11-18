@@ -13,6 +13,33 @@ public static class SeedData
     {
         if (db.Factions.Any()) return;
 
+        // Characters, factions, Assets and locations live in canonical files (ADVENTURE-BOOK-PLAN.md
+        // §9, §10). If files exist, a fresh database links to them instead of seeding its own;
+        // otherwise the defaults below become files on the first save.
+        if (db.Canon is { } canon && canon.All().Count > 0)
+        {
+            var order = 0;
+            foreach (var entry in canon.All())
+            {
+                ICanonEntity link = entry.Kind switch
+                {
+                    "npc" or "pc" => new Character(),
+                    "faction" => new Faction { SortOrder = order++ },
+                    "asset" => new Asset(),
+                    "location" => new Location(),
+                    "goal" => new FactionGoal(),
+                    _ => throw new InvalidOperationException($"unknown canon kind {entry.Kind}"),
+                };
+                link.GetType().GetProperty(nameof(ICanonEntity.Id))!.SetValue(link, Guid.NewGuid().ToString());
+                link.CanonId = entry.Id;
+                ColonyTracker.Api.Services.Canon.CanonMapping.Hydrate(link, entry, refs: null, canon);   // references stay canonical until saved
+                db.Add(link);
+            }
+            AddSingletons(db);
+            db.SaveChanges();
+            return;
+        }
+
         var factions = new List<Faction>
         {
             new()
@@ -323,7 +350,12 @@ public static class SeedData
         };
 
         db.Characters.AddRange(characters);
+        AddSingletons(db);
+        db.SaveChanges();
+    }
 
+    private static void AddSingletons(AppDbContext db)
+    {
         db.ColonyStates.Add(new ColonyState
         {
             Id = "singleton",
@@ -337,7 +369,5 @@ public static class SeedData
         });
 
         db.RulesConfigs.Add(new RulesConfig { Id = "singleton" });
-
-        db.SaveChanges();
     }
 }

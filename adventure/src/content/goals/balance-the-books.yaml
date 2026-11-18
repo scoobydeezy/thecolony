@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.balance-the-books
+slug: balance-the-books
+name: Balance the Books
+faction: faction.aspis
+type: Maintain
+priority: Critical
+visibility: Known
+outcome: Automatic
+earliestAct: 1
+champion: npc.perrik-tallow
+target:
+  type: Asset
+  id: asset.claims-registry
+  state: Stable
+status: draft
+start:
+  status: Progressing

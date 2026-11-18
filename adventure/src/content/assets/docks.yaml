@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.docks
+slug: docks
+name: Docks
+type: Infrastructure
+role: Strategic
+tier: 5
+keystone: false
+summary: Warehouses, piers, cranes, and loading yards lining the Colony's riverfront. Control of the docks determines the movement of food, supplies, and commerce, making them one of the most strategically important pieces of infrastructure in the Colony.
+status: draft
+start:
+  controller: faction.aspis
+  location: location.mercantile-district
+  status: Stable

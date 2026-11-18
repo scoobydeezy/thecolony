@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.await-the-pilgrims
+slug: await-the-pilgrims
+name: Await the Pilgrims
+faction: faction.cult-of-the-unknown
+type: Maintain
+priority: Critical
+visibility: Known
+outcome: Automatic
+earliestAct: 1
+champion: npc.maelyn
+target:
+  type: Asset
+  id: asset.pilgrim-s-rest
+  state: Stable
+status: draft
+start:
+  status: Progressing

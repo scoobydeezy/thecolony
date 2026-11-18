@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.prepare-the-chosen
+slug: prepare-the-chosen
+name: Prepare the Chosen
+faction: faction.witnesses
+type: Maintain
+priority: Critical
+visibility: Known
+outcome: Automatic
+earliestAct: 1
+champion: npc.uldren-harthwright
+target:
+  type: Asset
+  id: asset.house-of-abiding
+  state: Stable
+status: draft
+start:
+  status: Progressing

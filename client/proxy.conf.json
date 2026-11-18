@@ -13,5 +13,11 @@
     "target": "http://localhost:5000",
     "secure": false,
     "changeOrigin": true
+  },
+  "/docs": {
+    "target": "http://localhost:4321",
+    "secure": false,
+    "changeOrigin": true,
+    "ws": true
   }
 }

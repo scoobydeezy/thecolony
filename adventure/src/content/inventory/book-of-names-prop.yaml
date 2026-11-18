@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../../../schemas/inventory.schema.json
+id: inventory.book-of-names-prop
+slug: book-of-names-prop
+name: Book of Names prop
+kind: prop
+summary: A physical Book of Names with 12 ritual pages. Turn one page each time Vara reads a Name-Page.
+status: draft
+provenance:
+  - { doc: Encounters, heading: 5. The Reading — Ritual Chamber > The Physical Book Clock }
+  - { doc: Creatures, heading: The Reading — Ritual Chamber > The Book Clock }

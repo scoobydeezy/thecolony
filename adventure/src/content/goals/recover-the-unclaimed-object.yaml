@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.recover-the-unclaimed-object
+slug: recover-the-unclaimed-object
+name: Recover the Unclaimed Object
+faction: faction.witnesses
+type: Achieve
+priority: Minor
+visibility: Open
+outcome: Automatic
+earliestAct: 1
+champion: npc.celia-harthwright
+target:
+  type: Asset
+  id: asset.unclaimed-object
+  owner: faction.witnesses
+effects:
+  accomplished:
+    - targetType: asset
+      targetId: asset.unclaimed-object
+      property: locationChange
+      delta: 0
+      value: location.hall-of-remembrance
+status: draft
+start:
+  status: Plotting

@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/thread.schema.json
+id: thread.crescent-island
+slug: crescent-island
+name: Crescent Island
+summary: "The Manor map points to two buried histories on Crescent Island: an old Keeper residence and a Dawn escape route."
+status: draft
+provenance:
+  - doc: Campaign Outline
+    heading: Act II — The Cost > Session 5 — Dawn / The Morning After > Shared Manor Discovery
+  - doc: Campaign Outline
+    heading: Manor Route 4 — Dawn Assembly > The Way Out → Revolutionaries > Manor Hook
+  - doc: Campaign Outline
+    heading: Manor Route 5 — Witnesses > The Veiled House → Witness Me > The Veiled House

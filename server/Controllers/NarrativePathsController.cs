@@ -1,59 +1,44 @@
 using ColonyTracker.Api.Data;
 using ColonyTracker.Api.Models;
+using ColonyTracker.Api.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ColonyTracker.Api.Controllers;
 
+// Paths are declared in their branch's file (§14); a path's id is its canonical id (path.<slug>).
 [ApiController]
 [Route("api/narrative/paths")]
-public class NarrativePathsController(AppDbContext db) : ControllerBase
+public class NarrativePathsController(AppDbContext db, ICampaignContext campaign) : ControllerBase
 {
     [HttpGet]
     public async Task<IActionResult> GetAll([FromQuery] string? pathSetId = null)
     {
-        var query = db.NarrativePaths.AsQueryable();
-        if (pathSetId is not null)
-            query = query.Where(p => p.PathSetId == pathSetId);
-        return Ok(await query.OrderBy(p => p.SortOrder).ThenBy(p => p.Name).ToListAsync());
+        var paths = await NarrativeBranches.PathsAsync(db, await campaign.GetActiveIdAsync());
+        return Ok(paths.Where(p => pathSetId is null || p.PathSetId == pathSetId).OrderBy(p => p.PathSetId).ThenBy(p => p.SortOrder));
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(string id)
-    {
-        var path = await db.NarrativePaths.FindAsync(id);
-        if (path is null) return NotFound();
-        return Ok(path);
-    }
+    public async Task<IActionResult> GetById(string id) =>
+        (await NarrativeBranches.PathsAsync(db, await campaign.GetActiveIdAsync())).FirstOrDefault(p => p.Id == id) is { } p ? Ok(p) : NotFound();
 
     [HttpPost]
     public async Task<IActionResult> Create([FromBody] NarrativePath path)
     {
-        path.Id = Guid.NewGuid().ToString();
-        db.NarrativePaths.Add(path);
-        await db.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetById), new { id = path.Id }, path);
+        var saved = await NarrativeBranches.AddPathAsync(db, await campaign.GetActiveIdAsync(), path);
+        return CreatedAtAction(nameof(GetById), new { id = saved.Id }, saved);
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(string id, [FromBody] NarrativePath path)
     {
         if (id != path.Id) return BadRequest();
-        var existing = await db.NarrativePaths.FindAsync(id);
-        if (existing is null) return NotFound();
-        existing.Name = path.Name;
-        existing.SortOrder = path.SortOrder;
-        await db.SaveChangesAsync();
-        return Ok(existing);
+        return Ok(await NarrativeBranches.UpdatePathAsync(db, await campaign.GetActiveIdAsync(), id, path));
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(string id)
     {
-        var path = await db.NarrativePaths.FindAsync(id);
-        if (path is null) return NotFound();
-        db.NarrativePaths.Remove(path);
-        await db.SaveChangesAsync();
+        await NarrativeBranches.RemovePathAsync(db, await campaign.GetActiveIdAsync(), id);
         return NoContent();
     }
 }

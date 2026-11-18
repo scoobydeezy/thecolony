@@ -1,0 +1,49 @@
+# yaml-language-server: $schema=../../../schemas/faction.schema.json
+id: faction.order-of-theia
+slug: order-of-theia
+name: The Order of Theia
+type: Faction
+summary: The Order has safeguarded the Colony since its founding, believing stability must be preserved even when mercy looks like cruelty.
+motto: Until the Veil is Lifted
+represents: Preservation, Stewardship
+publicFace: The ruling authority of the Colony.
+selfImage: The necessary shield between the Colony and collapse.
+coreTenet: Stability is a responsibility.
+focus: The Present
+certainOf: Civilization survives through order.
+rightAbout: The threat is real and the ritual works.
+afraidOf: Collapse
+wrongAbout: The current system is the only possible solution.
+response: Contain the burden.
+origin: The Colony needed caretakers willing to preserve the ritual and protect people from the unbearable weight of memory. Protectors became rulers when preservation and authority became indistinguishable.
+foundedAs: Protectors
+became: Authoritarians
+history: |-
+  The Order of Theia began as a small circle of caretakers entrusted with preserving the ritual at the heart of the Colony's survival. Their work was not understood as rule, law, or government, but as vigilance. Someone had to guard the Book of Names, prepare the Ritual Chamber, and ensure the burden was carried before its weight became too great for the Colony to endure. The first members of the Order did not think of themselves as rulers. They were guardians standing between ordinary people and a truth too heavy to bear.
+
+  Over generations, preservation became administration. Every practical question eventually touched the ritual, and the Order answered those questions one by one—not through conquest, but through necessity. The Hall of the Keepers became the center of civic life, where disputes were settled and traditions interpreted, while the Bell of the Sun gave the Order's decisions public voice. The ritual remained hidden, but the authority built around it became visible throughout the Colony.
+
+  Today, the Order can no longer distinguish between preserving the Colony and preserving its own institutions. Its members sincerely believe they stand between civilization and collapse, and they are not entirely wrong. The ritual has protected the Colony for generations, reinforcing the conviction that stability itself is proof of righteousness. What began as a duty to safeguard the burden has become a certainty that no other future can be trusted.
+
+  Even now, many within the Order are disciplined, compassionate people carrying an impossible responsibility. They conceal the truth not from cruelty, but from the belief that some burdens destroy those unprepared to bear them. The name Theia itself reflects that transformation—a fragment of Aletheia, the first name recorded in the Book, whose meaning has long since been forgotten. The Order was founded to preserve a truth it can no longer speak, and over time, preserving that truth became preserving the silence around it.
+notes: The Order of Theia's name derives from Aletheia - though no one remembers this, she's the first name in the book.
+heraldry:
+  glyph: /uploads/factions/keepers-glyph.png?v=1785375300467
+  icon: /uploads/factions/keepers-icon.svg?v=1785375309123
+  primaryColor: "#dedede"
+  secondaryColor: "#1c1c1c"
+  bannerShape: pennant
+status: draft
+start:
+  active: true
+  leader: npc.serevan-ilvar
+  momentum: 1
+  size: 220
+  values:
+    truth: 0.121
+    stability: 0.879
+    agency: 0
+  beliefs:
+    a: Negative
+    b: Negative
+    c: Positive

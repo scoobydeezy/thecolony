@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/thread.schema.json
+id: thread.the-face-of-the-unknown
+slug: the-face-of-the-unknown
+name: The Face of the Unknown
+summary: The Cult uses the Face to receive the Unknown's many Forms, not realizing that its pilgrims are the ones supplying that shape.
+status: draft
+provenance:
+  - doc: Campaign Outline
+    heading: Manor Route 2 — Cult of the Unknown > The Thin Place → The Shape of Someone > What the Cult Believes
+  - doc: Campaign Outline
+    heading: Manor Route 2 — Cult of the Unknown > The Thin Place → The Shape of Someone > What Is Actually Happening
+  - doc: The Veiled
+    heading: Form — Face of the Unknown

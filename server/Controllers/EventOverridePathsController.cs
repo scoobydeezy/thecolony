@@ -1,43 +1,24 @@
 using ColonyTracker.Api.Data;
 using ColonyTracker.Api.Models;
+using ColonyTracker.Api.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ColonyTracker.Api.Controllers;
 
+// A version's `when` (§14).
 [ApiController]
 [Route("api/narrative/event-override-paths")]
-public class EventOverridePathsController(AppDbContext db) : ControllerBase
+public class EventOverridePathsController(AppDbContext db, ICampaignContext campaign) : ControllerBase
 {
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] string? overrideId = null)
-    {
-        var query = db.EventOverridePaths.AsQueryable();
-        if (overrideId is not null)
-            query = query.Where(op => op.EventOverrideId == overrideId);
-        return Ok(await query.ToListAsync());
-    }
+    public async Task<IActionResult> GetAll([FromQuery] string? overrideId = null) =>
+        Ok((await NarrativeBranches.VersionsAsync(db, await campaign.GetActiveIdAsync())).SelectMany(v => v.Paths).Where(p => overrideId is null || p.EventOverrideId == overrideId));
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] EventOverridePath op)
-    {
-        var exists = await db.EventOverridePaths
-            .AnyAsync(x => x.EventOverrideId == op.EventOverrideId && x.PathId == op.PathId);
-        if (exists) return Conflict();
-        db.EventOverridePaths.Add(op);
-        await db.SaveChangesAsync();
-        return Ok(op);
-    }
+    public async Task<IActionResult> Create([FromBody] EventOverridePath op) =>
+        await NarrativeBranches.SetVersionPathAsync(db, await campaign.GetActiveIdAsync(), op.EventOverrideId, op.PathId, on: true) ? Ok(op) : Conflict();
 
     [HttpDelete]
-    public async Task<IActionResult> Delete(
-        [FromQuery] string overrideId,
-        [FromQuery] string pathId)
-    {
-        var existing = await db.EventOverridePaths.FindAsync(overrideId, pathId);
-        if (existing is null) return NotFound();
-        db.EventOverridePaths.Remove(existing);
-        await db.SaveChangesAsync();
-        return NoContent();
-    }
+    public async Task<IActionResult> Delete([FromQuery] string overrideId, [FromQuery] string pathId) =>
+        await NarrativeBranches.SetVersionPathAsync(db, await campaign.GetActiveIdAsync(), overrideId, pathId, on: false) ? NoContent() : NotFound();
 }

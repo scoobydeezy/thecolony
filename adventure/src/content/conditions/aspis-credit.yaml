@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.aspis-credit
+slug: aspis-credit
+name: Aspis Credit
+variesBy:
+  subject:
+    kind: goalStage
+    id: goal.divest
+  rows:
+    - state: Planning
+      text: ""
+      stress: 0
+    - state: Progressing
+      text: Aspis loads portable capital and personnel onto outbound convoys and suspends new local credit guarantees.
+      stress: 0
+    - state: Ready
+      text: ""
+      stress: 0
+    - state: Accomplished
+      text: The River Exchange stops offering Consortium-backed guarantees and new credit while Aspis withdraws staff and capital.
+      stress: 0
+    - state: Failed
+      text: ""
+      stress: 0
+    - state: Retired
+      text: ""
+      stress: 0
+status: draft

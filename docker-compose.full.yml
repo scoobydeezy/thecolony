@@ -8,10 +8,17 @@ services:
     volumes:
       - colony-data:/app/data
       - colony-uploads:/app/uploads
+      # Characters live in the repo's canonical content files (ADVENTURE-BOOK-PLAN.md §9).
+      - ./adventure:/app/adventure
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:5000
       - ConnectionStrings__Default=Data Source=/app/data/colony.db
+      - Canon__ContentPath=/app/adventure/src/content
+      - Canon__SchemaPath=/app/adventure/schemas
+      - Canon__LinkMapPath=/app/data/canon-switch-archive/staging/characters/id-map.yaml
+      - Canon__EntityLinkMapPath=/app/data/canon-switch-archive/staging/entities/id-map.yaml
+      - Canon__GoalLinkMapPath=/app/data/canon-switch-archive/staging/goals/id-map.yaml
     restart: unless-stopped
 
   ui:

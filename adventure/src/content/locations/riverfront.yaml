@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.riverfront
+slug: riverfront
+name: The Riverfront
+type: Zone
+summary: The High Bank Shore of the River
+parent: location.colony
+markerColor: "#830c0c"
+status: draft
+start:
+  state: Stable

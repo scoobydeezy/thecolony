@@ -1,0 +1,93 @@
+# Migration map: canonical concepts moving from the 13 source documents
+# (in the parent "The Colony/" folder) into the book.
+#
+# status:   unmigrated | in-progress | migrated
+# role:     states   — the location defines (part of) the concept
+#           depends  — the location relies on the concept and must point at it once migrated
+# heading:  heading path in the source doc, levels separated by " > " (validated by scripts/validate.mjs)
+#
+# A concept becomes "migrated" only when every provenance entry is reconciled and the user
+# has approved any resolution that changed meaning.
+
+concepts:
+  rule.book.keeper-bound-handling:
+    status: in-progress
+    targets: [rule.book.keeper-bound-handling]
+    provenance:
+      - { doc: The Veiled, heading: The Book of Names — Keeper-Bound Handling, role: states, reconciled: true }
+      - { doc: The Burden — Final Veiled Encounter, heading: The Book of Names — Keeper-Bound Handling, role: states, reconciled: true }
+      - { doc: Encounters, heading: 5. The Reading — Ritual Chamber > The Book and Ritual Interruption, role: states, reconciled: true }
+      - { doc: Creatures, heading: The Reading — Ritual Chamber > The Book Clock, role: states, reconciled: true, note: handling paragraph }
+      - { doc: The Burden — Final Veiled Encounter, heading: Keeper-Bound Book During the Window, role: depends, reconciled: false, note: point at the rule when The Burden is migrated }
+      - { doc: The Burden — Final Veiled Encounter, heading: Book of Names — Source 15, role: depends, reconciled: false, note: "\"The intrinsic Keeper-Bound Handling rule remains active\" (third copy of the block)" }
+      - { doc: The Burden — Final Veiled Encounter, heading: Interrupting the Interlude, role: depends, reconciled: false, note: "says \"Keeper-Bound Backlash\"; ruled to be ordinary Mnemonic Backlash" }
+      - { doc: The Burden — Final Veiled Encounter, heading: Direct Contact, role: depends, reconciled: false }
+    reconciliation:
+      - "2026-11-17 (user): \"current\" in \"full current Class V Mnemonic Backlash\" has no meaning. Backlash is always computed from the Source's Veiled Class."
+      - "\"Keeper-Bound Backlash\" (The Burden, Interrupting the Interlude) is ordinary Mnemonic Backlash."
+      - The allowed and blocked actions from all four statements are combined (hold and carry listed separately in The Burden; obscuring the page from Encounters and Creatures; attacking an active Ward from range from The Veiled).
+      - "Serevan's recognition by the Book is kept as a Secret: a deliberate unresolved thread."
+
+  source.book-of-names:
+    status: in-progress
+    targets: [source.book-of-names]
+    provenance:
+      - { doc: The Burden — Final Veiled Encounter, heading: Book of Names — Source 15, role: states, reconciled: true, note: the same block appears three times }
+      - { doc: The Veiled, heading: Class > Class I–V, role: states, reconciled: true, note: generic formulas }
+    reconciliation:
+      - Derived values reproduce The Burden's block exactly (Source DC 39, Ward AC 39, Ward HP 200, Backlash 5d12 basic Will DC 39, threshold 6, radius 50 feet).
+      - "2026-11-17 (user): Source Level 15 throughout the campaign, including The Reading."
+      - "2026-11-17 (user): the threshold is \"Stability Threshold\" (The Veiled). The Burden's and Creatures' \"Reconstruction Threshold\" is retired."
+
+  creature.kelda-varruk:
+    status: in-progress
+    targets: [creature.kelda-varruk]
+    provenance:
+      - { doc: Creatures, heading: Captain Kelda Varruk — Creature 13, role: states, reconciled: true }
+      - { doc: Character Briefs, heading: Captain of the Guard - Kelda Varruk, role: states, reconciled: true, note: ancestry (Dwarf) and title }
+    reconciliation:
+      - "2026-11-17 (user): encounter-specific text leaves stat blocks. Tactical Priority and the nonlethal default moved to The Reading."
+      - "2026-11-17 (user): No One Crosses and Protector of the Keeper are, for now, Kelda's general abilities; they stay on her stat block as written."
+      - "2026-11-17 (user): Kelda is a dwarf. The source block listed only \"Medium Humanoid\"; the Dwarf trait is now derived from npc.kelda-varruk (ancestry), and her name and title come from the NPC entry."
+      - "2026-11-17 (user): NPCs with playable ancestries read like PCs; her stat block header is \"Dwarf Fighter 13\" (class and level on npc.kelda-varruk). The app's \"Level 11\" is replaced by 13; \"Creature\" is reserved for entities that are not NPCs."
+
+  encounter.the-reading:
+    status: in-progress
+    targets: [encounter.the-reading]   # was concept chapter.act-1.the-reading: the old book page became the encounter (2026-11-18)
+    provenance:
+      - { doc: Encounters, heading: 5. The Reading — Ritual Chamber, role: states, reconciled: false, note: representative section compiled; not yet complete }
+      - { doc: Creatures, heading: The Reading — Ritual Chamber > Vara Trust and Appeal, role: states, reconciled: false }
+      - { doc: Creatures, heading: The Reading — Ritual Chamber > The Book Clock, role: states, reconciled: false }
+      - { doc: Creatures, heading: The Reading — Ritual Chamber > Varenya “Vara” Cairn — NPC 10, role: states, reconciled: false, note: encounter-specific parts of Vara's stat block belong to the chapter }
+    open:
+      - Vara's NPC 10 stat block is almost entirely encounter-specific. Split it between her entity and the chapter when the chapter is written.
+
+  # Narrative rulings (ADVENTURE-BOOK-PLAN.md §13), recorded once the event files existed.
+  narrative.observer-timing:
+    status: migrated
+    targets: [event.the-confluence, event.the-observer, event.eclipse]
+    provenance:
+      - { doc: Campaign Outline, heading: Session 8 — The Confluence > If the Reading Was Stopped, role: states, reconciled: true }
+      - { doc: Campaign Outline, heading: Session 8 — The Confluence > If the Reading Succeeded, role: states, reconciled: true }
+      - { doc: Campaign Outline, heading: The Observer Reveal, role: states, reconciled: true }
+      - { doc: Character Briefs, heading: The Observer - Silas Venn > The Manor, role: states, reconciled: true }
+      - { doc: Character Briefs, heading: The Observer - Silas Venn > Relationship to the Party, role: states, reconciled: true }
+    reconciliation:
+      - "2026-11-18 (user): The Observer ends Act II and holds the whole reveal, in either order. Reading stopped: the eclipse begins at the Confluence, then the Observer calls the Party back. Reading succeeded: the Observer reveals himself, then the eclipse begins. Eclipse opens Act III with the eclipse already begun. Both source documents were edited to say so."
+
+  narrative.final-reading:
+    status: migrated
+    targets: [event.the-light-remains]
+    provenance:
+      - { doc: Campaign Outline, heading: Session 12 — The Light Remains, role: states, reconciled: true }
+    reconciliation:
+      - "2026-11-17 (user): the Final Reading / Enacting the Answer is prose inside The Light Remains, not an entity of its own."
+
+  narrative.sheep-observation:
+    status: migrated
+    targets: [encounter.the-breach]
+    provenance:
+      - { doc: Encounters, heading: 14. The Breach — EGRESS Crisis, role: states, reconciled: true }
+      - { doc: Campaign Outline, heading: Session 10 — Shattered > The Breach — EGRESS Institute, role: states, reconciled: true, note: corrected 2026-11-18 }
+    reconciliation:
+      - "2026-11-18: the Sheep is harmless while watched and lethal when its last observer loses sight (Encounters, Creatures). The Campaign Outline had the opposite and was corrected."

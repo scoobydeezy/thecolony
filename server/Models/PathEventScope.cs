@@ -1,7 +1,7 @@
 namespace ColonyTracker.Api.Models;
 
-// Explicit membership: this Event is within the active lifetime of this Path.
-// Presence here does not imply the Event has overrides — scope and variation are separate.
+// Explicit membership: this event is within the active lifetime of this path (§14: the event file's
+// `onPaths`). Presence does not imply the event has versions. Not a table.
 public class PathEventScope
 {
     public string PathId { get; set; } = string.Empty;

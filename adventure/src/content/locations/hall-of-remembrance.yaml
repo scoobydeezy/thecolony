@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.hall-of-remembrance
+slug: hall-of-remembrance
+name: Hall of Remembrance
+summary: The Witnesses keep objects here that are imbued with emotional resonance.
+parent: location.abiding-way
+asset: asset.hall-of-remembrance
+status: draft
+start:
+  state: Stable

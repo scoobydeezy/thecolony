@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.procession-protest
+slug: procession-protest
+name: Procession Protest
+variesBy:
+  subject:
+    kind: goalStage
+    id: goal.blockade-the-procession
+  rows:
+    - state: Planning
+      text: ""
+      stress: 0
+    - state: Progressing
+      text: Dawn demonstrators gather along the Keeper Procession route.
+      stress: 0
+    - state: Ready
+      text: ""
+      stress: 0
+    - state: Accomplished
+      text: The occupied route cannot be used without negotiation, dispersal or alternate approach.
+      stress: 0
+    - state: Failed
+      text: ""
+      stress: 0
+    - state: Retired
+      text: ""
+      stress: 0
+status: draft

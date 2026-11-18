@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.order-watch-garrison
+slug: order-watch-garrison
+name: Order Watch Garrison
+type: Infrastructure
+role: Operational
+tier: 3
+keystone: false
+summary: The Order’s watch barracks and guard deployment facilities, supporting patrols, civic security, and enforcement of Order decisions.
+status: draft
+start:
+  controller: faction.order-of-theia
+  status: Stable

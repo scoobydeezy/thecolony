@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.river-exchange
+slug: river-exchange
+name: River Exchange
+type: Infrastructure
+role: Operational
+tier: 5
+keystone: false
+summary: The Consortium's administrative and commercial headquarters, where trade entering or leaving the Colony is negotiated, inspected, and recorded. More than a marketplace, the River Exchange serves as the Colony's primary connection to Andoran, Isger, and the wider world beyond its borders.
+status: draft
+start:
+  controller: faction.aspis
+  location: location.riverfront
+  status: Stable

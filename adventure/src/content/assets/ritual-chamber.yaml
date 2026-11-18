@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.ritual-chamber
+slug: ritual-chamber
+name: The Ritual Chamber
+type: Infrastructure
+role: Operational
+tier: 5
+keystone: false
+summary: The sacred chamber where the annual ritual is performed. Few have entered it, fewer still understand it, and none speak openly of what transpires within.
+status: draft
+start:
+  controller: faction.order-of-theia
+  status: Stable

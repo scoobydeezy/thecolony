@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.steal-the-unclaimed-object
+slug: steal-the-unclaimed-object
+name: Steal the Unclaimed Object
+faction: faction.shattered
+type: Achieve
+priority: Critical
+visibility: Open
+outcome: Automatic
+earliestAct: 2
+champion: npc.kivren-quozot
+target:
+  type: Asset
+  id: asset.unclaimed-object
+  owner: faction.shattered
+status: draft
+start:
+  status: Plotting

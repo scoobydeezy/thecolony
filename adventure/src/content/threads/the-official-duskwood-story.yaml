@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../../../schemas/thread.schema.json
+id: thread.the-official-duskwood-story
+slug: the-official-duskwood-story
+name: The Official Duskwood Story
+summary: The Colony blames the Duskwood for the Veiled, though its dangers are ordinary Golarion ones and the Veiled do not originate there. Act I challenges the origin story and Old Town demolishes it; later revelations show why the politically useful explanation persisted.
+status: draft
+provenance:
+  - doc: Campaign Outline
+    heading: Campaign-Wide Promises and Narrative Threads > The Official Duskwood Story
+  - doc: Campaign Outline
+    heading: Act I — The Secret > Session 3 — Dusk > Cult Route — Duskwood

@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.cult-ledger-relationships
+slug: cult-ledger-relationships
+name: Cult Ledger Relationships
+rule: New Cult-related Veiled incursions gain +1 Class (stacks with Cult Registry Pattern; max Class V; not retroactive).
+requires:
+  - kind: assetController
+    assetId: asset.ledger
+    factionId: faction.cult-of-the-unknown
+status: draft

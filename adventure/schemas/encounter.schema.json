@@ -1,0 +1,386 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^encounter\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string"
+    },
+    "status": {
+      "default": "draft",
+      "type": "string",
+      "enum": [
+        "stub",
+        "draft",
+        "canonical"
+      ]
+    },
+    "previousSlugs": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+      }
+    },
+    "aliases": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z]+\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+      }
+    },
+    "provenance": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "doc": {
+            "type": "string"
+          },
+          "heading": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "doc",
+          "heading"
+        ]
+      }
+    },
+    "design": {
+      "type": "string"
+    },
+    "function": {
+      "type": "string"
+    },
+    "synopsis": {
+      "type": "string"
+    },
+    "visibility": {
+      "default": "GMOnly",
+      "type": "string",
+      "enum": [
+        "Public",
+        "GMOnly",
+        "Revealed"
+      ]
+    },
+    "part": {
+      "type": "string",
+      "pattern": "^part\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    },
+    "chapter": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "order": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "sidebar": {
+      "type": "object",
+      "properties": {
+        "label": {
+          "type": "string"
+        },
+        "overviewLabel": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    },
+    "route": {
+      "type": "string"
+    },
+    "leadsTo": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "string",
+            "pattern": "^(event|encounter)\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+          },
+          "thread": {
+            "type": "string",
+            "pattern": "^thread\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+          },
+          "visibility": {
+            "type": "string",
+            "enum": [
+              "Public",
+              "GMOnly",
+              "Revealed"
+            ]
+          }
+        },
+        "required": [
+          "to",
+          "thread"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "links": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string",
+            "pattern": "^[a-z]+\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[a-z]+\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+              },
+              "role": {
+                "type": "string"
+              },
+              "notes": {
+                "type": "string"
+              },
+              "primary": {
+                "type": "boolean"
+              },
+              "visibility": {
+                "type": "string",
+                "enum": [
+                  "Public",
+                  "GMOnly",
+                  "Revealed"
+                ]
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "variesBy": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^branch\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+      }
+    },
+    "onPaths": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^path\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+      }
+    },
+    "variants": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+          },
+          "when": {
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^path\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+            }
+          },
+          "summary": {
+            "type": "string"
+          },
+          "synopsis": {
+            "type": "string"
+          },
+          "leadsTo": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "to": {
+                  "type": "string",
+                  "pattern": "^(event|encounter)\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+                },
+                "thread": {
+                  "type": "string",
+                  "pattern": "^thread\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+                },
+                "visibility": {
+                  "type": "string",
+                  "enum": [
+                    "Public",
+                    "GMOnly",
+                    "Revealed"
+                  ]
+                }
+              },
+              "required": [
+                "to",
+                "thread"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "pattern": "^[a-z]+\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "pattern": "^[a-z]+\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "notes": {
+                      "type": "string"
+                    },
+                    "primary": {
+                      "type": "boolean"
+                    },
+                    "visibility": {
+                      "type": "string",
+                      "enum": [
+                        "Public",
+                        "GMOnly",
+                        "Revealed"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "key"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "readiness": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "scaffold",
+            "compiled",
+            "audited",
+            "inventoried",
+            "written",
+            "closed"
+          ]
+        },
+        "playtest": {
+          "default": [],
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "status"
+      ],
+      "additionalProperties": false
+    },
+    "inventory": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^inventory\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+          },
+          "note": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "revelations": {
+      "default": [],
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^revelation\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "introduces",
+              "requires",
+              "keeps-available"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "mode"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "event": {
+      "type": "string",
+      "pattern": "^event\\.[a-z0-9]+(?:[.-][a-z0-9]+)*$"
+    }
+  },
+  "required": [
+    "id",
+    "slug",
+    "name"
+  ],
+  "additionalProperties": false
+}

@@ -22,26 +22,19 @@ public class NarrativeThreadsController(AppDbContext db, ICampaignContext campai
             if (!Enum.TryParse<NarrativeEntityType>(entityType, ignoreCase: true, out var parsedType))
                 return BadRequest("Invalid entityType.");
 
-            var linkedIds = await db.NarrativeEntityLinks
-                .Where(l => l.CampaignId == cid
-                    && l.OwnerType == NarrativeOwnerType.Thread
-                    && l.EntityType == parsedType
-                    && l.EntityId == entityId)
+            var linkedIds = (await NarrativeGraph.LinksAsync(db, cid))
+                .Where(l => l.OwnerType == NarrativeOwnerType.Thread && l.EntityType == parsedType && l.EntityId == entityId)
                 .Select(l => l.OwnerId)
-                .ToListAsync();
+                .ToList();
 
-            var threads = await db.NarrativeThreads
+            var threads = (await db.NarrativeThreads
                 .Where(t => t.CampaignId == cid && linkedIds.Contains(t.Id))
-                .OrderBy(t => t.Title)
-                .ToListAsync();
+                .ToListAsync()).OrderBy(t => t.Title);
             return Ok(threads);
         }
 
-        var all = await db.NarrativeThreads
-            .Where(t => t.CampaignId == cid)
-            .OrderBy(t => t.Title)
-            .ToListAsync();
-        return Ok(all);
+        // Title is file-backed (not a column): order in memory.
+        return Ok((await db.NarrativeThreads.Where(t => t.CampaignId == cid).ToListAsync()).OrderBy(t => t.Title));
     }
 
     [HttpGet("{id}")]
@@ -58,6 +51,8 @@ public class NarrativeThreadsController(AppDbContext db, ICampaignContext campai
         var cid = await campaign.GetActiveIdAsync();
         thread.Id = Guid.NewGuid().ToString();
         thread.CampaignId = cid;
+        thread.CanonId = null;
+        thread.LinksJson = null;
         db.NarrativeThreads.Add(thread);
         await db.SaveChangesAsync();
         return CreatedAtAction(nameof(GetById), new { id = thread.Id }, thread);
@@ -83,6 +78,7 @@ public class NarrativeThreadsController(AppDbContext db, ICampaignContext campai
         var thread = await db.NarrativeThreads.FindAsync(id);
         if (thread is null) return NotFound();
         db.NarrativeThreads.Remove(thread);
+        db.NarrativeEntityLinks.RemoveRange(db.NarrativeEntityLinks.Where(l => l.OwnerType == NarrativeOwnerType.Thread && l.OwnerId == id));
         await db.SaveChangesAsync();
         return NoContent();
     }

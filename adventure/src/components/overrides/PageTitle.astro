@@ -1,0 +1,57 @@
+---
+// The page title, plus the book's editor toolbar (ADVENTURE-BOOK-PLAN.md §16). The toolbar stays hidden
+// unless the Colony API answers, so a copy of the book opened without the app shows no editing controls.
+//   Edit / Delete   the page's source file (a docs page's own file, or rpSource for a generated page)
+//   New             on an index page (rpNew: the entry type), or on a book page (a new page in its folder)
+import fs from 'node:fs';
+import Default from '@astrojs/starlight/components/PageTitle.astro';
+
+const route = Astro.locals.starlightRoute;
+const data = route.entry.data ?? {};
+// A generated page (StarlightPage) gets a made-up docs path: only a real file counts as the page's own.
+const path = route.entry.filePath;
+const own = !data.rpSource && !data.rpNew && path?.startsWith('src/content/') && fs.existsSync(path) ? path.slice('src/content/'.length) : null;
+const source = data.rpSource ?? own ?? '';
+// A book page in a chapter folder can add a sibling page there.
+const docsDir = own?.startsWith('docs/') && own.split('/').length === 3 ? own.split('/')[1] : '';
+const newType = data.rpNew ?? (docsDir ? 'docs' : '');
+---
+
+<Default />
+<div class="rp-editbar" data-source={source} data-new-type={newType} data-new-dir={docsDir} hidden>
+  {source && <button type="button" data-action="edit">Edit</button>}
+  {newType && <button type="button" data-action="new">New {newType === 'docs' ? 'page' : ''}</button>}
+  {source && <button type="button" data-action="delete" class="rp-danger">Delete</button>}
+</div>
+
+<script>
+  import { initToolbar } from '../../editor/toolbar.js';
+  initToolbar();
+</script>
+
+<style>
+  .rp-editbar {
+    display: flex;
+    gap: 0.4rem;
+    margin: 0.25rem 0 0.75rem;
+  }
+  .rp-editbar[hidden] {
+    display: none;
+  }
+  .rp-editbar button {
+    padding: 0.2rem 0.7rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.4rem;
+    background: var(--sl-color-gray-6);
+    color: var(--sl-color-white);
+    font-size: var(--sl-text-sm);
+    cursor: pointer;
+  }
+  .rp-editbar button:hover {
+    border-color: var(--sl-color-accent);
+  }
+  .rp-editbar .rp-danger:hover {
+    border-color: var(--sl-color-red, #d33);
+    color: var(--sl-color-red-high, #f88);
+  }
+</style>

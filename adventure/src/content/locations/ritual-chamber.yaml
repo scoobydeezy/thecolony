@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.ritual-chamber
+slug: ritual-chamber
+name: Ritual Chamber
+summary: Beneath the Monument of the First Keeper, reached through the Memorial Building and down a spiral stair.
+parent: location.memorial-building
+asset: asset.ritual-chamber
+status: stub
+start:
+  state: Stable
+provenance:
+  - doc: Encounters
+    heading: 5. The Reading — Ritual Chamber > Arena

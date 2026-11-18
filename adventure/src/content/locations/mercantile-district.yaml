@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.mercantile-district
+slug: mercantile-district
+name: Mercantile District
+type: Zone
+summary: Warehouses, Docks, and Industrial buildings dominate this part of the Colony.
+parent: location.colony
+status: draft
+start:
+  state: Stable

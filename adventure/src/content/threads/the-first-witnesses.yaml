@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../../../schemas/thread.schema.json
+id: thread.the-first-witnesses
+slug: the-first-witnesses
+name: The First Witnesses
+summary: The Veiled House preserves the failure that proved the early Witnesses right and forced the Order to preserve context, not merely possessions.
+status: draft
+provenance:
+  - doc: Campaign Outline
+    heading: Manor Route 5 — Witnesses > The Veiled House → Witness Me > The Veiled House
+  - doc: Campaign Outline
+    heading: Manor Route 5 — Witnesses > The Veiled House → Witness Me > The Last Correct Context

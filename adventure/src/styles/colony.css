@@ -1,0 +1,202 @@
+/* Results Pending — book theme. Dark palette mirrors the Colony app
+   (client/src/styles.scss) so the two read as one product. */
+
+:root {
+  --sl-font: 'Inter', system-ui, -apple-system, sans-serif;
+  --rp-serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+
+  /* light theme (Starlight applies :root[data-theme='light'] below) */
+  --rp-read-bg: #f3efe4;
+  --rp-read-fg: #2b2418;
+  --rp-read-edge: #b08d4a;
+  --rp-player-bg: #e8f2ea;
+  --rp-player-edge: #2f855a;
+  --rp-secret-bg: #fbeaea;
+  --rp-secret-edge: #c53030;
+  --rp-gm-bg: #eaf1fb;
+  --rp-gm-edge: #2b6cb0;
+  --rp-design-bg: #f3e8ff;
+  --rp-design-fg: #553c9a;
+  --rp-branch-edge: #94a3b8;
+  --rp-sb-bg: #f8f6f1;
+  --rp-sb-edge: #7b2d26;
+  --rp-sb-head-fg: #ffffff;
+}
+
+:root[data-theme='dark'],
+:root:not([data-theme]) {
+  --sl-color-accent-low: #1a2e4a;
+  --sl-color-accent: #3b82f6;
+  --sl-color-accent-high: #93c5fd;
+  --sl-color-white: #f1f5f9;
+  --sl-color-gray-1: #e2e8f0;
+  --sl-color-gray-2: #cbd5e1;
+  --sl-color-gray-3: #94a3b8;
+  --sl-color-gray-4: #64748b;
+  --sl-color-gray-5: #334155;
+  --sl-color-gray-6: #1e293b;
+  --sl-color-black: #0f172a;
+
+  --rp-read-bg: #2a2418;
+  --rp-read-fg: #f3e9d2;
+  --rp-read-edge: #c9a45c;
+  --rp-player-bg: #13261b;
+  --rp-player-edge: #22c55e;
+  --rp-secret-bg: #2a1215;
+  --rp-secret-edge: #ef4444;
+  --rp-gm-bg: #13213a;
+  --rp-gm-edge: #60a5fa;
+  --rp-design-bg: #2a1d45;
+  --rp-design-fg: #d6bcfa;
+  --rp-branch-edge: #64748b;
+  --rp-sb-bg: #18202f;
+  --rp-sb-edge: #9b3b32;
+  --rp-sb-head-fg: #ffffff;
+}
+
+:root[data-theme='light'] {
+  --sl-color-accent-low: #dbeafe;
+  --sl-color-accent: #2563eb;
+  --sl-color-accent-high: #1e3a8a;
+}
+
+/* ---------- audience blocks ---------- */
+.sl-markdown-content .rp-block {
+  margin-block: 1.25rem;
+  padding: 0.85rem 1rem;
+  border-inline-start: 4px solid var(--rp-branch-edge);
+  border-radius: 0.35rem;
+}
+.sl-markdown-content .rp-block > .rp-label,
+.sl-markdown-content .rp-embed > .rp-label {
+  margin: 0 0 0.4rem;
+  font-size: var(--sl-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sl-color-gray-3);
+}
+.sl-markdown-content .rp-read-aloud {
+  background: var(--rp-read-bg);
+  color: var(--rp-read-fg);
+  border-color: var(--rp-read-edge);
+  font-family: var(--rp-serif);
+  font-size: 1.05em;
+  font-style: italic;
+}
+.sl-markdown-content .rp-read-aloud > .rp-label { font-family: var(--sl-font); font-style: normal; }
+.sl-markdown-content .rp-player-facing { background: var(--rp-player-bg); border-color: var(--rp-player-edge); }
+.sl-markdown-content .rp-secret { background: var(--rp-secret-bg); border-color: var(--rp-secret-edge); }
+.sl-markdown-content .rp-gm-note { background: var(--rp-gm-bg); border-color: var(--rp-gm-edge); }
+.sl-markdown-content .rp-design { background: var(--rp-design-bg); color: var(--rp-design-fg); border-color: var(--rp-design-fg); }
+.sl-markdown-content .rp-branch { border: 1px solid var(--sl-color-gray-5); border-inline-start-width: 4px; }
+
+/* ---------- clocks ---------- */
+.sl-markdown-content .rp-clock { background: var(--sl-color-gray-6); border-color: var(--sl-color-accent); }
+.sl-markdown-content .rp-clock-track {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(2.25rem, 1fr));
+  gap: 0.35rem;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.sl-markdown-content .rp-clock-track li {
+  margin: 0;
+  padding: 0.35rem 0;
+  border: 1px solid var(--sl-color-gray-4);
+  border-radius: 0.25rem;
+  text-align: center;
+  font-size: var(--sl-text-xs);
+  color: var(--sl-color-gray-3);
+}
+.sl-markdown-content .rp-clock-note { margin: 0.5rem 0 0; font-size: var(--sl-text-sm); color: var(--sl-color-gray-2); }
+
+/* ---------- references ---------- */
+.sl-markdown-content .rp-ref { text-decoration-style: dotted; text-underline-offset: 0.2em; }
+.sl-markdown-content .rp-ref-missing { color: var(--rp-secret-edge); text-decoration: underline wavy; }
+.sl-markdown-content .rp-stat { font-weight: 600; white-space: nowrap; }
+.sl-markdown-content .rp-cite {
+  font-size: var(--sl-text-xs);
+  padding: 0 0.35rem;
+  border-radius: 0.25rem;
+  background: var(--rp-design-bg);
+  color: var(--rp-design-fg);
+  text-decoration: none;
+}
+.sl-markdown-content .rp-embed {
+  margin-block: 1.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-radius: 0.35rem;
+}
+
+/* ---------- stat blocks ---------- */
+.rp-statblock {
+  margin-block: 1rem;
+  border: 1px solid var(--sl-color-gray-5);
+  border-top: 3px solid var(--rp-sb-edge);
+  border-radius: 0.35rem;
+  background: var(--rp-sb-bg);
+  padding: 0 1rem 0.75rem;
+  font-size: var(--sl-text-sm);
+}
+.rp-statblock .rp-sb-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 -1rem 0.5rem;
+  padding: 0.4rem 1rem;
+  background: var(--rp-sb-edge);
+  color: var(--rp-sb-head-fg);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.rp-statblock .rp-sb-traits { display: flex; flex-wrap: wrap; gap: 0.25rem; margin: 0 0 0.5rem; padding: 0; list-style: none; }
+.rp-statblock .rp-sb-traits li {
+  margin: 0;
+  padding: 0.05rem 0.45rem;
+  border-radius: 0.2rem;
+  background: #5b2a86;
+  color: #fff;
+  font-size: var(--sl-text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.rp-statblock p { margin: 0.15rem 0; }
+.rp-statblock hr { margin: 0.4rem 0; border: 0; border-top: 1px solid var(--sl-color-gray-5); }
+
+/* ---------- entity index pages ---------- */
+.rp-entity-list { list-style: none; padding: 0; }
+.rp-entity-list li { padding: 0.5rem 0; border-bottom: 1px solid var(--sl-color-gray-6); }
+.rp-entity-list .rp-muted { color: var(--sl-color-gray-3); font-size: var(--sl-text-sm); }
+.rp-badge {
+  display: inline-block;
+  padding: 0 0.45rem;
+  border-radius: 999px;
+  font-size: var(--sl-text-xs);
+  background: var(--sl-color-gray-6);
+  color: var(--sl-color-gray-2);
+  border: 1px solid var(--sl-color-gray-5);
+}
+.rp-table-wrap { overflow-x: auto; }
+
+/* Sidebar: a chapter (a sub-group inside a part) is labelled like a page link, not like a part heading
+   (user, 2026-11-18). Mirrors Starlight's link styling in SidebarSublist.astro. Parts keep the large label. */
+.sidebar-content ul ul summary {
+  padding-block: 0.3em;
+}
+.sidebar-content ul ul summary .large {
+  font-size: inherit;
+  font-weight: inherit;
+  color: var(--sl-color-gray-2);
+}
+.sidebar-content ul ul summary:hover .large {
+  color: var(--sl-color-white);
+}
+@media (min-width: 50rem) {
+  .sidebar-content ul ul summary .large {
+    font-size: var(--sl-text-sm);
+  }
+}

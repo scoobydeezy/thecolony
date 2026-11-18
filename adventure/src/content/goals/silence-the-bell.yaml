@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.silence-the-bell
+slug: silence-the-bell
+name: Silence the Bell
+faction: faction.shattered
+type: Achieve
+priority: Critical
+visibility: Secret
+outcome: Automatic
+earliestAct: 3
+champion: npc.vorik-ash
+target:
+  type: Asset
+  id: asset.bell-of-the-sun
+  state: Destroyed
+effects:
+  progressing:
+    - targetType: asset
+      targetId: asset.bell-of-the-sun
+      property: status
+      delta: 0
+      value: Damaged
+status: draft
+start:
+  status: Plotting

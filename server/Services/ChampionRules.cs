@@ -21,10 +21,10 @@ public static class ChampionRules
         if (string.IsNullOrEmpty(goal.ChampionId) || !IsActive(goal.Status)) return null;
         var newlyOccupied = previous is null || previous.ChampionId != goal.ChampionId || !IsActive(previous.Status);
         if (!newlyOccupied) return null;
-        var other = await db.FactionGoals.AsNoTracking()
-            .Where(g => g.CampaignId == goal.CampaignId && g.Id != goal.Id && g.ChampionId == goal.ChampionId
-                        && g.Status != GoalStatus.Accomplished && g.Status != GoalStatus.Failed && g.Status != GoalStatus.Retired)
-            .OrderBy(g => g.Title).FirstOrDefaultAsync();
+        // Champion, status and title are file-backed (ADVENTURE-BOOK-PLAN.md §11): filter after loading.
+        var other = (await db.FactionGoals.AsNoTracking().Where(g => g.CampaignId == goal.CampaignId && g.Id != goal.Id).ToListAsync())
+            .Where(g => g.ChampionId == goal.ChampionId && IsActive(g.Status))
+            .OrderBy(g => g.Title, StringComparer.Ordinal).FirstOrDefault();
         if (other is null) return null;
         var name = (await db.Characters.AsNoTracking().FirstOrDefaultAsync(c => c.Id == goal.ChampionId))?.Name ?? goal.ChampionId;
         return $"{name} already champions \"{other.Title}\". A character champions one active goal or assignment at a time.";

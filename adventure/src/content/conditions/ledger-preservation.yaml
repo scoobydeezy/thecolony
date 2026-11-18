@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.ledger-preservation
+slug: ledger-preservation
+name: Ledger Preservation
+variesBy:
+  subject:
+    kind: goalStage
+    id: goal.preserve-the-ledger
+  rows:
+    - state: Planning
+      text: ""
+      stress: 0
+    - state: Progressing
+      text: Witnesses move the Ledger's working volumes to Celia's desk and post defenders in the Hall of Remembrance.
+      stress: 0
+    - state: Ready
+      text: Under Totality, four Witness defenders hold the Hall of Remembrance while Celia works the Ledger's cross-references.
+      stress: 0
+    - state: Accomplished
+      text: The Witnesses keep the Ledger and the capacity to use it through Totality (the Ledger's status records how much survived).
+      stress: 0
+    - state: Failed
+      text: The Witnesses could not preserve the Ledger; it is lost to them.
+      stress: 0
+    - state: Retired
+      text: ""
+      stress: 0
+status: draft

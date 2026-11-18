@@ -19,6 +19,11 @@ export class ApiService {
   private base = '/api';
 
   // Factions
+  /** §12: canonical-file health: stale references (to entries that no longer exist), unreadable files. */
+  getCanonStatus(): Observable<{ staleReferences: { from: string; path: string; to: string }[]; loadErrors: { file: string; message: string }[] }> {
+    return this.http.get<any>(`${this.base}/canon/status`);
+  }
+
   getFactions(): Observable<Faction[]> {
     return this.http.get<any[]>(`${this.base}/factions`).pipe(map(fs => fs.map(factionFromApi)));
   }

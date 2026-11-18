@@ -1,10 +1,10 @@
 namespace ColonyTracker.Api.Models;
 
-// Entity association (asset, character, faction, etc.) for an event under a specific override context.
-// Only used when the parent NarrativeEventOverride.OverridesAssets = true.
+// One entry of a version's `links` (used when the version's OverridesAssets is true). Not a table: the
+// id is derived from the version and the entity. Only authored types (faction, character, Asset, location).
 public class EventOverrideEntityLink
 {
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string Id { get; set; } = string.Empty;
     public string EventOverrideId { get; set; } = string.Empty;
     public NarrativeEntityType EntityType { get; set; }
     public string EntityId { get; set; } = string.Empty;

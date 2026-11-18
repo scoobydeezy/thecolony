@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.lower-bank
+slug: lower-bank
+name: Lower Bank
+type: Zone
+summary: Lower, newer part of the Colony
+parent: location.colony
+markerColor: "#60fb96"
+status: draft
+start:
+  state: Stable

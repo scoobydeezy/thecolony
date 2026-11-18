@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.civic-improvement-fund
+slug: civic-improvement-fund
+name: Civic Improvement Fund
+type: Resource
+role: Strategic
+tier: 4
+keystone: false
+summary: A treasury reserved exclusively for projects that improve the lives of the Colony's citizens. Roads, bridges, schools, gardens, and public works are all financed through the Fund, making it one of the Assembly's most effective tools for turning ideals into visible change.
+status: draft
+start:
+  controller: faction.dawn-assembly
+  location: location.assembly-hall
+  status: Stable

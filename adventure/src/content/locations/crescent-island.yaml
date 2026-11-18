@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.crescent-island
+slug: crescent-island
+name: Crescent Island
+type: Zone
+summary: The oxbow island within the Colony housing the remains of abandoned structures built before the river changed course.
+parent: location.colony
+status: draft
+start:
+  state: Stable

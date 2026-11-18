@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.clearing-house
+slug: clearing-house
+name: Clearing House
+type: Infrastructure
+role: Strategic
+tier: 5
+keystone: false
+summary: A network of offices responsible for reconciling contracts, transferring property, settling debts, and maintaining commercial continuity despite the Colony's unique circumstances. Here, obligations are preserved even when memory cannot be.
+status: draft
+start:
+  controller: faction.aspis
+  status: Stable

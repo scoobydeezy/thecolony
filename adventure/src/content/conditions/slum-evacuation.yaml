@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.slum-evacuation
+slug: slum-evacuation
+name: Slum Evacuation
+variesBy:
+  subject:
+    kind: goalStage
+    id: goal.evacuate-slums
+  rows:
+    - state: Planning
+      text: ""
+      stress: 0
+    - state: Progressing
+      text: Witnesses record the identities and belongings of slum residents while guiding a threatened neighborhood toward a viable exit.
+      stress: 0
+    - state: Ready
+      text: ""
+      stress: 0
+    - state: Accomplished
+      text: A slum neighborhood reaches a documented refuge with its people and belongings accounted for; the wider district remains under Totality.
+      stress: 0
+    - state: Failed
+      text: ""
+      stress: 0
+    - state: Retired
+      text: ""
+      stress: 0
+status: draft

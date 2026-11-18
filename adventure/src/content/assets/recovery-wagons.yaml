@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.recovery-wagons
+slug: recovery-wagons
+name: Recovery Wagons
+type: Resource
+role: Operational
+tier: 2
+keystone: false
+summary: Wagons and transport supplies used by the Witnesses to recover, convey, and safeguard belongings associated with the Forgotten.
+status: draft
+start:
+  controller: faction.witnesses
+  status: Stable

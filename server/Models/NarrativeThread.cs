@@ -1,6 +1,11 @@
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
+
 namespace ColonyTracker.Api.Models;
 
-public class NarrativeThread
+// ADVENTURE-BOOK-PLAN.md §13: a thread is a canonical file (thread.<slug> under
+// adventure/src/content/threads/). State is play data and stays in the row.
+public class NarrativeThread : ICanonEntity
 {
     public string Id { get; set; } = Guid.NewGuid().ToString();
     public string CampaignId { get; set; } = string.Empty;
@@ -10,4 +15,10 @@ public class NarrativeThread
 
     public NarrativeThreadState State { get; set; } = NarrativeThreadState.Open;
     public string? Color { get; set; }
+
+    [JsonIgnore] public string? LinksJson { get; set; }
+
+    public string? CanonId { get; set; }
+    [NotMapped] public string? CanonVersion { get; set; }
+    [NotMapped] public bool CanonMissing { get; set; }
 }

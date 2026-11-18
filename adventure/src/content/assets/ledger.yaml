@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.ledger
+slug: ledger
+name: The Ledger
+type: Artifact
+role: Strategic
+tier: 5
+keystone: true
+summary: An ever-growing inventory of the belongings entrusted to the Hall of Remembrance. Every entry records where an object was found, signs of its use, and the traces of the life that surrounded it—but never a name. Attempts to record names invariably fade, smear, or become unreadable, and generations ago the Witnesses stopped trying.
+status: draft
+start:
+  controller: faction.witnesses
+  location: location.memorial-building
+  status: Stable

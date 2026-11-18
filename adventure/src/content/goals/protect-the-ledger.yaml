@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.protect-the-ledger
+slug: protect-the-ledger
+name: Protect the Ledger
+faction: faction.witnesses
+type: Maintain
+priority: Major
+visibility: Known
+outcome: Automatic
+earliestAct: 1
+champion: npc.sister-marra
+target:
+  type: Asset
+  id: asset.ledger
+  state: Stable
+status: draft
+start:
+  status: Progressing

@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.dead-drop-network
+slug: dead-drop-network
+name: Dead Drop Network
+type: Distributed
+summary: A network of hidden caches and messages used by the Shattered.
+asset: asset.dead-drop-network
+status: draft
+start:
+  state: Stable

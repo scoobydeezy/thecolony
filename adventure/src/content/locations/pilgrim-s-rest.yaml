@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.pilgrim-s-rest
+slug: pilgrim-s-rest
+name: Pilgrim's Rest
+summary: An Inn run by the Cult of the Unknown that acts as a waystation for the living and the forgotten.
+parent: location.pilgrim-quarter
+asset: asset.pilgrim-s-rest
+status: draft
+start:
+  state: Stable

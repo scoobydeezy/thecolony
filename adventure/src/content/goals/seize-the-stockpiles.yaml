@@ -1,0 +1,31 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.seize-the-stockpiles
+slug: seize-the-stockpiles
+name: Seize the Stockpiles
+faction: faction.egress-institute
+type: Achieve
+priority: Minor
+visibility: Open
+outcome: Automatic
+earliestAct: 1
+champion: npc.professor-nhalia-lumina
+target:
+  type: Asset
+  id: asset.hidden-stockpiles
+  owner: faction.egress-institute
+effects:
+  progressing:
+    - targetType: asset
+      targetId: asset.hidden-stockpiles
+      property: status
+      delta: 0
+      value: Contested
+  accomplished:
+    - targetType: asset
+      targetId: asset.hidden-stockpiles
+      property: status
+      delta: 0
+      value: Stable
+status: draft
+start:
+  status: Plotting

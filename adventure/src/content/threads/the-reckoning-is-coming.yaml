@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/thread.schema.json
+id: thread.the-reckoning-is-coming
+slug: the-reckoning-is-coming
+name: The Reckoning is Coming
+summary: The Manor map links the first incursion to the Broken Bell; under Totality, Old Town's buried history returns.
+status: draft
+provenance:
+  - doc: Campaign Outline
+    heading: Manor Route 1 — The Shattered > The Broken Bell → Old Town > The Broken Bell
+  - doc: Campaign Outline
+    heading: Act II — The Cost > Session 5 — Dawn / The Morning After > Shared Manor Discovery
+  - doc: Campaign Outline
+    heading: Session 10 — Shattered > Sunny — Old Town / Shattered

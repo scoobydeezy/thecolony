@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.maintain-the-book-of-names
+slug: maintain-the-book-of-names
+name: Maintain the Book of Names
+faction: faction.order-of-theia
+type: Maintain
+priority: Major
+visibility: Known
+outcome: Automatic
+earliestAct: 1
+champion: npc.edrion-vykas
+target:
+  type: Asset
+  id: asset.book-of-names
+  state: Stable
+status: draft
+start:
+  status: Progressing

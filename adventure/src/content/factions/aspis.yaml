@@ -1,0 +1,50 @@
+# yaml-language-server: $schema=../../../schemas/faction.schema.json
+id: faction.aspis
+slug: aspis
+name: Aspis
+type: Faction
+summary: "Aspis arrived as merchants and remained as administrators, discovering that the ritual breaks contracts, ownership, inheritance, and debt as surely as it breaks memory. Their presence in the Colony is exploitative, but also stabilizing: they preserve the systems of obligation that allow trade, food, property, and civic life to continue."
+motto: Partners in Prosperity
+represents: Obligation, Leverage, Logistics
+publicFace: Trade Guild
+selfImage: Partners in Prosperity
+coreTenet: Every system must be made useful, stable, and accountable.
+focus: Will, Opportunity
+certainOf: Every system can be managed if its obligations are understood.
+rightAbout: The Colony cannot survive moral transformation without logistical continuity.
+afraidOf: Idealists disrupting stability
+wrongAbout: They mistake value for worth.
+response: Use it. If the burden exists, it has value. Stability, knowledge, and power should not be wasted.
+origin: Aspis established a trading post to exploit the Colony's strategic location, only to discover that its true value lay in the impossible challenges it posed to commerce.
+foundedAs: Merchants
+became: Administrators
+history: |-
+  Aspis arrived in the Colony as merchants, drawn by the opportunity of a prosperous independent settlement straddling the border between Andoran and Isger. Its agents expected to find a profitable trade hub, rich in commerce but otherwise unremarkable. The Colony's traditions were dismissed as local custom, its rituals as harmless superstition, and its politics as another landscape to navigate. They did not come seeking the burden. They came seeking opportunity.
+
+  Everything changed when the books stopped balancing. Debtors vanished from memory. Contracts lost their signatories. Property ownership became impossible to reconcile. Businesses continued operating despite having no traceable founders. Commerce depends upon continuity, and the ritual quietly undermined every assumption on which trade was built. What began as a commercial venture became a centuries-long effort to understand how a functioning economy could survive in a society where identity itself was unstable.
+
+  The River Exchange grew into the Colony's primary connection to the outside world, while the Docks became the artery through which food, supplies, and commerce continued to flow. To preserve the web of obligations the ritual continually unraveled, Aspis established the Clearing House, developing legal and financial systems capable of reconciling debts, contracts, inheritances, and property despite the erosion of memory. Behind it all, the Claims Registry quietly accumulated generations of commercial anomalies, becoming one of the most complete records of how the ritual reshapes the Colony's legal and economic foundations.
+
+  Today, Aspis presents itself as a practical partner in the Colony's prosperity, providing trade, credit, logistics, and administrative stability while remaining largely indifferent to the philosophical disputes consuming the other factions. Its methods are unapologetically self-interested, but its systems have become indispensable.
+
+  The systems developed within the Colony have become valuable far beyond its borders. Every improvement to the Clearing House, every refinement to the Claims Registry, and every new method of preserving obligation despite uncertainty strengthens the Consortium's ability to conduct commerce throughout Golarion. To Aspis, the Colony is no longer merely a profitable trade outpost—it is the proving ground for a more resilient world.
+heraldry:
+  glyph: /uploads/factions/aspis-glyph.png?v=1785375446978
+  icon: /uploads/factions/aspis-icon.svg?v=1785375455806
+  primaryColor: "#ffd333"
+  secondaryColor: "#000000"
+  bannerShape: right-triangle
+status: draft
+start:
+  active: true
+  leader: npc.perrik-tallow
+  momentum: 0
+  size: 25
+  values:
+    truth: 0
+    stability: 0.5043
+    agency: 0.4957
+  beliefs:
+    a: Negative
+    b: Negative
+    c: Neutral

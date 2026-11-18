@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.old-town
+slug: old-town
+name: Old Town
+summary: A portion of the Colony destroyed during a former Veiled incursion. Rebuilding has proven difficult.
+parent: location.colony
+status: draft
+start:
+  state: Unstable

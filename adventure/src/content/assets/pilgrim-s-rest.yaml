@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.pilgrim-s-rest
+slug: pilgrim-s-rest
+name: Pilgrim's Rest
+type: Infrastructure
+role: Operational
+tier: 4
+keystone: false
+summary: A welcoming sanctuary that offers food, shelter, and quiet hospitality to pilgrims, travelers, and seekers alike. Several rooms are intentionally kept prepared for the Pilgrims should they ever arrive, their beds made and lanterns lit despite centuries of remaining unoccupied.
+status: draft
+start:
+  controller: faction.cult-of-the-unknown
+  status: Stable

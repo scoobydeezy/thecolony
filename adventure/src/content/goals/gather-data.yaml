@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.gather-data
+slug: gather-data
+name: Gather Data
+faction: faction.egress-institute
+type: Achieve
+priority: Major
+visibility: Known
+outcome: Automatic
+earliestAct: 3
+status: draft
+start:
+  status: Plotting

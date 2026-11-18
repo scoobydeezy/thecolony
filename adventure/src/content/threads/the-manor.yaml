@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../../../schemas/thread.schema.json
+id: thread.the-manor
+slug: the-manor
+name: The Manor
+summary: An apparently ownerless Manor becomes either a refuge or an accounting anomaly—and contains the map that opens Act II.
+status: draft
+provenance:
+  - doc: Campaign Outline
+    heading: Act II — The Cost > Session 5 — Dawn / The Morning After
+  - doc: Character Briefs
+    heading: Major Narrative Characters > The Observer - Silas Venn > The Manor

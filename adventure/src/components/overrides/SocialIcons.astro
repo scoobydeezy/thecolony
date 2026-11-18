@@ -1,0 +1,43 @@
+---
+// Header link back to the management app, shown beside Starlight's own icons.
+// Built pages are served on the app's origin (/docs/ beside the SPA), so "/" is
+// the app. In `astro dev` the book runs on its own port, so point at the Angular
+// dev server instead (override with PUBLIC_APP_URL).
+import Default from '@astrojs/starlight/components/SocialIcons.astro';
+import { isDesigner } from '../../lib/target.mjs';
+
+const appHref = import.meta.env.DEV ? (import.meta.env.PUBLIC_APP_URL ?? 'http://localhost:4200/') : '/';
+---
+
+<a class="rp-back" href={appHref} title="Return to the Colony management app">
+  <span aria-hidden="true">←</span> Colony
+</a>
+{isDesigner && <span class="rp-target-badge">Designer build</span>}
+<Default />
+
+<style>
+  .rp-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.65rem;
+    border: 1px solid var(--sl-color-gray-5);
+    border-radius: 0.4rem;
+    color: var(--sl-color-white);
+    font-size: var(--sl-text-sm);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .rp-back:hover {
+    border-color: var(--sl-color-accent);
+    color: var(--sl-color-accent-high);
+  }
+  .rp-target-badge {
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    background: var(--rp-design-bg);
+    color: var(--rp-design-fg);
+    font-size: var(--sl-text-xs);
+    white-space: nowrap;
+  }
+</style>

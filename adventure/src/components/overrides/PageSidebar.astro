@@ -1,0 +1,83 @@
+---
+// The right sidebar: Starlight's "On this page", then the narrative threads of the event or encounter the
+// page shows (registry threadsOf: threads on the connections into and out of it, and threads it links to).
+// An item's extra pages (belongsTo: The Burden's phases) show the item's threads. Pages that aren't about
+// an event or encounter, or an item on no thread, show no threads section.
+import Default from '@astrojs/starlight/components/PageSidebar.astro';
+import { loadRegistry, threadsOf, entityUrl } from '../../lib/registry.mjs';
+
+const route = Astro.locals.starlightRoute;
+const data = route.entry.data ?? {};
+const itemId = [data.rpEntity, data.belongsTo].find((id) => /^(event|encounter)\./.test(id ?? ''));
+const threads = itemId ? threadsOf(loadRegistry(), itemId) : [];
+---
+
+<Default />
+{
+  route.toc && threads.length > 0 && (
+    <div class="right-sidebar-panel rp-threads sl-hidden lg:sl-block">
+      <div class="sl-container">
+        <h2 id="rp-narrative-threads">Narrative threads</h2>
+        <ul>
+          {threads.map((t) => (
+            <li>
+              <a href={entityUrl(t)}>
+                {t.data.color && <span class="rp-swatch" style={`background:${t.data.color}`} aria-hidden="true" />}
+                {t.view.name}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  )
+}
+
+<style>
+  /* Mirrors Starlight's PageSidebar.astro panel and table-of-contents styling. */
+  .right-sidebar-panel {
+    padding: 0 var(--sl-sidebar-pad-x) 1rem;
+  }
+  .sl-container {
+    width: calc(var(--sl-sidebar-width) - 2 * var(--sl-sidebar-pad-x));
+  }
+  h2 {
+    color: var(--sl-color-white);
+    font-size: var(--sl-text-h5);
+    font-weight: 600;
+    line-height: var(--sl-line-height-headings);
+    margin-bottom: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--sl-color-hairline-light);
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  a {
+    display: block;
+    padding: 0.25rem 0.5rem;
+    font-size: var(--sl-text-xs);
+    line-height: 1.25;
+    text-decoration: none;
+    color: var(--sl-color-gray-3);
+    overflow-wrap: anywhere;
+  }
+  a:hover {
+    color: var(--sl-color-white);
+  }
+  .rp-swatch {
+    display: inline-block;
+    width: 0.55em;
+    height: 0.55em;
+    margin-inline-end: 0.4em;
+    border-radius: 50%;
+    vertical-align: 0.05em;
+  }
+  @media (min-width: 72rem) {
+    .sl-container {
+      max-width: calc(((100vw - var(--sl-sidebar-width) - 2 * var(--sl-content-pad-x) - 2 * var(--sl-sidebar-pad-x)) * 0.25));
+    }
+  }
+</style>

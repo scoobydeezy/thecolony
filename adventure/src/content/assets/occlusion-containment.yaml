@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.occlusion-containment
+slug: occlusion-containment
+name: Occlusion Containment
+type: Infrastructure
+role: Covert
+tier: 5
+keystone: false
+summary: A restricted research facility where captured Veiled and other anomalous phenomena are studied under controlled conditions. To EGRESS, understanding the Unknown is the surest path toward protecting the Colony—even if that pursuit requires experiments few others would consider acceptable.
+status: draft
+start:
+  controller: faction.egress-institute
+  status: Stable

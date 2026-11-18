@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.order-evacuations
+slug: order-evacuations
+name: Order Evacuations
+variesBy:
+  subject:
+    kind: goalStage
+    id: goal.rescue-civilians
+  rows:
+    - state: Planning
+      text: ""
+      stress: 0
+    - state: Progressing
+      text: Order patrols establish civilian assembly points and escort one stranded group toward a secure refuge.
+      stress: 0
+    - state: Ready
+      text: ""
+      stress: 0
+    - state: Accomplished
+      text: A guarded evacuation route and refuge are known; further escorted rescues can use them while accessible.
+      stress: 0
+    - state: Failed
+      text: ""
+      stress: 0
+    - state: Retired
+      text: ""
+      stress: 0
+status: draft

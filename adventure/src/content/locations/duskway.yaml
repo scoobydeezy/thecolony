@@ -1,0 +1,11 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.duskway
+slug: duskway
+name: The Duskway
+type: Zone
+summary: Between Old Town and more populated districts, people that live in the Duskway live between light and dark.
+parent: location.colony
+markerColor: "#e9fb60"
+status: draft
+start:
+  state: Stable

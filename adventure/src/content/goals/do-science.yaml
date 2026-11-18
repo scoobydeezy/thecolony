@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.do-science
+slug: do-science
+name: Do Science
+faction: faction.egress-institute
+type: Maintain
+priority: Critical
+visibility: Known
+outcome: Automatic
+earliestAct: 1
+champion: npc.veyra-kess
+target:
+  type: Asset
+  id: asset.engram-vault
+  state: Stable
+status: draft
+start:
+  status: Progressing

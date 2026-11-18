@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.cult-clearing-house
+slug: cult-clearing-house
+name: Cult Clearing House
+rule: While the Cult controls the Clearing House, it can use the premises for pilgrims; ordinary commercial claims settlement from that facility is suspended.
+requires:
+  - kind: assetController
+    assetId: asset.clearing-house
+    factionId: faction.cult-of-the-unknown
+status: draft

@@ -25,6 +25,7 @@ public enum GeometryType { Point, Polygon, MultiPoint }
 public enum PlacementSubjectType { Location, Character, Asset }
 public enum NarrativeThreadState  { Open, Resolved }
 public enum NarrativeEventStatus  { Planned, Available, Occurred, Bypassed, Obsolete }
+public enum NarrativeKind         { Event, Encounter }
 public enum NarrativeOwnerType    { Thread, Event }
 public enum NarrativeEntityType   { Faction, Character, Asset, Location, Session, SessionEvent }
 

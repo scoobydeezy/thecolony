@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.manor
+slug: manor
+name: The Manor
+summary: Abandoned manor in the center of the Colony
+parent: location.high-bank
+status: draft
+start:
+  state: Stable

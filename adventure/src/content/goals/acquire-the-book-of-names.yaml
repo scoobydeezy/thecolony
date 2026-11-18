@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.acquire-the-book-of-names
+slug: acquire-the-book-of-names
+name: Acquire the Book of Names
+faction: faction.aspis
+type: Achieve
+priority: Major
+visibility: Open
+outcome: Automatic
+earliestAct: 2
+champion: npc.merit-vance
+target:
+  type: Asset
+  id: asset.book-of-names
+  owner: faction.aspis
+status: draft
+start:
+  status: Plotting

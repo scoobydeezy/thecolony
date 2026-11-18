@@ -14,10 +14,9 @@ public class CharactersController(AppDbContext db, ICampaignContext campaign, IW
     public async Task<IActionResult> GetAll()
     {
         var cid = await campaign.GetActiveIdAsync();
-        return Ok(await db.Characters
-            .Where(c => c.CampaignId == cid)
-            .OrderBy(c => c.Name)
-            .ToListAsync());
+        // Name is file-backed (ADVENTURE-BOOK-PLAN.md §9), so sort after loading.
+        var chars = await db.Characters.Where(c => c.CampaignId == cid).ToListAsync();
+        return Ok(chars.OrderBy(c => c.Name, StringComparer.CurrentCulture).ToList());
     }
 
     [HttpGet("{id}")]
@@ -32,6 +31,7 @@ public class CharactersController(AppDbContext db, ICampaignContext campaign, IW
     {
         var cid = await campaign.GetActiveIdAsync();
         character.Id = await EntityIds.ForCreateAsync(db.Characters, character.Id);   // keep an imported id when it is free
+        character.CanonId = null;   // a new character gets a new canonical file
         character.CampaignId = cid;
         db.Characters.Add(character);
         await db.SaveChangesAsync();
@@ -43,6 +43,10 @@ public class CharactersController(AppDbContext db, ICampaignContext campaign, IW
     {
         if (id != character.Id) return BadRequest();
         character.CampaignId = await campaign.GetActiveIdAsync();
+        // The link to the character's file is the server's, never the request's.
+        var link = await db.Characters.AsNoTracking().Where(c => c.Id == id).Select(c => new { c.CanonId }).FirstOrDefaultAsync();
+        if (link is null) return NotFound();
+        character.CanonId = link.CanonId;
         db.Entry(character).State = EntityState.Modified;
         await db.SaveChangesAsync();
         return Ok(character);

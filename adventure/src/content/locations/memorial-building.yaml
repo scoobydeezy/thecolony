@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.memorial-building
+slug: memorial-building
+name: Memorial Building
+summary: Where the Reading of the Ledger takes place.
+parent: location.abiding-way
+status: draft
+start:
+  state: Stable

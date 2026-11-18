@@ -1,0 +1,15 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.maelyn-s-boon
+slug: maelyn-s-boon
+name: Maelyn's Boon
+rule: Maelyn is able to offer gifts to each of the Party members.
+otherwise: Maelyn has nothing to give.
+requires:
+  - kind: assetController
+    assetId: asset.offering-chest
+    factionId: faction.cult-of-the-unknown
+  - kind: assetStatus
+    assetId: asset.offering-chest
+    statuses:
+      - Stable
+status: draft

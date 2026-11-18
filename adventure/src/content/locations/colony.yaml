@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.colony
+slug: colony
+name: The Colony
+summary: An independent city-state astride the River Foam on the border of Isger and Andoran.
+parent: location.darkmoon-plains
+status: draft
+start:
+  state: Stable

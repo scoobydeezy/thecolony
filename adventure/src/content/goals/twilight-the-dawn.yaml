@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=../../../schemas/goal.schema.json
+id: goal.twilight-the-dawn
+slug: twilight-the-dawn
+name: Twilight the Dawn
+faction: faction.witnesses
+type: Achieve
+priority: Minor
+visibility: Known
+outcome: Automatic
+earliestAct: 2
+champion: npc.fenwick-bristlethorn
+target:
+  type: Asset
+  id: asset.dawn-press
+  owner: faction.witnesses
+status: draft
+start:
+  status: Plotting

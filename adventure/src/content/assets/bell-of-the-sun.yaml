@@ -1,0 +1,14 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.bell-of-the-sun
+slug: bell-of-the-sun
+name: Bell of the Sun
+type: Artifact
+role: Strategic
+tier: 3
+keystone: false
+summary: Hung above the central square, the Bell of the Sun marks moments of civic importance. For two centuries, its voice has carried the authority of the Order.
+status: draft
+start:
+  controller: faction.order-of-theia
+  location: location.town-square
+  status: Stable

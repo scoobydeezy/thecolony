@@ -1,5 +1,6 @@
 using ColonyTracker.Api.Data;
 using ColonyTracker.Api.Models;
+using ColonyTracker.Api.Services.Canon;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -95,9 +96,10 @@ public class CampaignsController(AppDbContext db) : ControllerBase
         await using var tx = await db.Database.BeginTransactionAsync();
 
         var characterIds = await db.Characters.Where(c => c.CampaignId == id).Select(c => c.Id).ToListAsync();
-        await db.CharacterNarrativeProfiles.Where(x => characterIds.Contains(x.CharacterId)).ExecuteDeleteAsync();
-        await db.CharacterDetails.Where(x => characterIds.Contains(x.CharacterId)).ExecuteDeleteAsync();
-        await db.CharacterRelationships.Where(x => characterIds.Contains(x.SourceCharacterId)).ExecuteDeleteAsync();
+        // Characters, factions, Assets and locations live in canonical files shared by every campaign:
+        // delete only this campaign's link rows and play state, never the files.
+        await db.CharacterSectionReveals.Where(x => characterIds.Contains(x.CharacterId)).ExecuteDeleteAsync();
+        // Relationships are in the character files (§15): nothing to delete here.
 
         var mapIds = await db.ColonyMaps.Where(m => m.CampaignId == id).Select(m => m.Id).ToListAsync();
         await db.MapPlacements.Where(x => mapIds.Contains(x.MapId)).ExecuteDeleteAsync();
@@ -109,20 +111,9 @@ public class CampaignsController(AppDbContext db) : ControllerBase
 
         // Narrative planning graph
         var narrativeEventIds = await db.NarrativeEvents.Where(e => e.CampaignId == id).Select(e => e.Id).ToListAsync();
-        var pathSetIds = await db.PathSets.Where(p => p.CampaignId == id).Select(p => p.Id).ToListAsync();
-        var pathIds = await db.NarrativePaths.Where(p => pathSetIds.Contains(p.PathSetId)).Select(p => p.Id).ToListAsync();
-        var overrideIds = await db.NarrativeEventOverrides.Where(o => narrativeEventIds.Contains(o.NarrativeEventId)).Select(o => o.Id).ToListAsync();
-        await db.EventOverridePaths.Where(x => overrideIds.Contains(x.EventOverrideId)).ExecuteDeleteAsync();
-        await db.EventOverrideConnections.Where(x => overrideIds.Contains(x.EventOverrideId)).ExecuteDeleteAsync();
-        await db.EventOverrideEntityLinks.Where(x => overrideIds.Contains(x.EventOverrideId)).ExecuteDeleteAsync();
-        await db.NarrativeEventOverrides.Where(x => overrideIds.Contains(x.Id)).ExecuteDeleteAsync();
-        await db.PathEventScopes.Where(x => pathIds.Contains(x.PathId) || narrativeEventIds.Contains(x.NarrativeEventId)).ExecuteDeleteAsync();
-        await db.NarrativeEventVariantParticipations.Where(x => pathSetIds.Contains(x.PathSetId) || narrativeEventIds.Contains(x.NarrativeEventId)).ExecuteDeleteAsync();
-        await db.PathSetContexts.Where(x => pathSetIds.Contains(x.PathSetId)).ExecuteDeleteAsync();
-        await db.NarrativePaths.Where(x => pathSetIds.Contains(x.PathSetId)).ExecuteDeleteAsync();
+        // Branches, paths and versions are in the files (§14); only the branch link rows go.
         await db.PathSets.Where(x => x.CampaignId == id).ExecuteDeleteAsync();
         await db.NarrativeEventPlacements.Where(x => narrativeEventIds.Contains(x.NarrativeEventId)).ExecuteDeleteAsync();
-        await db.NarrativeEventConnections.Where(x => x.CampaignId == id).ExecuteDeleteAsync();
         await db.NarrativeEntityLinks.Where(x => x.CampaignId == id).ExecuteDeleteAsync();
         await db.NarrativeThreads.Where(x => x.CampaignId == id).ExecuteDeleteAsync();
 
@@ -168,121 +159,48 @@ public class CampaignsController(AppDbContext db) : ControllerBase
         var types = request.EntityTypes ?? [];
         var importAll = request.ImportAll;
 
-        // Build faction and character ID remap tables so references can be fixed up
-        var factionIdMap = new Dictionary<string, string>();
-        var characterIdMap = new Dictionary<string, string>();
+        // Factions and characters are canonical files shared by every campaign (ADVENTURE-BOOK-PLAN.md
+        // §9, §10): importing one links the target campaign to the same file. References between them
+        // (a character's faction, a faction's leader) are canonical ids in the files, so they resolve to
+        // the target campaign's own rows automatically; a reference to something not imported shows
+        // its canonical id until that entity is imported too.
+        var canon = db.Canon ?? throw new InvalidOperationException("No canonical file store.");
+        var linked = 0;
+        var skipped = 0;
 
-        if (importAll || types.Contains("factions"))
+        async Task LinkAsync<T>(IQueryable<T> source, Func<T, bool> include, Func<T, T> newRow) where T : class, ICanonEntity
         {
-            var sourceFactions = await db.Factions.Where(f => f.CampaignId == request.SourceCampaignId).ToListAsync();
-            foreach (var f in sourceFactions)
+            var existing = (await db.Set<T>().AsNoTracking().Where(x => x.CampaignId == targetCid).Select(x => x.CanonId).ToListAsync()).ToHashSet();
+            foreach (var x in (await source.AsNoTracking().ToListAsync()).Where(include))
             {
-                var newId = Guid.NewGuid().ToString();
-                factionIdMap[f.Id] = newId;
-                db.Factions.Add(new Faction
-                {
-                    Id = newId,
-                    CampaignId = targetCid,
-                    Name = f.Name,
-                    Represents = f.Represents,
-                    Type = f.Type,
-                    CoreTenet = f.CoreTenet,
-                    Focus = f.Focus,
-                    CertainOf = f.CertainOf,
-                    RightAbout = f.RightAbout,
-                    AfraidOf = f.AfraidOf,
-                    WrongAbout = f.WrongAbout,
-                    Response = f.Response,
-                    Summary = f.Summary,
-                    Motto = f.Motto,
-                    Origin = f.Origin,
-                    FoundedAs = f.FoundedAs,
-                    Became = f.Became,
-                    PublicFace = f.PublicFace,
-                    SelfImage = f.SelfImage,
-                    History = f.History,
-                    GlyphPath = f.GlyphPath,
-                    IconPath = f.IconPath,
-                    BeliefC = f.BeliefC,
-                    BeliefA = f.BeliefA,
-                    BeliefB = f.BeliefB,
-                    TruthValue = f.TruthValue,
-                    StabilityValue = f.StabilityValue,
-                    AgencyValue = f.AgencyValue,
-                    Active = f.Active,
-                    Notes = f.Notes,
-                    SortOrder = f.SortOrder,
-                    Momentum = f.Momentum,
-                    PowerModifier = f.PowerModifier,
-                    // D15 (M0): previously dropped
-                    FactionSize = f.FactionSize,
-                    PrimaryColor = f.PrimaryColor,
-                    SecondaryColor = f.SecondaryColor,
-                    BannerShape = f.BannerShape,
-                    LeaderId = f.LeaderId, // remapped to the imported character below, or cleared
-                });
+                if (x.CanonId is null || existing.Contains(x.CanonId) || !canon.TryGet(x.CanonId, out var entry)) { skipped++; continue; }
+                var row = newRow(x);
+                row.CanonId = x.CanonId;
+                CanonMapping.Hydrate(row, entry, refs: null, canon);   // the file's values, so the save writes nothing
+                db.Add(row);
+                existing.Add(x.CanonId);
+                linked++;
             }
         }
+
+        if (importAll || types.Contains("factions"))
+            await LinkAsync(db.Factions.Where(f => f.CampaignId == request.SourceCampaignId), _ => true,
+                f => new Faction { Id = Guid.NewGuid().ToString(), CampaignId = targetCid, SortOrder = f.SortOrder, Momentum = f.Momentum, PowerModifier = f.PowerModifier });
 
         if (importAll || types.Contains("characters") || types.Contains("partyMembers"))
         {
-            var query = db.Characters.Where(c => c.CampaignId == request.SourceCampaignId);
-            if (!importAll && types.Contains("partyMembers") && !types.Contains("characters"))
-                query = query.Where(c => c.CharacterType == CharacterType.PartyMember);
-
-            var sourceChars = await query.ToListAsync();
-            foreach (var c in sourceChars)
-            {
-                var newCharId = Guid.NewGuid().ToString();
-                characterIdMap[c.Id] = newCharId;
-                // Remap factionId if the faction was imported; null if it wasn't
-                var newFactionId = c.FactionId != null && factionIdMap.TryGetValue(c.FactionId, out var mapped)
-                    ? mapped : null;
-
-                db.Characters.Add(new Character
-                {
-                    Id = newCharId,
-                    CampaignId = targetCid,
-                    Name = c.Name,
-                    CharacterType = c.CharacterType,
-                    Ancestry = c.Ancestry,
-                    Heritage = c.Heritage,
-                    Class = c.Class,
-                    Background = c.Background,
-                    Level = c.Level,
-                    Gender = c.Gender,
-                    Age = c.Age,
-                    Occupation = c.Occupation,
-                    Summary = c.Summary,
-                    FactionId = newFactionId,
-                    // Social classes are factions: remap if imported, otherwise null.
-                    SocialClassId = c.SocialClassId != null && factionIdMap.TryGetValue(c.SocialClassId, out var mappedClass) ? mappedClass : null,
-                    NarrativeTier = c.NarrativeTier,
-                    Pronouns = c.Pronouns,
-                    Aliases = c.Aliases,
-                    PortraitPath = c.PortraitPath,
-                    TruthValue = c.TruthValue,
-                    StabilityValue = c.StabilityValue,
-                    AgencyValue = c.AgencyValue,
-                    BeliefC = c.BeliefC,
-                    BeliefA = c.BeliefA,
-                    BeliefB = c.BeliefB,
-                    DoubtDirection = c.DoubtDirection,
-                    Conviction = c.Conviction,
-                    Pressure = c.Pressure,
-                    Influence = c.Influence,
-                    Impressionable = c.Impressionable,
-                    State = c.State,
-                });
-            }
+            var partyOnly = !importAll && types.Contains("partyMembers") && !types.Contains("characters");
+            await LinkAsync(db.Characters.Where(c => c.CampaignId == request.SourceCampaignId), c => !partyOnly || c.CharacterType == CharacterType.PartyMember,
+                _ => new Character { Id = Guid.NewGuid().ToString(), CampaignId = targetCid });
         }
 
-        // D15: leaders point at imported characters (or nothing, if the leader wasn't imported).
-        foreach (var f in db.ChangeTracker.Entries<Faction>().Where(e => e.State == EntityState.Added).Select(e => e.Entity))
-            f.LeaderId = f.LeaderId != null && characterIdMap.TryGetValue(f.LeaderId, out var newLeader) ? newLeader : null;
-
         await db.SaveChangesAsync();
-        return Ok(new { message = "Import complete." });
+        return Ok(new
+        {
+            message = skipped > 0 ? $"Import complete: {linked} linked, {skipped} already in this campaign or without a file." : "Import complete.",
+            linked,
+            skipped,
+        });
     }
 }
 

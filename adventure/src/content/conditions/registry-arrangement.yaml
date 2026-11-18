@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.registry-arrangement
+slug: registry-arrangement
+name: Registry Arrangement
+rule: Perrik can provide services connecting Cult-related surrendered property to the Claims Registry.
+requires:
+  - kind: assetController
+    assetId: asset.claims-registry
+    factionId: faction.aspis
+  - kind: assetController
+    assetId: asset.offering-chest
+    factionId: faction.aspis
+  - kind: assetStatus
+    assetId: asset.claims-registry
+    statuses:
+      - Stable
+      - Contested
+      - Damaged
+  - kind: assetStatus
+    assetId: asset.offering-chest
+    statuses:
+      - Stable
+      - Contested
+      - Damaged
+status: draft

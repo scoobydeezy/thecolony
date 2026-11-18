@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=../../../schemas/location.schema.json
+id: location.veiled-house
+slug: veiled-house
+name: Veiled House
+summary: A house on Crescent Island that has been long abandoned.
+parent: location.crescent-island
+status: draft
+start:
+  state: Unstable

@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=../../../schemas/asset.schema.json
+id: asset.assembly-hall
+slug: assembly-hall
+name: Assembly Hall
+type: Infrastructure
+role: Operational
+tier: 4
+keystone: false
+summary: The recognized home of the Dawn Assembly, where proposals are debated, public hearings are held, and visions for the Colony's future are shaped. Though the Order retains ultimate authority, the Assembly Hall remains the center of civic discourse and reform.
+status: draft
+start:
+  controller: faction.dawn-assembly
+  status: Stable

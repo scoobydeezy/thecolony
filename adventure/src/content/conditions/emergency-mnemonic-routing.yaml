@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=../../../schemas/condition.schema.json
+id: condition.emergency-mnemonic-routing
+slug: emergency-mnemonic-routing
+name: Emergency Mnemonic Routing
+variesBy:
+  subject:
+    kind: goalStage
+    id: goal.contain-the-breach
+  rows:
+    - state: Planning
+      text: ""
+      stress: 0
+    - state: Progressing
+      text: EGRESS stages emergency teams at Occlusion Containment and the Engram Vault.
+      stress: 0
+    - state: Ready
+      text: EGRESS splits its staff between the Occlusion Containment emergency and the defence of the Engram Vault.
+      stress: 0
+    - state: Accomplished
+      text: Surviving EGRESS infrastructure can divert some escaping mnemonic weight to other containment sites; diversion transfers and concentrates the burden rather than ending Totality or erasing a Source (the Engram Vault's status records how much survived).
+      stress: 0
+    - state: Failed
+      text: EGRESS was overwhelmed by the containment emergency and could not protect the Engram Vault.
+      stress: 0
+    - state: Retired
+      text: ""
+      stress: 0
+status: draft
