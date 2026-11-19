@@ -1131,3 +1131,52 @@ The section is in the desktop right sidebar only; on narrow screens Starlight fo
 
 - **Files:** `src/components/overrides/PageSidebar.astro` (new; Starlight's sidebar, then the threads), `astro.config.mjs` (registers it), `src/lib/registry.mjs` (`threadsOf`), `src/schemas.mjs` (`rpEntity`: the entry a generated page shows), `src/pages/[area]/[slug].astro` (passes it). JSON schemas regenerated.
 - **Checks:** validator passes; the running book rebuilt; The Calling shows Pépé Sylvya and The Keeper, The Burden and its phase pages show its six threads, Running and part pages show none; the designer build checks 35,554 internal links in 345 pages.
+
+## 2026-11-18: Opening chapter reconciliation
+
+Expanded **Bad Maps** and **Prisoners** into compiled GM-facing scenes, with conditional NPC availability, player choices, aftermath, and handoffs. Added separate entries for the Evin reconstruction (Baby) and Evin's cloth toy Source, preserving the current source statistics and linking reusable rules instead of duplicating their ownership. Corrected The Calling's arrival wording, clarified The House of Abiding's editorial staging, and removed Kivren's obsolete assumption that Gressa necessarily dies.
+
+Recorded source and recovered conversation evidence, superseded proposals, editorial additions, and unresolved decisions in `adventure/sources/opening-reconciliation.yaml`. These scenes are compiled drafts, not playtested or declared run-ready. Open questions include arrival order, response timing and roster, cloth-toy durability, unusual Source-transfer and Scar outcomes, and exceptional detention outcomes. Later Evin scenes and Duskwood remain subsequent migration work.
+
+The migration now inventories the twelve current source documents. Campaign Synopsis is retired in favour of Campaign Vision and Campaign Outline. Updated the book plan, landing-page navigation, migration map, and coverage inventory; the inventory contains 333 sections with none unclassified. Original source exports remain unchanged.
+
+Made source-folder selection configurable, corrected Astro's handling of Windows source paths, and made designer commands portable. Normal book validation no longer requires the original exports; explicit `--sources` validation checks their provenance. Coverage regeneration fails without source documents rather than replacing the inventory with an empty one.
+
+- **Checks:** entity/reference validation and explicit source-provenance validation pass (282 entities, 123 Markdown files, nine migration concepts). GM build passes with 327 pages and 30,891 internal links; designer build passes with 346 pages and 35,765 internal links. The GM privacy scan passes. Generated HTML checks confirm the encounter's embedded statistics and aftermath content. Missing-source failure behaviour and inventory preservation were checked. The local browser preview could not connect, so visual layout has not been verified.
+- **Commits:** none; the user handles commits.
+
+## 2026-11-18: Parts I and II handbook and setting pass
+
+At the user's request, moved the authoring priority to the overview and Colony setting before further narrative chapters. The nineteen pages in `docs/running/` and `docs/setting/` now contain compiled prose or reviewed existing drafts: navigation, campaign branches, Identity lessons, the Veiled primer, Colony Turn guidance, faction operations, session preparation, rewards, promises, history, districts, traditions, institutions, factions, and people. Readiness remains **compiled**, not playtested or closed.
+
+Added five owning rules for Identity and Stabilization, Anchoring and Resolution, Faction Goals and Champions, the Colony Turn, and Act III Front Outcomes. The primer now links procedural owners instead of repeating numbers or scripting the first encounter's aftermath. The current source and adopted review decisions govern faction draws, guards, Priority, Character Phase ordering, and Stress; retired versions were not reintroduced.
+
+Added generated setting directories for NPCs by faction and location, all locations by parent, and faction perspectives with the four social classes separated from the seven factions. They show baseline facts, including Forgotten states and unassigned locations, directly from the owning entries. Corrected the Order's references to the Colony's founding and Aletheia as the first name in the Book, and removed the Ritual Chamber Asset's fixed annual schedule.
+
+Evidence and unresolved questions are in `adventure/sources/parts-1-2-reconciliation.yaml`. Remaining gaps include five versus six Identity Keystones (the Dawn Charter conflict), advancement and treasure planning beyond the documented six-PC level-12 encounter baseline, canonical map selection, some setting-record discrepancies, and front deadline tuning. Original source exports and live app state were not changed.
+
+- **Checks:** source validation passes (287 entities, 128 Markdown files, 15 migration concepts); four directory tests pass. Rendered HTML checks cover all nineteen pages, both NPC groupings, 37 locations, and separate faction/social-class groups. GM build and search pass with 332 pages and 32,042 internal links; designer build and search pass with 351 pages and 37,094 internal links. GM privacy scan passes. An initial Windows search-index file-access failure was resolved by rebuilding with normal file access. Visual layout remains unverified.
+- **Migration tracking:** 333 source sections, zero unclassified, 115 in progress, three previously migrated; the new material is not marked fully migrated merely because it builds.
+- **Commits:** none; the user handles commits.
+
+### Follow-up ruling: six Keystones; level schedule deferred
+
+The user confirmed **six Identity Keystones**, with the **Dawn Charter supporting Choice**. Context remains without a Keystone. Added `rule.keystones` as the owning reference for the mapping and access limits, and updated the Identity and rewards chapters and reconciliation records. The six existing Asset Keystone flags already match this ruling. Tools still require evidence and do not replace local recovery, Restoration, or a person's actual agency.
+
+The user explicitly left the level schedule open. The six-PC level-12 encounter baseline remains documented without turning it into an advancement schedule. Source exports remain untouched; no commits made.
+
+Source validation, both builds and search indexes, link checks, and the GM privacy scan pass after this ruling (333 GM pages; 352 designer pages). The rendered Keystone reference and all six Asset flags were checked.
+
+## 2026-11-18: Remaining campaign draft and context reconciliation
+
+Compiled the remaining Act I material, all Act II routes and transitions, five Act III fronts, four Burden phases, Aletheia, and The Light Remains. All 33 events and encounters now have compiled bodies. Added the mechanical owners required by those chapters, plus Reconstruction and Resonance, Corrupted Engrams, Tuned Suppression, and Controlled Routing. Expanded the rule index, quick reference, and faction-method guidance. NPC identity remains owned by NPC entries; scene aftermath remains in chapters; Source-derived statistics use their owning references.
+
+Recovered context from sixteen accessible campaign-chat excerpts and recorded a lookup for every event and encounter in `adventure/sources/remaining-reconciliation.yaml`. The excerpts were bounded, supplied no older cursor, and omitted linked attachments; this is not exhaustive history recovery. Explicit user decisions were distinguished from assistant suggestions. Notable reconciliations include Black Claw Gorge, Vara remaining remembered after the stopped-path resumed Reading fails, branch-specific Observer/eclipse timing, five-front consequences, and the standalone finale source’s Wound → Composite → Echo → Chorus order.
+
+Authored missing prototype details under the user’s autonomy instruction and recorded them in `MIGRATION-REVIEW.md`: Duskwood profile completion, missing Source values, Sunny troop recovery timing, Milltown numerical hazards and a deterministic Floodwarden sequence, Open Door hazard numbers, announced fictional deadlines, and exceptional ending fallbacks. Preserved the source’s Milltown collision degrees and per-debris-piece frequency. Corrected import errors that treated AC labels as creature traits. These decisions are drafts for review, not retroactive user approvals or playtest results.
+
+Added five player-only Markdown exports for the display labels, Celia’s procedure, Focus card, Ledger, and Material Concordance. Exports allow only explicit player-facing blocks and reject nested directives; GM notes and the sealed key remain excluded. The actual generated downloads were compared with their filtered content.
+
+The inventory covers 333 source sections: none unclassified or unreviewed, 330 in progress and three previously migrated. Reviewed ranges identify their chapter and reference destinations; design criteria are retained in `adventure/sources/design-review.md`. “In progress” deliberately preserves pending meaning-changing review and preparation. Source exports remain unchanged, and no commits were made.
+
+**Validation:** source-provenance and entity/reference checks pass (366 entities, 209 Markdown files, 17 migration concepts), with no stale references. All six directory/export tests pass. Final GM build: 411 pages, 40,353 internal links, successful search index and privacy scan (846 files; 255 private snippets). Final designer build: 430 pages, 46,588 internal links and successful search index. Additional content checks confirm 33 compiled scene bodies, five correct player exports, corrected profile traits, and non-overlapping prototype barrier placements. Browser visual layout, encounter balance, and physical components have not been playtested. Advancement and the other preparation items in `MIGRATION-REVIEW.md` remain open.

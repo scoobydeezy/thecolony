@@ -1,12 +1,22 @@
 ---
-title: "Quick Reference"
-description: "The rules a GM keeps open at the table, assembled by embedding the rule entries."
+title: Quick Reference
+description: The rules a GM keeps open at the table, assembled by embedding the rule entries.
 sidebar:
   order: 2
+readiness:
+  status: compiled
 ---
 
-:::design
-**Stub (BOOK-STRUCTURE.md §1).** Covers: The rules a GM keeps open at the table, assembled by embedding the rule entries. Main sources: the rule entries; Faction Goals: GM Quick Reference.
-:::
+Keep the relevant owner open; these cards are embedded from the rules, not separately maintained copies.
 
-*This page is not written yet.*
+::embed{#rule.sources-and-resonance}
+
+::embed{#rule.dispersal}
+
+::embed{#rule.stabilization-window}
+
+::embed{#rule.identity-and-stabilization}
+
+::embed{#rule.anchoring-and-resolution}
+
+::embed{#rule.act-three-fronts}

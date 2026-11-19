@@ -1,4 +1,4 @@
-# Migration map: canonical concepts moving from the 13 source documents
+# Migration map: canonical concepts moving from the 12 current source documents
 # (in the parent "The Colony/" folder) into the book.
 #
 # status:   unmigrated | in-progress | migrated
@@ -9,7 +9,123 @@
 # A concept becomes "migrated" only when every provenance entry is reconciled and the user
 # has approved any resolution that changed meaning.
 
+retiredDocuments:
+  Campaign Synopsis:
+    representedBy: [Campaign Vision, Campaign Outline]
+    decision: User confirmed retirement on 2026-11-18; do not restore this as a thirteenth source.
+
 concepts:
+  book.parts-one-two:
+    status: in-progress
+    targets: []
+    provenance:
+      - { doc: Campaign Vision, heading: Campaign Vision, role: states, reconciled: true }
+      - { doc: The Colony — Foundational Truths, heading: The Colony, role: states, reconciled: true }
+      - { doc: The Colony — Foundational Truths, heading: Traditions and Empty Spaces, role: states, reconciled: true }
+      - { doc: The Colony — Foundational Truths, heading: The Factions, role: states, reconciled: false, note: current owner mottos differ from earlier source wording }
+      - { doc: Campaign Outline, heading: Campaign-Wide Promises and Narrative Threads, role: states, reconciled: true }
+      - { doc: Campaign Outline, heading: Branching and Continuity Rules, role: states, reconciled: true }
+      - { doc: Campaign Outline, heading: The Seven Components of Identity, role: states, reconciled: true, note: user confirmed six Keystones including Dawn Charter for Choice on 2026-11-18 }
+      - { doc: Campaign Outline, heading: Colony State Handoff, role: states, reconciled: true }
+      - { doc: GM Design Guide, heading: GM Design Guide, role: states, reconciled: true }
+      - { doc: GM Design Guide, heading: Campaign Components, role: states, reconciled: true }
+      - { doc: GM Design Guide, heading: Session Design, role: states, reconciled: true }
+      - { doc: GM Design Guide, heading: Encounter Design, role: states, reconciled: true }
+      - { doc: GM Design Guide, heading: Combat, role: states, reconciled: true }
+      - { doc: GM Design Guide, heading: NPC Design, role: states, reconciled: true }
+      - { doc: GM Design Guide, heading: Props, role: states, reconciled: true }
+      - { doc: GM Design Guide, heading: The Observer, role: states, reconciled: true }
+      - { doc: GM Design Guide, heading: The Veiled, role: states, reconciled: true }
+      - { doc: GM Design Guide, heading: Endings, role: states, reconciled: true }
+      - { doc: GM Design Guide, heading: GM Principles, role: states, reconciled: true }
+    reconciliation:
+      - "2026-11-18: nineteen overview and setting pages compiled or reviewed; page inventory, evidence, and gaps are in parts-1-2-reconciliation.yaml."
+      - "Generated directories preserve entity ownership and label starting state; SocialClass entries remain separate from the seven factions."
+    open:
+      - Advancement schedule explicitly deferred by the user; treasure plan, canonical city map, Ledger starting location, Broken Bell physical description, and legacy mottos remain open.
+
+  rule.keystones:
+    status: in-progress
+    targets: [rule.keystones]
+    provenance:
+      - { doc: Campaign Outline, heading: The Seven Components of Identity, role: states, reconciled: true }
+      - { doc: Campaign Outline, heading: Faction Relationships as Act III Mechanics > Keystones Create Independence, role: states, reconciled: true }
+      - { doc: The Veiled, heading: Keystones, role: states, reconciled: false, note: five-tool taxonomy superseded by user ruling; detailed Engram and Proxy material now compiled in rule.corrupted-engrams }
+    reconciliation:
+      - "2026-11-18 user: Six Keystones; Dawn Charter supports Choice. Context has no Keystone. Evidence and local-recovery requirements remain."
+
+  rule.identity-and-stabilization:
+    status: in-progress
+    targets: [rule.identity-and-stabilization]
+    provenance:
+      - { doc: The Veiled, heading: Identity as Meaning, role: states, reconciled: true, note: definitions transferred; five-tool taxonomy superseded by user-confirmed six in rule.keystones }
+      - { doc: The Veiled, heading: Recovering Identity, role: states, reconciled: true }
+      - { doc: The Veiled, heading: Recover and Restore, role: states, reconciled: true }
+      - { doc: The Veiled, heading: Acceptance and Stabilization, role: states, reconciled: true }
+      - { doc: The Veiled, heading: Reconstruction After Partial Stabilization, role: states, reconciled: true }
+
+  rule.anchoring-and-resolution:
+    status: in-progress
+    targets: [rule.anchoring-and-resolution]
+    provenance:
+      - { doc: The Veiled, heading: Anchoring and Resolution, role: states, reconciled: true }
+      - { doc: The Veiled, heading: Anchors by Resonance Type, role: depends, reconciled: false, note: specialized examples remain for encounter-specific migration }
+
+  rule.faction-goals:
+    status: in-progress
+    targets: [rule.faction-goals]
+    provenance:
+      - { doc: Faction Goals, heading: I. Goal Model, role: states, reconciled: true }
+      - { doc: Faction Goals, heading: III. Direct Play and the App, role: states, reconciled: true }
+
+  rule.colony-turn:
+    status: in-progress
+    targets: [rule.colony-turn]
+    provenance:
+      - { doc: Faction Goals, heading: II. The Colony Turn, role: states, reconciled: true }
+      - { doc: Faction Goals, heading: III. Direct Play and the App, role: states, reconciled: true }
+    open:
+      - Balance remains provisional; app psychological scores and configurable thresholds are not reimplemented by this workflow migration.
+
+  rule.act-three-fronts:
+    status: in-progress
+    targets: [rule.act-three-fronts]
+    provenance:
+      - { doc: Faction Goals, heading: IV. Act III — Totality and the Five Fronts, role: states, reconciled: false, note: shared outcomes transferred; front-specific baselines stay with encounters }
+      - { doc: Campaign Outline, heading: Faction Relationships as Act III Mechanics, role: states, reconciled: true }
+    open:
+      - Individual deadlines and offscreen execution tuning remain open; do not infer complete encounters from this shared rule.
+
+  encounter.bad-maps:
+    status: in-progress
+    targets: [encounter.bad-maps, creature.evin-baby, source.evin-cloth-toy]
+    provenance:
+      - { doc: Campaign Outline, heading: Session 2 — Bad Maps, role: states, reconciled: true, note: causal sequence and optional Vara attendance }
+      - { doc: Encounters, heading: 1. Bad Maps — Evin Peakwalker Baby Reconstruction, role: states, reconciled: true }
+      - { doc: Creatures, heading: Evin Peakwalker Reconstruction (Baby) — Creature 15, role: states, reconciled: true, note: unchanged numerical implementation }
+      - { doc: Creatures, heading: Cloth Toy — Source 15, role: states, reconciled: true }
+      - { doc: Creatures, heading: Gressa Peakwalker — Living Source 15, role: depends, reconciled: false, note: transfer and Caretaker profiles compiled; exceptional Source-destruction consequences remain open }
+      - { doc: The Veiled, heading: Minimal Worked Example — Bad Maps, role: states, reconciled: false, note: ordinary flow covered; dead-Gressa and Scar edge cases remain open }
+    reconciliation:
+      - "2026-11-18: encounter owns staging, response and handoff; creature owns Tantrum and other abilities; Source owns its profiles and derived statistics; universal rules are reused."
+      - "Vara's refusal branch does not prevent Bad Maps; Uldren's absence must not remove the Order's response. Gressa's death is not scripted."
+    open:
+      - Ordinary cloth-vessel durability, Order arrival timing and combat support roster.
+      - Dead-Gressa transfer and Scar interaction with an active Baby; preserve as unresolved.
+      - Confirm balance and table usability before calling the chapter run-ready.
+
+  event.prisoners:
+    status: in-progress
+    targets: [event.prisoners]
+    provenance:
+      - { doc: Campaign Outline, heading: Session 2 — Bad Maps > Vara Trust Beat — The Compass, role: states, reconciled: true }
+      - { doc: Campaign Outline, heading: Vara Trust Spine, role: states, reconciled: true }
+      - { doc: Campaign Outline, heading: Session 3 — Dusk, role: depends, reconciled: false, note: route handoff included; the three investigations remain to migrate }
+    reconciliation:
+      - "2026-11-18: visit before questioning; deliberate confidence differs from missing the connection; second invitation preserves earned Trust on refusal. No new subtraction or confiscation mechanics."
+    open:
+      - Detention arrangements, release terms and exceptional aftermaths.
+
   rule.book.keeper-bound-handling:
     status: in-progress
     targets: [rule.book.keeper-bound-handling]
@@ -91,3 +207,94 @@ concepts:
       - { doc: Campaign Outline, heading: Session 10 — Shattered > The Breach — EGRESS Institute, role: states, reconciled: true, note: corrected 2026-11-18 }
     reconciliation:
       - "2026-11-18: the Sheep is harmless while watched and lethal when its last observer loses sight (Encounters, Creatures). The Campaign Outline had the opposite and was corrected."
+
+  campaign.remaining-chapters:
+    status: in-progress
+    targets:
+      - event.aletheia
+      - event.an-opportunity
+      - event.eclipse
+      - event.prisoners
+      - event.the-broken-bell
+      - event.the-calling
+      - event.the-confluence
+      - event.the-house-of-abiding
+      - event.the-institute
+      - event.the-light-remains
+      - event.the-manor
+      - event.the-morning-after
+      - event.the-observer
+      - event.the-thin-place
+      - event.the-veiled-house
+      - event.the-way-out
+      - event.totality
+      - encounter.a-life
+      - encounter.bad-maps
+      - encounter.containment
+      - encounter.duskwood
+      - encounter.milltown
+      - encounter.old-town
+      - encounter.playing-for-keeps
+      - encounter.revolutionaries
+      - encounter.sunny
+      - encounter.the-breach
+      - encounter.the-burden
+      - encounter.the-open-door
+      - encounter.the-reading
+      - encounter.the-shape-of-someone
+      - encounter.the-tangled-web
+      - encounter.witness-me
+    provenance:
+      - doc: Campaign Outline
+        heading: Campaign Outline
+        role: states
+        reconciled: false
+        note: >-
+          Compiled draft; per-section destinations and provisional decisions recorded in
+          remaining-reconciliation.yaml and MIGRATION-REVIEW.md.
+      - doc: Encounters
+        heading: Encounters
+        role: states
+        reconciled: false
+        note: >-
+          Compiled draft; per-section destinations and provisional decisions recorded in
+          remaining-reconciliation.yaml and MIGRATION-REVIEW.md.
+      - doc: Creatures
+        heading: Creatures
+        role: states
+        reconciled: false
+        note: >-
+          Compiled draft; per-section destinations and provisional decisions recorded in
+          remaining-reconciliation.yaml and MIGRATION-REVIEW.md.
+      - doc: The Burden — Final Veiled Encounter
+        heading: The Burden — Final Veiled Encounter
+        role: states
+        reconciled: false
+        note: >-
+          Compiled draft; per-section destinations and provisional decisions recorded in
+          remaining-reconciliation.yaml and MIGRATION-REVIEW.md.
+      - doc: The Ledger — Hall of Remembrance Source Records
+        heading: The Ledger — Hall of Remembrance Source Records
+        role: states
+        reconciled: false
+        note: >-
+          Compiled draft; per-section destinations and provisional decisions recorded in
+          remaining-reconciliation.yaml and MIGRATION-REVIEW.md.
+      - doc: The Witnesses — Material Concordance
+        heading: The Witnesses — Material Concordance
+        role: states
+        reconciled: false
+        note: >-
+          Compiled draft; per-section destinations and provisional decisions recorded in
+          remaining-reconciliation.yaml and MIGRATION-REVIEW.md.
+    reconciliation:
+      - >-
+        2026-11-18: all 33 scenes and four finale phases have compiled drafts; chapter-owned procedures link to
+        canonical mechanical owners.
+      - >-
+        Sixteen bounded recent chat excerpts reviewed; all scenes have lookup records. No older cursor or linked
+        attachments were returned.
+      - Original exports remain unchanged. The user will commit.
+    open:
+      - Meaning-changing provisional decisions require later user review; details in MIGRATION-REVIEW.md.
+      - Advancement, rewards, physical preparation and encounter playtesting remain open.

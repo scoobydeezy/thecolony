@@ -17,7 +17,7 @@ part:
 ---
 
 :::design
-**Act overview (template 3.1), first draft 2026-11-18.** Compiled from :cite[Campaign Outline — Act I]{doc=campaign-outline anchor=act-i--the-secret} and :cite[Campaign Synopsis — Weeks 1–4]{doc=campaign-synopsis anchor=week-1--arrival}. Suggested pacing follows the Outline's four sessions; the Synopsis's weekly titles are kept as a second view.
+**Act overview (template 3.1), reconciled 2026-11-18.** Campaign Vision owns the campaign's intent; :cite[Campaign Outline — Act I]{doc=campaign-outline anchor=act-i--the-secret} owns this act's causality, Trust spine and suggested pacing. Campaign Synopsis is retired: its contents are represented by those two current documents (user, 2026-11-18).
 :::
 
 ## The Act in Brief

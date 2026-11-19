@@ -6,9 +6,9 @@
   "scripts": {
     "serve": "node scripts/serve.mjs",
     "dev": "astro dev --force",
-    "dev:designer": "BOOK_TARGET=designer astro dev --force",
+    "dev:designer": "node scripts/astro-target.mjs designer dev --force",
     "build": "astro build --force && node scripts/validate.mjs dist && node scripts/privacy-scan.mjs dist",
-    "build:designer": "BOOK_TARGET=designer astro build --force && node scripts/validate.mjs dist-designer",
+    "build:designer": "node scripts/astro-target.mjs designer build --force && node scripts/validate.mjs dist-designer",
     "preview": "astro preview",
     "check": "node scripts/validate.mjs",
     "schema": "node scripts/json-schema.mjs"

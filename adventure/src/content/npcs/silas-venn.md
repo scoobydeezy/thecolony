@@ -12,7 +12,7 @@ gender: Male
 pronouns: He/Him
 aliases:
   - The Observer
-summary: Patient scholar studying how institutions harden around their answers; Darkwing is his experiment.
+summary: Patient scholar studying how institutions harden around their answers; Darkwing tests the limits of his model.
 narrativeTier: Major
 status: draft
 origin: prepared
@@ -154,7 +154,7 @@ Its anomalous legal status, uncertain relationship to the Claims Registry, and l
 The Manor contains his annotated map, accumulated observations, faction patterns, and evidence of ongoing habitation. The Party first encounters the place before encountering him.
 The two Manor visits frame Act II:
 **First visit:** The Party sees the board.  
-**Second visit:** The eclipse has already begun at the Confluence; the Observer invites Darkwing through an impossible threshold back to the Manor, and the Party learns that it is on the board.
+**Second visit:** After the Confluence, the Observer invites Darkwing through an impossible threshold back to the Manor, and the Party learns that it is on the board. If the Reading was stopped, the eclipse has already begun at the Confluence. If the Reading succeeded, his full revelation precedes the eclipse. See :ref[The Observer]{#event.the-observer} for the scene’s branch timing.
 
 ## Relationship to the Keeper’s Father
 
@@ -184,7 +184,7 @@ He watches how they respond when:
 * Their own priorities begin functioning like another faction’s agenda.
 * They acquire enough influence to impose a solution of their own.
 
-At the second Manor visit—**after** Darkwing has already attempted to broker the Confluence and the eclipse has begun—he reveals that he has not merely been studying the Colony’s response to crisis.
+At the second Manor visit, after Darkwing has attempted to broker the Confluence, he reveals that he has not merely been studying the Colony’s response to crisis. The eclipse’s timing follows the branch described above.
 He has been studying what the Party does when every available certainty fails. He deliberately waits until after the Assembly because he wants to observe what Darkwing builds without first telling them what question he is asking.
 
 ## Relationship to the Party’s Answer
@@ -197,20 +197,6 @@ He asks:
 * What prevents voluntary service from becoming expected sacrifice?
 * What question was this institution created to answer?
 * What would convince its successors that the answer is no longer enough?
-
-He does not ask these questions to defeat the proposal or steer the Party toward a preferred solution.
-Once the Party understands the consequence, the choice remains theirs.
-
-## Testing the Party’s Answer
-
-The Observer does not evaluate the Party’s proposal by asking whether it solves the immediate crisis alone.
-He asks:
-• What happens in fifty years?
-• Who inherits this responsibility?
-• Who is accountable when the system fails?
-• What prevents voluntary service from becoming expected sacrifice?
-• What question was this institution created to answer?
-• What would convince its successors that the answer is no longer enough?
 
 He does not ask these questions to defeat the proposal or steer the Party toward a preferred solution.
 Once the Party understands the consequence, the choice remains theirs.

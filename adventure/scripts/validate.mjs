@@ -3,11 +3,13 @@
 // directory (dist / dist-designer) it also checks every internal link and anchor.
 //   node scripts/validate.mjs            source checks only
 //   node scripts/validate.mjs dist       + built-output link checks
+//   node scripts/validate.mjs --sources  + original-document provenance checks
 import fs from 'node:fs';
 import path from 'node:path';
 import { loadRegistry, listFiles, parseEntityFile, ENTITY_TYPES, CONTENT_DIR, ROOT, rel, staleReferences, PART, partDir, loadParts } from '../src/lib/registry.mjs';
 import { visit } from 'unist-util-visit';
 import { BLOCKS, TEXT_DIRECTIVES, LEAF_DIRECTIVES, directiveId, parseMarkdownBody } from '../src/lib/remark-colony.mjs';
+import { directoryError } from '../src/lib/directory.mjs';
 import { STAT_KEYS } from '../src/lib/veiled.mjs';
 import { listSourceDocs, headingsOf, resolveHeadingPath, loadMigrationMap } from '../src/lib/source-docs.mjs';
 
@@ -46,6 +48,10 @@ for (const e of reg.entities) {
 
 // ---------------------------------------------------------------- source documents
 const sourceDocs = listSourceDocs();
+// The published book must remain verifiable after the source exports are retired.
+// Original heading/citation checks are an explicit migration check, not a build dependency.
+const checkSources = process.argv.includes('--sources');
+if (checkSources && !sourceDocs.length) err('No source documents found; set COLONY_SOURCE_DOCS_DIR to the source exports folder.');
 const docByName = new Map(sourceDocs.map((d) => [d.name, d]));
 const docById = new Map(sourceDocs.map((d) => [d.id, d]));
 const headingCache = new Map();
@@ -54,6 +60,7 @@ const headings = (doc) => {
   return headingCache.get(doc.id);
 };
 function checkProvenance(where, p) {
+  if (!checkSources) return;
   const doc = docByName.get(p.doc);
   if (!doc) return err(`${where}: unknown source document "${p.doc}"`);
   if (!resolveHeadingPath(headings(doc), p.heading)) err(`${where}: heading "${p.heading}" not found in ${p.doc}`);
@@ -77,7 +84,7 @@ const coverageFile = path.join(ROOT, 'sources/coverage.yaml');
 if (fs.existsSync(coverageFile)) {
   const cov = (await import('js-yaml')).default.load(fs.readFileSync(coverageFile, 'utf8'));
   for (const [doc, rows] of Object.entries(cov.documents ?? {})) {
-    if (!docByName.has(doc)) err(`coverage: unknown source document "${doc}"`);
+    if (checkSources && !docByName.has(doc)) err(`coverage: unknown source document "${doc}"`);
     for (const r of rows)
       for (const h of [...(r.home ?? []), ...(r.dependsOn ?? [])])
         if (h !== 'unclassified' && !cov.planned?.[h] && !reg.byId.has(h)) staleRef(`coverage: ${doc} › ${r.heading}: home ${h} is neither an entry nor a planned page`);
@@ -117,7 +124,13 @@ for (const file of markdownFiles) {
       return;
     }
     const attrs = node.attributes ?? {};
+    if (name === 'directory') {
+      const problem = directoryError(attrs);
+      if (problem) err(`${at}: ${problem}`);
+      return;
+    }
     if (name === 'cite') {
+      if (!checkSources) return;
       const doc = docById.get(attrs.doc);
       if (!doc) err(`${at}: :cite to unknown source document "${attrs.doc}"`);
       else if (attrs.anchor && !headings(doc).some((h) => h.anchor === attrs.anchor)) err(`${at}: :cite anchor #${attrs.anchor} not in ${doc.name}`);
@@ -195,7 +208,7 @@ for (const e of reg.entities) {
 }
 
 // ---------------------------------------------------------------- built output
-const distArg = process.argv[2];
+const distArg = process.argv.slice(2).find((arg) => !arg.startsWith('--'));
 if (distArg) {
   const dist = path.resolve(ROOT, distArg);
   if (!fs.existsSync(dist)) err(`Build directory ${distArg} does not exist`);

@@ -1,6 +1,8 @@
 # Results Pending: book structure, page templates and ownership
 
-**Status:** revision 2, approved by the user (2026-11-18), after the planning agent's review. The open decisions are settled (§9). Two review points conflicted with the user's rulings of 2026-11-18; the rulings stand and are explained in §9. Nothing has been built or migrated yet.
+**Status:** revision 2, approved by the user (2026-11-18), after the planning agent's review. The structure now contains compiled drafts for the nineteen overview/setting pages, all 33 events and encounters, and all four Burden phases, with their supporting reference owners. Provisional decisions, physical preparation and playtesting remain; page existence does not establish completion. See `MIGRATION-REVIEW.md`. Two review points conflicted with the user's rulings of 2026-11-18; the rulings stand and are explained in §9.
+
+**Current migration agreement (2026-11-18):** the twelve current source exports are the baseline, supplemented by retrieved campaign chats. Campaign Synopsis is retired into Campaign Vision and Campaign Outline; references to a thirteen-document inventory below describe the earlier inventory. Recover explicit accepted decisions and their reasons without reviving superseded proposals. A later assistant draft is not, by itself, an accepted ruling. Record unresolved conflicts rather than choosing by recency alone. The Starlight book will supersede the source documents; maintain migration evidence here, not parallel edits to the originals. See `adventure/sources/opening-reconciliation.yaml` for the first chapter's evidence, scope and outstanding decisions.
 
 **Contents:**
 1. The table of contents
@@ -12,6 +14,8 @@
 7. Existing migrations to keep
 8. After approval: the coverage inventory
 9. Decisions (settled)
+
+**Current pass (user, 2026-11-18):** after Parts I and II, the user authorized autonomous reconciliation of the remaining sources and chat-context lookup for every new event and encounter, with provisional decisions recorded for review. That draft pass is compiled in the book. See `adventure/sources/remaining-reconciliation.yaml` for all 33 scene lookups, the sixteen accessible bounded chat excerpts, and reviewed source ranges. Earlier opening and Parts I–II records remain applicable. Six Identity Keystones include the Dawn Charter for Choice; the level schedule remains explicitly open. This is not a claim of complete historical recovery, maps, treasure, balancing, or playtesting.
 
 **Working method (agreed 2026-11-18):**
 1. Fix this structure first.

@@ -1,0 +1,83 @@
+# Working evidence and unresolved decisions, not GM prose or new campaign authority.
+date: '2026-11-18'
+chapter: arrival-and-the-first-incursion
+status: compiled-for-review
+sourcePolicy:
+  baseline: Twelve current local Markdown exports, read without modifying them.
+  destination: Starlight becomes the authoritative home as material is reconciled.
+  retired: Campaign Synopsis is represented by Campaign Vision and Campaign Outline (user, this chat).
+  history: Recover explicit accepted decisions and rationale; distinguish proposals, later revisions, and unresolved choices. Recency alone does not resolve authority.
+  tracking: Migration provenance is optional historical evidence, not a permanent dependency of the GM build.
+scope:
+  reviewed: [event.the-calling, event.the-house-of-abiding]
+  authored: [encounter.bad-maps, event.prisoners]
+  supportingEntries: [creature.evin-baby, source.evin-cloth-toy]
+  reusedRules: [rule.active-sources, rule.dispersal, rule.stabilization-window, rule.source-destruction, rule.containment]
+  notClaimed: Later investigations, complete universal-rule audit, combat balance, completed map, props, playtesting, or all campaign chat history.
+evidence:
+  - source: Campaign Outline
+    sections: [Act I — The Secret, Vara Trust Spine, Session 1 — The Calling, Session 2 — Bad Maps, Session 3 — Dusk]
+    use: Causal spine, three Trust opportunities, agency distinction, optional attendance, and Source-dependent route availability.
+  - source: Encounters
+    sections: [1. Bad Maps — Evin Peakwalker Baby Reconstruction]
+    use: First contact, combat as evidence, separation, Dispersal, Rupture and Order intervention.
+  - source: Creatures
+    sections: [Evin Peakwalker Reconstruction (Baby) — Creature 15, Cloth Toy — Source 15, Gressa Peakwalker — Living Source 15]
+    use: Preserve concrete statistics and abilities; derive shared Source values rather than copy them.
+  - source: The Veiled
+    sections: [Minimal Worked Example — Bad Maps]
+    use: Distinguish containment from restoration; retain unsettled edge cases.
+  - source: Character Briefs
+    sections: [Shattered Instigator - Kivren Quozot, The Keeper - Varenya “Vara” Cairn, Steward of the House of Abiding - Uldren Harthwright]
+    use: Existing owning character entries inform scene behavior; Kivren expects danger, not a scripted death.
+  - chat: General Campaign Discussion
+    threadId: 6a45794e-39c0-83ea-8582-350c4bdc076e
+    userTurn: 5f14e1db-f68d-4f02-856e-fe2598ab7f76
+    disposition: deferred
+    finding: The possible forgotten-sister hook is explicitly pinned pending actual backstories; do not insert it into the arrival chapter.
+  - chat: Veiled vs Forgotten
+    threadId: 6a650b8f-5340-83ea-b6e2-d68583aa4559
+    disposition: historical-and-partly-superseded
+    finding: Dispersal creating an opportunity and persistent recovered Identity support the current design. Earlier mandatory double locks and finale order must not override the current Veiled and Burden documents.
+  - chat: Encounter Design Part II
+    threadId: 6ae0b7b4-8d08-83ea-98c3-3ed836bee8e3
+    disposition: recovery-candidate-for-next-chapter
+    finding: The accepted Duskwood gorge, kobold engineers, two Vemeraks and half-health release trigger are absent from current exports. The later assistant stat-block draft still needs review; no Duskwood mechanics are migrated here.
+  - source: ADVENTURE-BOOK-CHANGES.md
+    sections: [Rulings on the first drafts]
+    use: Retain the repository's recorded rulings on Perrik's less-than-eighteen-month arrival, Abiding Way, and the UFO mission order. Fix the stale years sentence without rewriting those decisions.
+editorialAdditions:
+  - Bad Maps street arrangement and read-aloud are draft staging, not fixed geography or an extra hazard.
+  - Prisoners stages the compass visit before the relevant question; exact questioning prose is editorial.
+  - If players prevent manifestation or avoid detention, follow actual play rather than force the authored sequence.
+resolvedDuringPass:
+  - Removed the stale duplicate First Operation section from Kivren's entry that presupposed Gressa's death; retained Relationship to the Victim and its conditional outcome.
+  - Retained Creature 15 and Source Level 15 from concrete profiles rather than retuning them because this is the opening fight.
+  - Baby is a false reconstruction, not Evin's NPC combat profile; no NPC identity inheritance link.
+  - One Source record follows the Weight through transfer; Gressa's NPC entry remains her identity owner.
+open:
+  - id: opening.arrival-order
+    question: What does the UFO mission order actually ask Darkwing to do?
+    effect: Existing hook retained; no invented organization details or player backstory.
+  - id: bad-maps.response
+    question: When does the Order arrive, with which combatants, and how is that support represented in initiative?
+    effect: Objectives are authored; exact combat timing and roster are not settled.
+  - id: bad-maps.toy-durability
+    question: What are the mundane toy's durability statistics after Breach, including reflected Backlash?
+    effect: Universal destruction rules are linked; no guessed HP or Hardness.
+  - id: bad-maps.dead-gressa
+    question: How does transfer into an already dead Gressa work, as distinct from killing her after she becomes a living Source?
+    effect: Sources allow the former but describe the result as living; unusual topology needs a ruling.
+  - id: bad-maps.scar
+    question: How does a Scar transfer affect an active Baby's condition and later reconstruction?
+    effect: Universal transfer preserves the active Incursion; no extra bespoke profile invented.
+  - id: window.condition-restored
+    question: If the condition is restored after Pressure has exceeded the threshold, is reconstruction immediate or does a new Window start?
+    effect: Existing rule design question retained; not silently resolved by encounter prose.
+  - id: prisoners.exceptional-outcomes
+    question: What are the Order's detention and release procedures after a prevented Incursion, revealed culprit, refusal, escape or unusual vessel outcome?
+    effect: Ordinary sequence is drafted; no mandatory arrest or new legal procedure.
+next:
+  - Reconcile A Life and Containment together with the Peakwalker identity trail and actual Source outcomes.
+  - Recover Duskwood's accepted design from chats before drafting its procedures.
+  - Preserve Evin's later payoff even if the Witness route is skipped; a short route is not a closed campaign promise.

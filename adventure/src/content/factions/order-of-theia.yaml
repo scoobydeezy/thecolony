@@ -3,7 +3,7 @@ id: faction.order-of-theia
 slug: order-of-theia
 name: The Order of Theia
 type: Faction
-summary: The Order has safeguarded the Colony since its founding, believing stability must be preserved even when mercy looks like cruelty.
+summary: The Order arose to safeguard the Reading and became the Colony's ruling authority, believing stability must be preserved even when mercy looks like cruelty.
 motto: Until the Veil is Lifted
 represents: Preservation, Stewardship
 publicFace: The ruling authority of the Colony.
@@ -25,8 +25,8 @@ history: |-
 
   Today, the Order can no longer distinguish between preserving the Colony and preserving its own institutions. Its members sincerely believe they stand between civilization and collapse, and they are not entirely wrong. The ritual has protected the Colony for generations, reinforcing the conviction that stability itself is proof of righteousness. What began as a duty to safeguard the burden has become a certainty that no other future can be trusted.
 
-  Even now, many within the Order are disciplined, compassionate people carrying an impossible responsibility. They conceal the truth not from cruelty, but from the belief that some burdens destroy those unprepared to bear them. The name Theia itself reflects that transformation—a fragment of Aletheia, the first name recorded in the Book, whose meaning has long since been forgotten. The Order was founded to preserve a truth it can no longer speak, and over time, preserving that truth became preserving the silence around it.
-notes: The Order of Theia's name derives from Aletheia - though no one remembers this, she's the first name in the book.
+  Even now, many within the Order are disciplined, compassionate people carrying an impossible responsibility. They conceal the truth not from cruelty, but from the belief that some burdens destroy those unprepared to bear them. The name Theia itself reflects that transformation—a fragment of Aletheia, the First Keeper, whose identity has long since been forgotten. The Order was founded to preserve a truth it can no longer speak, and over time, preserving that truth became preserving the silence around it.
+notes: The Order of Theia's name derives from Aletheia, though no one remembers this. She was the First Keeper, not the first name in the memorial register; crowded memorial pages precede the Keeper succession.
 heraldry:
   glyph: /uploads/factions/keepers-glyph.png?v=1785375300467
   icon: /uploads/factions/keepers-icon.svg?v=1785375309123

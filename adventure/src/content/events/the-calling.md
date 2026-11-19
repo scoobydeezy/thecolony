@@ -71,7 +71,7 @@ A small goblin in an ink-stained coat surfaces from behind the largest stack. He
 
 Perrik walks the Party through records that cannot be reconciled. He talks too fast, interrupts himself, and produces each piece of evidence from a pile that seems unrelated to the last. **The comedy is in the presentation, never in incompetence:** every pile has a reason, and every reason holds.
 
-He has spent years trying to prove that the errors are connected. He is right. He is simply terrible at explaining why.
+Since arriving, he has been trying to prove that the errors are connected. He is right. He is simply terrible at explaining why.
 
 **What he shows, in whatever order he grabs it:**
 

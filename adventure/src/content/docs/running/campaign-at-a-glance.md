@@ -3,6 +3,10 @@ title: The Campaign at a Glance
 description: What Results Pending is, what it asks of the table, and the shape of its three acts.
 sidebar:
   order: 2
+readiness:
+  status: compiled
+canon:
+  concepts: [book.parts-one-two]
 ---
 
 :::design
@@ -61,6 +65,6 @@ The campaign does not contain a predetermined answer. Beneath that question is t
 
 ## Where to Go Next
 
-- **GM Truths:** what the GM knows that no one at the table does.
-- **The Veiled: A Practical Primer:** how the campaign's supernatural danger works at the table.
-- **Act I — The Secret:** the first act, beginning with The Calling.
+- **[GM Truths](/docs/running/gm-truths/):** the secrets behind the Colony's institutions.
+- **[The Veiled: A Practical Primer](/docs/running/veiled-primer/):** how the campaign's supernatural danger works at the table.
+- **[Act I — The Secret](/docs/act-1/):** the first act, beginning with The Calling.

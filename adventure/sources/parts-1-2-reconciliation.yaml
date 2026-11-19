@@ -1,0 +1,91 @@
+date: '2026-11-18'
+scope: Parts I and II; handbook and gazetteer, not additional narrative chapters.
+status: compiled-for-review
+sourcePolicy:
+  baseline: Twelve current local exports; originals unchanged.
+  retirement: Campaign Synopsis remains superseded by Campaign Vision and Campaign Outline.
+  ownership: Authored chapters explain; rule entries own procedures; entity entries own facts; the app owns live campaign state.
+  history: Accepted decisions are distinguished from assistant proposals and subsequently superseded mechanics.
+pages:
+  running: [index, how-to-use, campaign-at-a-glance, gm-truths, reading-and-branches, seven-components, veiled-primer, colony-turn, faction-operations, running-the-game, progression-and-rewards, promises-and-threads]
+  setting: [index, history, geography, everyday-life, factions, institutions, whos-who]
+ruleOwners:
+  - rule.identity-and-stabilization
+  - rule.anchoring-and-resolution
+  - rule.faction-goals
+  - rule.colony-turn
+  - rule.act-three-fronts
+  - rule.keystones
+evidence:
+  - source: Campaign Vision
+    use: Premise, incomplete institutional answers, player authorship, hope without a predetermined ending.
+  - source: The Colony — Foundational Truths
+    use: Founding before the Reading, memorial before Keepers, irregular Calling, six traditions, faction origins.
+  - source: Campaign Outline
+    use: Reading branches, Identity curriculum, promises, faction stance, current Observer timing, local recovery and skipped-route fallbacks.
+  - source: GM Design Guide
+    use: Session preparation, evidence, NPC protections, consequential combat, props, Observer restraint.
+  - source: The Veiled
+    use: Current viable Identity paths, persistent Restoration, Acceptance without a roll, anchoring requirements.
+  - source: Faction Goals
+    use: Current goal model, per-faction operations, five fronts, pending deadlines and balance work.
+  - source: BOARD-GAME-REVIEW.md
+    sections: ['17.3', '18.2', '18.3', '18.4', '18.10', '18.12', '18.13']
+    use: Recover later adopted rulings; superseded summaries are not current procedures.
+  - source: server/Services/ColonyTurnEngine.cs
+    use: Confirm Character Phase order, consumed faction opportunity, eligibility, and stable tie-breaking; no engine changes.
+  - source: Creatures and The Burden — Final Veiled Encounter
+    use: Repeated six-PC level-12 tuning baseline, including Act I and finale; no inferred level-up cadence.
+  - chat: Veiled vs Forgotten
+    threadId: 6a650b8f-5340-83ea-b6b6-c6d8b65a4aca
+    userTurn: 84a29d7c-4e06-4003-9794-666f8e9d83fd
+    use: User describes five Keystones and evidence-dependent use; supports access rather than automatic answers.
+    limit: Older double-lock and finale-order proposals are superseded by current exports and recorded rulings. The historical five-tool count is superseded by the user's six-Keystone ruling in this chat on 2026-11-18.
+resolved:
+  - "2026-11-18 user ruling: six Identity Keystones, with the Dawn Charter supporting Choice. Context remains without a Keystone. The existing Charter Keystone flag already agrees; no baseline flag change was needed."
+  - Aletheia is the First Keeper, not the first memorial name. Corrected the Order's owning entry.
+  - The Colony predates the Order. Corrected the Order's founding implication.
+  - The Reading has no fixed annual schedule. Corrected the Ritual Chamber Asset summary.
+  - The Observer ends Act II with branch-dependent eclipse timing; Eclipse opens Act III already under way.
+  - Identity follows viable paths, not a universal pair of required locks; restored truth persists and Acceptance adds no roll or Pressure.
+  - Current Faction Phase uses one token per eligible goal or threatened guard, Priority bonuses, and DC 10; retired wildcard and five-card allocation excluded.
+  - Defection checks belong to the Character Phase; current Stress derives from in-force conditions.
+  - NPC directory includes Forgotten and unavailable baseline states rather than implying everyone listed can appear.
+editorialWork:
+  - District orientation and institutional access examples synthesize owning entries; they establish no new distances, service fees, law, or alliance matrix.
+  - Street examples are optional staging, not new canon scenes.
+  - Faction comparison and directories are generated from owners, with separate SocialClass grouping.
+  - The primer now points to procedural owners instead of repeating numeric mechanics and a forced first-encounter outcome.
+open:
+  - id: progression.schedule
+    gap: Six level-12 PCs are the documented encounter baseline; no authoritative advancement schedule or complete treasure allocation found.
+    treatment: User explicitly deferred the level schedule on 2026-11-18. Preserve the documented encounter baseline and reward guidance; no milestone schedule or complete treasure allocation is implied.
+  - id: setting.map
+    gap: Uploaded map images exist but are not identified as the canonical book map with scale, orientation, and district alignment.
+    treatment: Location hierarchy and directory supplied; map selection and production remain open.
+  - id: setting.ledger-location
+    conflict: Ledger Asset starts in the Memorial Building; Empty Lectern describes returning it to the Hall after ceremonies.
+    treatment: Preserve baseline and explain storage versus ceremonial use; no relocation invented.
+  - id: setting.broken-bell
+    conflict: Location describes an actual recovered bell; Asset describes a faded sign depicting a broken-away bell.
+    treatment: Gazetteer links owners without choosing a new physical arrangement; reconcile when the location is expanded.
+  - id: setting.mottos
+    conflict: Foundational Truths uses earlier Order and Aspis mottos; current faction entries differ.
+    treatment: Current owner values preserved; no new motto adopted in prose.
+  - id: fronts.timing
+    gap: Precise front deadlines, delegated execution, and balancing remain open in source tuning notes.
+    treatment: Shared outcome rule transferred; individual clocks remain encounter responsibilities.
+notClaimed:
+  - Full campaign migration, all historical chat recovery, new narrative scene completion, combat balancing or playtesting.
+  - Complete treasure plan, canonical city-map production, or completion of the proposed five-measure readiness tooling.
+  - Reimplementation or exhaustive conformance audit of app scoring formulas.
+validation:
+  sourceReferences: Passed after the Keystone ruling; 288 entities, 129 Markdown files, 16 migration concepts.
+  directories: Four tests passed; complete owner coverage, separate SocialClass grouping, Forgotten state, absent location, and owner updates.
+  renderedContent: Nineteen pages checked; both NPC groupings, all 37 locations, seven factions and four social classes; no placeholder text or private reconciliation notes in GM output.
+  gmBuild: Passed with search after the Keystone ruling; 333 pages and 32142 internal links.
+  designerBuild: Passed with search after the Keystone ruling; 352 pages and 37214 internal links.
+  privacy: Passed; 681 files checked against 156 private snippets.
+  keystones: Rendered rule includes Dawn Charter for Choice and no Keystone for Context; all six existing Asset flags agree, and GM output omits the private ruling note.
+  environment: Initial restricted GM build hit Pagefind Access denied; retry with normal Windows file access succeeded. No content workaround or disabled search.
+  visualLayout: Not verified in a browser.

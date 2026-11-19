@@ -13,10 +13,24 @@ Node 24 (`nvm use` reads `../.nvmrc`). Astro 7.4 needs Node 22.23.4 or later.
 | `npm run dev:designer` | Designer book (source docs, notes, migration status) at http://localhost:4323/docs/ |
 | `npm run build` | GM build to `dist/`, then link validation and privacy scan. Fails on any problem. |
 | `npm run build:designer` | Designer build to `dist-designer/` (local only, never deployed) |
-| `npm run check` | Source validation only (fast) |
+| `npm run check` | Book content and reference validation (fast; no build output required) |
+| `npm run check -- --sources` | Also verify migration provenance and citations against the original exports; set `COLONY_SOURCE_DOCS_DIR` first. |
 | `npm run schema` | Regenerate JSON Schemas in `schemas/` |
 
 **Why `serve` rather than `dev` behind the app:** Astro's dev server loads Starlight's scripts and styles from root paths (`/node_modules/…`, `/src/…`) instead of under `/docs/`. Through the app's proxy, those requests reach Angular, which breaks search and the menus. `serve` always serves real built pages, so it also never shows a stale cross-reference.
+
+## Original documents during migration
+
+The twelve current Markdown exports are read-only migration evidence. **Campaign Synopsis is retired into Campaign Vision and Campaign Outline** (user, 2026-11-18). Recover accepted decisions and missing context from campaign chats without reviving superseded proposals; record evidence and open questions in `sources/`. The finished book supersedes the originals.
+
+Set `COLONY_SOURCE_DOCS_DIR` to the exports folder for the designer's source views and explicit provenance checks. Relative paths resolve from `adventure/`; without the variable, the legacy two-level parent location is used. On this Windows checkout:
+
+```powershell
+$env:COLONY_SOURCE_DOCS_DIR = 'C:\Users\scoob\Documents\ChatGPT\The Colony'
+npm run check -- --sources
+```
+
+The GM build checks the book's own references without needing the old exports. `--sources` adds the migration-only checks and fails if the exports are unavailable. It does not change or synchronize the originals.
 
 ## Where things go
 
@@ -24,6 +38,7 @@ Node 24 (`nvm use` reads `../.nvmrc`). Astro 7.4 needs Node 22.23.4 or later.
 - `src/content/<type>/`: canonical entities, one file each. Use `.yaml` for data, or `.md` with frontmatter for anything with rules text.
   - Types: `creatures`, `npcs`, `locations`, `rules`, `veiled-sources`, `items`, `inventory`, `revelations`, `clocks`, `handouts`.
 - `sources/migration-map.yaml`: which source-document sections have moved into which concepts.
+- `sources/remaining-reconciliation.yaml`: per-scene chat lookups, retrieval limits and reviewed source ranges for the remaining campaign draft. See the repository’s `MIGRATION-REVIEW.md` for provisional decisions and preparation still required.
 
 **IDs** are `<type>.<kebab-name>`, set in frontmatter. They're permanent and never reused. To rename a page, change `slug` and add the old one to `previousSlugs`.
 
@@ -58,6 +73,13 @@ Text…
 ```
 
 - `:::design` blocks and `design:` frontmatter never appear in the GM build.
+- Setting directories read their facts from the entity entries: `::directory{type=location}`, `::directory{type=faction}`, and `::directory{type=npc group=faction}` or `group=location`. They show the campaign baseline, including Forgotten characters, not live availability.
 - Nest blocks by using a longer outer fence (`::::branch` … `::::`).
 - `:stat` keys: `class`, `source-level`, `source-dc`, `backlash`, `backlash-damage`, `stability-threshold`, `ward-hp`, `active-bulk-minimum`, `rupture-radius`.
 - Never type a Veiled value by hand. Use `:stat`.
+
+## Player-only handout downloads
+
+Each player handout links to `/docs/player-handouts/<slug>.md`. The export includes only explicit top-level `:::player-facing` blocks. Nested directives are rejected so private blocks and GM reference expansion cannot enter a download. Tables and record notation remain Markdown. Surrounding GM notes, frontmatter, navigation and the sealed solution stay out of the export. Share the downloaded file, not the GM handout page.
+
+Run `node --test scripts/directory.test.mjs scripts/player-handout.test.mjs` for the directory ownership and export-boundary checks. Normal GM builds also run the existing link validator and privacy scan. These checks do not establish encounter balance or replace a physical playtest.

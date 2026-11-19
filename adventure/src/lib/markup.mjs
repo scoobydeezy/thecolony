@@ -15,7 +15,7 @@ export const BLOCKS = {
   branch: { label: 'Branch', audience: 'gm', tag: 'section' },
 };
 export const TEXT_DIRECTIVES = ['ref', 'stat', 'cite'];
-export const LEAF_DIRECTIVES = ['clock', 'embed', 'part-contents'];
+export const LEAF_DIRECTIVES = ['clock', 'embed', 'part-contents', 'directory'];
 // Directive attribute shorthand splits "#npc.vara-cairn" into id "npc" plus class
 // "vara-cairn" (a dot starts a class). Rebuild the canonical ID from both parts.
 export function directiveId(node) {

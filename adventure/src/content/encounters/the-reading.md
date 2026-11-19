@@ -1,11 +1,13 @@
 ---
-# yaml-language-server: $schema=../../../schemas/encounter.schema.json
 id: encounter.the-reading
 slug: the-reading
 name: The Reading
 summary: Vara enters the Ritual Chamber and begins reading the Book of Names.
 function: Act I Climax
-synopsis: The eclipse advances with the Reading. The Party must decide whether to interrupt a willing sacrifice or allow the inherited system to work. If stopped, Vara survives and the eclipse recoils; if completed, Vara is forgotten and the Party becomes shaped by a relationship it no longer consciously remembers.
+synopsis: >-
+  The eclipse advances with the Reading. The Party must decide whether to interrupt a willing sacrifice or allow the
+  inherited system to work. If stopped, Vara survives and the eclipse recoils; if completed, Vara is forgotten and the
+  Party becomes shaped by a relationship it no longer consciously remembers.
 part: part.act-1
 chapter: act-i-climax
 order: 2
@@ -26,8 +28,6 @@ links:
 status: draft
 readiness:
   status: compiled
-  playtest:
-    - Confirm the twelve-page clock gives roughly four rounds at a six-PC table.
 inventory:
   - id: inventory.book-of-names-prop
     note: The countdown. Turn one page per Read a Name-Page.
@@ -220,3 +220,12 @@ When Vara completes the final page and writes **Varenya Cairn**, the ritual succ
 Vara is forgotten by the Colony and by the Party's characters. The players remember her.
 :::
 ::::
+
+## Supporting Combat Profiles
+
+- :ref[Vara at the Reading]{#creature.vara-reading}
+- :ref[Serevan at the Reading]{#creature.serevan-reading}
+- :ref[Uldren at the Reading]{#creature.uldren-reading}
+- :ref[Order Chamber Guard]{#creature.order-chamber-guard} (two)
+
+The chapter owns Trust, Appeal, and the Book clock. These profiles own individual actions and reactions. Keep any successfully completed pages when the rite is interrupted; do not restart the clock to prolong the encounter.

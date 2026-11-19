@@ -3,125 +3,81 @@ title: "The Veiled: A Practical Primer"
 description: What the Veiled are, and what the GM needs at the table, step by step, when an Incursion happens.
 sidebar:
   order: 6
+readiness:
+  status: compiled
+canon:
+  concepts: [book.parts-one-two]
 ---
 
-This chapter explains the Veiled in table terms. It doesn't repeat the rules: each step links to the rule entry that defines it, and every number comes from those entries. Read this once before :ref[Bad Maps]{#encounter.bad-maps}; keep the rule entries open while you run it.
+A Veiled encounter begins with something that mattered and ends, if the Party can resolve it, with a truthful responsibility the living accept. Read this primer for the sequence. The linked rule entries supply procedures; the encounter supplies its particular evidence, opposition, and stakes.
 
-## What the Veiled are
+## The Forgotten and the Veiled
 
-**The Forgotten** are real people whose names and relationships the Colony lost. They were complete people, with contradictions, choices and consequences. They are not predators, and when one becomes perceptible they can offer testimony or perspective, but they are not all-knowing and they don't pass the campaign's moral verdict.
+The **Forgotten** are real people whose identities the Colony has lost. They had whole lives, including contradictions, failures, affection, and choices. Recovering one does not make them an all-knowing witness or the campaign's moral authority.
 
-**The Veiled** are not the Forgotten. A Veiled is a **false reconstruction**: what reality builds when it recognizes that something mattered but doesn't know enough to rebuild it truthfully. It fills the gaps with whatever is nearby: the object, the people holding it, the room, the records, the stories, even the methods being used to study or contain it.
+A **Veiled** is a false reconstruction. Reality recognizes that something mattered but lacks enough Identity to rebuild it truthfully. It fills gaps from nearby objects, people, places, records, and methods. A manifestation can therefore be emotionally true and historically wrong.
 
-So a Veiled can be emotionally true and factually wrong. In Bad Maps, a worn cloth toy and a mother's surviving love preserve one true fact, *mother and infant*, and nothing about the adult life that followed. Reality builds the whole missing person out of that one fact, and an enormous infant appears.
+In :ref[Bad Maps]{#encounter.bad-maps}, a cloth toy and a mother's love preserve a genuine mother-infant relationship. The reconstruction mistakes that fragment for the whole person. The enormous infant is dangerous, but it is not the actual child's complete life returned.
 
-The Veiled look like pure black silhouettes that reflect no light and cast no shadow, but they are fully corporeal while manifested: they have weight, take up space and hit hard.
+Veiled appear as black silhouettes that reflect no light and cast no shadow. While manifested, they are corporeal: they occupy space, have weight, and can hurt people.
 
-:::gm-note
-When you prepare a Veiled, answer four questions: what genuine impulse remains, what Identity is missing, what false conclusion reality has drawn, and how that mistake endangers the living. The monster is not evil because its answer is wrong. Its incomplete answer is still dangerous.
-:::
-
-## The mnemonic cycle in brief
-
-Everything Veiled follows one process:
+## The Mnemonic Cycle
 
 > **Weight → Recognition → Reconstruction → Meaning → Acceptance → Rest**
 
-- **Weight.** Memory has weight, and it rests in people, objects, places and records. Most of it is dormant.
-- **Recognition.** Something recognizes the Weight. Mechanically, that is **Resonance**.
-- **Reconstruction.** If too much is missing, reality guesses. The guess is the Incursion.
-- **Meaning.** The party supplies truth: Identity that reality no longer has to invent.
-- **Acceptance.** The players acknowledge who the person was. That completes Stabilization.
-- **Rest.** The Weight settles in a truthful, viable destination.
+Memory carries Weight. Resonance supplies Recognition. Incomplete Identity produces a false Reconstruction. The Party's evidence supplies Meaning; Acceptance acknowledges the life those facts imply. A viable Anchor gives its Weight somewhere to rest.
 
-Bad Maps lives in the first three steps: the party learns that the problem can be fought, moved and boxed up, but not solved there. Act I's A Life route reaches the rest of the cycle.
+This is one process, from a single resonant possession to the Book's accumulated inheritance. The Reading follows the same underlying physics.
 
-## At the table: an Incursion, step by step
+## From Trigger to Opportunity
 
-### 1. The Trigger
+| What is happening | What to establish | Rule owner |
+|---|---|---|
+| A Source is recognized | Its Vessel, initial Trigger, and continuing Reconstruction Condition | :ref[Sources and Resonance]{#rule.sources-and-resonance} |
+| An Incursion manifests | The encounter's opposition and the Source's separate mnemonic pressure | :ref[Class]{#rule.class} and the creature entry |
+| The Source is active | Its Ward, Backlash, weight, and possible Breach | :ref[Active Sources]{#rule.active-sources} |
+| The manifestation is overcome | What ends with its body and what survives | :ref[Dispersal]{#rule.dispersal} |
+| Reality can reconstruct | The opening for intervention and its Pressure | :ref[The Stabilization Window]{#rule.stabilization-window} |
+| The Party supplies truthful Identity | What it knows, what it can Restore, and what visibly changes | :ref[Identity and Stabilization]{#rule.identity-and-stabilization} |
+| Weight needs a resting place | Connection, Capacity, and Consent | :ref[Anchoring and Resolution]{#rule.anchoring-and-resolution} |
 
-Every Source has an **Incursion Trigger**: a concrete, observable condition for the first manifestation. Until it is met, nothing happens. In Bad Maps the Trigger is :ref[Gressa Peakwalker]{#npc.gressa-peakwalker} physically holding the cloth toy. The Source, its Resonance Type, its Trigger and its Reconstruction Condition are defined in :ref[Sources and Resonance]{#rule.sources-and-resonance}. The Source's **Class** (I–V) sets its mnemonic pressure and derives every generic number below; see :ref[Class]{#rule.class}.
+A Source's Class is not the Incursion's Pathfinder level. Read numbers from the Source and creature entries rather than inferring one from the other.
 
-### 2. The manifestation
+## What Different Responses Accomplish
 
-When the Trigger is met, the Incursion appears and the Source becomes **active**. The Incursion uses ordinary PF2e creature statistics for its level. The Source gains two properties from its Class, defined in :ref[Active Sources]{#rule.active-sources}:
+**Combat** protects people, disrupts a false objective, exposes evidence, and can create a Stabilization Window. It does not destroy Weight or supply a biography by itself.
 
-- a **Ward** that absorbs attacks aimed at the Vessel and deals **Mnemonic Backlash** to anyone who touches it;
-- **Mnemonic Weight**: an active object Source is literally heavy, and moving it directly takes a Reposition against the Source DC.
+**Breaking Resonance** can prevent reconstruction without resolving the underlying burden. It does not automatically remove a manifestation already active.
 
-### 3. Fighting it
+**Containment** isolates unresolved Weight from dangerous Resonance. It works and saves lives without requiring complete truth. Use :ref[Containment]{#rule.containment} for suppression, capacity, and routing.
 
-Run the fight as a normal PF2e encounter, but let the monster's behaviour be the evidence. The baby relentlessly tries to reach Gressa; the players can read the relationship from that without a knowledge check.
+**Transfer** moves Weight into another Vessel. It changes the encounter's arrangement without resolving it. Destroying a Vessel can cause Rupture and Spill rather than destroying its Weight. Use :ref[Source Transfer]{#rule.source-transfer} and :ref[Source Destruction]{#rule.source-destruction}.
 
-The party has three levers beyond hitting the monster:
+**Stabilization** makes a false reconstruction untenable through truthful Identity and Acceptance. **Anchoring** gives the surviving Weight a valid destination. A stabilized but unanchored burden remains a responsibility, not a failed combat.
 
-- **Break the Reconstruction Condition.** Separating Gressa and the toy by more than 30 feet does *not* Disperse the baby, but it prevents a later reconstruction. It also triggers the baby's **Resonance Break** response, Tantrum, which makes the current fight worse. See :ref[Sources and Resonance]{#rule.sources-and-resonance}.
-- **Breach the Source.** Battering down the Ward lets the party handle or damage the Vessel mid-fight. It doesn't end the Incursion or remove Mnemonic Weight. See :ref[Active Sources]{#rule.active-sources}.
-- **Not a lever: Gressa's death.** Her death doesn't break Resonance: she is still the mother.
+## Teach Through the Encounter
 
-:::gm-note
-Killing the attached civilian must never become the rational answer. If the players try it, the Reconstruction Condition is still true, and the next step will show them.
-:::
+Bad Maps teaches that the body can be fought and the Source moved or contained, while the person's fuller truth remains missing. Its owning scene handles the toy, Gressa, the Order's response, and the actual aftermath. Do not force the expected demonstration if the Party changes the situation.
 
-### 4. Dispersal
+Later encounters let the Party Recover and Restore Identity. Show immediate feedback when truth takes hold. If another reconstruction follows, it must incorporate that progress. [The Seven Components of Identity](/docs/running/seven-components/) connects those lessons across the campaign.
 
-Reduce the Incursion to 0 HP and it is **Dispersed**, not killed. The Ward vanishes, Mnemonic Weight is suppressed, and the toy becomes physically ordinary. Then check the Reconstruction Condition. If it is false, the Source goes dormant. If it is true, the Window opens. See :ref[Dispersal]{#rule.dispersal}.
+As the stakes grow, keep the human question visible: what genuine connection survived, what was lost, and what has reality wrongly supplied?
 
-### 5. The Window
-
-The **Stabilization Window** runs inside normal initiative. Every action, reaction or free action anyone takes, other than plain movement, adds 1d2 **Reconstruction Pressure** after it resolves. When Pressure exceeds the Source's **Stability Threshold**, the Incursion reforms at full HP unless something has made that impossible. See :ref[The Stabilization Window]{#rule.stabilization-window}.
-
-The players should feel reality pushing back while they heal, act in character, pick up the toy or run: the random push should create uncertainty, not pure denial.
-
-:::gm-note
-The movement exception matters: Striding is free, so a character can carry the exposed toy away from Gressa. Picking it up is what costs Pressure.
-:::
-
-### 6. Outcomes
-
-When Pressure exceeds the Stability Threshold, one of these holds:
-
-- **It reforms.** The Reconstruction Condition was still true and nothing was Stabilized or Contained. The Incursion returns at full HP with a fresh Ward, Pressure resets, and the fight goes on. See :ref[The Stabilization Window]{#rule.stabilization-window}.
-- **It is Contained.** The Source is sealed inside a vessel with enough Capacity, cutting off Resonance. Lives are saved; nothing is resolved. See :ref[Containment]{#rule.containment}.
-- **Resonance is broken.** The toy and Gressa are apart, so no reconstruction occurs. The Source is dormant and unresolved, and will start again if the condition returns. See :ref[Sources and Resonance]{#rule.sources-and-resonance}.
-Destroying the Vessel is not a fifth way out. If the toy is destroyed, it **Ruptures**: a Pulse of mental damage hits everyone nearby, then the Weight **Spills** into the strongest compatible Recognition, or becomes a **Scar** in the street. See :ref[Source Destruction]{#rule.source-destruction}. Rupture moves the Weight; it doesn't end the Window. The action that caused it still adds Pressure, and the Incursion can reconstruct at once from its new Vessel. Moving Weight from one Vessel to another, by accident or deliberately, follows :ref[Source Transfer]{#rule.source-transfer}.
-
-:::secret
-If the toy is destroyed with Gressa in the Rupture area, the Weight Spills into Gressa. She becomes the Source, and the Order's portable containment can't hold a living Source. That outcome opens the Containment branch at EGRESS instead of A Life at the Hall of Remembrance.
-:::
-
-Full Stabilization isn't available in Bad Maps: the party can see the mother-child bond, but doesn't yet know enough about the child's later life to make the infant false. The Order of Theia arrives, contains or quarantines the Source, and shows the party that there is a method. That is the lesson: *there is a method to this, and the Order knows one.*
-
-## What combat accomplishes, and what it doesn't
-
-Combat is necessary because a false reconstruction is physically dangerous. A fight can:
-
-- protect civilians and interrupt the Veiled's false objective;
-- force access to a Source or break false structures;
-- expose evidence through the monster's behaviour;
-- open a Stabilization Window and buy time for investigation.
-
-Combat can't remove Weight or supply truth. Dispersal ends the body, not the problem: if Resonance holds, reality tries again. Destroying the Vessel only moves the Weight somewhere less controlled. The first lesson of the campaign is *killing the body does not solve the Weight.*
-
-Before every Veiled fight, ask: **why is this fight happening now?** The objective should rarely be "reduce every enemy to 0 HP".
-
-## Beyond Act I
-
-Bad Maps can't Restore anything, but Act I's A Life route can, and later Incursions build on it. The party learns to **Recover** truth (to know something about the forgotten person), and then to **Restore** it, making reality incorporate that truth into the reconstruction, usually during a Window. Restored Identity stays true through every later reconstruction and visibly changes the fight. Once enough is Restored and the players answer *who were they?*, the Incursion is Stabilized. The Weight still needs somewhere to rest: an **Anchor**, a truthful and viable destination with Connection, Capacity and Consent. Stabilizing and Anchoring are separate questions. On the A Life route, the party Restores the mother-son Relationship and the Weight can be Anchored, preferably in the cloth toy itself.
-
-## Player-facing vocabulary
-
-Players can hear these words, from the Order, from EGRESS, or from you. Other terms (Fragment, Recover, Restore, Acceptance, Spill, Scar, Capacity) exist mainly for GM preparation and rules precision, and don't need teaching as vocabulary.
+## Words the Players Can Use
 
 :::player-facing
-- **Source:** something currently carrying mnemonic weight.
-- **Resonance:** the condition that activates a Source by recognizing its weight.
-- **Incursion:** a false reconstruction manifested by an active Source.
-- **Class:** EGRESS's I–V measure of mnemonic pressure.
-- **Disperse:** destroy the current manifestation, usually by reducing it to 0 Hit Points.
-- **Stabilize:** restore enough truthful identity that the false reconstruction cannot recur.
-- **Contain:** isolate weight so that it cannot form dangerous Resonance, without resolving it.
-- **Anchor:** give stabilized weight a truthful, viable destination in which to rest.
+- **Source:** something carrying mnemonic Weight.
+- **Resonance:** Recognition that activates that Weight.
+- **Incursion:** a manifested false reconstruction.
+- **Class:** EGRESS's measure of mnemonic pressure.
+- **Disperse:** overcome the present manifestation.
+- **Stabilize:** restore enough truth that its false reconstruction cannot recur.
+- **Contain:** isolate unresolved Weight from dangerous Resonance.
+- **Anchor:** give stabilized Weight a truthful, viable destination.
+:::
 
-*Find the Source. Figure out what is making it resonate. Fight the Incursion. Use the opening when it disperses. Learn something true. Stabilize the reconstruction. Decide where the weight goes.*
+Introduce vocabulary as it becomes useful. Players can reason about evidence and relationships without learning every technical term. Ask what they do and why it matters, then apply the rule that fits.
+
+:::design
+Reconciled from :cite[The Veiled]{doc=the-veiled} and the existing rule entries. The earlier primer's duplicated Window formula and scripted Bad Maps aftermath are replaced by owner references. Current viable paths supersede historical universal double locks; no combat or Source statistics changed here.
 :::

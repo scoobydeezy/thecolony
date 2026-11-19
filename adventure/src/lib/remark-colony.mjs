@@ -13,6 +13,7 @@ import { statText } from './veiled.mjs';
 import { statblockHast } from './statblock.mjs';
 import { h } from './hast.mjs';
 import { BASE } from './target.mjs';
+import { directoryHast } from './directory.mjs';
 
 const MAX_EMBED_DEPTH = 2;
 const ARRANGEMENT = {
@@ -63,6 +64,17 @@ export default function remarkColony({ target = 'gm' } = {}) {
           },
         };
         return;
+      }
+
+      // ---------- directories generated from canonical baseline records ----------
+      if (node.type === 'leafDirective' && node.name === 'directory') {
+        try {
+          parent.children.splice(index, 1, hastNode(directoryHast(reg, node.attributes ?? {})));
+        } catch (err) {
+          warn(err.message, node);
+          parent.children.splice(index, 1);
+        }
+        return [SKIP, index + 1];
       }
 
       // ---------- clocks ----------

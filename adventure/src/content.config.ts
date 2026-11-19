@@ -1,4 +1,5 @@
 import fs from 'node:fs';
+import { pathToFileURL } from 'node:url';
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { docsLoader } from '@astrojs/starlight/loaders';
@@ -26,12 +27,13 @@ const entityCollections = Object.fromEntries(
     ]),
 );
 
-// The 13 original source documents, read in place from the parent "The Colony/"
-// folder (never copied, so no second home for unmigrated facts). Designer build only.
+// Original exports, read in place for migration review. Campaign Synopsis is retired;
+// the current set has twelve documents. See COLONY_SOURCE_DOCS_DIR in source-docs.mjs.
+// Designer build only; the GM book does not load these files.
 const sourceDocs = isDesigner
   ? {
       sourceDocs: defineCollection({
-        loader: glob({ pattern: '*.md', base: SOURCE_DOCS_DIR, generateId: ({ entry }) => sourceDocId(entry) }),
+        loader: glob({ pattern: '*.md', base: pathToFileURL(SOURCE_DOCS_DIR), generateId: ({ entry }) => sourceDocId(entry) }),
       }),
     }
   : {};

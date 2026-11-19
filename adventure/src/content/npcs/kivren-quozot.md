@@ -109,10 +109,3 @@ Their insight is genuine. So is their responsibility.
 Darkwing’s presence provides convenient misdirection. Armed outsiders standing at the center of an unprecedented attack become the most believable explanation, even though the Party was never the operation’s target.
 When the Party confronts the Instigator at the Broken Bell, they may flee if threatened; if they remain, are cornered, or become convinced they will not be killed, their fear quickly gives way to excitement that the Party remembered them.
 They become the Shattered’s recurring liaison whenever Darkwing follows one of the faction’s paths.
-
-## The First Operation
-
-The woman’s death unsettles them, but does not make them reject the operation.
-They argue that she was already being consumed by a grief everyone around her insisted belonged to no one:
-“You call it murder because you saw the moment it happened. No one had a word for what was happening to her yesterday.”
-Their insight is genuine. So is their responsibility.

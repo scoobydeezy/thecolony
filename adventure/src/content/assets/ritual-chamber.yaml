@@ -6,7 +6,7 @@ type: Infrastructure
 role: Operational
 tier: 5
 keystone: false
-summary: The sacred chamber where the annual ritual is performed. Few have entered it, fewer still understand it, and none speak openly of what transpires within.
+summary: The sacred chamber where the Reading is performed when a Keeper is Called. Few have entered it, fewer still understand it, and none speak openly of what transpires within.
 status: draft
 start:
   controller: faction.order-of-theia

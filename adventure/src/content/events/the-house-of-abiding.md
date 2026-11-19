@@ -29,9 +29,9 @@ provenance:
 :::design
 **First draft, 2026-11-18 (narrative scene, template 3.2).** From :cite[Campaign Outline — Session 1]{doc=campaign-outline anchor=session-1--the-calling} (Vara, the map, Trust 1), :cite[Campaign Outline — Vara Trust Spine]{doc=campaign-outline anchor=vara-trust-spine}, and the briefs for :cite[Vara]{doc=character-briefs anchor=the-keeper---varenya-vara-cairn} and :cite[Uldren]{doc=character-briefs anchor=steward-of-the-house-of-abiding---uldren-harthwright}.
 
-**For review: not in the sources, added in this draft.**
-1. **What Vara has noticed.** Her Calling symptoms are applied from :cite[The Ritual]{doc=the-colony--foundational-truths anchor=the-ritual}: dreams of unfamiliar lives, recognising places she has never been. She describes them as exciting, not frightening.
-2. **The map** (ruling, user, 2026-11-18): the slums are in **Abiding Way**, the same district as the House of Abiding. The bad map is of the streets right outside.
+**Editorial staging:** the read-aloud, crowd details and map discrepancies give the GM a way to present the scene; they do not establish additional campaign history. Vara's dreams and recognition of unfamiliar places apply the Calling symptoms from :cite[The Ritual]{doc=the-colony--foundational-truths anchor=the-ritual}; her excited description is draft characterization.
+
+**Recorded map ruling (user, 2026-11-18):** the slums are in **Abiding Way**, the same district as the House of Abiding. The bad map is of the streets right outside. Trust 1 follows the current Campaign Outline; refusal remains a supported branch. Later confidence and participation scenes now live in Prisoners.
 :::
 
 :::gm-note

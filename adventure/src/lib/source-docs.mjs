@@ -5,8 +5,11 @@ import yaml from 'js-yaml';
 import GithubSlugger, { slug } from 'github-slugger';
 import { ROOT } from './registry.mjs';
 
-// colony-tracker/adventure -> "The Colony/"
-export const SOURCE_DOCS_DIR = path.resolve(ROOT, '../..');
+// Original exports are migration evidence, not a second editable campaign store.
+// Set COLONY_SOURCE_DOCS_DIR when they are outside the legacy parent-folder layout.
+export const SOURCE_DOCS_DIR = process.env.COLONY_SOURCE_DOCS_DIR
+  ? path.resolve(ROOT, process.env.COLONY_SOURCE_DOCS_DIR)
+  : path.resolve(ROOT, '../..');
 export const MIGRATION_MAP = path.join(ROOT, 'sources/migration-map.yaml');
 
 export const sourceDocId = (fileName) => slug(fileName.replace(/\.md$/, ''));

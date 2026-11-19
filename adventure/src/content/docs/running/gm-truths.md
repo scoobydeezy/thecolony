@@ -3,6 +3,10 @@ title: GM Truths
 description: What the GM knows that no one at the table does.
 sidebar:
   order: 3
+readiness:
+  status: compiled
+canon:
+  concepts: [book.parts-one-two]
 ---
 
 :::design
