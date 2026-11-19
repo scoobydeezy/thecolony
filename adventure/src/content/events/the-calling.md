@@ -36,7 +36,7 @@ provenance:
 **First draft, 2026-11-18 (narrative scene, template 3.2).** From :cite[Campaign Outline — Session 1]{doc=campaign-outline anchor=session-1--the-calling}, :cite[Character Briefs — Perrik Tallow]{doc=character-briefs anchor=aspis-administrator---perrik-tallow}, :cite[Foundational Truths — The Ritual]{doc=the-colony--foundational-truths anchor=the-ritual} and :cite[Traditions and Empty Spaces]{doc=the-colony--foundational-truths anchor=traditions-and-empty-spaces}. Vara's meeting and Trust 1 moved to :ref[The House of Abiding]{#event.the-house-of-abiding} (one fact, one place).
 
 **Rulings (user, 2026-11-18):**
-1. **The arrival:** Darkwing comes under a **UFO mission order**, as the Synopsis says. What the order is will be expanded later.
+1. **The arrival:** Darkwing comes under a **UFO mission order**. What the order is will be expanded later.
 2. **Perrik's timeline:** he has been in the Colony **less than eighteen months**, arriving between Marek Cairn's Reading and Vara's Calling. So the eclipse gaps he shows are in the Registry's historical records, and this Calling is the first he has seen.
 3. **No Lord-Mayor line:** tying the unrecognised signatures to the forgotten Lord-Mayor was too on the nose. The contracts stay anonymous.
 

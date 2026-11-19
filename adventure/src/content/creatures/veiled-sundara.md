@@ -1,7 +1,7 @@
 ---
 id: creature.veiled-sundara
 slug: veiled-sundara
-name: Veiled Sundara — Provisional Individual Creature 8
+name: Veiled Sundara
 status: draft
 level: 8
 rarity: common
@@ -24,7 +24,12 @@ saves:
   will: 18
 immunities: []
 speed: 20 feet
-strikes: []
+strikes:
+  - name: Clutching Hands
+    type: melee
+    bonus: 20
+    damage: 2d6+8 bludgeoning
+    traits: [nonlethal]
 provenance:
   - doc: Creatures
     heading: Veiled Sundara — Provisional Individual Creature 8
@@ -32,7 +37,7 @@ provenance:
 
 Four slot-limited Medium bodies, not Undead. They share the current mass manifestation’s Weight; these are not four independently leveled Sources.
 
-**Clutching Hands ◆** *Melee* +20; **Damage** 2d6+8 bludgeoning, nonlethal; on a critical hit, target is **grabbed** until the start of the Sundara's next turn (Escape normally applies).  
+**Clutching Hands:** on a critical hit, target is **grabbed** until the start of the Sundara's next turn (Escape normally applies).  
 **Blind Familiarity:** Attempts to get close to the current Recognition target and hold that person's attention; does not make independent morally informed choices.  
 **Dispersal:** At 0 HP, body collapses, creates **one Grave Resonance** at the nearest marker, and vacates its slot until Reconstruction. Source Weight stays connected to Tom/Old Town; no Source vessel teleports.  
 **Reconstruction:** At the **start of its next turn** after Dispersal (normally its turn in **round N+1** after being Dispersed in round N), return that individual slot at one of the four fixed emergence marks, at full HP. It does **not** need to spend a whole additional round absent: the deliberately rapid **next-turn** return matches the tested encounter premise. A slot reappears only once per Dispersal; mark it briefly as awaiting its next turn rather than creating a separate creature. This is an **encounter exception** to the ordinary Class-based Stabilization Window, justified by the unusually active mass Wound under Totality. A stable Sundara Name boundary permanently stops reappearance.

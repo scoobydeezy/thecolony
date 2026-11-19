@@ -13,7 +13,7 @@ The river is the Colony's practical connection to the wider world. Within the ci
 
 ## Reading the City
 
-The civic center brings the :ref[Keeper District]{#location.keeper-district}, the :ref[Hall of Keepers]{#location.hall-of-keepers}, and the :ref[Town Square]{#location.town-square} into the Party's early life. :ref[Abiding Way]{#location.abiding-way} connects care for the living Keeper with remembrance of the Forgotten. The :ref[Dawn District]{#location.dawn-district} gives reform a visible civic home.
+The civic center brings the :ref[Keeper District]{#location.keeper-district}, the :ref[Hall of Keepers]{#location.hall-of-keepers}, and the :ref[Town Square]{#location.town-square} into the Party's early life. :ref[Abiding Way]{#location.abiding-way} connects care for the living Keeper with remembrance of the Forgotten. The Colony's slums lie within it, in the same district as the :ref[House of Abiding]{#location.house-of-abiding}. The :ref[Dawn District]{#location.dawn-district} gives reform a visible civic home.
 
 The Colony also works for a living. The :ref[Mercantile District]{#location.mercantile-district}, :ref[Riverfront]{#location.riverfront}, :ref[Milltown]{#location.milltown}, and :ref[West District]{#location.west-district} bring trade, transport, labor, and public works into view. Their practical needs should remain present when faction arguments become abstract.
 

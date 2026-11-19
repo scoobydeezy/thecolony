@@ -22,14 +22,18 @@ saves:
   will: 19
 immunities: []
 speed: 25 feet
-strikes: []
+strikes:
+  - name: Shoulder / Fist
+    type: melee
+    bonus: 22
+    damage: 2d10+10 bludgeoning
+    traits: [nonlethal]
 provenance:
   - doc: Creatures
     heading: Breaker — Creature 10
 ---
 
-**Role:** primary Shove / Trip frontliner  
-**Shoulder / Fist** +22, **Damage** 2d10+10 bludgeoning, nonlethal
+**Role:** primary Shove / Trip frontliner
 
 ### Standard Tactical Options
 The Breaker prioritizes standard **Shove** and **Trip** actions over damage.

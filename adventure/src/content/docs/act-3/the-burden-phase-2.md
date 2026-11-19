@@ -490,17 +490,7 @@ The Party may recover in the ruined chamber before beginning Phase III.
 
 ## Phase II Encounter Parameters
 
-- **Creature 15**
-- **AC 35**
-- **HP 440**
-- **Fort +31 / Ref +27 / Will +30**
-- **Ability DC 36**
-- **Composite Hand +29**
-- **Form AC 33**
-- **Form HP 45**
-- **12 total Form pieces**
-- **6 active families**
-- **2 relics per family**
+Use the :ref[Borrowed First Keeper]{#creature.borrowed-first-keeper} entry embedded above; it owns the Composite's statistics, the Composite Hand, and the Form pieces' AC and HP.
 
 The Composite is slightly more durable than the Monument because Party damage can be diverted into Forms.
 

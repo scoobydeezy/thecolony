@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=../../../schemas/faction.schema.json
 id: faction.dawn-assembly
 slug: dawn-assembly
@@ -46,3 +47,4 @@ start:
     a: Neutral
     b: Positive
     c: Negative
+---

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ColonyTracker.Api.Tests;
 
-// ADVENTURE-BOOK-PLAN.md §10: factions, Assets and locations live in canonical .yaml files, and
+// ADVENTURE-BOOK-PLAN.md §10: factions live in canonical .md files (frontmatter; the body is the book's), Assets and locations in .yaml files, and
 // files refer to each other by canonical id while the app's rows keep using row ids.
 public class CanonEntityTests : IDisposable
 {
@@ -47,7 +47,7 @@ public class CanonEntityTests : IDisposable
     {
         SeedWorld();
         var faction = File.ReadAllText(_canon.File("faction.order-of-theia"));
-        Assert.StartsWith("# yaml-language-server: $schema=../../../schemas/faction.schema.json\nid: faction.order-of-theia\n", faction);
+        Assert.StartsWith("---\n# yaml-language-server: $schema=../../../schemas/faction.schema.json\nid: faction.order-of-theia\n", faction);   // a faction is a Markdown file (its body is the book's)
         Assert.Contains("  leader: npc.serevan-ilvar\n", faction);
         Assert.Contains("history: |-\n  First paragraph.\n\n  Second paragraph.\n", faction);   // prose stays readable
         Assert.Contains("  primaryColor: \"#dedede\"\n", faction);

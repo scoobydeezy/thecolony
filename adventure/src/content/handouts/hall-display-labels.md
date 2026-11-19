@@ -9,12 +9,6 @@ provenance:
     heading: First-Visit Display Labels
 ---
 
-[Download player-only Markdown](/docs/player-handouts/hall-display-labels.md)
-
-[Download player-only Markdown](/docs/player-handouts/hall-display-labels.md)
-
-[Download player-only Markdown](/docs/player-handouts/hall-display-labels.md)
-
 :::player-facing
 | No. | Exhibit label | What a visitor sees |
 |---:|---|---|

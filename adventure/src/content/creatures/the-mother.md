@@ -27,24 +27,23 @@ immunities:
   - disease
   - poison
   - death effects
-speed: 15 feet, swim 40 feet
+speed: 15 feet, swim 40 feet when submerged
 abilityDC: 34
-strikes: []
+strikes:
+  - name: Cradling Arms
+    type: melee
+    bonus: 26
+    damage: 3d10+12 bludgeoning
+    traits: [reach 15 feet, nonlethal]
 provenance:
   - doc: Creatures
     heading: Mother — Provisional Creature 13
 ---
 
-### Mother — Provisional Creature 13
+### Mother
 *Huge Unique Veiled Echo / Relationship; Athamaru-matriarch-like aquatic Form, pure black*
 
-**Perception** +25; **Senses** resonance sense (brood / birthing basin) 120 feet  
-**Skills** Athletics +25  
-**AC** 33; **HP** 310; **Fort** +27, **Ref** +21, **Will** +28  
-**Speed** 15 feet, **Swim** 40 feet when submerged; **Ability DC** 34  
-**Immunities** bleed, disease, poison, death effects
-
-**Cradling Arms ◆** *Melee* +26, reach 15 feet, **Damage** 3d10+12 bludgeoning, nonlethal. She ordinarily does not target intruders unless they threaten the basin or actively obstruct the fry.
+**Cradling Arms:** she ordinarily does not target intruders unless they threaten the basin or actively obstruct the fry.
 
 ### Labor Cry ◆◆
 **AUDITORY, MENTAL** — Every creature that can hear the Mother within **40 feet** attempts **DC 34 Fortitude**: critical success unaffected; success **deafened** until the start of its next turn; failure **deafened** until the end of its next turn and **stupefied 1** for that duration; critical failure as failure plus **stunned 1**. **Frequency:** once every 1d4 rounds, rolled after use. A loud, telegraphed Cry can visibly strain overhead braces and trigger the Beam hazard below; it need not be an aggressive tactical choice.

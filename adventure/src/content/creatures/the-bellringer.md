@@ -1,7 +1,7 @@
 ---
 id: creature.the-bellringer
 slug: the-bellringer
-name: "Optional Campus Substitute: The Bellringer"
+name: The Bellringer
 status: draft
 level: 11
 rarity: unique
@@ -28,13 +28,16 @@ immunities:
   - death effects
 speed: 25 feet
 abilityDC: 31
-strikes: []
+strikes:
+  - name: Handbell
+    type: melee
+    bonus: 24
+    damage: 2d10+10 bludgeoning
+    traits: []
 provenance:
   - doc: Creatures
     heading: "Optional Campus Substitute: The Bellringer — Creature 11"
 ---
-
-**Handbell ◆** *Melee* +24; **Damage** 2d10+10 bludgeoning.
 
 ### Alarm Without End ◆◆
 **AUDITORY, SONIC, EMOTION, FEAR** — Every creature that can hear the bell within **40 feet** attempts **DC 31 Fortitude**.

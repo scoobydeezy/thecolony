@@ -2,14 +2,14 @@
 title: "The Seven Components of Identity"
 description: "Name, Relationship, Form, Context, Pattern, Choice and Memory: what each is, how it is restored, and where each is taught."
 sidebar:
-  order: 5
+  order: 2
 readiness:
   status: compiled
 canon:
   concepts: [book.parts-one-two]
 ---
 
-The Party learns to replace a false reconstruction with enough truth that reality can stop guessing. The seven components of Identity name different kinds of evidence, not seven scores every encounter must fill. :ref[Identity and Stabilization]{#rule.identity-and-stabilization} owns their definitions and the Recover, Restore, and Acceptance procedures.
+The Party learns to replace a false reconstruction with enough truth that reality can stop guessing. The seven components of Identity name different kinds of evidence, not seven scores every encounter must fill. :ref[Identity and Stabilization]{#rule.identity-and-stabilization} owns their definitions and the Recover, Restore, and Acceptance procedures; :ref[Reconstruction and Resonance Paths]{#rule.reconstruction-and-resonance} owns which components each kind of Veiled can be Restored through.
 
 ## What the Campaign Teaches
 
@@ -27,7 +27,7 @@ The Party learns to replace a false reconstruction with enough truth that realit
 
 Let players handle a tool, hear a repeated phrase, notice a repair, or compare records before asking them to classify what it means. They need a reasonable question to pursue. They do not need to announce the name of an Identity component before a useful action counts.
 
-An Engram can faithfully preserve what someone remembered or believed without establishing that every remembered claim was true. A record of obligation can establish Pattern without recovering affection. A portrait can supply Form without explaining the circumstances in which it was painted. Bring different evidence into conversation rather than allowing one source to answer every question.
+An Engram can faithfully preserve what someone remembered or believed without establishing that every remembered claim was true (see :ref[Engrams, Frames and Proxies]{#rule.corrupted-engrams}). A record of obligation can establish Pattern without recovering affection. A portrait can supply Form without explaining the circumstances in which it was painted. Bring different evidence into conversation rather than allowing one source to answer every question.
 
 ## Knowing and Restoring
 

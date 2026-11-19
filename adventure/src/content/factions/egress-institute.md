@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=../../../schemas/faction.schema.json
 id: faction.egress-institute
 slug: egress-institute
@@ -49,3 +50,4 @@ start:
     a: Neutral
     b: Negative
     c: Neutral
+---

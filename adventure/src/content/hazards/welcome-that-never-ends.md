@@ -15,7 +15,7 @@ provenance:
   - doc: Encounters
     heading: 17. The Open Door — Pilgrim's Rest / Cult Crisis
 design: >-
-  Provisional level-12 implementation: DC 34, counteract rank 6. Degree meanings and meaningful-choice recovery come
+  Level-12 implementation: DC 34, counteract rank 6. Degree meanings and meaningful-choice recovery come
   from the encounter; these numerical choices require review against the eventual level schedule.
 ---
 

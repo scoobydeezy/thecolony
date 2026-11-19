@@ -1,18 +1,12 @@
 ---
+# yaml-language-server: $schema=../../../schemas/encounter.schema.json
 id: encounter.the-open-door
 slug: the-open-door
 name: The Open Door
 summary: "Under Totality, the Pilgrim Quarter goes silent: everyone has gone to Pilgrim's Rest, and no one wants to leave."
 function: Cult Front
 synopsis: >-
-  There is no alarm. Townspeople, Cult adherents, and genuine Veiled arrive voluntarily to witness what seems the
-  triumph of generations of welcome, until every street in the quarter is deserted. Pilgrim's Rest has become a
-  location-Source whose real history of hospitality draws a false conclusion: being welcomed means never wanting
-  anything else. Guests keep their memory and competence while every other obligation loses its felt priority. Maelyn is
-  not in control of the effect. Her own Offering Chest practice, the willing release of treasured possessions, offers
-  the contradiction that can let her release the people her home receives, leave, and freely return. The Open Door is
-  the Cult front: whether Pilgrim's Rest can again offer hospitality beyond its walls sets its finale capability and its
-  Finale Pressure.
+  There is no alarm. Townspeople, Cult adherents, and genuine Veiled arrive voluntarily to witness what seems the triumph of generations of welcome, until every street in the quarter is deserted. Pilgrim's Rest has become a location-Source whose real history of hospitality draws a false conclusion: being welcomed means never wanting anything else. Guests keep their memory and competence while every other obligation loses its felt priority. Maelyn is not in control of the effect. Her own Offering Chest practice, the willing release of treasured possessions, offers the contradiction that can let her release the people her home receives, leave, and freely return. The Open Door is the Cult front: whether Pilgrim's Rest can again offer hospitality beyond its walls sets its finale capability and its Finale Pressure.
 part: part.act-3
 chapter: the-five-fronts
 order: 5
@@ -27,6 +21,8 @@ links:
   - npc.tarn
   - asset.pilgrim-s-rest
 status: draft
+readiness:
+  status: compiled
 provenance:
   - doc: Campaign Outline
     heading: Session 10 — Shattered > The Open Door — Pilgrim's Rest / Cult of the Unknown
@@ -34,8 +30,6 @@ provenance:
     heading: 17. The Open Door — Pilgrim's Rest / Cult Crisis
   - doc: Encounters
     heading: 17. The Open Door — Pilgrim's Rest / Cult Crisis
-readiness:
-  status: compiled
 ---
 
 ## At the Table
@@ -44,7 +38,7 @@ readiness:
 
 ## Mechanical Reference
 
-Use :ref[The Welcome That Never Ends]{#hazard.welcome-that-never-ends} for provisional DC, recovery results and counteraction. The rules below explain the situation and the actual limits on agency.
+Use :ref[The Welcome That Never Ends]{#hazard.welcome-that-never-ends} for its DC, recovery results and counteraction. The rules below explain the situation and the actual limits on agency.
 
 ### Encounter Identity
 **The quiet catastrophe.** Under Totality, the entire Pilgrim Quarter has gone silent. By the time Darkwing investigates, its streets are empty, its shops unattended, and every resident has entered Pilgrim's Rest. Inside, living townsfolk and Veiled Pilgrims celebrate together. No one is bound, threatened, or attempting escape. **Everyone feels too profoundly at home to want to leave.**
@@ -190,5 +184,5 @@ Place the hard Welcome DC, hazard level/traits, repeated-departure save details,
 Use :ref[Act III Front Outcomes]{#rule.act-three-fronts}. Functional unavailability can make the Rest Lost without destroying the building. Tarn participates only if alive and available; his absence does not remove the internal recovery opportunities.
 
 :::design
-The hazard values are provisional additions. No new countdown, automatic rescue or mandatory sacrifice has been added.
+The hazard values are additions to the source. No new countdown, automatic rescue or mandatory sacrifice has been added.
 :::

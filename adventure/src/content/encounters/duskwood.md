@@ -1,14 +1,12 @@
 ---
+# yaml-language-server: $schema=../../../schemas/encounter.schema.json
 id: encounter.duskwood
 slug: duskwood
 name: Duskwood
 summary: The Party follows the official story into Duskwood to see if The Order is telling the truth.
 function: Disprove the Duskwood Story
 synopsis: >-
-  The Party follows the Colony's explanation outward with the Cult's roadwarden, tracking the supposed route by which
-  the Veiled enter from the Duskwood and Candlestone approaches. The expedition encounters genuine but entirely
-  traceable Golarion dangers. Nothing mnemonic originates in the forest; whatever strange resonance exists travels
-  outward with people and objects from the Colony rather than inward from the wilderness.
+  The Party follows the Colony's explanation outward with the Cult's roadwarden, tracking the supposed route by which the Veiled enter from the Duskwood and Candlestone approaches. The expedition encounters genuine but entirely traceable Golarion dangers. Nothing mnemonic originates in the forest; whatever strange resonance exists travels outward with people and objects from the Colony rather than inward from the wilderness.
 part: part.act-1
 chapter: session-3-investigations
 order: 3
@@ -20,13 +18,13 @@ links:
   - npc.tarn
   - asset.duskwood-shrine
 status: draft
+readiness:
+  status: compiled
 provenance:
   - doc: Campaign Outline
     heading: Session 3 — Dusk > Cult Route — Duskwood
   - doc: Encounters
     heading: 4. Duskwood — Golarion / Darklands Threat
-readiness:
-  status: compiled
 ---
 
 ## At the Table
@@ -43,7 +41,7 @@ Give Vara her opportunity to ask to accompany the Party if that Trust beat remai
 
 Use a winding ravine about 30 feet wide, ridges 30 feet above it, accessible climbing routes and two cave mouths. Show the second gate’s cable, counterweight and lever from the floor. Provide cover that can break the Vemerak’s long attack lines. Put the gatewrights far enough from the lever that they must spend a whole turn moving before a subsequent turn can operate it; check this against their actual Speed when drawing the map. They cannot release it on the threshold turn from an unseen adjacent position.
 
-The route out remains physically usable. Do not seal every escape simply because the ambush has begun. Exact map dimensions and climb surfaces are provisional staging.
+The route out remains physically usable. Do not seal every escape simply because the ambush has begun. Exact map dimensions and climb surfaces are staging choices.
 
 ## Opening State
 
@@ -74,5 +72,5 @@ The official explanation remains plausible because the Duskwood really is danger
 The ambush is not a mandatory milestone. Tarn can report the dangerous diversion, but the Party has not personally established the full negative evidence. Keep the forest available for investigation; advance the Reading through its actual preparations, not an arbitrary forest deadline.
 
 :::design
-Chat recovery: Encounter Design Part II, 6ae0b7b4-8d08-83ea-98c3-3ed836bee8e3. User accepted two Vemeraks, four–six kobolds, mechanical release and half-health response. The latest assistant’s roster and component values were recoverable; its downloadable full stat blocks were not. Replacement kobold mechanics and component durability details are provisional. Serevan’s involvement was discussed but not settled, so no conspiracy evidence has been authored.
+Chat recovery: Encounter Design Part II, 6ae0b7b4-8d08-83ea-98c3-3ed836bee8e3. User accepted two Vemeraks, four–six kobolds, mechanical release and half-health response. The latest assistant’s roster and component values were recoverable; its downloadable full stat blocks were not. Replacement kobold mechanics and component durability details are additions to the source. Serevan’s involvement was discussed but not settled, so no conspiracy evidence has been authored.
 :::

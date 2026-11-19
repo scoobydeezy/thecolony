@@ -32,13 +32,16 @@ immunities:
   - death effects
 speed: 25 feet
 abilityDC: 28
-strikes: []
+strikes:
+  - name: "Keeper's Staff"
+    type: melee
+    bonus: 21
+    damage: 2d8+9 bludgeoning plus 1d6 mental
+    traits: [nonlethal]
 provenance:
   - doc: Creatures
     heading: House Keeper Reconstruction — Creature 9
 ---
-
-**Keeper's Staff** ◆ **+21**, **Damage** 2d8+9 bludgeoning plus 1d6 mental, nonlethal
 
 ### Custodial, Not Hostile
 The House Keeper does not use ordinary Strikes against creatures merely because they are present.

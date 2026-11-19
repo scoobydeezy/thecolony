@@ -2,7 +2,8 @@
 title: "The Veiled: A Practical Primer"
 description: What the Veiled are, and what the GM needs at the table, step by step, when an Incursion happens.
 sidebar:
-  order: 6
+  label: A Practical Primer
+  order: 1
 readiness:
   status: compiled
 canon:
@@ -38,8 +39,13 @@ This is one process, from a single resonant possession to the Book's accumulated
 | The Source is active | Its Ward, Backlash, weight, and possible Breach | :ref[Active Sources]{#rule.active-sources} |
 | The manifestation is overcome | What ends with its body and what survives | :ref[Dispersal]{#rule.dispersal} |
 | Reality can reconstruct | The opening for intervention and its Pressure | :ref[The Stabilization Window]{#rule.stabilization-window} |
+| The Party reads the classification | The Reconstruction and Resonance Type, and the Restoration path each points to | :ref[Reconstruction and Resonance Paths]{#rule.reconstruction-and-resonance} |
 | The Party supplies truthful Identity | What it knows, what it can Restore, and what visibly changes | :ref[Identity and Stabilization]{#rule.identity-and-stabilization} |
+| The Party uses a reusable tool | Which component it supports, and the lead it needs | :ref[Identity Keystones]{#rule.keystones}; for the Book, :ref[Keeper-Bound Handling]{#rule.book.keeper-bound-handling} |
 | Weight needs a resting place | Connection, Capacity, and Consent | :ref[Anchoring and Resolution]{#rule.anchoring-and-resolution} |
+| Weight is isolated rather than resolved | Capacity, and whether Resonance is severed or a known signature suppressed | :ref[Containment]{#rule.containment}; EGRESS's methods: :ref[Controlled Routing]{#rule.controlled-routing} and :ref[Tuned Suppression]{#rule.tuned-suppression} |
+| Weight moves, or its Vessel is destroyed | The new Vessel, and any Rupture and Spill | :ref[Source Transfer]{#rule.source-transfer} and :ref[Source Destruction]{#rule.source-destruction} |
+| A recorded Memory is involved | Whether an Engram is authentic or corrupted, and what a Frame can express | :ref[Engrams, Frames and Proxies]{#rule.corrupted-engrams} |
 
 A Source's Class is not the Incursion's Pathfinder level. Read numbers from the Source and creature entries rather than inferring one from the other.
 
@@ -49,7 +55,7 @@ A Source's Class is not the Incursion's Pathfinder level. Read numbers from the 
 
 **Breaking Resonance** can prevent reconstruction without resolving the underlying burden. It does not automatically remove a manifestation already active.
 
-**Containment** isolates unresolved Weight from dangerous Resonance. It works and saves lives without requiring complete truth. Use :ref[Containment]{#rule.containment} for suppression, capacity, and routing.
+**Containment** isolates unresolved Weight from dangerous Resonance. It works and saves lives without requiring complete truth. Use :ref[Containment]{#rule.containment} for suppression, capacity, and routing; EGRESS's techniques are :ref[Controlled Routing]{#rule.controlled-routing} and :ref[Tuned Suppression]{#rule.tuned-suppression}.
 
 **Transfer** moves Weight into another Vessel. It changes the encounter's arrangement without resolving it. Destroying a Vessel can cause Rupture and Spill rather than destroying its Weight. Use :ref[Source Transfer]{#rule.source-transfer} and :ref[Source Destruction]{#rule.source-destruction}.
 
@@ -59,7 +65,7 @@ A Source's Class is not the Incursion's Pathfinder level. Read numbers from the 
 
 Bad Maps teaches that the body can be fought and the Source moved or contained, while the person's fuller truth remains missing. Its owning scene handles the toy, Gressa, the Order's response, and the actual aftermath. Do not force the expected demonstration if the Party changes the situation.
 
-Later encounters let the Party Recover and Restore Identity. Show immediate feedback when truth takes hold. If another reconstruction follows, it must incorporate that progress. [The Seven Components of Identity](/docs/running/seven-components/) connects those lessons across the campaign.
+Later encounters let the Party Recover and Restore Identity. Show immediate feedback when truth takes hold. If another reconstruction follows, it must incorporate that progress. [The Seven Components of Identity](/docs/veiled/seven-components/) connects those lessons across the campaign.
 
 As the stakes grow, keep the human question visible: what genuine connection survived, what was lost, and what has reality wrongly supplied?
 

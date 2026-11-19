@@ -1,7 +1,7 @@
 ---
 id: creature.the-glassblower
 slug: the-glassblower
-name: "Campus Spotlight: The Glassblower"
+name: The Glassblower
 status: draft
 level: 12
 rarity: unique
@@ -29,7 +29,12 @@ immunities:
   - death effects
 speed: 25 feet
 abilityDC: 32
-strikes: []
+strikes:
+  - name: Scalding Touch
+    type: melee
+    bonus: 26
+    damage: 3d8+10 bludgeoning plus 2d6 fire
+    traits: []
 provenance:
   - doc: Creatures
     heading: "Campus Spotlight: The Glassblower — Creature 12"
@@ -38,9 +43,6 @@ resistances:
 weaknesses:
   - cold 10
 ---
-
-**Resistance** fire 15; **Weakness** cold 10; **Immunities** bleed, disease, poison, death effects
-**Scalding Touch ◆** *Melee* +26; **Damage** 3d8+10 bludgeoning plus 2d6 fire.
 
 ### Living Furnace
 A creature that **starts its turn within 10 feet** of the Glassblower or **first enters that distance on its turn** attempts **DC 32 basic Fortitude** against **2d6 fire**. A creature saves at most **once per turn** against this aura. The heat does not vanish merely because the silhouette is perfectly black; the source of heat is an inaccurate reconstruction of the craftsperson's job.

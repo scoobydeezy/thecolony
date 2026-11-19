@@ -9,12 +9,6 @@ provenance:
     heading: Reference Focus — Temporary Examination Card
 ---
 
-[Download player-only Markdown](/docs/player-handouts/spider-focus.md)
-
-[Download player-only Markdown](/docs/player-handouts/spider-focus.md)
-
-[Download player-only Markdown](/docs/player-handouts/spider-focus.md)
-
 :::player-facing
 **I:** `F-00 / provisional`  
 **N:** Devotional focus, Nana Anadi; unaccessioned  

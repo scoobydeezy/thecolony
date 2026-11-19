@@ -30,13 +30,16 @@ immunities:
   - death effects
 speed: 20 feet
 abilityDC: 29
-strikes: []
+strikes:
+  - name: Hand
+    type: melee
+    bonus: 21
+    damage: 2d6+10 mental
+    traits: []
 provenance:
   - doc: Creatures
     heading: Evin Peakwalker Reconstruction (Infant) — Creature 10
 ---
-
-**Hand** +21 to hit, 2d6+10 mental damage
 
 ### Same Baby, Smaller Body
 The infant has the same iconic posture, gestures, proportions, and desperate dependency as the Giant Baby from *Bad Maps*, now reconstructed at Tiny size. Do not give it exaggerated arms or a distinct new body concept. It is obviously the same infant-shaped false conclusion at a different scale.
@@ -55,7 +58,7 @@ The Infant cries with impossible, piercing volume. Each eligible creature attemp
 - **Failure:** Deafened and stupefied 1 until the start of the Infant's next turn.
 - **Critical Failure:** Deafened for 1 minute and stupefied 2 until the start of the Infant's next turn.
 
-This is a fresh save each time the action occurs; conditions of the same type do not stack. Scream is not used while its Comfort suppression remains active. **Provisional:** if successful saves producing Deafened is too punitive in playtest, move that effect to Failure while retaining Stupefied as the additional severity.
+This is a fresh save each time the action occurs; conditions of the same type do not stack. Scream is not used while its Comfort suppression remains active. **Tuning:** if successful saves producing Deafened is too punitive in playtest, move that effect to Failure while retaining Stupefied as the additional severity.
 
 ### Carrying the Baby
 An adjacent creature with a free hand can **Interact ◆** to pick up the Infant, or an adjacent creature already holding it can **Interact ◆** to pass it to a willing adjacent creature with a free hand. The Infant does not resist being held. No special skill check or new carrying minigame is required.

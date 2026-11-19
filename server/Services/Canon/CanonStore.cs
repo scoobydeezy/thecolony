@@ -46,7 +46,7 @@ public sealed partial class CanonStore
     {
         ["npc"] = new("npc", "npcs", ".md", CharacterKeys),
         ["pc"] = new("pc", "pcs", ".md", CharacterKeys),
-        ["faction"] = new("faction", "factions", ".yaml", ["id", "slug", "name", "type", "summary", "motto", "represents", "publicFace", "selfImage",
+        ["faction"] = new("faction", "factions", ".md", ["id", "slug", "name", "type", "summary", "motto", "represents", "publicFace", "selfImage",
             "coreTenet", "focus", "certainOf", "rightAbout", "afraidOf", "wrongAbout", "response", "origin", "foundedAs", "became", "history", "notes",
             "heraldry", "status", "start", "provenance", "design"]),
         ["asset"] = new("asset", "assets", ".yaml", ["id", "slug", "name", "type", "role", "tier", "keystone", "summary", "status", "start", "provenance", "design"]),

@@ -1,18 +1,12 @@
 ---
+# yaml-language-server: $schema=../../../schemas/encounter.schema.json
 id: encounter.sunny
 slug: sunny
 name: Sunny
 summary: Under Totality, Old Town remembers one woman hundreds of times.
 function: Shattered Front
 synopsis: >-
-  Lost parts of Old Town return as solid, featureless black extensions of its ruined streets, and the damaged Broken
-  Bell sounds without being struck. Tom's genuine Relationship with Sundara, under overwhelming Recognition, drives the
-  district's Wound to manifest hundreds of false reconstructions of one woman. Darkwing must hold back the black horde
-  while searching the cemetery for Sundara's specific grave among many plausible ones, then sound the authentic whistle
-  bound to her memory. Graves Anchored on an earlier Old Town visit help calibrate the search but do not solve it.
-  Ending the mass Incursion can stabilize the cemetery without healing Tom or the district's older Wound. Sunny is the
-  Shattered front: the Shattered's organized response sets the Dead Drop Network's finale capability and its Finale
-  Pressure.
+  Lost parts of Old Town return as solid, featureless black extensions of its ruined streets, and the damaged Broken Bell sounds without being struck. Tom's genuine Relationship with Sundara, under overwhelming Recognition, drives the district's Wound to manifest hundreds of false reconstructions of one woman. Darkwing must hold back the black horde while searching the cemetery for Sundara's specific grave among many plausible ones, then sound the authentic whistle bound to her memory. Graves Anchored on an earlier Old Town visit help calibrate the search but do not solve it. Ending the mass Incursion can stabilize the cemetery without healing Tom or the district's older Wound. Sunny is the Shattered front: the Shattered's organized response sets the Dead Drop Network's finale capability and its Finale Pressure.
 part: part.act-3
 chapter: the-five-fronts
 order: 1
@@ -26,6 +20,8 @@ links:
   - npc.sundara-cobb
   - asset.broken-bell
 status: draft
+readiness:
+  status: compiled
 provenance:
   - doc: Campaign Outline
     heading: Session 10 — Shattered > Sunny — Old Town / Shattered
@@ -33,8 +29,6 @@ provenance:
     heading: 13. Sunny — Old Town / Cemetery Crisis
   - doc: Encounters
     heading: 13. Sunny — Old Town / Cemetery Crisis
-readiness:
-  status: compiled
 ---
 
 ## At the Table
@@ -125,7 +119,7 @@ Use a standard **24×30 five-foot-square Flip-Mat** (120 feet north–south × 1
 | 22 | #64=13, #65=17, #66=25, #67=27 |
 | 23 | #68=07, #69=18, #70=20, #71=26 |
 
-**Provisional GM key for repeatable paper tests:** Sundara's correct grave = **#10 (row 04, column 20)**, in the old northern section. This is *never* marked on the player map. Set it once before printing the final board; do not move it to accommodate guesses or GM pacing. For parties that completed Old Town, the six Anchored calibration graves are **#8, #18, #28, #39, #55, #67**. If the earlier session established different physical positions, honor them instead and re-key the map before play. The six Anchors may not include Sundara's correct grave.
+**GM key for repeatable paper tests:** Sundara's correct grave = **#10 (row 04, column 20)**, in the old northern section. This is *never* marked on the player map. Set it once before printing the final board; do not move it to accommodate guesses or GM pacing. For parties that completed Old Town, the six Anchored calibration graves are **#8, #18, #28, #39, #55, #67**. If the earlier session established different physical positions, honor them instead and re-key the map before play. The six Anchors may not include Sundara's correct grave.
 
 **Fences:** Use separate wrought-iron pieces **along the edges between five-foot squares**; they do not occupy grave squares. Fence runs vary with historical family plots and make movement and shooting lanes more interesting, not into a second maze. The test layout and final physical positions are **still to be drawn and tested**: aim for roughly six to eight irregular runs, some **5-foot gates** for individuals and some **10-foot avenues** for Troop segments. Iron bars usually preserve line of sight; apply cover based on actual geometry. Physical fences can be damaged using ordinary PF2e object rules, with selected black reconstructions completing burned sections. Do not promise a safe enclave the Troop can never reach. The well or other sub-Wounds are optional landmarks and should not erase grave candidates or cover all sightlines.
 
@@ -147,7 +141,7 @@ The party finds the *actual* grave through repeated physical measurements rather
 
 - **Select the stone deterministically:** nearest gravestone measured from the zombie's Dispersal square. For the paper prototype use **Manhattan grid distance** `|row1-row2| + |col1-col2|` solely to select and measure graves (not PF2e movement). Break ties by the lowest grave ID. Walls and fences don't alter the abstract Resonance distance.
 - **Flare:** the selected stone flashes with a low, dark vibration. One flare lasts until the **end of the following round**. Multiple bodies Dispersed by one attack may generate multiple flares but do not require GM measurements until players choose to interpret them. A single flare is readable once; later new Dispersals can retest a grave for more precise information at a real combat cost.
-- **Interpret:** 1-action **Recall Knowledge**, secret, visible flare in range (provisional 60-foot line of sight); skills may include Occultism, Religion, or Society when grounded in the evidence. The correct grave's object/reaction is evident **without a check**. Exact check DCs, timing and exceptional effects are in the mechanical reference entries linked on this page.
+- **Interpret:** 1-action **Recall Knowledge**, secret, visible flare in range (60-foot line of sight); skills may include Occultism, Religion, or Society when grounded in the evidence. The correct grave's object/reaction is evident **without a check**. Exact check DCs, timing and exceptional effects are in the mechanical reference entries linked on this page.
 - **Critical success:** eight-way direction **plus** distance band to Sundara's true grave.
 - **Success:** distance band only.
 - **Failure:** **warmer / colder / equal** than the *previous distinct grave tested* (compare true distances, not prior die results). If this is the first test, there is no previous comparison; the party still knows the tested grave is wrong.
@@ -189,7 +183,7 @@ Record direct intervention, supported delegation, or the unattended deadline as 
 
 **Settled:** original Sources burned, Scar/Wound persistence, Tom as current dominant living Source, mass false-Sundara reconstruction, 24×30 cemetery / 71 markers, two-layer Troop + four individuals, nearest-stone Dispersal feedback, Model E graded readings, "Sunny" luring, six earlier Named Anchors if earned, whistle and Name ending, no automatic full Old Town cure.
 
-**Provisional pending physical playtest:** final fence edges/gates, exact individual and Troop stats at party level, four emergence-point squares and timing adjustments, weathering/well obstruction placement, resonance DC and observation distance, battlefield approach scenes, and which champion/faction operations are live that night. The correct grave and calibration IDs above are **fixed for this paper layout**, but can be re-keyed *before* printing final components; never retcon a grave in response to a player deduction.
+**Pending physical playtest:** final fence edges/gates, exact individual and Troop stats at party level, four emergence-point squares and timing adjustments, weathering/well obstruction placement, resonance DC and observation distance, battlefield approach scenes, and which champion/faction operations are live that night. The correct grave and calibration IDs above are **fixed for this paper layout**, but can be re-keyed *before* printing final components; never retcon a grave in response to a player deduction.
 
 ### Systems Exercised
 
@@ -201,9 +195,9 @@ Record direct intervention, supported delegation, or the unattended deadline as 
 
 **Trigger:** An *individual* Sundara is reduced to 0 HP and **Disperses**. The **single nearest grave** to its last occupied square resonates (the corpses of real townspeople are not being consumed). Use Manhattan coordinate distance purely for this **investigation measurement**, not PF2e movement or attack range. With equal distance, use the lowest numbered grave. Number the 71 stones north-to-south, west-to-east. An NPC/non-PC dispersal can also cause a flare; only a player's observed or investigated flare becomes an actionable reading. **Troop segment losses and Troop Dispersal never produce 4–16 grave tests.**
 
-**Tell:** First observed individual Dispersal, ask PCs who can see the stone for a **GM-triggered Perception check** (moderate DC for party level; provisional **DC 30** for level 12) to notice a nearby stone tremble and a black thread converge on it. The actual check does not cost them an action. On an initial failure, repeat the visible phenomenon on a later Dispersal; it is a tutorial, not a secret gate or one-chance clue. Once discovered, no further Perception rolls are required for ordinary flares.
+**Tell:** First observed individual Dispersal, ask PCs who can see the stone for a **GM-triggered Perception check** (moderate DC for party level; **DC 30** for level 12) to notice a nearby stone tremble and a black thread converge on it. The actual check does not cost them an action. On an initial failure, repeat the visible phenomenon on a later Dispersal; it is a tutorial, not a secret gate or one-chance clue. Once discovered, no further Perception rolls are required for ordinary flares.
 
-**Duration:** Flare can be read through the **end of the next combat round**. An aware PC who has line of sight to the flare from **within 60 feet (provisional)** may spend **one action to Recall Knowledge**, using Occultism, Society, Religion, or another genuinely relevant skill. Treat as a **secret check**, provisional **DC 30** for a level-12 group (no automatic bonus for the name being obvious in roleplay). Choose appropriate level-based DC and difficulty adjustments for actual party. One reading per flare; a new individual Dispersal permits a new reading at that same stone, though its true spatial result cannot change.
+**Duration:** Flare can be read through the **end of the next combat round**. An aware PC who has line of sight to the flare from **within 60 feet** may spend **one action to Recall Knowledge**, using Occultism, Society, Religion, or another genuinely relevant skill. Treat as a **secret check**, **DC 30** for a level-12 group (no automatic bonus for the name being obvious in roleplay). Choose appropriate level-based DC and difficulty adjustments for actual party. One reading per flare; a new individual Dispersal permits a new reading at that same stone, though its true spatial result cannot change.
 
 | Degree | Information actually provided |
 |---|---|
@@ -253,5 +247,5 @@ A called Sundara still uses ordinary PF2e movement and attacks, and may attack a
 - [ ] Actual Act III factions/Assets affected; no automatic repair of unrelated assets.
 
 :::design
-The optional Break from the Horde rule is disabled by default. The Troop’s unspecified return interval is provisionally three full rounds after Dispersal; individual slots retain their explicit next-turn return. This creates breathing room without turning troop damage into grave information. Review against the actual Party.
+The optional Break from the Horde rule is disabled by default. The Troop returns three full rounds after Dispersal; individual slots retain their explicit next-turn return. This creates breathing room without turning troop damage into grave information. Review against the actual Party.
 :::

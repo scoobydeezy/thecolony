@@ -11,8 +11,8 @@ planned:
   page:running/campaign-at-a-glance: Part I · The Campaign at a Glance
   page:running/gm-truths: Part I · GM Truths
   page:running/reading-and-branches: Part I · The Reading and Its Branches
-  page:running/seven-components: Part I · The Seven Components of Identity
-  page:running/veiled-primer: "Part I · The Veiled: A Practical Primer"
+  page:veiled/seven-components: Part III · The Seven Components of Identity
+  page:veiled/primer: "Part III · The Veiled: A Practical Primer"
   page:running/colony-turn: Part I · The Colony Turn
   page:running/faction-operations: Part I · Faction Operations and the Act III Fronts
   page:running/running-the-game: Part I · Running Investigations, Relationships and Consequences
@@ -24,31 +24,31 @@ planned:
   page:setting/factions: Part II · The Factions
   page:setting/institutions: Part II · Civic Institutions
   page:setting/whos-who: Part II · Who's Who
-  page:act-1: Part III · Act I overview
-  page:act-2: Part IV · Act II overview
-  page:act-3: Part V · Act III overview
-  page:act-3/the-burden-phase-1: "Part V · The Burden, Phase I: Wound"
-  page:act-3/the-burden-phase-2: "Part V · The Burden, Phase II: Composite"
-  page:act-3/the-burden-phase-3: "Part V · The Burden, Phase III: Echo"
-  page:act-3/the-burden-phase-4: "Part V · The Burden, Phase IV: Chorus"
-  page:reference/glossary: Part VI · Glossary
-  page:reference/quick-reference: Part VI · Quick Reference
-  handout.ledger: "Part VI · Handouts: the Ledger (Hall of Remembrance records)"
-  handout.material-concordance: "Part VI · Handouts: the Witnesses' Material Concordance"
+  page:act-1: Part IV · Act I overview
+  page:act-2: Part V · Act II overview
+  page:act-3: Part VI · Act III overview
+  page:act-3/the-burden-phase-1: "Part VI · The Burden, Phase I: Wound"
+  page:act-3/the-burden-phase-2: "Part VI · The Burden, Phase II: Composite"
+  page:act-3/the-burden-phase-3: "Part VI · The Burden, Phase III: Echo"
+  page:act-3/the-burden-phase-4: "Part VI · The Burden, Phase IV: Chorus"
+  page:reference/glossary: Part VII · Glossary
+  page:reference/quick-reference: Part VII · Quick Reference
+  handout.ledger: "Part VII · Handouts: the Ledger (Hall of Remembrance records)"
+  handout.material-concordance: "Part VII · Handouts: the Witnesses' Material Concordance"
   designer: Designer area (rationale, open decisions, tuning, production)
-  rule.sources-and-resonance: "Part VI · Rules Reference: sources and resonance (planned)"
-  rule.class: "Part VI · Rules Reference: class (planned)"
-  rule.active-sources: "Part VI · Rules Reference: active sources (planned)"
-  rule.dispersal: "Part VI · Rules Reference: dispersal (planned)"
-  rule.stabilization-window: "Part VI · Rules Reference: stabilization window (planned)"
-  rule.source-transfer: "Part VI · Rules Reference: source transfer (planned)"
-  rule.source-destruction: "Part VI · Rules Reference: source destruction (planned)"
-  rule.containment: "Part VI · Rules Reference: containment (planned)"
-  rule.keystones: "Part VI · Rules Reference: keystones (planned)"
-  rule.recover-and-restore: "Part VI · Rules Reference: recover and restore (planned)"
-  rule.acceptance-and-stabilization: "Part VI · Rules Reference: acceptance and stabilization (planned)"
-  rule.anchoring: "Part VI · Rules Reference: anchoring (planned)"
-  rule.corrupted-engrams: "Part VI · Rules Reference: corrupted engrams (planned)"
+  rule.sources-and-resonance: "Part VII · Rules Reference: sources and resonance (planned)"
+  rule.class: "Part VII · Rules Reference: class (planned)"
+  rule.active-sources: "Part VII · Rules Reference: active sources (planned)"
+  rule.dispersal: "Part VII · Rules Reference: dispersal (planned)"
+  rule.stabilization-window: "Part VII · Rules Reference: stabilization window (planned)"
+  rule.source-transfer: "Part VII · Rules Reference: source transfer (planned)"
+  rule.source-destruction: "Part VII · Rules Reference: source destruction (planned)"
+  rule.containment: "Part VII · Rules Reference: containment (planned)"
+  rule.keystones: "Part VII · Rules Reference: keystones (planned)"
+  rule.recover-and-restore: "Part VII · Rules Reference: recover and restore (planned)"
+  rule.acceptance-and-stabilization: "Part VII · Rules Reference: acceptance and stabilization (planned)"
+  rule.anchoring: "Part VII · Rules Reference: anchoring (planned)"
+  rule.corrupted-engrams: "Part VII · Rules Reference: corrupted engrams (planned)"
 summary:
   - doc: Campaign Outline
     sections: 50
@@ -139,7 +139,7 @@ documents:
       lines: 22
       subheadings: 0
       home:
-        - page:running/seven-components
+        - page:veiled/seven-components
       basis: rule
       status: in-progress
       citedBy:
@@ -1513,10 +1513,10 @@ documents:
       intro: true
       home:
         - encounter.the-reading
-        - creature.vara-reading
-        - creature.serevan-reading
+        - creature.vara-cairn
+        - creature.serevan-ilvar
         - creature.kelda-varruk
-        - creature.uldren-reading
+        - creature.uldren-harthwright
         - creature.order-chamber-guard
       basis: name
       status: in-progress
@@ -1528,10 +1528,10 @@ documents:
       subheadings: 0
       home:
         - encounter.the-reading
-        - creature.vara-reading
-        - creature.serevan-reading
+        - creature.vara-cairn
+        - creature.serevan-ilvar
         - creature.kelda-varruk
-        - creature.uldren-reading
+        - creature.uldren-harthwright
         - creature.order-chamber-guard
       basis: name
       status: in-progress
@@ -1543,10 +1543,10 @@ documents:
       subheadings: 5
       home:
         - encounter.the-reading
-        - creature.vara-reading
-        - creature.serevan-reading
+        - creature.vara-cairn
+        - creature.serevan-ilvar
         - creature.kelda-varruk
-        - creature.uldren-reading
+        - creature.uldren-harthwright
         - creature.order-chamber-guard
       basis: name
       status: in-progress
@@ -1560,10 +1560,10 @@ documents:
       subheadings: 0
       home:
         - encounter.the-reading
-        - creature.vara-reading
-        - creature.serevan-reading
+        - creature.vara-cairn
+        - creature.serevan-ilvar
         - creature.kelda-varruk
-        - creature.uldren-reading
+        - creature.uldren-harthwright
         - creature.order-chamber-guard
       basis: name
       status: in-progress
@@ -1581,15 +1581,15 @@ documents:
       subheadings: 4
       home:
         - encounter.the-reading
-        - creature.vara-reading
-        - creature.serevan-reading
+        - creature.vara-cairn
+        - creature.serevan-ilvar
         - creature.kelda-varruk
-        - creature.uldren-reading
+        - creature.uldren-harthwright
         - creature.order-chamber-guard
       basis: name
       status: in-progress
       citedBy:
-        - creature.vara-reading
+        - creature.vara-cairn
         - npc.vara-cairn
       concepts:
         - encounter.the-reading
@@ -1601,16 +1601,16 @@ documents:
       subheadings: 6
       home:
         - encounter.the-reading
-        - creature.vara-reading
-        - creature.serevan-reading
+        - creature.vara-cairn
+        - creature.serevan-ilvar
         - creature.kelda-varruk
-        - creature.uldren-reading
+        - creature.uldren-harthwright
         - creature.order-chamber-guard
       basis: name
       status: in-progress
       citedBy:
-        - creature.serevan-reading
-        - creature.serevan-succession
+        - creature.serevan-ilvar
+        - creature.serevan-ilvar
       confirmed: true
       note: Compiled or retained as design guidance; see remaining-reconciliation.yaml and MIGRATION-REVIEW.md. Range homes identify the owning chapter and supporting references.
     - heading: The Reading — Ritual Chamber > Captain Kelda Varruk — Creature 13
@@ -1619,10 +1619,10 @@ documents:
       subheadings: 6
       home:
         - encounter.the-reading
-        - creature.vara-reading
-        - creature.serevan-reading
+        - creature.vara-cairn
+        - creature.serevan-ilvar
         - creature.kelda-varruk
-        - creature.uldren-reading
+        - creature.uldren-harthwright
         - creature.order-chamber-guard
       basis: name
       status: in-progress
@@ -1638,15 +1638,15 @@ documents:
       subheadings: 4
       home:
         - encounter.the-reading
-        - creature.vara-reading
-        - creature.serevan-reading
+        - creature.vara-cairn
+        - creature.serevan-ilvar
         - creature.kelda-varruk
-        - creature.uldren-reading
+        - creature.uldren-harthwright
         - creature.order-chamber-guard
       basis: name
       status: in-progress
       citedBy:
-        - creature.uldren-reading
+        - creature.uldren-harthwright
       confirmed: true
       note: Compiled or retained as design guidance; see remaining-reconciliation.yaml and MIGRATION-REVIEW.md. Range homes identify the owning chapter and supporting references.
     - heading: The Reading — Ritual Chamber > Order Chamber Guard — Creature 9
@@ -1655,10 +1655,10 @@ documents:
       subheadings: 4
       home:
         - encounter.the-reading
-        - creature.vara-reading
-        - creature.serevan-reading
+        - creature.vara-cairn
+        - creature.serevan-ilvar
         - creature.kelda-varruk
-        - creature.uldren-reading
+        - creature.uldren-harthwright
         - creature.order-chamber-guard
       basis: name
       status: in-progress
@@ -1672,10 +1672,10 @@ documents:
       subheadings: 0
       home:
         - encounter.the-reading
-        - creature.vara-reading
-        - creature.serevan-reading
+        - creature.vara-cairn
+        - creature.serevan-ilvar
         - creature.kelda-varruk
-        - creature.uldren-reading
+        - creature.uldren-harthwright
         - creature.order-chamber-guard
       basis: name
       status: in-progress
@@ -2898,7 +2898,7 @@ documents:
       lines: 34
       subheadings: 4
       home:
-        - page:running/veiled-primer
+        - page:veiled/primer
       basis: rule
       status: in-progress
       confirmed: true
@@ -2981,7 +2981,7 @@ documents:
       concepts:
         - rule.book.keeper-bound-handling
       dependsOn:
-        - page:running/seven-components
+        - page:veiled/seven-components
       confirmed: true
       note: Compiled or retained as design guidance; see remaining-reconciliation.yaml and MIGRATION-REVIEW.md. Range homes identify the owning chapter and supporting references.
     - heading: "5. Phase I — Wound: The Monument"
@@ -3004,7 +3004,7 @@ documents:
         - rule.book.keeper-bound-handling
         - source.book-of-names
       dependsOn:
-        - page:running/seven-components
+        - page:veiled/seven-components
       confirmed: true
       note: Compiled or retained as design guidance; see remaining-reconciliation.yaml and MIGRATION-REVIEW.md. Range homes identify the owning chapter and supporting references.
     - heading: "6. Phase II — Composite: The Borrowed First Keeper"
@@ -3021,7 +3021,7 @@ documents:
       concepts:
         - rule.book.keeper-bound-handling
       dependsOn:
-        - page:running/seven-components
+        - page:veiled/seven-components
       confirmed: true
       note: Compiled or retained as design guidance; see remaining-reconciliation.yaml and MIGRATION-REVIEW.md. Range homes identify the owning chapter and supporting references.
     - heading: "7. Phase III — Echo: Through Her Eyes"
@@ -3044,7 +3044,7 @@ documents:
         - hazard.duskwood-memory
         - hazard.flood-memory
       dependsOn:
-        - page:running/seven-components
+        - page:veiled/seven-components
       confirmed: true
       note: Compiled or retained as design guidance; see remaining-reconciliation.yaml and MIGRATION-REVIEW.md. Range homes identify the owning chapter and supporting references.
     - heading: 8. Crescent Island as the Origin
@@ -3068,15 +3068,15 @@ documents:
       subheadings: 52
       home:
         - page:act-3/the-burden-phase-4
-        - creature.serevan-succession
+        - creature.serevan-ilvar
       basis: rule
       status: in-progress
       citedBy:
-        - creature.serevan-succession
+        - creature.serevan-ilvar
       concepts:
         - rule.book.keeper-bound-handling
       dependsOn:
-        - page:running/seven-components
+        - page:veiled/seven-components
       confirmed: true
       note: Compiled or retained as design guidance; see remaining-reconciliation.yaml and MIGRATION-REVIEW.md. Range homes identify the owning chapter and supporting references.
     - heading: 10. After Aletheia Is Named — The Host Resolves
@@ -3297,7 +3297,7 @@ documents:
       lines: 17
       subheadings: 0
       home:
-        - page:running/veiled-primer
+        - page:veiled/primer
       basis: rule
       status: in-progress
       confirmed: true
@@ -3600,7 +3600,7 @@ documents:
       lines: 30
       subheadings: 0
       home:
-        - page:running/veiled-primer
+        - page:veiled/primer
       basis: rule
       status: in-progress
       confirmed: true
@@ -3770,6 +3770,7 @@ documents:
       status: in-progress
       citedBy:
         - rule.class
+        - rule.controlled-routing
     - heading: Identity as Meaning
       line: 1230
       lines: 24
@@ -3970,7 +3971,7 @@ documents:
       lines: 25
       subheadings: 0
       home:
-        - page:running/veiled-primer
+        - page:veiled/primer
       basis: rule
       status: in-progress
       confirmed: true
@@ -3980,7 +3981,7 @@ documents:
       lines: 23
       subheadings: 0
       home:
-        - page:running/veiled-primer
+        - page:veiled/primer
       basis: rule
       status: in-progress
       confirmed: true

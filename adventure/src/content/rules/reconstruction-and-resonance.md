@@ -12,6 +12,8 @@ summary: >-
   sufficient Meaning.
 ---
 
+## Definition
+
 Every Veiled has two independent mechanical classifications in addition to **Class**:
 
 - **Reconstruction** identifies the kind of mistake reality is making as it assembles the missing life.
@@ -22,8 +24,6 @@ Each classification points toward an Identity component that can provide suffici
 These are **alternate Restoration paths, not mandatory double locks**.
 
 > **Restoring sufficient truthful Meaning through either path can Stabilize an Incursion.**
-
-Both paths may be recovered. Some encounters may expose only one practical route. Recognition of the relevant component is not enough by itself: the recovered truth must materially constrain the false conclusion reality is currently making.
 
 **Reconstruction** answers:
 
@@ -44,6 +44,13 @@ Every part has mechanical meaning:
 - **Relationship Resonance** says **Relationship** is another viable Restoration path.
 
 The taxonomy should become practical battlefield language rather than lore trivia.
+
+## Procedure
+
+1. **Name the field description:** Class, Reconstruction and Resonance Type (for example, Class II Echo / Relationship).
+2. **Find both Restoration paths** in the Reconstruction Paths and Resonance Type Paths tables below.
+3. **Restore sufficient truthful Meaning through either path**, using :ref[Identity and Stabilization]{#rule.identity-and-stabilization}. Both paths may be recovered. Some encounters may expose only one practical route.
+4. **Test the result.** Recognition of the relevant component is not enough by itself: the recovered truth must materially constrain the false conclusion reality is currently making.
 
 ## Reconstruction Paths
 

@@ -4,25 +4,33 @@ import starlight from '@astrojs/starlight';
 import { unified } from '@astrojs/markdown-remark';
 import remarkColony from './src/lib/remark-colony.mjs';
 import { BOOK_TARGET, isDesigner, BASE } from './src/lib/target.mjs';
-import { loadRegistry, loadParts, partChapters, unplacedItems, entityUrl } from './src/lib/registry.mjs';
+import { loadRegistry, loadParts, partChapters, unplacedItems, entityUrl, ENTITY_TYPES } from './src/lib/registry.mjs';
 
-// Reference (BOOK-STRUCTURE.md §1, Part VI): generated from the entries, in the approved order.
+// Reference (BOOK-STRUCTURE.md §1, Part VI): generated from the entries, in the approved order. Each index
+// is a collapsed group (its index page, then its entries in the index page's order) so the page you are on
+// is selectable under its parent; Starlight opens the group that holds the current page. An index with no
+// entries stays a plain link.
+const REFERENCE = [
+  ['Bestiary', 'creature'], ['Veiled Sources', 'source'], ['Hazards', 'hazard'], ['Items and Treasure', 'item'],
+  ['NPCs', 'npc'], ['Factions', 'faction'], ['Faction Goals', 'goal'], ['Assets', 'asset'], ['Locations', 'location'],
+  ['World Conditions', 'condition'], ['Narrative Threads', 'thread'], ['Branches', 'branch'], ['Rules Reference', 'rule'],
+  ['Maps', 'map'], ['Handouts and Props', 'handout'],
+];
+const stripBase = (url) => url.replace(new RegExp(`^${BASE}`), '');
+const reg = loadRegistry({ fresh: true });
+// An entry a part lists in one of its chapters (a Veiled rule, the Clearing House) is in the sidebar there, not
+// again here, so each page has one place in the sidebar. Its index still lists it.
+const placed = new Set(loadParts().flatMap((c) => partChapters(reg, c).flatMap((s) => s.items.map((e) => e.data.id))));
 const appendices = [
-  { label: 'Bestiary', link: '/bestiary/' },
-  { label: 'Veiled Sources', link: '/veiled-sources/' },
-  { label: 'Hazards', link: '/hazards/' },
-  { label: 'Items and Treasure', link: '/items/' },
-  { label: 'NPCs', link: '/npcs/' },
-  { label: 'Factions', link: '/factions/' },
-  { label: 'Faction Goals', link: '/goals/' },
-  { label: 'Assets', link: '/assets/' },
-  { label: 'Locations', link: '/gazetteer/' },
-  { label: 'World Conditions', link: '/conditions/' },
-  { label: 'Narrative Threads', link: '/threads/' },
-  { label: 'Branches', link: '/branches/' },
-  { label: 'Rules Reference', link: '/rules/' },
-  { label: 'Maps', link: '/maps/' },
-  { label: 'Handouts and Props', link: '/handouts/' },
+  ...REFERENCE.map(([label, type]) => {
+    const link = `/${ENTITY_TYPES[type].area}/`;
+    const entries = reg.entities
+      .filter((e) => e.type === type && entityUrl(e) && !placed.has(e.data.id))
+      // A stat block variant reads as the index page shows it: "High Keeper Serevan Ilvar (The Reading)".
+      .map((e) => ({ label: `${e.view.fullName ?? e.view.name}${e.view.variant ? ` (${e.view.variant})` : ''}`, link: stripBase(entityUrl(e)) }))
+      .sort((a, b) => a.label.localeCompare(b.label));
+    return entries.length ? { label, collapsed: true, items: [{ label: 'Index', link }, ...entries] } : { label, link };
+  }),
   // Book pages: Starlight takes the label from the page (sidebar.label, else its title).
   'reference/glossary',
   'reference/quick-reference',
@@ -32,7 +40,6 @@ const appendices = [
 // part: frontmatter), in sidebar order. An act lists its chapters as sub-groups, each with its events and
 // encounters; a general part (Running, The Colony) lists its folder's pages. Read when the config loads,
 // so a new event file appears after a rebuild. (A page's ## headings are its sections, in Starlight's sense.)
-const reg = loadRegistry({ fresh: true });
 // How a chapter's items relate, shown in its sidebar label (BOOK-STRUCTURE.md §2).
 const ARRANGEMENT_HINT = { alternatives: ' (alternatives)', optional: ' (any order)', concurrent: ' (at the same time)', reference: ' (throughout the act)' };
 const parts = loadParts().map((c) => ({
@@ -41,10 +48,11 @@ const parts = loadParts().map((c) => ({
     ? [{ autogenerate: { directory: c.dir } }]
     : [
         { label: c.pageLabel, link: `/${c.dir}/` },   // sidebar.label, else the page title (also its name in Previous / Next)
+        ...c.pages.map((p) => ({ label: p.label, link: `/${c.dir}/${p.slug}/` })),   // the part's own pages, in sidebar.order
         ...partChapters(reg, c).map((s) => ({
           label: s.label ?? `${s.title}${ARRANGEMENT_HINT[s.arrangement] ?? ''}`,   // chapter label, else title + hint
           items: s.items.map((e) => {
-            const link = (entityUrl(e) ?? '').replace(new RegExp(`^${BASE}`), '');
+            const link = stripBase(entityUrl(e) ?? '');
             // An item with pages of its own (The Burden's phases) becomes a group: its page, then its parts.
             const label = e.data.sidebar?.label ?? e.view.name;
             return e.pages?.length

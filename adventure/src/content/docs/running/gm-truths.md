@@ -99,7 +99,7 @@ The **Forgotten** are the real people carried in the inheritance. The **Veiled**
 ## The Observer
 
 :::secret
-The **Observer** is not the campaign's villain. He is its central question made into a person: a man who has spent decades studying how institutions change, how every answer to a real problem hardens into tradition, doctrine and certainty, until it creates the problems it once solved.
+The **Observer** is not the campaign's villain. He is its central question made into a person: a man who has spent a long time studying how institutions change, how every answer to a real problem hardens into tradition, doctrine and certainty, until it creates the problems it once solved.
 
 > **Can people build something better without eventually becoming the thing they fought?**
 

@@ -329,7 +329,7 @@ The first visible milestone is the end of Stage B: the book with two chapters, a
 
 | Kind | Folder | Format | Book section |
 |---|---|---|---|
-| Faction or social class | `adventure/src/content/factions/` | `.yaml` | Factions |
+| Faction or social class | `adventure/src/content/factions/` | `.md` (frontmatter is app data; the body is the book's) | Factions |
 | Asset | `adventure/src/content/assets/` | `.yaml` | Assets |
 | Location | `adventure/src/content/locations/` | `.yaml` | Gazetteer |
 

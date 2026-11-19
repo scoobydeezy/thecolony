@@ -1,14 +1,12 @@
 ---
+# yaml-language-server: $schema=../../../schemas/event.schema.json
 id: event.an-opportunity
 slug: an-opportunity
 name: An Opportunity
 summary: Dawn turns the Party's doubts into a chance to observe the Reading.
 function: Introduce the Dawn
 synopsis: >-
-  After the Party's investigation undermines the clean explanation surrounding the Veiled, Dawn argues that the
-  approaching Reading deserves scrutiny the Order will not permit. Miriel and the Assembly can put the Party close
-  enough to the procession and Ritual Chamber to observe what happens—and, if the Party decides intervention is
-  necessary, to act.
+  After the Party's investigation undermines the clean explanation surrounding the Veiled, Dawn argues that the approaching Reading deserves scrutiny the Order will not permit. Miriel and the Assembly can put the Party close enough to the procession and Ritual Chamber to observe what happens—and, if the Party decides intervention is necessary, to act.
 part: part.act-1
 chapter: act-i-climax
 order: 1
@@ -21,11 +19,11 @@ links:
   - asset.assembly-hall
   - asset.dawn-charter
 status: draft
+readiness:
+  status: compiled
 provenance:
   - doc: Campaign Outline
     heading: Session 3 — Dusk > Convergence — Dawn and the Agency Stance
-readiness:
-  status: compiled
 ---
 
 ## Opening State
@@ -52,7 +50,7 @@ Dawn will be publically protesting the Reading along the Ritual procession line.
 
 ## Player Choices
 
-Dawn offers access through a public protest and Julian’s distraction. Serevan offers access in return for removing the protesters. Present their concrete requests and let Darkwing bargain, refuse, expose the bargain, or find another route. The source’s expected choice of sides is pressure, not a rule that erases a credible third option.
+Dawn offers access through a public protest and Julian’s distraction. Serevan offers access in return for removing the protesters. Present their concrete requests. Both promise access to the Ritual Chamber, and **the Party must choose a side**.
 
 Record the Agency Stance from how the Party treats Vara’s authority, not from which faction it supports. Sympathy for Dawn alone does not establish respect for her consent.
 

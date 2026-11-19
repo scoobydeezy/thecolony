@@ -1,8 +1,8 @@
 ---
-id: creature.serevan-succession
-slug: serevan-succession
+id: creature.serevan-ilvar
+slug: serevan-ilvar
+previousSlugs: [serevan-reading, serevan-succession]
 status: draft
-level: 14
 rarity: common
 size: Medium
 traits:
@@ -25,20 +25,23 @@ saves:
 immunities: []
 speed: 25 feet
 abilityDC: 34
-strikes: []
+strikes:
+  - name: Ceremonial Staff
+    type: melee
+    bonus: 27
+    damage: 3d8+11 bludgeoning
+    traits: [nonlethal]
 provenance:
   - doc: Creatures
     heading: Serevan Ilvar — Creature 14
   - doc: The Burden — Final Veiled Encounter
     heading: Serevan's Final Combat Identity
 npc: npc.serevan-ilvar
-variant: The Succession
 design: >-
-  Same physical chassis as the Reading. Stay Your Hand uses DC 35 in this confrontation. Institutional protection, Book
-  drops and Companies belong to Phase IV; they do not alter the underlying creature’s maximum HP.
+  One stat block for the Reading and the Succession (user, 2026-11-19); the two blocks differed only in Stay Your
+  Hand's DC. Institutional protection, Book drops and Companies belong to Phase IV; they do not alter the
+  underlying creature’s maximum HP.
 ---
-
-**Ceremonial Staff** +27, **Damage** 3d8+11 bludgeoning, nonlethal
 
 ### Unyielding Doctrine
 Serevan cannot be persuaded during this encounter to permit the Reading to stop.
@@ -63,7 +66,7 @@ Restore the Rite cannot move Vara, free her from a condition, or override her vo
 ### Stay Your Hand ◆◆
 **AUDITORY, EMOTION, LINGUISTIC, MENTAL**
 
-One creature within 60 feet attempts a **DC 35 Will save**.
+One creature within 60 feet attempts a **DC 34 Will save** (DC 35 in the Succession).
 
 - **Critical Success:** Unaffected.
 - **Success:** The creature takes a –1 status penalty to attacks and Athletics checks against Order allies or Vara until the start of Serevan's next turn.
@@ -81,6 +84,6 @@ Serevan prioritizes, in order:
 
 If Vara voluntarily stops, Serevan's objective becomes securing Vara and the Book until the Order can regain control of the chamber.
 
-## The Succession
+## In the Succession
 
-Use the Institutional Ward and Last Secret timing in Phase IV. Prior Institutional Backlash damage remains real when the final Ward falls. Do not refresh HP, create a second form, or add a spellcaster suite.
+Stay Your Hand uses DC 35. Use the Institutional Ward and Last Secret timing in Phase IV. Prior Institutional Backlash damage remains real when the final Ward falls. Do not refresh HP, create a second form, or add a spellcaster suite.

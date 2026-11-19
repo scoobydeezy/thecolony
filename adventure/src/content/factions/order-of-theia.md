@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=../../../schemas/faction.schema.json
 id: faction.order-of-theia
 slug: order-of-theia
@@ -47,3 +48,4 @@ start:
     a: Negative
     b: Negative
     c: Positive
+---

@@ -9,7 +9,7 @@ traits:
 provenance: []
 design: >-
   Recovered component HP, DC 28 jam and one-action lever from the latest assistant summary in Encounter Design Part II.
-  Component AC/Hardness and action costs for jams/repairs are provisional additions. No independent hazard turn or
+  Component AC/Hardness and action costs for jams/repairs are additions to the source. No independent hazard turn or
   damage routine.
 ---
 

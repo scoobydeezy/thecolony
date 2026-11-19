@@ -1180,3 +1180,108 @@ Added five player-only Markdown exports for the display labels, Celia’s proced
 The inventory covers 333 source sections: none unclassified or unreviewed, 330 in progress and three previously migrated. Reviewed ranges identify their chapter and reference destinations; design criteria are retained in `adventure/sources/design-review.md`. “In progress” deliberately preserves pending meaning-changing review and preparation. Source exports remain unchanged, and no commits were made.
 
 **Validation:** source-provenance and entity/reference checks pass (366 entities, 209 Markdown files, 17 migration concepts), with no stale references. All six directory/export tests pass. Final GM build: 411 pages, 40,353 internal links, successful search index and privacy scan (846 files; 255 private snippets). Final designer build: 430 pages, 46,588 internal links and successful search index. Additional content checks confirm 33 compiled scene bodies, five correct player exports, corrected profile traits, and non-overlapping prototype barrier placements. Browser visual layout, encounter balance, and physical components have not been playtested. Advancement and the other preparation items in `MIGRATION-REVIEW.md` remain open.
+
+## 2026-11-19: Review of the source-doc conversion; fixes
+
+Four independent reviews of commit 2320b6e. Open items and decisions are in `CONVERSION-REVIEW.md`. Fixed here:
+
+- **App round trip:** 30 app-owned files (29 events and encounters, plus Serevan) had been rewritten by js-yaml: the schema line was dropped and text was folded at 120 characters. The app would have rewritten each one on its next save. I rewrote them with the app's own serializer; parsed values are identical in all 268 files. The byte-for-byte server test passes again.
+- **Player downloads:**
+  - each handout had the download link typed in three times; the handout page now renders one link itself;
+  - GM material inside player blocks moved into GM notes: the Concordance's §9 (the editorial standard) and two GM-voice lines; the Ledger's "give an excerpt only when…" instruction; two dossier sentences that resolved red herrings; and "non-Spider" wording;
+  - the exporter now refuses raw HTML, links, images, link definitions and unclosed blocks, leaves a block's label out, and keeps a bare `word:word` as prose;
+  - downloads exist only for handouts that have a player block (`audience` defaults to players);
+  - the privacy scan now covers the `.md` downloads;
+  - the dev server serves `.md` as Markdown;
+  - new test file `scripts/player-handout-safety.test.mjs`.
+- **Contents list:** generated entry pages now pass their headings to Starlight (Synopsis, the body's headings, Connections, path variants), so long item pages have a working "On this page".
+- **Editor:** accepts `::directory` (it had refused to save the four directory pages).
+- **Remark:** a failed `::directory` no longer skips the node after it.
+- **Directory:** a stale id shows as missing (it used to read "Not recorded"); a missing key no longer crashes.
+- **Designer notes:** an entry's `design:` note renders even when the entry has no provenance (the invented Duskwood numbers' flags were hidden).
+- **Validator:** provenance checks run whenever the source exports are present. `--sources` still demands them, and `--no-sources` skips them.
+
+**Checks:** validator passes (with source checks); 12 node tests and 96 server tests pass. The GM build has 411 pages and 43,113 links, and the privacy scan covers 851 files. The designer build has 431 pages and 49,470 links. Screenshots confirmed the contents lists, the single download link and the designer note.
+
+### Follow-up: the user's rulings on the review (2026-11-19)
+
+- **Second Reading (stopped path):** it happens during the Confluence, while the Party is in the Assembly with the factions; they don't interrupt it, and the Book rejects it. I rewrote the Confluence's stopped branch (and removed the "if Darkwing prevents the rite" fallback) and Eclipse's stopped variant and branch.
+- **Pépé Sylvya is a Keeper:** in Playing for Keeps, Pépé is now Adult / Keeper / Archive. Iven Quill, an ordinary recorded life, takes Adult / Civilian / Archive, so the 18 combinations stay unique.
+- **Party level:** expected to be 12 or 13, possibly higher. The progression page and four encounter passages now say this; tuning still refers to six level-12 PCs.
+- **The Keeper host is corporeal** (Aletheia now agrees with The Burden).
+- **Serevan is an Elf.** This was already rendered (the trait derives from the NPC entry); the NPC's design note is updated.
+- **The Veiled formula supersedes the source's arithmetic.** No change: the book already shows DC 32.
+- **No provisional markers:** removed from GM-facing text in 31 files. Provenance headings that quote a source heading, and the Spider Focus record code, are unchanged.
+- **Not a defect:** the Pépé Sylvya thread is the records investigation by design.
+
+Checks: validator and server tests (96) pass. A copy of the content before these edits is in the session scratchpad (`pre-rulings/`).
+
+## 2026-11-19: Full integration fixes
+
+**Storage:**
+- **Factions are `.md` files** (frontmatter is app data; the body is the book's), like events. `CanonStore` uses `.md` for the faction kind; the 11 files are wrapped, already in the app's canonical form, with parsed values unchanged. One server test assertion and ADVENTURE-BOOK-PLAN.md §10 updated. API image rebuilt (not started).
+- **Clearing House restored to `locations/clearing-house.yaml`** (with its provenance), so the app sees it again. Its GM guidance moved to a new "Resources: the Clearing House" section on the Act II part page; the "not a sixth encounter" rationale became a designer note.
+
+**Narrative** (all of CONVERSION-REVIEW §2):
+- **Witness Me:** invented path variants removed.
+- **The Institute:** variants rewritten from the Outline's Branch Texture, with `:::branch` blocks.
+- **The Thin Place:** a GM "Demonstration" section (an ordinary object as a second Source); the duplicate heading renamed.
+- **An Opportunity:** the Party must choose a side.
+- **Stale references:** the Synopsis citation and "ninth crisis board" removed.
+- **Totality:** a path-neutral synopsis, plus variants and branches.
+- **Act II and Act III overviews:** Act Question and Emotional Progression added; Act III phase names now match the phase pages.
+- **Branch markup:** Phase IV's path differences are now `:::branch` blocks; the Observer has `variesBy` and order 2.
+- **Headings:** empty headings filled or removed (The Manor, Aletheia); The Burden's source section numbers dropped, and its §11–12 now link to the events that own that material.
+- **Duplicated mechanics:** Phase II's restated numbers replaced by a link; Raw Weight uses `:stat`.
+- **Smaller fixes:** Witness Me's duplicate provenance removed; Phase IV heading levels corrected.
+
+**Rules and entries:**
+- **Silas Venn:** the summary follows Character Briefs.
+- **Act III fronts:** the rule owns the front, faction, goal, Asset and guard table, and "Damaged" means half contribution. Faction Operations links to it.
+- **Routing and suppression:** Containment, Controlled Routing and Tuned Suppression each own one procedure and link each other.
+- **Rule template:** every rule has Definition and Procedure sections, summaries and, where scoped, `appliesTo`. The primer links every Veiled rule, and the two orphan rules now have inbound links.
+- **Gazetteer:** Abiding Way contains the slums.
+- **New goal file:** `goals/answer-the-reckoning.yaml` (see CONVERSION-REVIEW §3).
+- **Stale descriptions:** Glossary and GM Truths.
+
+**Creatures, hazards and Sources:**
+- **The Eclipse** moved to the Monument of the First Keeper.
+- **Duplication removed:** a duplicate heading, three repeated stat or resistance passages, and source labels in five creature names.
+- **Counterfeit Weaver:** `abilityDC` added and the pre-Remaster school trait dropped.
+- **Veiled House:** the Class I–V table restored (it matches the formula).
+- **Memory hazards:** the HP triggers now link to their owner.
+- **Strikes:** structured `strikes:` added to 30 creatures, transcribed from their prose.
+
+**Tooling:** coverage regeneration skips retired documents and refuses to run when any document the inventory covers is missing.
+
+**Checks:** validator passes (367 entities, 219 Markdown files); 12 node tests and 96 server tests pass, including byte for byte. The GM build has 412 pages and 43,365 links (privacy scan: 853 files). The designer build has 432 pages and 49,730 links. Coverage regenerated (one new citation).
+
+## 2026-11-19: Reference entries in the sidebar
+
+- `adventure/astro.config.mjs`: each Reference index (Bestiary, NPCs, Rules Reference, …) is now a collapsed sidebar group: an "Index" link to the index page, then every entry with a page, sorted as the index page sorts them (full name, alphabetical). Starlight opens the group holding the current page, so an entry page is highlighted under its parent. Indexes with no entries (Items and Treasure, Maps) stay plain links. The base-stripping of entity URLs is shared (`stripBase`) with the part sidebar.
+- Checks: GM build 412 pages, 180,479 internal links, validator and privacy scan (853 files) clean; designer build 432 pages, 193,484 links clean.
+
+## 2026-11-19: New part, The Veiled
+
+- New part `docs/veiled/` (part.the-veiled), after The Colony; the acts' `sidebar.order` moved to 3–5. It holds the primer (moved from `running/veiled-primer.md` to `veiled/primer.md`, sidebar label "A Practical Primer") and The Seven Components of Identity (moved from `running/`), then two chapters: **Rules** (the sixteen Veiled rule entries in reading order; Colony Turn, Faction Goals and Act III Front Outcomes stay in Rules Reference) and **Veiled Sources** (all source entries by name). Links in `running/index.md`, `campaign-at-a-glance.md` and the primer updated.
+- Entries keep their URLs and their Reference index pages. An entry listed in a part's chapter no longer also appears under its Reference group, so each page has one place in the sidebar; Reference › Veiled Sources is now a plain link to its index.
+- Tooling: a chapter can list `entriesOf: <type>` (every entry of that type, by name) as well as `entries:` (schemas.mjs, registry.mjs); a part with chapters lists its own folder pages after the part page in the sidebar (`loadParts().pages`); the validator checks `entriesOf` names a type with pages and that chapter `entries` exist. The part-page text for `reference` chapters now reads "For reference: available at any point." (it said "in the act").
+- Coverage: page keys renamed (`page:veiled/primer`, `page:veiled/seven-components`) in the inventory script, `sources/coverage.yaml` and `sources/remaining-reconciliation.yaml`; part numbers in the coverage labels shifted (acts IV–VI, Reference VII). `parts-1-2-reconciliation.yaml` is a dated record and keeps the old paths. BOOK-STRUCTURE.md §1 has the new Part III.
+- Checks: validator clean; 12 book tests pass; GM build 413 pages, 180,949 links, privacy scan 856 files clean; designer build 433 pages, 193,962 links.
+
+## 2026-11-19: Factions and Faction Goals in The Colony
+
+- `docs/setting/index.md` (part.the-colony) now has two chapters, **Factions** (`entriesOf: faction`, all 11 entries including the social classes) and **Faction Goals** (`entriesOf: goal`, all 54), shown after the part's own pages in the sidebar and listed on the part page (`::part-contents`); two rows added to its Finding Your Way table. Reference › Factions and Reference › Faction Goals are now plain links to their indexes. BOOK-STRUCTURE.md §1 Part II updated.
+- Checks: validator clean; GM build 413 pages, 181,020 links, privacy scan 856 files; designer build 433 pages, 194,033 links; server tests 96 pass. (The first GM build of this pass reported broken links in a partly written `dist/`; an immediate rebuild was clean, as on the earlier occasion. Likely iCloud syncing the output folder.)
+
+## 2026-11-19: Stat block variants in the Reference sidebar
+
+- `adventure/astro.config.mjs`: a Reference sidebar entry adds its stat block `variant` in parentheses, as the index page does, so Serevan's two blocks read "Serevan Ilvar (The Reading)" and "Serevan Ilvar (The Succession)" (Uldren and Vara also gain "(The Reading)"). Before, both Serevan entries were labelled with the name alone.
+- Checks: GM build 413 pages, 181,020 links, privacy scan 856 files; designer build 433 pages, 194,033 links. The first GM build again wrote an empty `dist/` (0 pages checked); a rebuild was clean.
+
+## 2026-11-19: One stat block per NPC (Serevan, Uldren, Vara)
+
+- Serevan's two blocks (`creature.serevan-reading`, `creature.serevan-succession`) are merged into `creatures/serevan-ilvar.md` (`creature.serevan-ilvar`), by the user's ruling. They differed only in Stay Your Hand (DC 34 / DC 35), so it now reads "DC 34 Will save (DC 35 in the Succession)" and the Succession note is an "In the Succession" section. Both provenance headings kept; `level:` removed (it comes from the NPC, 14). `previousSlugs: [serevan-reading, serevan-succession]` redirect.
+- Uldren and Vara had one block each, labelled `variant: The Reading` only because the blocks are level 10 and the NPC entries said 7 and 2. Ruling: the source's level 10 is right. `npcs/uldren-harthwright.md` and `npcs/vara-cairn.md` now say `level: 10` (headers read "Human Rogue 10", "Human Psychic 10"); the blocks lost `variant:` and `level:` and are renamed `creature.uldren-harthwright` / `creature.vara-cairn` (from `uldren-reading` / `vara-reading`, which redirect).
+- References updated: `encounters/the-reading.md`, `docs/act-3/the-burden-phase-4.md` (`::embed`), `sources/remaining-reconciliation.yaml`, `sources/coverage.yaml` (regenerated).
+- Checks: validator 366 entities; GM build 416 pages, 180,179 links, privacy scan 858 files; designer build 437 pages, 193,171 links; server tests 96 pass. The first designer build again wrote a partial output folder (broken source-doc links); a rebuild was clean.

@@ -10,7 +10,9 @@ provenance:
   - { doc: Faction Goals, heading: III. Direct Play and the App }
 ---
 
-## Achieve and Maintain
+## Definition
+
+### Achieve and Maintain
 
 An **Achieve** goal changes something. Its ordinary stages are **Planning → Progressing → Accomplished**. The app stores Planning as Plotting. A successful operation advances one stage at most; ordinary failure leaves the stage unchanged.
 
@@ -18,7 +20,7 @@ With **Auto-Resolve On**, a final success applies the goal's target and Accompli
 
 A **Maintain** goal is a defensive assignment, not a progress track. It is active once its Earliest Act arrives, while its champion is capable and in the faction, and the faction controls the non-Destroyed target Asset, or its target Character is alive. Damaged and Contested Assets can still be defended. An active assignment competes to guard only when threatened, under :ref[The Colony Turn]{#rule.colony-turn}.
 
-## Champions and Eligibility
+### Champions and Eligibility
 
 A champion has at most one unfinished assignment, Achieve or Maintain. Dormant, not-yet-eligible, and Ready to Resolve assignments still occupy that commitment. Accomplishment, failure, or retirement frees the champion.
 
@@ -30,7 +32,9 @@ Do not add eligibility gates for political support, undiscovered routes, unseen 
 
 A defector leaves the faction's goals behind without a champion. Reassignment is explicit and manual. An unassigned goal stays Dormant, rather than failing merely because nobody owns it.
 
-## Completion and Retirement
+## Procedure
+
+### Completion and Retirement
 
 When an Effect changes an Achieve goal's target from false to true, that goal becomes Accomplished whoever caused the change. No roll ratifies an outcome already established in play. Attribution records the cause; it does not automatically grant Momentum or credit.
 
@@ -38,7 +42,7 @@ Accomplishment is permanent history. A later reversal changes the world but does
 
 **Retire** an ambition that has become impossible or meaningless. Obsolescence is flagged for the GM, never silently resolved. Goals without machine-readable targets need explicit resolution.
 
-## Effects and World Conditions
+### Effects and World Conditions
 
 A goal may have Effects when it reaches Progressing and when it reaches Accomplished. Only its own advances write those Effects; completion by another source does not retroactively invent milestones or their Effects. Accepted resolution applies its Accomplished Effects.
 

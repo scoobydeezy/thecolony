@@ -23,14 +23,18 @@ saves:
   will: 20
 immunities: []
 speed: 25 feet
-strikes: []
+strikes:
+  - name: Open Hand
+    type: melee
+    bonus: 21
+    damage: 2d8+9 bludgeoning
+    traits: [nonlethal]
 provenance:
   - doc: Creatures
     heading: Binder — Creature 10
 ---
 
-**Role:** Grapple / immobilization / Reposition  
-**Open Hand** +21, **Damage** 2d8+9 bludgeoning, nonlethal
+**Role:** Grapple / immobilization / Reposition
 
 ### Standard Tactical Options
 The Binder prioritizes standard **Grapple, Reposition, Escape**, and Formation actions.

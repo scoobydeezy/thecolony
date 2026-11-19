@@ -30,14 +30,18 @@ immunities:
   - death effects
 speed: 30 feet
 abilityDC: 37
-strikes: []
+strikes:
+  - name: Unformed Hand
+    type: melee
+    bonus: 30
+    damage: 3d10+14 bludgeoning
+    traits: [reach 10 feet]
 provenance:
   - doc: Creatures
     heading: The Shape of Someone — Creature 16
 ---
 
 **Capture Strength** `ceil(P / 2)`; normally **3** for six PCs
-**Unformed Hand** +30 to hit, reach 10 feet, **3d10+14 bludgeoning damage**
 
 ### Form Capacity
 

@@ -9,12 +9,6 @@ provenance:
     heading: Cataloguing Standard & Field Reference — v1.1
 ---
 
-[Download player-only Markdown](/docs/player-handouts/material-concordance.md)
-
-[Download player-only Markdown](/docs/player-handouts/material-concordance.md)
-
-[Download player-only Markdown](/docs/player-handouts/material-concordance.md)
-
 :::player-facing
 ## 1. Quick reference
 
@@ -382,11 +376,12 @@ Z: Z.1548
 - The item Notes can give a concise, factual summary of an observed incident (for example, spontaneous spinning) while the incident record may contain more detail.
 - A single object can be part of a larger Source network, or only one surviving fragment of a relationship whose other objects are not in this Hall.
 
-Do not use the `Z` field as an automatic answer key to which objects sustain the principal Incursion.
+:::
 
----
+:::gm-note
+**Not for players.** Do not use the `Z` field as an automatic answer key to which objects sustain the principal Incursion. The inference rules in section 10 matter for both in-world credibility and the Hall encounter.
 
-## 9. Notes — editorial standard
+**Writing the Notes field (editorial standard; source §9).**
 
 **Notes combine the object description and all supplemental observational notes into a single field.** There is no separate description field, no GM-explanation field, and no need to repeat information already fully contained in the coded lines.
 
@@ -418,12 +413,10 @@ Avoid Notes that:
 > The mitten has a minor repaired tear and its unique maker is connected to the Spider's thimble, which is important in the coming encounter.
 
 The first records evidence; the second duplicates `C01` and leaks GM interpretation.
+:::
 
----
-
+:::player-facing
 ## 10. Archival evidence versus inference
-
-This is the most important rule for both in-world credibility and the Hall encounter.
 
 | Claim | Supported by | Does not by itself prove |
 |---|---|---|

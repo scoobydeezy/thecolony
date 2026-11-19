@@ -1,7 +1,7 @@
 ---
 id: creature.the-stitcher
 slug: the-stitcher
-name: "Campus Spotlight: The Stitcher"
+name: The Stitcher
 status: draft
 level: 12
 rarity: unique
@@ -29,13 +29,16 @@ immunities:
   - death effects
 speed: 25 feet
 abilityDC: 32
-strikes: []
+strikes:
+  - name: Needle Fingers
+    type: melee
+    bonus: 26
+    damage: 3d6+12 piercing
+    traits: [reach 15 feet]
 provenance:
   - doc: Creatures
     heading: "Campus Spotlight: The Stitcher — Creature 12"
 ---
-
-**Needle Fingers ◆** *Melee* +26, reach 15 feet; **Damage** 3d6+12 piercing.
 
 ### Stitch in Place ◆◆
 **ATTACK, MANIPULATE** — One creature within 30 feet attempts a **DC 32 Reflex save** as black thread joins it to a wall, floor, or fixed furnishing.

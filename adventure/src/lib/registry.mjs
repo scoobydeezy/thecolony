@@ -169,10 +169,13 @@ export function loadParts() {
     const itemPages = fs.readdirSync(path.join(docs, dir.name)).filter((f) => f.endsWith('.md') && f !== 'index.md').map((f) => {
       const p = parseEntityFile(path.join(docs, dir.name, f)).data;
       return { slug: f.replace(/\.md$/, ''), title: p.title, label: p.sidebar?.label ?? p.title, order: p.sidebar?.order ?? 99, belongsTo: p.belongsTo };
-    }).filter((p) => p.belongsTo).sort((a, b) => a.order - b.order);
+    }).sort((a, b) => a.order - b.order);
     if (data.part?.id)
       out.push({
-        itemPages,
+        // A part with chapters lists its own pages (the Veiled primer) after the part page; an item's pages
+        // (belongsTo) appear under the item instead.
+        pages: itemPages.filter((p) => !p.belongsTo),
+        itemPages: itemPages.filter((p) => p.belongsTo),
         dir: dir.name, id: data.part.id, title: data.title,
         label: data.part.label ?? data.title,             // the sidebar group
         pageLabel: data.sidebar?.label ?? data.title,     // the part page's own entry in it
@@ -192,6 +195,7 @@ export function partChapters(reg, part) {
     items: [
       ...items.filter((e) => e.data.chapter === s.key).sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99)),
       ...(s.entries ?? []).map((id) => reg.byId.get(id)).filter(Boolean),
+      ...(s.entriesOf ? reg.entities.filter((e) => e.type === s.entriesOf).sort((a, b) => a.view.name.localeCompare(b.view.name)) : []),
     ].map((e) => Object.assign(e, { pages: (part.itemPages ?? []).filter((p) => p.belongsTo === e.data.id) })),
   }));
 }

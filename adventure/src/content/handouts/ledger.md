@@ -9,12 +9,6 @@ provenance:
     heading: The Twelve Material Concordance Entries
 ---
 
-[Download player-only Markdown](/docs/player-handouts/ledger.md)
-
-[Download player-only Markdown](/docs/player-handouts/ledger.md)
-
-[Download player-only Markdown](/docs/player-handouts/ledger.md)
-
 :::player-facing
 ### 01 — Child's red mitten
 
@@ -269,9 +263,9 @@ Z: Z.031
 
 ---
 
-## Reference Dossiers — Actual Player Evidence
+## Reference Dossiers
 
-*Give an excerpt only when its actual `X` lead is followed or the party finds the source through play. These are authentic Witnesses records. Their facts are always true, but some archivists' hypotheses are explicitly marked as hypotheses.*
+These are authentic Witnesses records. Their facts are always true, but some archivists' hypotheses are explicitly marked as hypotheses.
 
 ### `ACC.041` — House of Abiding, post-Reading intake
 
@@ -279,7 +273,7 @@ Objects `H.200.3.041` (blue cup) and `H.200.3.042` (meal tin) were delivered in 
 
 ### `ACC.058` — Market-side lodging
 
-Objects `H.196.1.058` (red mitten) and `H.196.1.059` (spinning top) were collected from the same child's lodging after the occupant could no longer be reliably named. The caretaker had observed the child playing with the top while wearing the mitten. These two objects **really are connected**. Their connection is not evidence of a relationship to the Spider.
+Objects `H.196.1.058` (red mitten) and `H.196.1.059` (spinning top) were collected from the same child's lodging after the occupant could no longer be reliably named. The caretaker had observed the child playing with the top while wearing the mitten. These two objects **really are connected**.
 
 ### `ACC.113` — Maelyn's Cult delivery
 
@@ -331,7 +325,7 @@ The lunch tin's seven interior scratches were recorded in a House of Abiding **s
 
 ### `DOC.056` — Cobbler's oversize-footwear commission
 
-A cobbler specializing in large-bodied customers used a stiff working glove while cutting oversized soles with a broad crescent-shaped leather knife. The glove was repaired with orange waxed cord. A needlework motif on the cuff was a **trade decoration**, not evidence of the Spider craftsperson's personal workbench.
+A cobbler specializing in large-bodied customers used a stiff working glove while cutting oversized soles with a broad crescent-shaped leather knife. The glove was repaired with orange waxed cord. A needlework motif on the cuff was a **trade decoration**.
 
 ### `DOC.081` — Community serving record
 
@@ -351,9 +345,11 @@ Small bottles of dried petals were donated from the Offering Chest by many visit
 
 ### `Z.1548`, `Z.012`, `Z.022`, `Z.031` — Prior isolated incidents
 
-`Z.1548`: wooden top rotated spontaneously. `Z.012`: leather glove briefly curled its fingers without a hand. `Z.022`: a spectacle lens tilted of its own accord. `Z.031`: petals suspended briefly in the sealed bottle. These demonstrate that benign and potentially alarming manifestations can arise from **non-Spider** objects. They do not rank current danger or automatically identify a main Source.
+`Z.1548`: wooden top rotated spontaneously. `Z.012`: leather glove briefly curled its fingers without a hand. `Z.022`: a spectacle lens tilted of its own accord. `Z.031`: petals suspended briefly in the sealed bottle. These demonstrate that benign and potentially alarming manifestations can arise from many ordinary archived objects. They do not rank current danger or automatically identify a main Source.
 :::
 
 :::secret
+Give a dossier excerpt only when its actual `X` lead is followed or the party finds the source through play. Two dossiers resolve red herrings: the mitten and top (`ACC.058`) really are connected, but that connection is not evidence of a relationship to the Spider; the cobbler's cuff motif (`DOC.056`) is a trade decoration, not the Spider craftsperson's workbench.
+
 The fixed solution and sealed evidence key live in The Tangled Web. These are documentary clues; shared codes are leads, not automatic proof of ownership.
 :::

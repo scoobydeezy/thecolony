@@ -34,13 +34,16 @@ immunities:
   - death effects
 speed: 30 feet
 abilityDC: 30
-strikes: []
+strikes:
+  - name: Shoulder Check
+    type: melee
+    bonus: 22
+    damage: 2d8+10 bludgeoning
+    traits: []
 provenance:
   - doc: Creatures
     heading: Evin Peakwalker Reconstruction (Child) — Creature 11
 ---
-
-**Shoulder Check** +22 to hit, 2d8+10 bludgeoning damage
 
 ### Goblin-Horse
 The Child's missing Identity makes the remembered hobby-horse game literal: a goblin torso atop an absurd, equine lower body. It plays, gallops, giggles, knocks things over, and expects everyone to join in. The physical **E.P.**-marked hobby horse is still the Source; the creature is its false interpretation, not the object transformed into a body.
@@ -54,7 +57,7 @@ The Child has exactly two game states, **Child Hides** and **Child Counts**. Sta
 
 On the **first** Ready or Not! of the encounter, creatures that can hear the giggling become **fascinated** with the Child, following the condition's normal ending rules (including ending upon hostile action against themselves or their allies). Later uses do not automatically reapply fascinated. The giggling gives the party a cue that the Child is hiding; it does not waive the Seek check.
 
-If **no PC finds the Child before the start of its next turn**, resolve **Nobody Found Me!** at that turn start. The Child may then start a new Hide phase or otherwise act normally. **Provisional pacing:** it cannot stack multiple unresolved Hide phases at once.
+If **no PC finds the Child before the start of its next turn**, resolve **Nobody Found Me!** at that turn start. The Child may then start a new Hide phase or otherwise act normally. **Pacing:** it cannot stack multiple unresolved Hide phases at once.
 
 ### Nobody Found Me! *(mental)*
 **Trigger:** The Child begins its turn still unfound after Ready or Not!  
@@ -66,7 +69,7 @@ If **no PC finds the Child before the start of its next turn**, resolve **Nobody
 - **Failure:** Sickened 1 and slowed 1 until the end of the creature's next turn.
 - **Critical Failure:** Sickened 2 and stunned 1; if already stunned, use the normal PF2e rules for application of the condition.
 
-The Child's game-state effect is supernatural and need not share line of sight with the victims. The effects of sickened follow ordinary rules for reducing that condition. **Provisional:** assess whether applying Sickened even on Success is too harsh only after testing against the party's actual saves.
+The Child's game-state effect is supernatural and need not share line of sight with the victims. The effects of sickened follow ordinary rules for reducing that condition. **Tuning:** assess whether applying Sickened even on Success is too harsh only after testing against the party's actual saves.
 
 ### Found You! *(free action; no separate roll)*
 **Trigger:** A PC succeeds at Seek to find the Child during Child Hides.  
@@ -84,7 +87,7 @@ The Child's game-state effect is supernatural and need not share line of sight w
 
 ### I See You! *(mental)*
 **Trigger:** Child Counts reaches 0.  
-**Effect:** Every PC in the Hall encounter area who is neither **hidden nor concealed** relative to the Child at that instant takes **6d6 mental damage** (**provisional**, no save). Having either condition is sufficient to avoid this damage. Resolve any ordinary effects of the damage, including ending fascinated where PF2e's condition rules call for it. Do not invent special hiding-spot tracking; use the battlefield's actual cover, concealment, spells, and ordinary visibility state.
+**Effect:** Every PC in the Hall encounter area who is neither **hidden nor concealed** relative to the Child at that instant takes **6d6 mental damage** (no save). Having either condition is sufficient to avoid this damage. Resolve any ordinary effects of the damage, including ending fascinated where PF2e's condition rules call for it. Do not invent special hiding-spot tracking; use the battlefield's actual cover, concealment, spells, and ordinary visibility state.
 
 ### Little Menace ◆
 Child Evin snatches, kicks, tips, or throws one unattended object of 1 Bulk or less within 10 feet, moving it up to 20 feet.

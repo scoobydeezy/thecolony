@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=../../../schemas/encounter.schema.json
 id: encounter.containment
 slug: containment
 name: Containment
@@ -22,6 +23,8 @@ links:
   - npc.perrik-tallow
   - asset.claims-registry
 status: draft
+readiness:
+  status: compiled
 provenance:
   - doc: Campaign Outline
     heading: Session 3 — Dusk > EGRESS Route — Containment
@@ -29,8 +32,6 @@ provenance:
     heading: 3. Containment — Gressa Peakwalker
   - doc: Encounters
     heading: 3. Containment — Gressa Peakwalker
-readiness:
-  status: compiled
 ---
 
 ## At the Table
@@ -97,7 +98,7 @@ Gressa leaves the Institute without the Class II Weight. Depending on Darkwing's
 ### Systems Established / Extended
 **Tuned signature-specific suppression, living Source, alternate Source resonance profiles, Pattern, Echo, independent non-Source satellite body, multiple Grapples, free maintenance, independent reactions, conditional transferred damage, Claims Registry, classification vs Restoration, consent, Class/Capacity-compatible routing, Containment vs Anchoring.**
 
-### Provisional Tuning / Open Design
+### Tuning and Open Design
 The Nurse/Bed paired combat values, sedative, repulsion, interception, and patient damage fractions are specified in the mechanical reference entries linked on this page and are intentionally aggressive. Playtest the linked pair as one encounter instead of assuming the Nurse's old solo XP is unchanged. The exact round-by-round controlled-routing checks and breach consequences remain open; the established **Class + Resonance + compatible destination** gate is unchanged.
 
 ## Routing at the Table
@@ -109,5 +110,5 @@ Once Class, Pattern topology, a compatible receiving cell, and safe working cond
 EGRESS prioritizes protecting its patient and classifying the new signature. It can contain a classified profile without restoring its history; carry an unresolved Nurse and Bed forward to The Breach if routing succeeds in the fiction. Do not assume Gressa dies because the Party chose another investigation.
 
 :::design
-Routing outside initiative is a provisional simplification of a procedure whose source leaves action/check counts open. The unattended outcome is conditional on EGRESS actually having the required destination and resources. No automatic offscreen Restoration is awarded.
+Routing outside initiative simplifies a procedure whose source leaves action/check counts open. The unattended outcome is conditional on EGRESS actually having the required destination and resources. No automatic offscreen Restoration is awarded.
 :::

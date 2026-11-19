@@ -1,18 +1,12 @@
 ---
+# yaml-language-server: $schema=../../../schemas/encounter.schema.json
 id: encounter.the-burden
 slug: the-burden
 name: The Burden
 summary: The accumulated weight of the Colony's past has nowhere left to go.
 function: Final Boss
 synopsis: >-
-  The Party confronts the final Veiled manifestation: centuries of Keepers, ritual imagery, institutional doctrine, and
-  forgotten history reconstructed around the missing shape of the First Keeper. The encounter forces the Party to use
-  every component of Identity it has learned—Name, Relationship, Form, Context, Pattern, Choice, and Memory—while the
-  five front results, Perrik's access to the Claims Registry, Kelda, and each faction's relationship with the Party
-  determine which help arrives and whether it assists or interferes. Each successful stabilization strips away another
-  false reconstruction, forcing the manifestation to become smaller, more specific, and more human. When the final Name
-  is restored, the black silhouette resolves into a recognizable woman. The Veiled manifestation is gone. Aletheia
-  remains.
+  The Party confronts the final Veiled manifestation: centuries of Keepers, ritual imagery, institutional doctrine, and forgotten history reconstructed around the missing shape of the First Keeper. The encounter forces the Party to use every component of Identity it has learned—Name, Relationship, Form, Context, Pattern, Choice, and Memory—while the five front results, Perrik's access to the Claims Registry, Kelda, and each faction's relationship with the Party determine which help arrives and whether it assists or interferes. Each successful stabilization strips away another false reconstruction, forcing the manifestation to become smaller, more specific, and more human. When the final Name is restored, the black silhouette resolves into a recognizable woman. The Veiled manifestation is gone. Aletheia remains.
 part: part.act-3
 chapter: finale
 order: 1
@@ -20,6 +14,8 @@ leadsTo:
   - to: event.aletheia
     thread: thread.the-reading
 status: draft
+readiness:
+  status: compiled
 provenance:
   - doc: Encounters
     heading: 18. The Burden — First Keeper Reconstruction
@@ -29,8 +25,6 @@ provenance:
     heading: 4. Governing Encounter Rules
   - doc: The Burden — Final Veiled Encounter
     heading: 15. Damaged Front — Half Capability
-readiness:
-  status: compiled
 ---
 
 ## At the Table
@@ -302,82 +296,18 @@ The point is that the final boss has ended by restoring the relationships the in
 
 ---
 
-## 11. Aletheia and the Weight
+## Aletheia and the Weight
 
-Aletheia does **not** provide the campaign's correct ending.
-
-She explains the problem the Colony forgot.
-
-She can tell Darkwing, in plain human terms:
-
-- what the Weight is;
-- that memory cannot be destroyed;
-- that she once chose to carry it;
-- that later people repeated her action until it became an institution;
-- that the accumulated Weight still has not been given a truthful new resting place.
-
-Her function is:
-
-> **restore the question**
-
-not:
-
-> **supply the answer**
-
-A working placeholder for her first explanation:
-
-> “I chose once. They chose after me. Some freely. Some because they believed there was no other way. None of that tells you what should happen now.”
-
-And then:
-
-> “The weight is still here.”
-
-> “You know what it is now.”
-
-> “The choice is yours.”
-
-The exact dialogue can be written later.
-
----
-
-## 12. Ending Totality
-
-Naming Aletheia ends **The Burden**.
-
-It does **not** automatically end Totality.
-
-The Weight still requires a truthful Resolution / Anchoring answer.
-
-Darkwing and the surviving Colony must decide:
-
-> **Where should all of this rest now?**
-
-Whatever solution they construct must satisfy the campaign's actual metaphysical requirements:
-
-- truthful Connection;
-- sufficient Capacity;
-- Consent where agency applies.
-
-If the Weight is successfully resolved:
-
-> **Totality ends.**
-
-The eclipse releases.
-
-The Colony fully stabilizes.
-
-The new answer does not need to be declared morally perfect.
-
-The campaign's success condition is that the Colony can survive its inheritance without returning automatically to one forgotten sacrificial bearer.
+Naming Aletheia ends **The Burden**; it does **not** end Totality. :ref[Aletheia]{#event.aletheia} owns her explanation, which restores the question rather than supplying the answer, and the choice of where the Weight should rest. :ref[The Light Remains]{#event.the-light-remains} owns the Final Reading and how Totality ends.
 
 ## Exceptional Continuity
 
 The authored Phase IV assumes Serevan can arrive as Bearer of the Last Secret. Do not undo a death or decisive earlier removal merely to restage him. Preserve the final Name through already established testimony or records, and let the surviving Keeper history supply its rightful boundary. Do not add a secret replacement villain. This exceptional route requires a scene-specific adaptation recorded from the actual campaign state.
 
 :::design
-## 17. Book / Table Prop Structure
+## Book / Table Prop Structure
 
-## Phase I — Pattern Ring
+### Phase I — Pattern Ring
 Prepare:
 
 - eight physical triangular ray markers;
@@ -395,7 +325,7 @@ Do not number the battlefield for the players.
 
 Reading orientation is part of the Pattern problem.
 
-## Phase II — Form Board
+### Phase II — Form Board
 Prepare:
 
 - six family slots:
@@ -411,7 +341,7 @@ Prepare:
 - Preserved Once markers;
 - Cult-disabled marker.
 
-## Phase III — Memory Chase
+### Phase III — Memory Chase
 Prepare:
 
 - one scrolling chase strip;
@@ -424,7 +354,7 @@ Prepare:
 - crowded memorial pages in the physical Book prop;
 - one final blank page for Aletheia.
 
-## Phase IV — Succession
+### Phase IV — Succession
 Prepare:
 
 - four quarter-moon Host pieces;
@@ -436,13 +366,13 @@ Prepare:
 
 ---
 
-## 18. Narrative Placeholders
+## Narrative Placeholders
 
 Exact dialogue remains deliberately unfinished.
 
 The following placeholders preserve the required beats without locking performance prose too early.
 
-## Serevan Takes the Book
+### Serevan Takes the Book
 
 The emotional sequence is:
 
@@ -462,7 +392,7 @@ Placeholder thesis:
 
 > “You will do no more damage to my Colony.”
 
-## Serevan's Last Secret
+### Serevan's Last Secret
 
 He does not need to repent.
 
@@ -474,7 +404,7 @@ Placeholder:
 
 > “Her name was Aletheia.”
 
-## Aletheia After Naming
+### Aletheia After Naming
 
 She should speak as a person, not an oracle.
 
@@ -492,7 +422,7 @@ Placeholder:
 
 ---
 
-## 19. Remaining Work
+## Remaining Work
 
 The encounter's design is structurally complete.
 
@@ -507,5 +437,5 @@ Remaining work is table preparation and refinement:
 - backfill any historical Keeper details that later story development makes useful.
 
 No additional final-boss phase or mechanical subsystem is currently missing.
-The Serevan-unavailable fallback is provisional protection against a narrative softlock; it is not a new assertion about who else the Book recognizes as a Keeper.
+The Serevan-unavailable fallback protects against a narrative softlock; it is not a new assertion about who else the Book recognizes as a Keeper.
 :::

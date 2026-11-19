@@ -26,16 +26,17 @@ saves:
 immunities: []
 speed: 30 feet
 abilityDC: 29
-strikes: []
+strikes:
+  - name: Clutching Hand
+    type: melee
+    bonus: 22
+    damage: 2d8+8 bludgeoning
+    traits: [reach 10 feet, Improved Grab]
 provenance:
   - doc: The Burden — Final Veiled Encounter
     heading: Processional Grasper — Creature 10
 ---
 
-## Clutching Hand
-**Melee** +22, reach 10 feet
-**Damage:** 2d8+8 bludgeoning
-**Improved Grab**
 ## Haul into Place ◆
 **Requirements:** the Grasper has a creature grabbed.
 Attempt Athletics against the grabbed creature's Fortitude DC.

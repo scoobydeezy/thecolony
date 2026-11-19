@@ -66,5 +66,5 @@ The campaign does not contain a predetermined answer. Beneath that question is t
 ## Where to Go Next
 
 - **[GM Truths](/docs/running/gm-truths/):** the secrets behind the Colony's institutions.
-- **[The Veiled: A Practical Primer](/docs/running/veiled-primer/):** how the campaign's supernatural danger works at the table.
+- **[The Veiled: A Practical Primer](/docs/veiled/primer/):** how the campaign's supernatural danger works at the table.
 - **[Act I — The Secret](/docs/act-1/):** the first act, beginning with The Calling.

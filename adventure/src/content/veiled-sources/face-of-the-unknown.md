@@ -34,5 +34,5 @@ The Ward is suppressed by control of two Available outer stations, as defined in
 After three Releases the same Weight becomes formless. Guiding it back and receiving the truth of the projecting community turns this vessel into an Anchor. Its :ref[Keystone role]{#rule.keystones} remains Form.
 
 :::design
-Source Level 16 and Class III are provisional choices for the missing Source profile, not values inferred as a universal rule from Creature Level. They give the raid gate a concrete Backlash using the normal source calculator. Review alongside the Creature 16 encounter before play. The projected Ward’s special gating is explicit in the source.
+Source Level 16 and Class III fill the missing Source profile, not values inferred as a universal rule from Creature Level. They give the raid gate a concrete Backlash using the normal source calculator. Review alongside the Creature 16 encounter before play. The projected Ward’s special gating is explicit in the source.
 :::

@@ -35,14 +35,21 @@ immunities:
   - poison
   - death effects
 speed: 30 feet
-strikes: []
+strikes:
+  - name: Bow
+    type: ranged
+    bonus: 27
+    damage: 3d8+14 piercing
+    traits: [deadly d10, range increment 60 feet]
+  - name: Fist
+    type: melee
+    bonus: 25
+    damage: 3d6+11 bludgeoning
+    traits: []
 provenance:
   - doc: Creatures
     heading: Evin Peakwalker Reconstruction (Keeper) — Creature 13
 ---
-
-**Bow** +27 to hit, 3d8+14 piercing damage, deadly d10, range increment 60 feet  
-**Fist** +25 to hit, 3d6+11 bludgeoning damage
 
 ### Full Coherence
 When the fourth Evin fragment Source joins the active Resonance network, the Infant, Child, and Adult reconstructions immediately cease to exist and **Keeper Evin manifests as one ordinary goblin man**. Every active Child game/countdown, carried-baby penalty, and Returning Arrow token ends. This is **not Dispersal** and does not begin Stabilization Windows for the fragment Incursions; reality is revising several incomplete conclusions into one coherent reconstruction.

@@ -1,17 +1,12 @@
 ---
+# yaml-language-server: $schema=../../../schemas/event.schema.json
 id: event.the-thin-place
 slug: the-thin-place
 name: The Thin Place
 summary: The Cult deliberately creates the conditions for a Veiled manifestation.
 function: Learn Cult Method
 synopsis: >-
-  The Party follows the Manor map to Pilgrim’s Rest, where Maelyn invites them to observe how the Cult receives the
-  beings it calls Pilgrims. The Party discovers an enormous devotional archive of paintings, sculptures, carvings, and
-  other attempted likenesses of Veiled manifestations, all centered around a smooth featureless mask called the Face of
-  the Unknown. A pilgrim uses a resonant object and accumulated visual impressions to give one manifestation a coherent
-  shape; the resulting Veiled appears calmly and behaves more like a guest than an attacker. The ritual seems to prove
-  the Cult’s belief that willing reception gives the Unknown permission to reveal itself. Maelyn then invites the Party
-  to perform the rite themselves, each choosing one of the Cult's small artworks and saying what it reveals to them.
+  The Party follows the Manor map to Pilgrim’s Rest, where Maelyn invites them to observe how the Cult receives the beings it calls Pilgrims. The Party discovers an enormous devotional archive of paintings, sculptures, carvings, and other attempted likenesses of Veiled manifestations, all centered around a smooth featureless mask called the Face of the Unknown. A pilgrim uses an ordinary object, as a second Source beside the Face, and accumulated visual impressions to give one manifestation a coherent shape; the resulting Veiled appears calmly and behaves more like a guest than an attacker. The ritual seems to prove the Cult’s belief that willing reception gives the Unknown permission to reveal itself. Maelyn then invites the Party to perform the rite themselves, each choosing one of the Cult's small artworks and saying what it reveals to them.
 part: part.act-2
 chapter: the-manor-routes
 order: 3
@@ -25,13 +20,13 @@ links:
   - asset.pilgrim-s-rest
   - asset.face-of-the-unknown
 status: draft
+readiness:
+  status: compiled
 provenance:
   - doc: Campaign Outline
     heading: Manor Route 2 — Cult of the Unknown > The Thin Place → The Shape of Someone > The Thin Place
   - doc: Campaign Outline
     heading: Manor Route 2 — Cult of the Unknown > The Thin Place → The Shape of Someone > Darkwing's Rite
-readiness:
-  status: compiled
 ---
 
 ## Opening State
@@ -59,7 +54,7 @@ The Cult does not treat contradiction as error. Its doctrine holds that the Unkn
 
 At the center is the blank mask known as the **Face of the Unknown**.
 
-## What the Cult Believes
+## Origin and Doctrine
 
 ### The Cult's Origin Story
 The Cult's history around the Face can be understood as a gradual continuum rather than a single miraculous beginning.
@@ -88,6 +83,10 @@ The Cult believes:
 Contradictory images are therefore interpreted as partial revelation rather than projection.
 
 This is why Cult instruction does not warn participants against supplying Form. A pilgrim is told to attend carefully to what reveals itself and to trust that different Forms can each contain part of the truth.
+
+## The Demonstration
+
+Before the Party is asked to take part, Maelyn shows them the rite working. A pilgrim brings an **ordinary object** and uses it as a **second Source**, separate from the Face, together with the accumulated visual impressions of the archive. The manifestation that coheres around the object appears calmly and behaves more like a guest than an attacker. To the Cult this proves that willing reception gives the Unknown permission to reveal itself.
 
 ## The Invitation
 

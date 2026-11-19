@@ -12,7 +12,7 @@ gender: Male
 pronouns: He/Him
 aliases:
   - The Observer
-summary: Patient scholar studying how institutions harden around their answers; Darkwing tests the limits of his model.
+summary: Patient scholar studying how institutions harden around their answers; the Colony is his evidence, and the Party is his experiment.
 narrativeTier: Major
 status: draft
 origin: prepared

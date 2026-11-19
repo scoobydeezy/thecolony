@@ -21,7 +21,7 @@ const ARRANGEMENT = {
   alternatives: 'Alternatives, chosen by the Colony state and the players; usually only some are played.',
   optional: 'Optional and independent, in any order.',
   concurrent: 'At the same time, independently: each has its own deadline, and some may be delegated or ignored.',
-  reference: 'Available at any point in the act.',
+  reference: 'For reference: available at any point.',
 };
 
 const hastNode = (hast) => ({ type: 'rpHast', children: [], data: { hName: 'div', hProperties: { className: ['rp-generated'] }, hChildren: [hast] } });
@@ -73,6 +73,7 @@ export default function remarkColony({ target = 'gm' } = {}) {
         } catch (err) {
           warn(err.message, node);
           parent.children.splice(index, 1);
+          return index;   // the node is gone: visit what took its place
         }
         return [SKIP, index + 1];
       }

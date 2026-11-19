@@ -1,19 +1,12 @@
 ---
+# yaml-language-server: $schema=../../../schemas/event.schema.json
 id: event.aletheia
 slug: aletheia
 name: Aletheia
 summary: The Party must decide how the weight of the past will be carried.
 function: Carry the Weight
 synopsis: >-
-  Restoring Aletheia does not move the eclipse. She remains connected to every name originally recorded in the memorial,
-  every Keeper who followed her, and the accumulated weight now distributed throughout the Colony. Aletheia can finally
-  explain what she understood and what she chose, but she does not provide the Party's answer; the spontaneous act of
-  one woman was never meant to become an eternal civic procedure. The Party must now bring the Colony's competing
-  capabilities together and decide where the burden can truthfully and safely rest. Factions offer cooperation,
-  conditions, opposition, people, Assets, infrastructure, expertise, or refusal according to the relationships and
-  consequences created throughout the campaign. With Aletheia restored as a person rather than an institution, the Party
-  assembles the system it will attempt in the Final Reading—and decides what it is willing to ask of her, of the Colony,
-  and of itself.
+  Restoring Aletheia does not move the eclipse. She remains connected to every name originally recorded in the memorial, every Keeper who followed her, and the accumulated weight now distributed throughout the Colony. Aletheia can finally explain what she understood and what she chose, but she does not provide the Party's answer; the spontaneous act of one woman was never meant to become an eternal civic procedure. The Party must now bring the Colony's competing capabilities together and decide where the burden can truthfully and safely rest. Factions offer cooperation, conditions, opposition, people, Assets, infrastructure, expertise, or refusal according to the relationships and consequences created throughout the campaign. With Aletheia restored as a person rather than an institution, the Party assembles the system it will attempt in the Final Reading—and decides what it is willing to ask of her, of the Colony, and of itself.
 part: part.act-3
 chapter: finale
 order: 2
@@ -25,20 +18,18 @@ links:
   - asset.ritual-chamber
   - npc.aletheia
 status: draft
+readiness:
+  status: compiled
 provenance:
   - doc: Campaign Outline
     heading: Event — Aletheia
   - doc: The Burden — Final Veiled Encounter
     heading: 11. Aletheia and the Weight
-readiness:
-  status: compiled
 ---
 
 ## Opening State
 
 The last Named Boundary has made Aletheia coherent. The hostile reconstruction is gone; the burden remains.
-
-## A Person at the Center
 
 ## Aletheia's Revelation
 Once coherent, Aletheia can deliver a short, deliberate revelation rather than a lore dump.
@@ -62,9 +53,9 @@ The crowded early pages were not a primitive version of the Reading. They belong
 Aletheia's solitary act was an answer she improvised, not a system she designed for eternity.
 
 ## The Host of Forgotten Keepers
-When Aletheia becomes coherent, the other Forgotten Keepers become perceptible around her as a quiet, almost angelic host.
+When Aletheia becomes coherent, the other Forgotten Keepers become present around her: roughly two hundred **fully corporeal Forgotten people** whom the Party can speak with and touch (see :ref[The Burden]{#encounter.the-burden}).
 
-They are primarily visual and emotional context, not a parade of exposition scenes.
+They are people, not a parade of exposition scenes.
 
 This host provides a final place to pay off open promises that the Party's route choices may have left unresolved.
 
@@ -83,8 +74,6 @@ The host should reward prior investigation without making optional routes mandat
 ## Closing Unvisited Promises
 
 Marek and Evin belong among the Keeper history where appropriate. Their recognition answers relationships actually pursued; it need not become five speeches. Sundara is **not a Keeper Company**. If Sunny was skipped, use Tom, surviving recognition and the now-legible Old Town record to offer a brief separate encounter with her history. It offers the missing relationship and a chance to choose Rest; it does not award a Stable front or undo losses. If Tom is unavailable, the grave and surviving object remain material evidence rather than an invented resurrection.
-
-## People Respond
 
 ## Existing Characters React
 Act III dialogue can also cash out personal institutional promises:
@@ -109,8 +98,6 @@ Aletheia may explain:
 She does **not** tell the Party what institution to build.
 
 She restores the forgotten question.
-
-## Who Carries the Weight?
 
 ## The Final Problem — Anchoring
 Aletheia remains connected to:
@@ -172,7 +159,7 @@ This is where politics becomes the ending mechanic.
 Use :ref[Anchoring and Resolution]{#rule.anchoring-and-resolution}. Identify real destinations, Capacity, truthful Recognition and consent before implementation. Discuss any hazard or missing capacity while choices remain open. Once a viable answer is agreed, the Final Reading enacts it; no surprise test or retracted commitment follows.
 
 :::design
-The separate Sundara fallback is provisional connective material. It preserves her non-Keeper identity without retroactively resolving her front.
+The separate Sundara fallback is connective material. It preserves her non-Keeper identity without retroactively resolving her front.
 :::
 
 ## Possible Next Developments

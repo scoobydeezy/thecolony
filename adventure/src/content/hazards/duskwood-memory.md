@@ -12,7 +12,7 @@ provenance:
     heading: Memory Two — Early Duskwood Invasion
 ---
 
-At 270 HP:
+This Memory opens when the Echo reaches its first Page Lock (see [Page Locks](/docs/act-3/the-burden-phase-3/#page-locks)).
 
 > *page.*
 

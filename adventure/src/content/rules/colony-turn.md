@@ -10,9 +10,15 @@ provenance:
   - { doc: Faction Goals, heading: III. Direct Play and the App }
 ---
 
+## Definition
+
 A Colony Turn runs during preparation before every session from Session 2 onward, after recording the previous session's direct outcomes. General faction draws do not occur during live play. The resulting state starts the next session; play can then change it normally.
 
-## Opening
+## Procedure
+
+Run the four steps in order.
+
+### 1. Opening
 
 Momentum persists from **−2 to +2** per faction. Gather signals since the last Opening, deduplicate by root cause, net them, cap the change at **±1**, and clamp the new value to the range. Each rolled attempt is its own root.
 
@@ -26,7 +32,7 @@ Momentum persists from **−2 to +2** per faction. Gather signals since the last
 
 Accomplishment alone sends no signal. A Keystone lost to another faction's operation sends none; its effect is already felt through Power. An occurrence never earns both an automatic and a GM-declared signal. Inactivity does not decay Momentum. Signals generated during this Turn wait until the next Opening.
 
-## Faction Phase
+### 2. Faction Phase
 
 **Freeze** one snapshot of Power, Momentum, goals, champions, and Assets. All rolls use it; an early success does not change a later roll's inputs.
 
@@ -56,7 +62,7 @@ A natural **12 always succeeds** and signals +1; a natural **2 always fails** an
 
 **Commit together.** Apply advances, their explicit Effects, automatic completions, and Ready to Resolve tasks. Record critical signals for the next Opening. Accept or Defer resolution tasks; defer those whose outcome must be played.
 
-## Character Phase
+### 3. Character Phase
 
 Resolve **Defection Checks first**, then **Settling**, then **Drift Rolls**. Use the campaign app's current psychological scores, roll targets, and band settings.
 
@@ -69,7 +75,7 @@ A recovery to Stable grants exemption from the first Character Phase after recov
 
 A defection's impact on faction operations and Momentum applies at the next Turn. Goals lose their champion; they are not automatically reassigned. Values, beliefs, Pressure, Conviction, and Drift Risk shape character behavior, not the operation-roll modifier.
 
-## Publish
+### 4. Publish
 
 Commit the Turn and inspect its resulting conditions, crises, and resolution tasks. Present what the Party can encounter: a guarded archive, a changed patrol, missing supplies, a public announcement, or agents preparing an operation. Showing an established change requires no separate visibility roll.
 

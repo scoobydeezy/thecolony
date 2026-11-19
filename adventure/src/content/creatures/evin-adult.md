@@ -34,14 +34,21 @@ immunities:
   - poison
   - death effects
 speed: 30 feet
-strikes: []
+strikes:
+  - name: Bow
+    type: ranged
+    bonus: 27
+    damage: 3d8+14 piercing
+    traits: [deadly d10, range increment 60 feet]
+  - name: Fist
+    type: melee
+    bonus: 25
+    damage: 3d6+11 bludgeoning
+    traits: []
 provenance:
   - doc: Creatures
     heading: Evin Peakwalker Reconstruction (Adult) — Creature 13
 ---
-
-**Bow** +27 to hit, 3d8+14 piercing damage, deadly d10, range increment 60 feet  
-**Fist** +25 to hit, 3d6+11 bludgeoning damage
 
 ### Impossible Skill
 The adult's genuine history includes exceptional archery skill. The incomplete reconstruction imagines four arms, two full-size longbows, and arrows capable of correcting their own missed shots. Two distinct targets can be selected during Order Drill. The bows are aspects of its manifested body; the **real E.P. bow** remains the separate physical Source.
@@ -51,6 +58,6 @@ Adult Evin makes **two Bow Strikes against two different creatures**, one from e
 
 ### Relentless Arrow *(free effect attached to a missed Bow Strike)*
 **Trigger:** The Adult misses or critically misses with a Bow Strike.  
-**Effect:** Place one **Returning Arrow** token near the original target. The arrow visibly curves and circles that creature. At the **start of the Adult's next turn, before it takes any actions**, each Returning Arrow attempts **one** Bow Strike against **its own original target** at **+25** (**provisional fixed return attack modifier**) dealing normal Bow damage on a hit. The return Strike is not affected by the Adult's current multiple attack penalty, does not contribute to its next turn's MAP, and **cannot itself create another Returning Arrow**. If the original target is no longer a legal target (e.g. out of range or behind total cover), the arrow is lost without an attack. After the attempt, hit or miss, remove the token.
+**Effect:** Place one **Returning Arrow** token near the original target. The arrow visibly curves and circles that creature. At the **start of the Adult's next turn, before it takes any actions**, each Returning Arrow attempts **one** Bow Strike against **its own original target** at **+25** (fixed return attack modifier) dealing normal Bow damage on a hit. The return Strike is not affected by the Adult's current multiple attack penalty, does not contribute to its next turn's MAP, and **cannot itself create another Returning Arrow**. If the original target is no longer a legal target (e.g. out of range or behind total cover), the arrow is lost without an attack. After the attempt, hit or miss, remove the token.
 
 The Adult can sustain **at most two Returning Arrows** at once, one for each bow. If a new missed arrow would exceed that limit, the oldest token dissipates. This is visible delayed attack pressure, **not** indefinite homing or a cloud of autonomous missiles. On Dispersal or full Coherence all Returning Arrows dissipate immediately.

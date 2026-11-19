@@ -24,7 +24,7 @@ An **Anchor** is a role, not a special class of magical object. It can be the or
 
 The original Source can become its own Anchor. It now carries sufficient truthful Meaning, so its genuine connection no longer forces reality to invent a false person.
 
-## Requirements
+### Requirements
 
 | Requirement | Question | Boundary |
 |---|---|---|
@@ -34,13 +34,15 @@ The original Source can become its own Anchor. It now carries sufficient truthfu
 
 Where the fiction supports genuine distribution, Capacity can be added across Anchors unless the encounter establishes why the Weight cannot be safely partitioned. A forced transfer may be physically possible without being legitimate Anchoring; coercion can leave containment, injury, and unresolved responsibility.
 
-## At Acceptance
+## Procedure
+
+### At Acceptance
 
 If a valid Anchor is prepared when :ref[Acceptance]{#rule.identity-and-stabilization} completes, check Connection, Capacity, and Consent. The Weight settles automatically. Do not introduce another climactic roll after the work of reconstruction and acceptance.
 
 If there is no valid Anchor, the hostile Incursion still ends. The Weight is **Stabilized but Unanchored**. It may remain a coherent presence, a non-hostile Source, a transport problem, a vulnerable burden, or pressure requiring temporary containment. This changes the problem; it does not declare the encounter failed or erase restored Identity.
 
-## Resolution
+### Resolution
 
 An Incursion is **Resolved** when its false reconstruction is Stabilized, any necessary present-day reckoning has been addressed sufficiently for a truthful destination to exist, and the coherent Weight settles into a valid Anchor.
 

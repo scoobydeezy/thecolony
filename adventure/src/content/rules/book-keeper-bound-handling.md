@@ -23,9 +23,13 @@ design: >-
   Class; the values are derived, never typed.
 ---
 
+## Definition
+
 The :ref[Book of Names]{#source.book-of-names} has an intrinsic handling restriction, independent of its ordinary mnemonic Ward. It is a property of the Book itself, not of any Incursion the Book creates.
 
 > **Only a creature the Book recognizes as a Keeper can physically handle it.**
+
+## Procedure
 
 A creature the Book does **not** recognize as a Keeper cannot successfully:
 
@@ -37,6 +41,8 @@ A creature the Book does **not** recognize as a Keeper cannot successfully:
 The attempted interaction fails, and that creature is immediately subjected to the Book's full Mnemonic Backlash: **:stat{#source.book-of-names key=backlash}**. As with any Source, the Backlash comes from the Book's Class (:stat{#source.book-of-names key=class}) and its Source DC.
 
 This handling Backlash applies even while the Book's ordinary Ward is absent, Breached, or suppressed.
+
+## Interactions
 
 Without handling the Book, any creature may still:
 

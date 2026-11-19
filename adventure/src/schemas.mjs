@@ -446,6 +446,8 @@ export const partMeta = z.object({
               arrangement: z.enum(['sequence', 'alternatives', 'optional', 'concurrent', 'reference']),
               // Entries listed in the chapter that are not events or encounters (a location as a resource).
               entries: z.array(anyId).optional(),
+              // Every entry of one type, by name, after any listed entries (the Veiled Sources).
+              entriesOf: z.string().optional(),
             })
             .strict(),
         )

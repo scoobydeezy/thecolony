@@ -24,14 +24,18 @@ saves:
   will: 24
 immunities: []
 speed: 25 feet
-strikes: []
+strikes:
+  - name: Free-Hand Staff
+    type: melee
+    bonus: 22
+    damage: 2d8+8 bludgeoning
+    traits: [nonlethal]
 provenance:
   - doc: Creatures
     heading: Rescue Captain — Creature 11
 ---
 
-**Role:** remembered rescue commander / strong Lead (historically Miriel’s grandfather)  
-**Free-Hand Staff** +22, **Damage** 2d8+8 bludgeoning, nonlethal
+**Role:** remembered rescue commander / strong Lead (historically Miriel’s grandfather)
 
 ### Standard Tactical Options
 The Captain freely uses standard **Shove, Trip, Reposition, Aid, Step, Stride**, and Formation actions.

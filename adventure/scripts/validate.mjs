@@ -50,7 +50,10 @@ for (const e of reg.entities) {
 const sourceDocs = listSourceDocs();
 // The published book must remain verifiable after the source exports are retired.
 // Original heading/citation checks are an explicit migration check, not a build dependency.
-const checkSources = process.argv.includes('--sources');
+// Provenance checks run whenever the source exports are present (or are demanded with --sources, which
+// fails without them); a machine without the exports skips them and says so. --no-sources skips them.
+const checkSources = process.argv.includes('--sources') || (sourceDocs.length > 0 && !process.argv.includes('--no-sources'));
+if (!checkSources) console.log('  · source provenance not checked (no source exports found; set COLONY_SOURCE_DOCS_DIR)');
 if (checkSources && !sourceDocs.length) err('No source documents found; set COLONY_SOURCE_DOCS_DIR to the source exports folder.');
 const docByName = new Map(sourceDocs.map((d) => [d.name, d]));
 const docById = new Map(sourceDocs.map((d) => [d.id, d]));
@@ -188,6 +191,10 @@ for (const e of reg.entities) {
 }
 // Narrative items (§13): a part and chapter that exist, an encounter's event, kinds of connection.
 const parts = loadParts();
+for (const p of parts) for (const c of p.chapters) {
+  if (c.entriesOf && !ENTITY_TYPES[c.entriesOf]?.area) err(`${p.id}: chapter "${c.key}" entriesOf "${c.entriesOf}" is not a type with pages`);
+  for (const id of c.entries ?? []) if (!reg.byId.has(id)) staleRef(`${p.id}: chapter "${c.key}" entries → ${id}`);
+}
 for (const e of reg.entities.filter((x) => x.type === 'event' || x.type === 'encounter')) {
   const where = rel(e.file);
   const p = parts.find((x) => x.id === e.data.part);

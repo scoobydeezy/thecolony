@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=../../../schemas/faction.schema.json
 id: faction.fractured
 slug: fractured
@@ -20,3 +21,4 @@ start:
     stability: 0
     agency: 0.3596
   beliefs: {}
+---

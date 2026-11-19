@@ -40,7 +40,18 @@ immunities:
   - poison
   - disease
 speed: 40 feet, climb 40 feet
-strikes: []
+abilityDC: 42
+strikes:
+  - name: Artisan's Leg
+    type: melee
+    bonus: 38
+    damage: 4d10+16 bludgeoning
+    traits: [magical, reach 20 feet]
+  - name: Looming Strand
+    type: ranged
+    bonus: 38
+    damage: 4d8+14 bludgeoning
+    traits: [magical, range increment 100 feet]
 provenance:
   - doc: Creatures
     heading: The Counterfeit Weaver — Creature 20
@@ -52,11 +63,11 @@ The Weaver is not a deity, avatar or divine herald. Its sense detects recognized
 
 **UNIQUE, VEILED, COMPOSITE, OCCULT** (encounter traits; **not** an actual deity, avatar, or divine herald)
 **Str** +8, **Dex** +9, **Con** +6, **Int** +10, **Wis** +8, **Cha** +9
-**Melee** ◆ *Artisan's Leg* +38 (magical, reach 20 ft), **Damage** 4d10+16 bludgeoning (average 38); on a critical hit, the Spider may Reposition the target 10 feet into a space it can reach, following the normal forced movement restrictions.
-**Ranged** ◆ *Looming Strand* +38 (magical, range increment 100 ft), **Damage** 4d8+14 bludgeoning (average 32) and a tethered target on a hit, as below.
+**Artisan's Leg:** on a critical hit, the Spider may Reposition the target 10 feet into a space it can reach, following the normal forced movement restrictions.
+**Looming Strand:** a hit also tethers the target, as below.
 **Occult ability DC** 42 (high level-20 DC). The Spider's field-note clues are **site-evidence**, not checks against this number: known inconsistencies such as persistent web and controlled timing can always be observed.
 
-### Web-Cast ◆◆ — Occult, Conjuration, Incursion
+### Web-Cast ◆◆ — Occult, Incursion
 
 The Spider fires a fully corporeal veil of microscopic strands at one creature within 100 feet that it can perceive. **Fortitude DC 42**.
 

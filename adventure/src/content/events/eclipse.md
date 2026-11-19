@@ -1,12 +1,12 @@
 ---
+# yaml-language-server: $schema=../../../schemas/event.schema.json
 id: event.eclipse
 slug: eclipse
 name: Eclipse
 summary: The eclipse returns because the Reading's closed inheritance has reopened.
 function: Begin Act III
 synopsis: >-
-  Act III opens with the eclipse already underway: it began at the Confluence on the stopped path, or after the Observer
-  reveal on the successful path. The Colony races toward Totality while the consequences for Vara remain distinct.
+  Act III opens with the eclipse already underway: it began at the Confluence on the stopped path, or after the Observer reveal on the successful path. The Colony races toward Totality while the consequences for Vara remain distinct.
 part: part.act-3
 chapter: catastrophe
 order: 1
@@ -24,20 +24,16 @@ variants:
       - path.the-reading-succeeds
     summary: Remembering Vara reopens a Reading the Colony believed was finished.
     synopsis: >-
-      No new Keeper begins a Reading. Instead, the pieces of Vara preserved across the Party's, records, objects, and
-      other anchors have become coherent enough to reestablish a living relationship with the Book's supposedly closed
-      inheritance. While the Party is occupied with the Observer, the eclipse begins again. The returning shadow is the
-      first undeniable sign that reconstructing the forgotten Keeper has reopened a transfer the Colony believed
-      complete.
+      No new Keeper begins a Reading. Instead, the pieces of Vara preserved across the Party's, records, objects, and other anchors have become coherent enough to reestablish a living relationship with the Book's supposedly closed inheritance. While the Party is occupied with the Observer, the eclipse begins again. The returning shadow is the first undeniable sign that reconstructing the forgotten Keeper has reopened a transfer the Colony believed complete.
   - key: stopped
     when:
       - path.the-reading-is-stopped
-    summary: The resumed Reading has begun during the Confluence; it cannot restore the old closed transfer.
+    summary: Vara's second Reading, completed during the Confluence, was rejected; it cannot restore the old closed transfer.
     synopsis: >-
-      Vara’s route to the Book follows actual choices and faction actions. A completed second attempt is rejected: Vara
-      remains present and the eclipse does not move. The Observer’s full reveal follows that onset before Act III
-      begins.
+      Vara completed her second attempt while the Party was in the Assembly with the factions, and the Book rejected it: Vara remains present and the eclipse does not move. The Observer’s full reveal follows that onset before Act III begins.
 status: draft
+readiness:
+  status: compiled
 provenance:
   - doc: Campaign Outline
     heading: Session 8 — The Confluence > If the Reading Was Stopped
@@ -47,8 +43,6 @@ provenance:
     heading: Session 9 — Totality
   - doc: Character Briefs
     heading: The Observer - Silas Venn > The Manor
-readiness:
-  status: compiled
 ---
 
 ## Opening State
@@ -60,7 +54,7 @@ The eclipse is already advancing when Act III opens. On the stopped path it bega
 Show existing faction operations colliding with a physical change everyone can see. Let Darkwing choose whom to protect, what evidence to preserve and where to go. The ritual route remains legible, but the Party’s actual position and priorities determine the journey.
 
 :::branch{when=path.the-reading-is-stopped}
-Vara’s resumed attempt cannot repeat the old transfer. If completed, the Book rejects her name; she remains present and the eclipse does not move. If the Party prevents or interrupts it, honor that intervention while the already distributed Weight continues its crisis. Another coerced Reading is not the only way forward.
+Vara’s second attempt, completed during the Confluence while the Party was in the Assembly, could not repeat the old transfer: the Book rejected her name. She remains present and the eclipse does not move, while the already distributed Weight continues its crisis. Another coerced Reading is not the only way forward.
 :::
 
 :::branch{when=path.the-reading-succeeds}

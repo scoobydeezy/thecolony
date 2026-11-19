@@ -1,18 +1,12 @@
 ---
+# yaml-language-server: $schema=../../../schemas/encounter.schema.json
 id: encounter.a-life
 slug: a-life
 name: A Life
 summary: The cloth toy reveals that the infant Veiled was only one fragment of a forgotten life.
 function: "Identity: Relationship"
 synopsis: >-
-  The Witnesses begin with an almost boring tour of the Hall's archival and quarantine procedures. During ordinary
-  processing, the newly arrived cloth toy is placed near a childhood object from the same forgotten life, and the two
-  begin reconstructing it: an Infant and a Child manifest first. Finding the Child brings an archived bow into the
-  active network, and an Adult manifests, hostile. Violence creates safety but does not resolve it. The Caretaker
-  recognizes one continuous life in the matching initials, then uses the Ledger to identify a fourth Source, a shaving
-  case, which the Party deliberately brings into the resonance. The exaggerated reconstructions collapse into one
-  ordinary person, and restoring his true relationship to his mother ends the encounter. The Ledger cannot recover his
-  name, but it proves that the infant was only one piece of an entire life.
+  The Witnesses begin with an almost boring tour of the Hall's archival and quarantine procedures. During ordinary processing, the newly arrived cloth toy is placed near a childhood object from the same forgotten life, and the two begin reconstructing it: an Infant and a Child manifest first. Finding the Child brings an archived bow into the active network, and an Adult manifests, hostile. Violence creates safety but does not resolve it. The Caretaker recognizes one continuous life in the matching initials, then uses the Ledger to identify a fourth Source, a shaving case, which the Party deliberately brings into the resonance. The exaggerated reconstructions collapse into one ordinary person, and restoring his true relationship to his mother ends the encounter. The Ledger cannot recover his name, but it proves that the infant was only one piece of an entire life.
 part: part.act-1
 chapter: session-3-investigations
 order: 1
@@ -28,6 +22,8 @@ links:
   - asset.hall-of-remembrance
   - asset.ledger
 status: draft
+readiness:
+  status: compiled
 provenance:
   - doc: Campaign Outline
     heading: Session 3 — Dusk > Witness Route — A Life
@@ -35,8 +31,6 @@ provenance:
     heading: 2. A Life — Evin Peakwalker Life Reconstruction
   - doc: Encounters
     heading: 2. A Life — Evin Peakwalker Life Reconstruction
-readiness:
-  status: compiled
 ---
 
 ## At the Table
@@ -104,15 +98,15 @@ The Hall can preserve the four objects together without reproducing the false fo
 ### Systems Established
 **Coherence, distributed/related Sources, deliberate Resonance, Identity Restoration during an active Incursion, hostility ending through Restoration, Source → Anchor transition, Ledger as Relationship evidence.**
 
-### Provisional Tuning / Playtest Watch
-The Child's status conditions, the Infant's Scream, and the Adult's returning arrows are intentionally oppressive when they overlap. The concrete DCs/damage/action costs are specified in the mechanical reference entries linked on this page as provisional. Test whether the combined action and status pressure creates meaningful choices without making an unlucky opening round functionally unwinnable. Do not dilute the condition-driven identity merely to smooth expected damage.
+### Tuning and Playtest Watch
+The Child's status conditions, the Infant's Scream, and the Adult's returning arrows are intentionally oppressive when they overlap. The concrete DCs/damage/action costs are specified in the mechanical reference entries linked on this page. Test whether the combined action and status pressure creates meaningful choices without making an unlucky opening round functionally unwinnable. Do not dilute the condition-driven identity merely to smooth expected damage.
 
 ## If the Party Does Not Intervene
 
 The Witnesses separate compatible objects and retain them under quarantine. This prevents further reconstruction while the condition is broken; it does not discover Evin’s Name or restore the whole life offscreen. Keep the records and objects available for a later visit. Celia can describe what happened without granting the Party an unearned personal relationship or Keystone.
 
 :::design
-The unattended baseline is provisional editorial staging. The source provides no fixed offscreen casualty count or automatic restoration deadline. The creature profiles retain their explicitly provisional tuning.
+The unattended baseline is editorial staging. The source provides no fixed offscreen casualty count or automatic restoration deadline.
 :::
 
 ## Printed Evidence

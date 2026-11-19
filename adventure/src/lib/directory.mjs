@@ -15,7 +15,8 @@ export function directoryHast(reg, attrs) {
   const entries = [...reg.byId.values()].filter(e => e.type === type).sort((a, b) => a.view.name.localeCompare(b.view.name));
   const link = id => {
     const e = reg.byId.get(id);
-    return e ? h('a', { href: entityUrl(e), 'data-ref': id }, e.view.name) : 'Not recorded';
+    // A recorded id that is not an entry shows as missing (as :ref does), not as "Not recorded".
+    return e ? h('a', { href: entityUrl(e), 'data-ref': id }, e.view.name) : id ? h('span', { class: 'rp-ref-missing', title: `No entry ${id}: stale reference` }, `${id} (missing)`) : 'Not recorded';
   };
   const table = (headers, rows) => h('table', {}, [
     h('thead', {}, h('tr', {}, headers.map(x => h('th', { scope: 'col' }, x)))),
@@ -33,7 +34,7 @@ export function directoryHast(reg, attrs) {
   return h('div', { className: ['rp-directory'], 'data-directory': `${type}-${group ?? 'default'}` }, [
     h('p', {}, 'At the start of the campaign. These records describe the baseline; consult the campaign app for changes made in play.'),
     ...[...groups].sort(([a], [b]) => label(a).localeCompare(label(b))).map(([key, list]) => h('section', {}, [
-      h('h3', { id: `directory-${type}-${group ?? 'default'}-${key.replaceAll('.', '-') || 'unassigned'}` }, label(key)),
+      h('h3', { id: `directory-${type}-${group ?? 'default'}-${String(key ?? '').replaceAll('.', '-') || 'unassigned'}` }, label(key)),
       type === 'npc'
         ? table(['Person', 'Role', group === 'faction' ? 'Starting location' : 'Starting faction', 'Starting state'], list.map(e => [link(e.data.id), e.data.role ?? '—', link(e.data.start?.[group === 'faction' ? 'location' : 'faction']), e.data.start?.state ?? 'Not recorded']))
         : type === 'location'

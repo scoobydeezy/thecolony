@@ -30,17 +30,19 @@ immunities:
   - death effects
 speed: 25 feet
 abilityDC: 36
-strikes: []
+strikes:
+  - name: Composite Hand
+    type: melee
+    bonus: 29
+    damage: 3d10+14 bludgeoning
+    traits: [reach 10 feet]
 provenance:
   - doc: The Burden — Final Veiled Encounter
     heading: The Borrowed First Keeper — Creature 15
 ---
 
 ## Composite Hand
-**Melee** +29  
-**Reach** 10 feet  
-**Damage** 3d10+14 bludgeoning
-This remains available regardless of which Form families have been removed.
+The Composite Hand Strike remains available regardless of which Form families have been removed.
 The borrowed Forms make the Composite more capable.
 They do not grant it the basic ability to hurt someone.
 

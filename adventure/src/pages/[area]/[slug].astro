@@ -8,7 +8,8 @@ import { toHtml } from 'hast-util-to-html';
 import { ENTITY_TYPES, loadRegistry, entityUrl, PART, partDir } from '../../lib/registry.mjs';
 import { statblockHast } from '../../lib/statblock.mjs';
 import { veiledDerived } from '../../lib/veiled.mjs';
-import { isDesigner } from '../../lib/target.mjs';
+import { isDesigner, BASE } from '../../lib/target.mjs';
+import { hasPlayerBlocks } from '../../lib/player-handout.mjs';
 import Ref from '../../components/Ref.astro';
 
 export async function getStaticPaths() {
@@ -37,7 +38,7 @@ if (redirectTo) return Astro.redirect(entityUrl(self));
 const d = { ...entry.data, ...self.view };
 const statblocks = type === 'npc' ? reg.statblocksOf(d.id) : [];
 
-const { Content } = entry.body ? await render(entry) : { Content: null };
+const { Content, headings: bodyHeadings = [] } = entry.body ? await render(entry) : { Content: null };
 const spec = ENTITY_TYPES[type];
 const link = (id) => {
   const e = reg.byId.get(id);
@@ -99,14 +100,27 @@ const conditionsUsing = (['asset', 'faction', 'npc', 'pc', 'location', 'goal', '
 const onThread = type === 'thread'
   ? reg.entities.flatMap((e) => (e.data.leadsTo ?? []).filter((l) => l.thread === d.id).map((l) => ({ from: e.data.id, to: l.to })))
   : [];
+
+// "On this page": the body's headings, framed by the headings this template adds around it for an event
+// or encounter (Synopsis before; Connections and the path variants after). Other types' template
+// headings are short lists and stay out of it.
+const hasConnections = narrative && (ledFrom.length > 0 || d.leadsTo?.length > 0);
+const headings = [
+  ...(narrative && d.synopsis ? [{ depth: 2, slug: 'synopsis', text: 'Synopsis' }] : []),
+  ...bodyHeadings.filter((h) => h.depth <= 3),
+  ...(hasConnections ? [{ depth: 2, slug: 'connections', text: 'Connections' }] : []),
+  ...(narrative ? (d.variants ?? []).map((v) => ({ depth: 2, slug: `if-${v.key}`, text: ifPaths(v.when) })) : []),
+];
 ---
 
-<StarlightPage frontmatter={{ title: d.name, description: d.summary, rpSource: entry.filePath?.replace(/^src\/content\//, ''), rpEntity: d.id }}>
+<StarlightPage frontmatter={{ title: d.name, description: d.summary, rpSource: entry.filePath?.replace(/^src\/content\//, ''), rpEntity: d.id }} headings={headings}>
   <p>
     <span class="rp-badge">{spec.label}</span>
     {d.version && <span class="rp-badge">Version {d.version}</span>}
     {d.status === 'stub' && <span class="rp-badge">Entry not yet written</span>}
   </p>
+  {/* A players' handout has a player-only download (src/pages/player-handouts/[slug].md.ts): only its player-facing blocks. */}
+  {type === 'handout' && (d.audience ?? 'players') === 'players' && hasPlayerBlocks(entry.body) && <p><a href={`${BASE}/player-handouts/${d.slug}.md`} download>Download player-only Markdown</a></p>}
 
   {d.summary && <p>{d.summary}</p>}
 
@@ -247,7 +261,7 @@ const onThread = type === 'thread'
         {encountersOf.length > 0 && <>{(d.route || d.event) && <br />}<strong>{encountersOf.length === 1 ? 'Encounter' : 'Encounters'}:</strong> {encountersOf.map((e, i) => <>{i > 0 && ', '}<a href={entityUrl(e)}>{e.view.name}</a></>)}</>}
         {d.function && <>{(d.route || d.event || encountersOf.length > 0) && <br />}<strong>Narrative function:</strong> {d.function}</>}
       </p>
-      {d.synopsis && <><h2>Synopsis</h2>{paras(d.synopsis).map((p) => <p>{p}</p>)}</>}
+      {d.synopsis && <><h2 id="synopsis">Synopsis</h2>{paras(d.synopsis).map((p) => <p>{p}</p>)}</>}
     </>
   )}
 
@@ -255,7 +269,7 @@ const onThread = type === 'thread'
 
   {narrative && (ledFrom.length > 0 || d.leadsTo?.length > 0) && (
     <>
-      <h2>Connections</h2>
+      <h2 id="connections">Connections</h2>
       {ledFrom.length > 0 && <><p><strong>Led from</strong></p><ul>{ledFrom.map((l) => <li><Ref id={l.from} /> <span class="rp-muted">· {nameOf(l.thread)}</span></li>)}</ul></>}
       {d.leadsTo?.length > 0 && <><p><strong>Leads to</strong></p><ul>{d.leadsTo.map((l) => <li><Ref id={l.to} /> <span class="rp-muted">· {nameOf(l.thread)}{l.visibility && l.visibility !== 'GMOnly' && ` · ${l.visibility}`}</span></li>)}</ul></>}
     </>
@@ -365,17 +379,18 @@ const onThread = type === 'thread'
     </>
   )}
 
-  {isDesigner && d.provenance?.length > 0 && (
+  {/* Designer notes show even when an entry has no provenance (authored entries carry their provisional flags in design:). */}
+  {isDesigner && (d.provenance?.length > 0 || d.design) && (
     <aside class="rp-block rp-design" data-private="designer">
-      <p class="rp-label">Provenance (designer)</p>
-      <ul>
+      <p class="rp-label">{d.provenance?.length > 0 ? 'Provenance (designer)' : 'Designer note'}</p>
+      {d.provenance?.length > 0 && <ul>
         {d.provenance.map((p) => (
           <li>
             {p.doc} — {p.heading}
             {p.note && <> ({p.note})</>}
           </li>
         ))}
-      </ul>
+      </ul>}
       {d.design && <p>{d.design}</p>}
       <p><code>{d.id}</code></p>
     </aside>

@@ -19,7 +19,7 @@ saves:
 speed: 25 feet
 provenance: []
 design: >-
-  Provisional replacement for unavailable chat attachment. The recovered assistant summary supplied name, level, HP and
+  Replacement for an unavailable chat attachment. The recovered assistant summary supplied name, level, HP and
   AC; remaining numbers and abilities are new reviewable implementation, not recovered canon. No Serevan conspiracy is
   implied.
 id: creature.black-claw-gatewright

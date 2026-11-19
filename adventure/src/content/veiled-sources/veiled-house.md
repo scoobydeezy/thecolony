@@ -29,7 +29,17 @@ Use :ref[Active Sources]{#rule.active-sources}, :ref[Dispersal]{#rule.dispersal}
 
 ## Variable Class
 
-After a failed Set the Hearth submission, reclassify this **same Source** to the number of wrong scored relationships (1–5). Source Level remains 9. Recalculate Source DC, Ward HP, Backlash, Stability Threshold and Spill radius using :ref[Active Sources]{#rule.active-sources}; the Keeper’s creature statistics do not change. A correct arrangement Restores Context rather than creating a Class 0 Source. The reclassification happens between manifestations, not during an existing one.
+After a failed Set the Hearth submission, reclassify this **same Source** to the number of wrong scored relationships (1–5). Source Level remains 9. The values below follow from Class and Source Level under :ref[Class]{#rule.class}; the Keeper’s creature statistics do not change.
+
+| Wrong scored Context relationships | Source Class | Source DC | Ward HP | Backlash | Stability Threshold | Rupture radius |
+|---:|---:|---:|---:|---:|---:|---:|
+| 1 | I | 27 | 100 | 1d4 mental | 14 | 10 feet |
+| 2 | II | 28 | 110 | 2d6 mental | 12 | 20 feet |
+| 3 | III | 29 | 120 | 3d8 mental | 10 | 30 feet |
+| 4 | IV | 30 | 130 | 4d10 mental | 8 | 40 feet |
+| 5 | V | 31 | 140 | 5d12 mental | 6 | 50 feet |
+
+This is a reclassification of the same Source between manifestations, not a Source Transfer. A correct arrangement Restores Context rather than creating a Class 0 Source. The reclassification happens between manifestations, not during an existing one.
 
 ### First Incursion Trigger
 Darkwing removes the **Greater Insistent Door Knocker** from the Hearth threshold historically associated with the Parlor.

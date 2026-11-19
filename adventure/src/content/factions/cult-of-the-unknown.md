@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=../../../schemas/faction.schema.json
 id: faction.cult-of-the-unknown
 slug: cult-of-the-unknown
@@ -46,3 +47,4 @@ start:
     a: Neutral
     b: Positive
     c: Negative
+---

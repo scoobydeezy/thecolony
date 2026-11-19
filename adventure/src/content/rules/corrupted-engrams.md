@@ -8,13 +8,20 @@ provenance:
     heading: Corrupted Engrams
   - doc: The Veiled
     heading: Keystones > Memory — Engrams
+appliesTo:
+  - source.corrupted-engram
+  - creature.corrupted-engram-occlusion
+  - creature.egress-memory-frame
+  - encounter.playing-for-keeps
 version: 1
 summary: >-
   An Engram can faithfully preserve a false reconstruction’s subjective Memory; a loaded Frame expresses Memory without
   becoming its subject.
 ---
 
-## Authentic Memory and Proxies
+## Definition
+
+### Authentic Memory and Proxies
 
 An **Engram** is a technical record of experienced Memory: what a subject perceived, felt, feared, understood, expected, or intended from a first-person frame.
 
@@ -45,7 +52,7 @@ Loading an Engram into a Frame does **not** by itself create a Source, Anchor, F
 
 A Proxy can therefore sincerely say **“I remember”** without that statement settling the separate question **“Are you the same person?”**
 
-## Definition
+### Corrupted Engrams
 
 > **A corrupted Engram is an Engram recorded from a Veiled Incursion rather than from a verified person.**
 
@@ -71,6 +78,13 @@ The resulting record can be internally accurate while being biographically false
 The useful shorthand is:
 
 > **The recording is accurate. The subject was not.**
+
+## Procedure
+
+1. **Read an Engram as Memory only.** It establishes what its subject experienced; every other Identity component needs its own truthful support (Authentic Memory and Proxies, above).
+2. **Check its provenance.** An OCC record preserves what a false reconstruction experienced: accurate as a recording, false as biography.
+3. **Give it ordinary Source statistics if it becomes a Source.** Define its Class, Resonance Type, Incursion Trigger and Reconstruction Condition (Corrupted Engrams as Sources, below).
+4. **Correct it with authentic Memory.** An authentic Engram that materially contradicts the corrupted self-model can make the current Echo untenable, through :ref[Identity and Stabilization]{#rule.identity-and-stabilization} (Authentic Memory as Constraint, below).
 
 ## Why This Is Still Memory
 

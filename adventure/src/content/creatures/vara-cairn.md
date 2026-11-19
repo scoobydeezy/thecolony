@@ -1,8 +1,8 @@
 ---
-id: creature.vara-reading
-slug: vara-reading
+id: creature.vara-cairn
+slug: vara-cairn
+previousSlugs: [vara-reading]
 status: draft
-level: 10
 rarity: common
 size: Medium
 traits:
@@ -27,7 +27,6 @@ provenance:
   - doc: Creatures
     heading: Varenya “Vara” Cairn — NPC 10
 npc: npc.vara-cairn
-variant: The Reading
 ---
 
 Vara is not an enemy and does not make hostile Strikes during this encounter.

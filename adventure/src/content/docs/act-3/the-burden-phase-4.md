@@ -386,11 +386,11 @@ Serevan immediately attempts the Backlash save.
 
 The universal **Mnemonic Backlash Reflection** rule creates a deliberate Link-and-Ganondorf exchange here.
 
-## Step 1 — Serevan rolls
+### Step 1 — Serevan rolls
 
 Serevan attempts the current basic Will save.
 
-### If he does not critically succeed
+#### If he does not critically succeed
 
 He takes the appropriate Backlash damage.
 
@@ -400,17 +400,17 @@ He:
 
 > **drops the Book**
 
-### If he critically succeeds
+#### If he critically succeeds
 
 He takes no damage.
 
 The Backlash reflects into the triggering attacker.
 
-## Step 2 — The attacker rolls
+### Step 2 — The attacker rolls
 
 The triggering attacker attempts the same basic Will save against the same DC and same rolled Backlash damage.
 
-### If the attacker does not critically succeed
+#### If the attacker does not critically succeed
 
 The attacker takes the appropriate damage.
 
@@ -424,7 +424,7 @@ The Institutional Ward remains:
 
 > **Breached at 0 HP**
 
-### If the attacker critically succeeds
+#### If the attacker critically succeeds
 
 The Backlash reflects back into Serevan.
 
@@ -661,7 +661,7 @@ After the Class I Ward breaks:
 
 ## Company I — Most Recent Keeper
 
-## Starting state
+### Starting state
 **Chorus Pressure:** 4  
 **Institutional Class:** V  
 **Ward HP:** 200  
@@ -673,7 +673,8 @@ Resolve the Backlash Duel.
 
 Force the Book drop.
 
-### If Vara completed the Reading and is currently Forgotten
+:::branch{when=path.the-reading-succeeds}
+Vara completed the Reading and is currently Forgotten.
 
 The visible Name is:
 
@@ -690,9 +691,9 @@ Player:
 > **“Varenya Cairn.”**
 
 Company I resolves.
+:::
 
-### Otherwise
-
+:::branch{when=path.the-reading-is-stopped}
 The visible Name is:
 
 > **Marek Cairn**
@@ -708,8 +709,9 @@ Player:
 > **“Marek Cairn.”**
 
 Company I resolves.
+:::
 
-## New state
+### New state
 **Pressure:** 3  
 **Institutional Class:** IV  
 **Ward HP:** 160
@@ -886,7 +888,7 @@ They still do not possess the authoritative Recognition needed to establish the 
 
 When the final Class I Ward is gone, damage reaches Serevan’s remaining HP. All earlier Backlash damage remains; the 1-HP floor ends.
 
-::embed{#creature.serevan-succession}
+::embed{#creature.serevan-ilvar}
 
 ## Kelda’s Choice
 

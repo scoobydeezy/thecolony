@@ -1,7 +1,7 @@
 ---
 id: creature.containment-guard
 slug: containment-guard
-name: "Threshold Obstacles: The Guards"
+name: The Guards
 status: draft
 level: 10
 rarity: common
@@ -27,13 +27,17 @@ immunities:
   - death effects
 speed: 25 feet
 abilityDC: 29
-strikes: []
+strikes:
+  - name: Halberd
+    type: melee
+    bonus: 22
+    damage: 2d10+10 slashing
+    traits: [reach 10 feet]
 provenance:
   - doc: Creatures
     heading: "Threshold Obstacles: The Guards — Paired Creature 10 Echoes"
 ---
 
-**Halberd ◆** *Melee* +22, reach 10 feet, **Damage** 2d10+10 slashing.
 
 ### No One Passes ◆
 The Guard chooses the hole's inner or outer edge and **Readies** a Shove or Halberd Strike against the next creature entering across it. This uses the ordinary Ready rules and its reaction. A Guard is not obliged to attack a creature it recognizes as authorized; its problem is that authorization is contradictory.

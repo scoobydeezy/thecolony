@@ -23,14 +23,18 @@ saves:
   will: 21
 immunities: []
 speed: 30 feet
-strikes: []
+strikes:
+  - name: Staff
+    type: melee
+    bonus: 21
+    damage: 2d6+8 bludgeoning
+    traits: [nonlethal]
 provenance:
   - doc: Creatures
     heading: Skirmisher — Creature 9
 ---
 
-**Role:** mobile formation repair / Trip / Escape  
-**Staff** +21, **Damage** 2d6+8 bludgeoning, nonlethal
+**Role:** mobile formation repair / Trip / Escape
 
 ### Standard Tactical Options
 The Skirmisher uses standard **Tumble Through, Escape, Trip**, and Formation actions.

@@ -23,7 +23,7 @@ Use [How to Use This Book](/docs/running/how-to-use/) for navigation and markers
 
 ## Before a Veiled Encounter
 
-Read [The Veiled: A Practical Primer](/docs/running/veiled-primer/) to understand the sequence of danger, evidence, and resolution. [The Seven Components of Identity](/docs/running/seven-components/) explains what each investigation teaches. The encounter itself supplies its required evidence, openings, and consequences; linked rule entries own the reusable procedures.
+Read [The Veiled: A Practical Primer](/docs/veiled/primer/) to understand the sequence of danger, evidence, and resolution. [The Seven Components of Identity](/docs/veiled/seven-components/) explains what each investigation teaches. The encounter itself supplies its required evidence, openings, and consequences; linked rule entries own the reusable procedures.
 
 ## Between Sessions
 

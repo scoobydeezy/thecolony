@@ -14,7 +14,7 @@ provenance:
   - doc: Creatures
     heading: Milltown — Creature and Hazard Stat Blocks (Open)
 design: >-
-  Provisional numerical completion for the documented six-PC level-12 baseline. The eighteen-card deck and all civilian
+  Numerical completion for the documented six-PC level-12 baseline. The eighteen-card deck and all civilian
   movement/erosion/scoring remain encounter-owned. No added damage on every card.
 ---
 
@@ -24,7 +24,7 @@ Act immediately after the Floodwarden, late in the round. Resolve the authored d
 
 ## Physical Debris
 
-Where the encounter’s collision rule calls for a PC save against actual moving debris, use **DC 32 Reflex**, with **4d6 bludgeoning** as full damage. These numbers are provisional for the six-PC level-12 baseline. This is not a basic save: apply the following degrees.
+Where the encounter’s collision rule calls for a PC save against actual moving debris, use **DC 32 Reflex**, with **4d6 bludgeoning** as full damage. These numbers are tuned for the six-PC level-12 baseline. This is not a basic save: apply the following degrees.
 
 | Result | Effect |
 |---|---|
@@ -35,7 +35,7 @@ Where the encounter’s collision rule calls for a PC save against actual moving
 
 Resolve at most one collision **per debris piece per PC per card**, even if the same piece crosses several of that PC’s squares. Different debris pieces can each cause a collision. Civilians retain the encounter’s Floating/Submerged/loss rules instead of HP damage.
 
-Darkwing is not carried or drowned by remembered water. Its physical debris and architecture remain dangerous. **Provisional brace action:** a PC deliberately stopping a debris piece can use two actions and Athletics DC 32 while adjacent: success holds it through the next Flood turn if the character maintains position and a free hand; failure leaves it moving without an additional punishment. This does not replace a collision save already triggered. Other credible abilities work normally.
+Darkwing is not carried or drowned by remembered water. Its physical debris and architecture remain dangerous. **Brace action:** a PC deliberately stopping a debris piece can use two actions and Athletics DC 32 while adjacent: success holds it through the next Flood turn if the character maintains position and a free hand; failure leaves it moving without an additional punishment. This does not replace a collision save already triggered. Other credible abilities work normally.
 
 ## Ending the Emergency
 

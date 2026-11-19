@@ -21,13 +21,16 @@ saves:
   will: 19
 immunities: []
 speed: 25 feet
-strikes: []
+strikes:
+  - name: Polearm
+    type: melee
+    bonus: 21
+    damage: 2d10+9 bludgeoning
+    traits: [reach 10 feet, nonlethal]
 provenance:
   - doc: Creatures
     heading: Order Chamber Guard — Creature 9
 ---
-
-**Polearm** +21, reach 10 feet, **Damage** 2d10+9 bludgeoning, nonlethal
 
 ### Hold Formation
 While adjacent to another Order ally, the guard gains a **+1 circumstance bonus to AC**.

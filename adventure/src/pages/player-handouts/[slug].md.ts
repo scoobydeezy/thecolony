@@ -1,10 +1,11 @@
 import { loadRegistry } from '../../lib/registry.mjs';
-import { playerHandout } from '../../lib/player-handout.mjs';
+import { playerHandout, hasPlayerBlocks } from '../../lib/player-handout.mjs';
 
 export function getStaticPaths() {
   const reg = loadRegistry();
   return [...reg.byId.values()]
-    .filter(entry => entry.type === 'handout' && entry.data.audience === 'players')
+    // audience defaults to players (schemas.mjs); a handout with no player-facing block has nothing to export.
+    .filter(entry => entry.type === 'handout' && (entry.data.audience ?? 'players') === 'players' && hasPlayerBlocks(entry.body))
     .map(entry => ({ params: { slug: entry.data.slug }, props: { entry } }));
 }
 

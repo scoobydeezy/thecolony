@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=../../../schemas/faction.schema.json
 id: faction.burdened
 slug: burdened
@@ -19,3 +20,4 @@ start:
     stability: 0.4999
     agency: 0.1727
   beliefs: {}
+---

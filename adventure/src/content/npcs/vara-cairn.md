@@ -7,7 +7,7 @@ role: The Keeper
 ancestry: Human
 class: Psychic
 background: Student
-level: 2
+level: 10
 gender: Female
 pronouns: She/Her
 age: 15

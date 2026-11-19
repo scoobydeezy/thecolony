@@ -1,7 +1,7 @@
 ---
 id: creature.the-embrace
 slug: the-embrace
-name: "Campus Spotlight: The Embrace"
+name: The Embrace
 status: draft
 level: 12
 rarity: unique
@@ -31,13 +31,16 @@ immunities:
   - death effects
 speed: 25 feet
 abilityDC: 32
-strikes: []
+strikes:
+  - name: Open Arms
+    type: melee
+    bonus: 26
+    damage: 3d8+12 bludgeoning
+    traits: [reach 15 feet, nonlethal]
 provenance:
   - doc: Creatures
     heading: "Campus Spotlight: The Embrace — Creature 12"
 ---
-
-**Open Arms ◆** *Melee* +26, reach 15 feet; **Damage** 3d8+12 bludgeoning, nonlethal.
 
 ### Gather Them In ◆◆
 **ATTACK** — The Embrace Strides up to half its Speed, then attempts **up to two Grapples against different targets** in reach, each Athletics +26 versus Fortitude DC. These are ordinary Grapples, with MAP applied normally; each successful hold occupies one branch of its arms. Maximum four held creatures, subject to reach.

@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=../../../schemas/faction.schema.json
 id: faction.aspis
 slug: aspis
@@ -48,3 +49,4 @@ start:
     a: Negative
     b: Negative
     c: Neutral
+---

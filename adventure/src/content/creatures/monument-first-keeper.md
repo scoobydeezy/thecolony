@@ -38,6 +38,8 @@ strikes: []
 provenance:
   - doc: The Burden — Final Veiled Encounter
     heading: Monument of the First Keeper — Creature 15
+  - doc: The Burden — Final Veiled Encounter
+    heading: The Eclipse
 resistances:
   - fire 10
   - piercing 10
@@ -48,8 +50,7 @@ weaknesses:
   - sonic 20
 ---
 
-**Stone Resistance** 10 fire, piercing, slashing  
-**Stone Weakness** 20 bludgeoning, electricity, sonic
+The Monument's resistances and weaknesses above are its **Stone Resistance** and **Stone Weakness**.
 
 ### Stationary Actuator
 
@@ -100,7 +101,23 @@ This creates the Phase I version of the final encounter's recurring lesson:
 
 > **Deal with the supporting structure and the boss becomes easier to hurt.**
 
-## Processional Actions
+## The Eclipse
+
+At encounter start, the outer glass globe of the eclipse sculpture shatters.
+
+The Monument raises its arms.
+
+The enormous stone sphere tears free through mnemonic force and flies into its upstretched hands.
+
+The forced-perspective artwork becomes physically true:
+
+> **The First Keeper now appears to hold the eclipse.**
+
+The stone sphere is not a separate creature and does not have its own HP pool.
+
+It is the Monument's primary direct weapon.
+
+---
 
 ## Processional Actions
 

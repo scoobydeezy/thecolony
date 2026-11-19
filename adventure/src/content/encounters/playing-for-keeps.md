@@ -1,16 +1,12 @@
 ---
+# yaml-language-server: $schema=../../../schemas/encounter.schema.json
 id: encounter.playing-for-keeps
 slug: playing-for-keeps
 name: Playing for Keeps
 summary: A corrupted Engram recorded from a Veiled becomes a Source. The recording is accurate; the subject was not.
 function: "Identity: Memory"
 synopsis: >-
-  EGRESS loads one of five corrupted OCC Engrams, recorded from a Veiled Incursion rather than a verified person, into
-  the Vault's comparison Core. At full strength, identity comparison supplies Recognition: the record that remembers
-  being someone becomes a Source and reconstructs its Occlusion physically in the Core as the Vault locks down. Trapped
-  and stalked, Darkwing tests authentic candidate Engrams one life at a time, reading each destructive response to
-  deduce whose experience the corrupted record falsely claims. Restoring the correct authentic Memory makes the false
-  experiential model untenable.
+  EGRESS loads one of five corrupted OCC Engrams, recorded from a Veiled Incursion rather than a verified person, into the Vault's comparison Core. At full strength, identity comparison supplies Recognition: the record that remembers being someone becomes a Source and reconstructs its Occlusion physically in the Core as the Vault locks down. Trapped and stalked, Darkwing tests authentic candidate Engrams one life at a time, reading each destructive response to deduce whose experience the corrupted record falsely claims. Restoring the correct authentic Memory makes the false experiential model untenable.
 part: part.act-2
 chapter: the-manor-routes
 order: 6
@@ -30,10 +26,7 @@ variants:
       - path.the-reading-succeeds
     summary: Vara's pre-Reading Engram is among the candidates, and the Party reacts to it without knowing why.
     synopsis: >-
-      EGRESS still holds Vara's pre-Reading Engram under her recorded identity, though no one consciously remembers her,
-      and it sits in the comparison set as an ordinary candidate. The Party's possessions, habits, and unexplained
-      reactions respond to it and to her compass, but those reactions do not replace the deterministic comparison:
-      Darkwing must still deduce the corrupted record's subject from evidence.
+      EGRESS still holds Vara's pre-Reading Engram under her recorded identity, though no one consciously remembers her, and it sits in the comparison set as an ordinary candidate. The Party's possessions, habits, and unexplained reactions respond to it and to her compass, but those reactions do not replace the deterministic comparison: Darkwing must still deduce the corrupted record's subject from evidence.
     links:
       - npc.vara-cairn
       - npc.orlombuthalde-nix
@@ -42,14 +35,14 @@ variants:
       - path.the-reading-is-stopped
     summary: Vara meets her own Engram and her father's among the candidates.
     synopsis: >-
-      Living Vara can encounter both her own pre-Reading Engram and Marek's archived record as ordinary candidates
-      inside the comparison set. Their presence makes the route intensely personal without either being the hidden
-      subject; the danger is letting recognition and grief stand in for the comparison the Core demands.
+      Living Vara can encounter both her own pre-Reading Engram and Marek's archived record as ordinary candidates inside the comparison set. Their presence makes the route intensely personal without either being the hidden subject; the danger is letting recognition and grief stand in for the comparison the Core demands.
     links:
       - npc.marek-cairn
       - npc.vara-cairn
       - npc.orlombuthalde-nix
 status: draft
+readiness:
+  status: compiled
 provenance:
   - doc: Campaign Outline
     heading: Manor Route 3 — EGRESS Institute
@@ -57,8 +50,6 @@ provenance:
     heading: 8. Playing for Keeps — EGRESS Engram Vault
   - doc: Encounters
     heading: 8. Playing for Keeps — EGRESS Engram Vault
-readiness:
-  status: compiled
 ---
 
 ## At the Table
@@ -192,7 +183,7 @@ Only three candidates are previously important campaign names. The other fifteen
 | **A — Autobiographical** | **A-2.11/a/R124-1** | **Varenya “Vara” Cairn** | Child | Keeper | Short-Term |
 |  | **A-7.03/c/R124-2** | **Hessa Wren** | Child | Civilian | Archive |
 |  | **A-4.31/b/R123-8** | **Cordan Rell** | Adult | Order | Short-Term |
-| **B — Procedural** | **B-5.24/b/R123-4** | **Pépé Sylvya** | Adult | Civilian | Archive |
+| **B — Procedural** | **B-5.24/b/R123-4** | **Pépé Sylvya** | Adult | Keeper | Archive |
 |  | **B-6.12/a/R121-7** | **Calder Rook** | Child | Keeper | Long-Term |
 |  | **B-8.05/c/R124-2** | **Olan Pryce** | Child | Order | Archive |
 | **C — Spatial** | **C-3.18/b/R123-2** | **Marek Cairn** | Adult | Keeper | Short-Term |
@@ -205,7 +196,7 @@ Only three candidates are previously important campaign names. The other fifteen
 |  | **E-1.52/a/R121-2** | **Alwen Marr** | Adult | Keeper | Long-Term |
 |  | **E-8.67/c/R118-8** | **Rhea Dorn** | Adult | Order | Long-Term |
 | **F — Affective** | **F-2.38/b/R124-5** | **Jessa Mor** | Adult | Civilian | Short-Term |
-|  | **F-7.44/c/R123-1** | **Iven Quill** | Adult | Keeper | Archive |
+|  | **F-7.44/c/R123-1** | **Iven Quill** | Adult | Civilian | Archive |
 |  | **F-9.14/c/R124-1** | **Tovin Arl** | Child | Order | Short-Term |
 
 The batch suffix dates transcription/archive handling rather than the remembered experience itself and therefore does not provide a fourth deduction trait.
@@ -215,7 +206,7 @@ Each of the five damaged-reference matches is a real corrupted record with one f
 
 | OCC Record | Hidden Authentic Subject | Hidden Profile |
 |---|---|---|
-| **A-9.13/b-OCC/R122-3** | **Pépé Sylvya** | Adult / Civilian / Archive |
+| **A-9.13/b-OCC/R122-3** | **Pépé Sylvya** | Adult / Keeper / Archive |
 | **B-9.43/d-OCC/R122-3** | **Marek Cairn** | Adult / Keeper / Short-Term |
 | **C-9.63/a-OCC/R022-3** | **Garrin Thale** | Adult / Order / Archive |
 | **E-9.73/c-OCC/R122-3** | **Varenya “Vara” Cairn** | Child / Keeper / Short-Term |
@@ -610,7 +601,7 @@ No full-power comparison means no authored Incursion. EGRESS can still discuss i
 :::design
 ## First-Pass Tuning Notes
 
-The Occlusion is intentionally built as a **Creature 14** rather than Creature 15. For the normal six-character level-12 Darkwing party, the Vault's isolation and objective pressure already increase the danger of individual contact. The creature should strongly threaten one isolated PC while remaining practical for several PCs to Disperse when they successfully converge on it.
+The Occlusion is intentionally built as a **Creature 14** rather than Creature 15. For a six-character level-12 Darkwing party (the expected level is 12 or 13, possibly higher), the Vault's isolation and objective pressure already increase the danger of individual contact. The creature should strongly threaten one isolated PC while remaining practical for several PCs to Disperse when they successfully converge on it.
 
 First-pass tuning targets:
 

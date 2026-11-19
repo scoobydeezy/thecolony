@@ -1,8 +1,8 @@
 ---
-id: creature.uldren-reading
-slug: uldren-reading
+id: creature.uldren-harthwright
+slug: uldren-harthwright
+previousSlugs: [uldren-reading]
 status: draft
-level: 10
 rarity: common
 size: Medium
 traits:
@@ -23,15 +23,17 @@ saves:
   will: 24
 immunities: []
 speed: 25 feet
-strikes: []
+strikes:
+  - name: Walking Stick
+    type: melee
+    bonus: 20
+    damage: 2d8+8 bludgeoning
+    traits: [nonlethal]
 provenance:
   - doc: Creatures
     heading: Uldren Harthwright — Creature 10
 npc: npc.uldren-harthwright
-variant: The Reading
 ---
-
-**Walking Stick** +20, **Damage** 2d8+8 bludgeoning, nonlethal
 
 ### Her Choice
 Uldren's allegiance follows Vara's expressed decision.

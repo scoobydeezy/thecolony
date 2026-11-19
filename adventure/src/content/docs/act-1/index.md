@@ -1,7 +1,7 @@
 ---
 title: Act I — The Secret
 sidebar:
-  order: 2
+  order: 3
 part:
   id: part.act-1
   chapters:

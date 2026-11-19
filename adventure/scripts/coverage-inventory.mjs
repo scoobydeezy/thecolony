@@ -31,8 +31,8 @@ const PLANNED = {
   'page:running/campaign-at-a-glance': 'Part I · The Campaign at a Glance',
   'page:running/gm-truths': 'Part I · GM Truths',
   'page:running/reading-and-branches': 'Part I · The Reading and Its Branches',
-  'page:running/seven-components': 'Part I · The Seven Components of Identity',
-  'page:running/veiled-primer': 'Part I · The Veiled: A Practical Primer',
+  'page:veiled/seven-components': 'Part III · The Seven Components of Identity',
+  'page:veiled/primer': 'Part III · The Veiled: A Practical Primer',
   'page:running/colony-turn': 'Part I · The Colony Turn',
   'page:running/faction-operations': 'Part I · Faction Operations and the Act III Fronts',
   'page:running/running-the-game': 'Part I · Running Investigations, Relationships and Consequences',
@@ -44,23 +44,23 @@ const PLANNED = {
   'page:setting/factions': 'Part II · The Factions',
   'page:setting/institutions': 'Part II · Civic Institutions',
   'page:setting/whos-who': "Part II · Who's Who",
-  'page:act-1': 'Part III · Act I overview',
-  'page:act-2': 'Part IV · Act II overview',
-  'page:act-3': 'Part V · Act III overview',
-  'page:act-3/the-burden-phase-1': 'Part V · The Burden, Phase I: Wound',
-  'page:act-3/the-burden-phase-2': 'Part V · The Burden, Phase II: Composite',
-  'page:act-3/the-burden-phase-3': 'Part V · The Burden, Phase III: Echo',
-  'page:act-3/the-burden-phase-4': 'Part V · The Burden, Phase IV: Chorus',
-  'page:reference/glossary': 'Part VI · Glossary',
-  'page:reference/quick-reference': 'Part VI · Quick Reference',
-  'handout.ledger': 'Part VI · Handouts: the Ledger (Hall of Remembrance records)',
-  'handout.material-concordance': 'Part VI · Handouts: the Witnesses\' Material Concordance',
+  'page:act-1': 'Part IV · Act I overview',
+  'page:act-2': 'Part V · Act II overview',
+  'page:act-3': 'Part VI · Act III overview',
+  'page:act-3/the-burden-phase-1': 'Part VI · The Burden, Phase I: Wound',
+  'page:act-3/the-burden-phase-2': 'Part VI · The Burden, Phase II: Composite',
+  'page:act-3/the-burden-phase-3': 'Part VI · The Burden, Phase III: Echo',
+  'page:act-3/the-burden-phase-4': 'Part VI · The Burden, Phase IV: Chorus',
+  'page:reference/glossary': 'Part VII · Glossary',
+  'page:reference/quick-reference': 'Part VII · Quick Reference',
+  'handout.ledger': 'Part VII · Handouts: the Ledger (Hall of Remembrance records)',
+  'handout.material-concordance': 'Part VII · Handouts: the Witnesses\' Material Concordance',
   designer: 'Designer area (rationale, open decisions, tuning, production)',
 };
 // Rule entries the primer will need (The Veiled); planned, not yet written.
 for (const r of ['sources-and-resonance', 'class', 'active-sources', 'dispersal', 'stabilization-window', 'source-transfer', 'source-destruction', 'containment',
   'keystones', 'recover-and-restore', 'acceptance-and-stabilization', 'anchoring', 'corrupted-engrams'])
-  PLANNED[`rule.${r}`] = `Part VI · Rules Reference: ${r.replace(/-/g, ' ')} (planned)`;
+  PLANNED[`rule.${r}`] = `Part VII · Rules Reference: ${r.replace(/-/g, ' ')} (planned)`;
 
 // ------------------------------------------------------------------ rules: [document, heading pattern, homes]
 // Matched against the unit's heading path ("A > B"); the first match wins. Provisional by design.
@@ -73,9 +73,9 @@ const RULES = [
   ['The Colony — Foundational Truths', /^The Colony$/, ['page:setting/history']],
   ['The Colony — Foundational Truths', /Traditions/, ['page:setting/everyday-life']],
   ['The Colony — Foundational Truths', /Factions/, ['page:setting/factions']],
-  ['The Colony — Foundational Truths', /Veiled/, ['page:running/veiled-primer']],
+  ['The Colony — Foundational Truths', /Veiled/, ['page:veiled/primer']],
   ['The Colony — Foundational Truths', /.*/, ['page:running/campaign-at-a-glance']],
-  ['GM Design Guide', /^The Veiled/, ['page:running/veiled-primer']],
+  ['GM Design Guide', /^The Veiled/, ['page:veiled/primer']],
   ['GM Design Guide', /^The Observer/, ['npc.silas-venn']],
   ['GM Design Guide', /^Endings/, ['page:act-3']],
   ['GM Design Guide', /.*/, ['page:running/running-the-game']],
@@ -105,11 +105,11 @@ const RULES = [
   ['The Veiled', /^Campaign Foreshadowing/, ['page:running/promises-and-threads']],
   ['The Veiled', /^Minimal Worked Example — Bad Maps/, ['encounter.bad-maps']],
   ['The Veiled', /Numerical Tuning|Final Design Test|Encounter Planning Worksheet|Common Design Failure Modes|Pathfinder Encounter Framework/, ['designer']],
-  ['The Veiled', /.*/, ['page:running/veiled-primer']],
+  ['The Veiled', /.*/, ['page:veiled/primer']],
   ['Campaign Outline', /Document Contract|Causal Spines|Continuity Watchlist|Final Design Test/, ['designer']],
   ['Campaign Outline', /^Campaign Outline$|^Campaign Premise|^Campaign Structure|Twelve-Session/, ['page:running/campaign-at-a-glance']],
   ['Campaign Outline', /^Foundational Narrative Truths/, ['page:running/gm-truths']],
-  ['Campaign Outline', /^The Seven Components/, ['page:running/seven-components']],
+  ['Campaign Outline', /^The Seven Components/, ['page:veiled/seven-components']],
   ['Campaign Outline', /^Campaign-Wide Promises/, ['page:running/promises-and-threads']],
   ['Campaign Outline', /^Branching and Continuity/, ['page:running/reading-and-branches']],
   ['Campaign Outline', /^Session Preparation/, ['page:running/running-the-game']],
@@ -145,7 +145,7 @@ const RULES = [
 const DEPENDS = [
   [/^The Ledger/, /.*/, ['encounter.a-life', 'encounter.the-tangled-web']],
   [/^The Witnesses — Material Concordance/, /.*/, ['encounter.a-life', 'encounter.the-tangled-web']],
-  [/^The Burden/, /^4\.|^(5|6|7|9)\./, ['page:running/seven-components']],
+  [/^The Burden/, /^4\.|^(5|6|7|9)\./, ['page:veiled/seven-components']],
   [/^Campaign Outline/, /^The Seven Components/, ['encounter.the-burden']],
   [/^The Veiled/, /Campaign Foreshadowing/, ['encounter.the-burden']],
 ];
@@ -210,8 +210,13 @@ function unitsOf(doc) {
 
 // ------------------------------------------------------------------ provenance and concepts
 const cites = []; // { doc, line, id }
-const docs = listSourceDocs();
+// Retired documents (migration-map.yaml retiredDocuments) are not inventoried. Every document the existing
+// inventory covers must still be found, or regeneration would silently drop its rows (confirmed ones too).
+const retiredDocs = new Set(Object.keys(loadMigrationMap().retiredDocuments ?? {}));
+const docs = listSourceDocs().filter((d) => !retiredDocs.has(d.name));
 if (!docs.length) throw new Error('No source documents found; set COLONY_SOURCE_DOCS_DIR. Existing coverage was not changed.');
+const missingDocs = Object.keys(PREVIOUS?.documents ?? {}).filter((name) => !docs.some((d) => d.name === name));
+if (missingDocs.length) throw new Error(`Source documents not found: ${missingDocs.join(', ')}. Existing coverage was not changed (check COLONY_SOURCE_DOCS_DIR).`);
 const headingsCache = new Map(docs.map((d) => [d.name, headingsOf(d.file)]));
 function lineOf(docName, heading) {
   const d = docs.find((x) => x.name === docName);

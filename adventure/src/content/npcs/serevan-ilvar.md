@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=../../../schemas/npc.schema.json
 id: npc.serevan-ilvar
 slug: serevan-ilvar
 name: Serevan Ilvar
@@ -7,6 +8,7 @@ ancestry: Elf
 heritage: Ancient Elf
 class: Champion
 background: Emissary
+level: 14
 gender: Male
 age: 230
 aliases:
@@ -40,21 +42,17 @@ relationships:
 
       He would spare her if he believed he could.
 
-      But he does not believe her refusal—or anyone else’s objection—can outweigh the lives of the entire Colony. Her
-      willingness matters to the meaning of the Reading, but not to whether he will permit it to proceed.
+      But he does not believe her refusal—or anyone else’s objection—can outweigh the lives of the entire Colony. Her willingness matters to the meaning of the Reading, but not to whether he will permit it to proceed.
   - to: npc.kelda-varruk
     type: Commander
     summary: >-
       He trusts the Captain completely but gives her only the information required to perform her duties.
 
-      He believes shielding subordinates from the full moral burden of command is an act of mercy. She believes his
-      secrecy reflects trust in the chain of command—until she learns how much responsibility she was asked to carry
-      without understanding it.
+      He believes shielding subordinates from the full moral burden of command is an act of mercy. She believes his secrecy reflects trust in the chain of command—until she learns how much responsibility she was asked to carry without understanding it.
 provenance:
   - doc: Character Briefs
     heading: His Prominence - Serevan Ilvar
-level: 14
-design: " Level 14 is taken from the Reading combat profile. NPC identity remains Elf / Ancient Elf / Champion; the Creatures export’s Human label does not override the character owner."
+design: " Level 14 is taken from the Reading combat profile. NPC identity remains Elf / Ancient Elf / Champion; the Creatures export’s Human label is wrong (user ruling, 2026-11-19: Serevan is an Elf) and does not override the character owner."
 ---
 
 ## Overview

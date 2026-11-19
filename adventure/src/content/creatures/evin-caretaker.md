@@ -35,13 +35,18 @@ immunities:
   - death effects
 speed: 30 feet
 abilityDC: 33
-strikes: []
+strikes:
+  - name: Open Hand
+    type: melee
+    bonus: 26
+    damage: 3d8+12 bludgeoning
+    traits: [reach 15 feet, nonlethal]
 provenance:
   - doc: Creatures
     heading: Evin Peakwalker Reconstruction (Caretaker / Nightmare Nurse) — Creature 13
 ---
 
-**Open Hand ◆** +26, reach 15 feet; 3d8+12 bludgeoning, nonlethal. A successful Strike does not automatically Grab; Grapple requires its own action. While carrying the active Bed, including an occupied Bed, the Nurse gains a +2 circumstance bonus to AC (35 total).
+**Open Hand:** a successful Strike does not automatically Grab; Grapple requires its own action. While carrying the active Bed, including an occupied Bed, the Nurse gains a +2 circumstance bonus to AC (35 total).
 
 ### Appearance and Six-Hand Inventory
 The reconstruction does not resemble Evin. It embodies the *function* of caretaking: an impossibly tall featureless black nurse with an exaggerated cap and apron, six hands, instruments, medications, pillows, and blankets. Its medical costume is a false conclusion imposed by incomplete Pattern evidence; Evin was not necessarily a nurse.

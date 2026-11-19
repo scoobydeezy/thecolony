@@ -61,7 +61,8 @@ const textOf = (file) => {
   return buf.toString('utf8');
 };
 
-const files = listFiles(dist, /\.(html|json|xml|txt|js|pf_fragment|pf_index|pf_meta)$/);
+// .md: the player handout downloads (dist/player-handouts/).
+const files = listFiles(dist, /\.(html|json|xml|txt|md|js|pf_fragment|pf_index|pf_meta)$/);
 for (const file of files) {
   const text = textOf(file);
   const flat = canon(text);

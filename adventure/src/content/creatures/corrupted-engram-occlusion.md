@@ -33,14 +33,16 @@ immunities:
   - death effects
 speed: 30 feet
 abilityDC: 34
-strikes: []
+strikes:
+  - name: Occluded Hand
+    type: melee
+    bonus: 29
+    damage: 3d10+14 bludgeoning plus 1d6 mental
+    traits: [reach 10 feet]
 provenance:
   - doc: Creatures
     heading: Corrupted Engram Occlusion — Creature 14
 ---
-
-**Occluded Hand** +29, reach 10 feet  
-**Damage** 3d10+14 bludgeoning plus 1d6 mental
 
 ### Baseline Form — The Almost-Person
 The Occlusion is an absolute-black, vaguely humanoid void without a stable face, age, costume, or consistent anatomy. Its arms lengthen, fold inward, or disappear; its head can settle in the wrong place; a hand may exist only for the instant of a Strike or Grapple. This is the visual consequence of a corrupted Engram recording an earlier **false** Veiled self-model rather than the original person's Memory directly. It is still mechanically an **Echo / Pattern**, not a new Composite or Form Resonance.

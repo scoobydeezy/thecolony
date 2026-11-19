@@ -30,7 +30,7 @@ provenance:
 
 ## Troop State
 
-Not Undead. Begin with four contiguous 10-foot-square segments. At 147 HP, reduce to three segments; at 73 HP, reduce to two. The Troop is slowed 1 and has no reactions. Its segments are false Sundaras, not separate grave probes. After full Dispersal, the provisional return is three full rounds later if the condition persists; no individual Grave Resonance is produced.
+Not Undead. Begin with four contiguous 10-foot-square segments. At 147 HP, reduce to three segments; at 73 HP, reduce to two. The Troop is slowed 1 and has no reactions. Its segments are false Sundaras, not separate grave probes. After full Dispersal, it returns three full rounds later if the condition persists; no individual Grave Resonance is produced.
 
 **Troop movement / defenses:** Use Remaster troop-movement and segment rules as written, not legacy "condense to a 20×20 block" behavior; segments must remain contiguous and share edge lengths as required. Do not use a 5-foot gap as passable by a 10-foot segment; individual Medium zombies can pass narrow gates normally. These are normal troop geometry restrictions, not a bespoke "fluid" teleporter.  
 **Grave Tide:** The mass can occupy space with other creatures and creatures can treat its occupied squares as **difficult terrain** (mirrors the published Shambler Troop's structural behavior, not undead biology).  

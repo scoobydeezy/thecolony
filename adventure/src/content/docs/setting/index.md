@@ -5,7 +5,17 @@ sidebar:
   order: 1
 part:
   id: part.the-colony
-  chapters: []
+  chapters:
+    - key: factions
+      title: Factions
+      label: Factions
+      arrangement: reference
+      entriesOf: faction
+    - key: faction-goals
+      title: Faction Goals
+      label: Faction Goals
+      arrangement: reference
+      entriesOf: goal
 readiness:
   status: compiled
 canon:
@@ -26,6 +36,8 @@ Use this part to give the players a place worth caring about before asking them 
 | Competing answers to the burden | [The Factions](/docs/setting/factions/) |
 | Who handles a practical civic problem | [Civic Institutions](/docs/setting/institutions/) |
 | People connected to a faction or place | [Who's Who](/docs/setting/whos-who/) |
+| One faction or social class in detail | its entry, listed below |
+| What a faction is working toward | its goals, listed below |
 
 ## A Place That Responds
 
@@ -34,6 +46,8 @@ Begin with work, relationships, and things people use. Let a familiar face intro
 The directories show the campaign's starting state. Injuries, changed loyalties, damaged holdings, and new obligations established in play belong to the continuing Colony. Use those changes when revisiting a place.
 
 For the underlying secret, read [GM Truths](/docs/running/gm-truths/). For how to keep the city moving between sessions, read [The Colony Turn](/docs/running/colony-turn/).
+
+::part-contents
 
 :::design
 Part II reconciliation, 2026-11-18. Overview synthesized from :cite[Campaign Vision]{doc=campaign-vision} and :cite[Foundational Truths]{doc=the-colony--foundational-truths}. Entity records remain the owners of individual facts; see sources/parts-1-2-reconciliation.yaml for unresolved geography and source conflicts.

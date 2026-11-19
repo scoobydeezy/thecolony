@@ -1,18 +1,12 @@
 ---
+# yaml-language-server: $schema=../../../schemas/encounter.schema.json
 id: encounter.old-town
 slug: old-town
 name: Old Town
 summary: Old Tom teaches the Party about names.
 function: "Identity: Name"
 synopsis: >-
-  The Party enters abandoned Old Town expecting the ruins of a Duskwood attack and instead finds details that refuse to
-  fit the story. At the old cemetery they meet Tom, who calls everyone “Sunny” despite remembering people, places,
-  objects, and relationships with remarkable precision. The cemetery's unresolved graves manifest six misassembled lives
-  as an unstable Chorus whose fragments migrate between bodies whenever they are dispersed. The Party learns to
-  recognize each person's recurring Pattern, find the grave and history it belongs to, and give that life a truthful
-  Name; each Named Boundary restores one life and Anchors its grave. Old Town's buried truth becomes clear: its
-  catastrophe began within the Colony, and the Shattered's habit of exposing evidence without preserving provenance
-  risks repeating it. Tom is briefly relieved, but whoever he calls “Sunny” remains unfound.
+  The Party enters abandoned Old Town expecting the ruins of a Duskwood attack and instead finds details that refuse to fit the story. At the old cemetery they meet Tom, who calls everyone “Sunny” despite remembering people, places, objects, and relationships with remarkable precision. The cemetery's unresolved graves manifest six misassembled lives as an unstable Chorus whose fragments migrate between bodies whenever they are dispersed. The Party learns to recognize each person's recurring Pattern, find the grave and history it belongs to, and give that life a truthful Name; each Named Boundary restores one life and Anchors its grave. Old Town's buried truth becomes clear: its catastrophe began within the Colony, and the Shattered's habit of exposing evidence without preserving provenance risks repeating it. Tom is briefly relieved, but whoever he calls “Sunny” remains unfound.
 part: part.act-2
 chapter: the-manor-routes
 order: 2
@@ -24,6 +18,8 @@ links:
   - npc.sundara-cobb
   - npc.tomlin-cobb
 status: draft
+readiness:
+  status: compiled
 provenance:
   - doc: Campaign Outline
     heading: Manor Route 1 — The Shattered
@@ -31,8 +27,6 @@ provenance:
     heading: 6. Old Town — Shattered Route
   - doc: Encounters
     heading: 6. Old Town — Shattered Route
-readiness:
-  status: compiled
 ---
 
 ## At the Table
@@ -119,7 +113,7 @@ The complete action, six tell scripts, skill matrix, DCs, false-Recognition cons
 | **Stretch** | 36 | 36 | 39 | 42 | 45 |
 | **Unrelated** | — | Not eligible | Not eligible | Not eligible | Not eligible |
 
-These DC tiers are a deliberate encounter-specific adjustment for a typical six-PC level-12 party. The creature level remains 10. Use the character's actual skill modifier and ordinary PF2e critical success/failure rules; the table measures *relevance*, not training or proficiency.
+These DC tiers are a deliberate encounter-specific adjustment for a six-PC level-12 party (the expected level is 12 or 13, possibly higher). The creature level remains 10. Use the character's actual skill modifier and ordinary PF2e critical success/failure rules; the table measures *relevance*, not training or proficiency.
 
 | Shell (GM working label) | Two Excellent skills | Two Reasonable skills | Two Stretch skills |
 |---|---|---|---|
@@ -242,5 +236,5 @@ A player should be able to watch a Corpus Disperse, see a Fragment physically ch
 Keep every Named Boundary already earned. Do not erase Names to reset the board. Tom remains at the cemetery; the surviving unresolved field can quiet again when the immediate confrontation ends, without resolving Old Town. The later Sunny encounter remains available.
 
 :::design
-The retreat baseline is provisional. The source supplies six fixed life kernels despite its one-Corpus-per-player phrasing. For a different table size, retain the six lives and reduce simultaneous active bodies if needed; do not invent new historical lives or discard the final Naming requirement without a balance pass.
+The source supplies six fixed life kernels despite its one-Corpus-per-player phrasing. For a different table size, retain the six lives and reduce simultaneous active bodies if needed; do not invent new historical lives or discard the final Naming requirement without a balance pass.
 :::

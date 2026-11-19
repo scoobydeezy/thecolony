@@ -12,7 +12,7 @@ provenance:
     heading: Memory Three — The Great Flood of the River Foam
 ---
 
-At 180 HP:
+This Memory opens when the Echo reaches its second Page Lock (see [Page Locks](/docs/act-3/the-burden-phase-3/#page-locks)).
 
 > *page.*
 

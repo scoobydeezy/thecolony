@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=../../../schemas/faction.schema.json
 id: faction.shattered
 slug: shattered
@@ -46,3 +47,4 @@ start:
     a: Positive
     b: Positive
     c: Negative
+---

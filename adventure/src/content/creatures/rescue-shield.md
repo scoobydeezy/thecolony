@@ -22,14 +22,18 @@ saves:
   will: 21
 immunities: []
 speed: 20 feet
-strikes: []
+strikes:
+  - name: Shield Boss
+    type: melee
+    bonus: 21
+    damage: 2d8+9 bludgeoning
+    traits: [nonlethal]
 provenance:
   - doc: Creatures
     heading: Shield — Creature 10
 ---
 
-**Role:** durable Front anchor  
-**Shield Boss** +21, **Damage** 2d8+9 bludgeoning, nonlethal
+**Role:** durable Front anchor
 **Shield** Hardness 8, HP 32, BT 16
 
 ### Raise a Shield ◆

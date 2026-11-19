@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=../../../schemas/faction.schema.json
 id: faction.heirs
 slug: heirs
@@ -19,3 +20,4 @@ start:
     stability: 0.1592
     agency: 0.5502
   beliefs: {}
+---

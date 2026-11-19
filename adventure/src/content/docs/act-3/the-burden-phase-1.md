@@ -26,7 +26,7 @@ Use the **contribution table in :ref[The Burden]{#encounter.the-burden}** to sel
 
 ## Encounter Parameters
 
-Phase I is designed for the usual **six-character, level-12 Darkwing party**.
+Phase I is tuned for a **six-character, level-12 Darkwing party** (Darkwing is expected to be level 12 or 13, possibly higher).
 
 - **Incursion:** Creature 15 / Party Level +3
 - **Source:** Level 15, Class V

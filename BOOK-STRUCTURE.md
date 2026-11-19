@@ -31,7 +31,7 @@
 
 ## 1. The table of contents
 
-The published book has six Parts. A Part is a hierarchy, not a file plan:
+The published book has seven Parts. A Part is a hierarchy, not a file plan:
 - one page can cover several items (The Calling and The House of Abiding could share a page);
 - one item can span several pages (The Burden's four phases).
 
@@ -39,7 +39,7 @@ The designer tools sit outside the table of contents (section 1.7).
 
 ### Part I — Running Results Pending (the GM's handbook)
 
-Authored pages in `docs/running/`. They explain; the rules they mention link to rule entries (Part VI), and are never restated.
+Authored pages in `docs/running/`. They explain; the rules they mention link to rule entries (Part III for the Veiled, Part VII otherwise), and are never restated.
 
 | Page | Covers | Main sources |
 |---|---|---|
@@ -47,8 +47,6 @@ Authored pages in `docs/running/`. They explain; the rules they mention link to 
 | The Campaign at a Glance | Premise, the Colony's secret, the central question, the three acts, the shape of the ending | Campaign Vision; Campaign Synopsis; Campaign Outline: Campaign Premise, Foundational Narrative Truths; Foundational Truths |
 | GM Truths | What the GM knows that no one at the table does: the First Law, the Book of Names, Aletheia, the Reading, the Eclipse, the Forgotten | Foundational Truths; Campaign Outline: Foundational Narrative Truths |
 | The Reading and Its Branches | How the Act I climax splits the campaign (stopped / succeeds), what each path changes, how paths are marked in this book | Campaign Outline: If the Reading Is Stopped / Succeeds, The Shared Endgame; `branch.the-reading` |
-| The Seven Components of Identity | Name, Relationship, Form, Context, Pattern, Choice, Memory: what each is, how it is restored, where each is taught | Campaign Outline: The Seven Components of Identity; The Veiled: Identity as Meaning, Recovering Identity |
-| The Veiled: A Practical Primer | The mnemonic cycle, Sources, Class, Dispersal, the Stabilization Window, Restore / Anchor, in table terms; links to every rule entry | The Veiled (player-facing vocabulary and the GM-facing core) |
 | The Colony Turn | How factions act between sessions; goals, Momentum, the Character Phase; what the app does for you | Faction Goals II–III; the app's rules |
 | Faction Operations and the Act III Fronts | Running faction goals at the table; how the five fronts work in Act III | Faction Goals I, IV |
 | Running Investigations, Relationships and Consequences | Session design, NPC play, props, clues that persist, consequences that continue | GM Design Guide; Campaign Vision: Design Principles |
@@ -57,7 +55,7 @@ Authored pages in `docs/running/`. They explain; the rules they mention link to 
 
 ### Part II — The Colony (the gazetteer)
 
-Authored overview pages in `docs/setting/`. They are prose about the place, linking to the entity entries, which hold the facts.
+Authored overview pages in `docs/setting/`. They are prose about the place, linking to the entity entries, which hold the facts. After them, two chapters on the part page list the entries themselves (user, 2026-11-19): **Factions** (every faction entry, social classes included, by name) and **Faction Goals** (every goal entry, by name). The entries keep their URLs and Reference indexes but appear in the sidebar only here.
 
 | Page | Covers | Main sources |
 |---|---|---|
@@ -68,7 +66,16 @@ Authored overview pages in `docs/setting/`. They are prose about the place, link
 | Civic Institutions | The Order, the Assembly, the Claims Registry, the Hall of Remembrance, EGRESS: what they do in daily life | Faction and Asset entries; Character Briefs |
 | Who's Who | A short authored introduction to the social circles that matter, then a directory generated from the NPC entries (by faction and location) | NPC entries |
 
-### Part III — Act I: The Secret
+### Part III — The Veiled
+
+The campaign's supernatural danger in one place (user, 2026-11-19). Authored pages in `docs/veiled/`, then two chapters on the part page that list existing entries: **Rules** (the sixteen Veiled rule entries, in reading order) and **Veiled Sources** (every source entry, by name, via `entriesOf: source`). The entries keep their own URLs (`/rules/…`, `/veiled-sources/…`) and their Reference indexes, but each appears in the sidebar only here. Veiled creatures stay in the Bestiary.
+
+| Page | Covers | Main sources |
+|---|---|---|
+| A Practical Primer (`veiled/primer`) | The mnemonic cycle, Sources, Class, Dispersal, the Stabilization Window, Restore / Anchor, in table terms; links to every rule entry | The Veiled (player-facing vocabulary and the GM-facing core) |
+| The Seven Components of Identity | Name, Relationship, Form, Context, Pattern, Choice, Memory: what each is, how it is restored, where each is taught | Campaign Outline: The Seven Components of Identity; The Veiled: Identity as Meaning, Recovering Identity |
+
+### Part IV — Act I: The Secret
 
 `docs/act-1/` (exists). The part page is an act overview (template 3.1), followed by its items. The chapters already in place:
 
@@ -78,7 +85,7 @@ Authored overview pages in `docs/setting/`. They are prose about the place, link
 | Session 3 investigations | alternatives (by Source state and the party's choices) | A Life (Witnesses) · Containment (EGRESS) · Duskwood (Cult) |
 | Act I climax | sequence | An Opportunity → The Reading |
 
-### Part IV — Act II: The Cost
+### Part V — Act II: The Cost
 
 `docs/act-2/` (exists).
 
@@ -89,7 +96,7 @@ Authored overview pages in `docs/setting/`. They are prose about the place, link
 | Resources | reference | **New:** The Clearing House, the location entry (extended as a resource, template 3.6), listed here as an investigative resource available at any point in the act |
 | Convergence | sequence | The Confluence → The Observer (ends the act). Per the user's ruling of 2026-11-18 (`narrative.observer-timing`): The Observer holds the whole reveal, in either order. If the Reading was stopped, the eclipse has already begun at the Confluence; if it succeeded, the Observer reveals himself and then the eclipse begins. |
 
-### Part V — Act III: The Reckoning
+### Part VI — Act III: The Reckoning
 
 `docs/act-3/` (exists).
 
@@ -99,19 +106,19 @@ Authored overview pages in `docs/setting/`. They are prose about the place, link
 | The five fronts | concurrent | Sunny (Shattered) · The Breach (EGRESS) · Milltown (Dawn) · The Tangled Web (Witnesses) · The Open Door (Cult) |
 | Finale | sequence | **The Burden**, on several pages: an overview, then Phase I Wound: The Monument, Phase II Composite: The Borrowed First Keeper, Phase III Echo: Through Her Eyes, and Phase IV Chorus: The Succession. Each page has its own At the Table panel and the state handed on to the next phase. → Aletheia (who carries the Weight, and on what terms) → The Light Remains, which opens with **The Final Reading** as a named section (its own heading and anchor, listed on the part page; no separate app event). The Final Reading enacts the answer already given: no new test and no surprise failure. |
 
-### Part VI — Reference (the GM appendices)
+### Part VII — Reference (the GM appendices)
 
 These are generated from the entries, never authored as separate copies. Most exist.
 
 | Appendix | From | Status |
 |---|---|---|
 | Bestiary | creature entries | exists |
-| Veiled Sources | source entries | exists |
+| Veiled Sources | source entries (listed in the sidebar under Part III) | exists |
 | Hazards | **new** hazard entries | to add (see §6) |
 | Items and Treasure | item entries (unique items, treasure by act) | type exists, no entries |
-| NPCs · Factions · Faction Goals · Assets · Locations | the entries | exist |
+| NPCs · Factions · Faction Goals · Assets · Locations | the entries (factions and goals are listed in the sidebar under Part II) | exist |
 | World Conditions · Narrative Threads · Branches | the entries | exist |
-| Rules Reference | rule entries | exists (1 entry) |
+| Rules Reference | rule entries (the Veiled rules are listed in the sidebar under Part III; the index lists all) | exists |
 | Maps | **new** map entries: artwork, grid, scale, orientation. The keyed-area descriptions belong to the location or encounter that uses the map | to add |
 | Handouts and Props | handout and inventory entries (player-facing material, GM key). Each handout also produces a clean player-only export that can't include the GM key | types exist |
 | Glossary | **new**: generated from the rule entries' definitions, plus `term` entries only for concepts that have no rule owner | to add |
@@ -388,7 +395,7 @@ From the planning agent's review, accepted by the user:
   - No new entries are created.
 
 **Other changes from the review:**
-- **The Final Reading** is a named section of The Light Remains (§1, Part V), not prose folded into it.
+- **The Final Reading** is a named section of The Light Remains (§1, Part VI), not prose folded into it.
 - **The templates** gain Availability / Trigger, NPC Objectives and If the Party Does Not Intervene for encounters, and Possible Next Developments for events. Read-aloud is optional.
 - **Baseline versus live state** is explicit (§4).
 - **Handouts** get player-only exports (§3.9).

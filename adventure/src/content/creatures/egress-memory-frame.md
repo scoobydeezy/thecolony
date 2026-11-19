@@ -22,19 +22,19 @@ saves:
 immunities:
   - standard construct immunities as appropriate
 speed: 25 feet
-strikes: []
+strikes:
+  - name: Clamp Arm
+    type: melee
+    bonus: 22
+    damage: 2d8+9 bludgeoning
+    traits: [Improved Grab]
 provenance:
   - doc: The Burden — Final Veiled Encounter
     heading: EGRESS Memory Frame — Creature 10
 ---
 
 The same machine is used whether EGRESS assists or interferes.
-**Ref** +19  
-**Will** +20
-## Clamp Arm
-**Melee** +22
-**Damage:** 2d8+9 bludgeoning
-**Improved Grab**
+
 ## Protective Intercept ↻
 **Trigger:** a protected creature within 15 feet would take damage.
 The Frame Steps up to 5 feet toward the protected creature if necessary.

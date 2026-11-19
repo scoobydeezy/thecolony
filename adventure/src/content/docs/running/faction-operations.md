@@ -23,15 +23,7 @@ A champion's absence changes the means available. Another person can inherit a n
 
 ## The Change at Totality
 
-Act II asks the Party to investigate partial truths. Under Totality, those same methods face emergencies. The five fronts test what their factions can preserve and bring to the final reconstruction.
-
-| Front | Faction | Front Asset |
-|---|---|---|
-| :ref[Sunny]{#encounter.sunny} | Shattered | :ref[Dead Drop Network]{#asset.dead-drop-network} |
-| :ref[The Breach]{#encounter.the-breach} | EGRESS | :ref[Engram Vault]{#asset.engram-vault} |
-| :ref[Milltown]{#encounter.milltown} | Dawn Assembly | :ref[Assembly Hall]{#asset.assembly-hall} |
-| :ref[The Tangled Web]{#encounter.the-tangled-web} | Witnesses | :ref[The Ledger]{#asset.ledger} |
-| :ref[The Open Door]{#encounter.the-open-door} | Cult of the Unknown | :ref[Pilgrim's Rest]{#asset.pilgrim-s-rest} |
+Act II asks the Party to investigate partial truths. Under Totality, those same methods face emergencies. The five fronts test what their factions can preserve and bring to the final reconstruction. :ref[Act III Front Outcomes]{#rule.act-three-fronts} owns the front, faction, front goal, front Asset and Maintain guard for each.
 
 These are concurrent crises, not five compulsory stops. The Party can intervene, arrange meaningful delegation, or leave a front unattended. Its decision uses time, people, and resources that may be needed elsewhere. The result comes from the encounter and the established situation.
 

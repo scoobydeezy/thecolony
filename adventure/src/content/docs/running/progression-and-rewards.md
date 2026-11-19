@@ -1,6 +1,6 @@
 ---
 title: "Character Progression and Rewards"
-description: "Levels by act, rewards, treasure, and Keystones as rewards."
+description: "The expected party level, rewards, treasure, and Keystones as rewards."
 sidebar:
   order: 10
 readiness:
@@ -13,7 +13,7 @@ The Party grows in practical capability as it learns the Colony, earns access, a
 
 ## Encounter Baseline
 
-The current encounter material repeatedly uses **six level-12 characters** as Darkwing's tuning baseline, including The Reading, the Engram Vault, and The Burden. Use the actual Party's level, size, and resources when preparing an encounter. A creature's level or a Source's level does not establish a character advancement milestone.
+Darkwing is expected to be **level 12 or 13, possibly higher**, with six characters. The encounter material (The Reading, the Engram Vault, The Burden and others) is tuned for six level-12 characters. Use the actual Party's level, size, and resources when preparing an encounter. A creature's level or a Source's level does not establish a character advancement milestone.
 
 An act-by-act advancement schedule and complete treasure allocation are not fixed here. Until they are chosen, keep the established character level visible in preparation and review any encounter whose assumptions no longer fit.
 

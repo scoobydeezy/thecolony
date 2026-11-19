@@ -22,14 +22,18 @@ saves:
   will: 21
 immunities: []
 speed: 25 feet
-strikes: []
+strikes:
+  - name: Rescue Pole
+    type: melee
+    bonus: 21
+    damage: 2d8+9 bludgeoning
+    traits: [reach 10 feet, trip, nonlethal]
 provenance:
   - doc: Creatures
     heading: Rear Guard — Creature 9
 ---
 
-**Role:** reach control / rear-file support  
-**Rescue Pole** +21, reach 10 feet, trip, **Damage** 2d8+9 bludgeoning, nonlethal
+**Role:** reach control / rear-file support
 
 ### Reactive Strike ↻
 Use the standard Reactive Strike reaction.

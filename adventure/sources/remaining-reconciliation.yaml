@@ -3475,10 +3475,10 @@ reviewedSourceRanges:
     lastLine: 2140
     homes:
       - encounter.the-reading
-      - creature.vara-reading
-      - creature.serevan-reading
+      - creature.vara-cairn
+      - creature.serevan-ilvar
       - creature.kelda-varruk
-      - creature.uldren-reading
+      - creature.uldren-harthwright
       - creature.order-chamber-guard
   - doc: Creatures
     firstLine: 2141
@@ -3574,7 +3574,7 @@ reviewedSourceRanges:
     lastLine: 4516
     homes:
       - page:act-3/the-burden-phase-4
-      - creature.serevan-succession
+      - creature.serevan-ilvar
   - doc: The Burden — Final Veiled Encounter
     firstLine: 4517
     lastLine: 4632
@@ -3647,7 +3647,7 @@ reviewedSourceRanges:
     firstLine: 2182
     lastLine: 2229
     homes:
-      - page:running/veiled-primer
+      - page:veiled/primer
   - doc: The Veiled
     firstLine: 2230
     lastLine: 2315

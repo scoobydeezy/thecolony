@@ -23,7 +23,7 @@ provenance:
 | Stability Threshold | :stat{#source.corrupted-engram key=stability-threshold} |
 | Rupture radius | :stat{#source.corrupted-engram key=rupture-radius} |
 
-Use :ref[Active Sources]{#rule.active-sources}, :ref[Dispersal]{#rule.dispersal}, and :ref[The Stabilization Window]{#rule.stabilization-window}.
+Use :ref[Active Sources]{#rule.active-sources}, :ref[Dispersal]{#rule.dispersal}, and :ref[The Stabilization Window]{#rule.stabilization-window}. What a corrupted (OCC) Engram is, and why authentic Memory constrains it, is :ref[Engrams, Frames and Proxies]{#rule.corrupted-engrams}.
 
 **Vessel:** selected OCC record mounted in the Vault Core; immovable while secured. **Resonance:** Pattern. **Reconstruction:** :ref[Corrupted Engram Occlusion]{#creature.corrupted-engram-occlusion}.
 

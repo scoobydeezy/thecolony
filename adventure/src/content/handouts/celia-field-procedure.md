@@ -9,12 +9,6 @@ provenance:
     heading: Celia's Desk — Controlled Relational Resonance, Field Procedure 4
 ---
 
-[Download player-only Markdown](/docs/player-handouts/celia-field-procedure.md)
-
-[Download player-only Markdown](/docs/player-handouts/celia-field-procedure.md)
-
-[Download player-only Markdown](/docs/player-handouts/celia-field-procedure.md)
-
 :::player-facing
 > **REFERENCE SOURCE / CRR–4**  
 > Observation: a dominant spiderlike Incursion maintains physical possession of the suspected devotional reference Focus while manifested. Upon Dispersal it releases the Focus and can be measured briefly.  

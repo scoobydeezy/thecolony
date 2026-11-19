@@ -1,8 +1,6 @@
 ---
 title: Glossary
-description: >-
-  Every term of the Veiled and the Colony, generated from the rule entries' definitions, plus term entries where no rule
-  owns the concept.
+description: An index of the book's rule entries, each listed with its current name and summary.
 sidebar:
   order: 1
 readiness:

@@ -5,13 +5,20 @@ name: Identity Keystones
 version: 1
 status: draft
 summary: Six reusable capabilities support Identity recovery; the Dawn Charter supports Choice, while Context has no Keystone.
+appliesTo:
+  - asset.book-of-names
+  - asset.ledger
+  - asset.claims-registry
+  - asset.engram-vault
+  - asset.face-of-the-unknown
+  - asset.dawn-charter
 provenance:
   - { doc: Campaign Outline, heading: The Seven Components of Identity }
   - { doc: Campaign Outline, heading: Faction Relationships as Act III Mechanics > Keystones Create Independence }
   - { doc: The Veiled, heading: Keystones }
 ---
 
-## Six Capabilities
+## Definition
 
 A **Keystone** provides a reusable way to recover a particular component of Identity. It is not a general label for an important or strategically valuable Asset.
 
@@ -26,7 +33,9 @@ A **Keystone** provides a reusable way to recover a particular component of Iden
 
 **Context has no Keystone.** Recover the circumstances that made a fact true through the encounter's local evidence.
 
-## Access, Not Automatic Answers
+## Procedure
+
+### Access, Not Automatic Answers
 
 A Keystone needs a meaningful lead. Possessing the Book does not identify every silhouette; consulting the Charter does not automatically establish someone's consent. The evidence must support the particular life and question being investigated.
 

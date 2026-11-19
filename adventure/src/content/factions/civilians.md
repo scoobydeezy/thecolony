@@ -1,3 +1,4 @@
+---
 # yaml-language-server: $schema=../../../schemas/faction.schema.json
 id: faction.civilians
 slug: civilians
@@ -19,3 +20,4 @@ start:
     stability: 0.4988
     agency: 0.3625
   beliefs: {}
+---

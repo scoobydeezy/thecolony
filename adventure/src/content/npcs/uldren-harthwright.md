@@ -7,7 +7,7 @@ role: Steward of the House of Abiding
 ancestry: Human
 class: Rogue
 background: Servant
-level: 7
+level: 10
 gender: Male
 age: 53
 aliases:

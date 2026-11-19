@@ -73,7 +73,7 @@ function check(fm, body, index) {
           if (node.attributes && Object.keys(node.attributes).length) errors.push(`Body line ${line}: unknown directive :${name}`);
           return;
         }
-        if (name === 'cite' || name === 'clock' || name === 'part-contents') return;
+        if (name === 'cite' || name === 'clock' || name === 'part-contents' || name === 'directory') return;
         const id = directiveId(node);
         if (!id) return void errors.push(`Body line ${line}: :${name} needs an #id`);
         if (!known.has(id)) warnings.push(`Body line ${line}: :${name} → ${id} is not an entry (it will show as missing)`);

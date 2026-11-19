@@ -40,7 +40,7 @@ design: >-
 
 **Capacity.** Containment devices, cells, receivers and routing systems have a Capacity rated on the I–V Class scale. A system must have enough Capacity to survive or carry the Weight placed in or routed through it; by default, that means Capacity at least equal to the Source's Class. Exact device rules and overload thresholds are still open. Capacity provides no Connection, Consent or truth.
 
-**Suppression.** A suppression system prevents a **known** reconstruction signature from reforming while it remains powered and correctly tuned. It removes no Weight and restores no Identity, may need measured Class, Reconstruction or Resonance information, and can fail if the Source develops a new Resonance profile or the topology changes. It is not a universal off switch.
+**Suppression.** A suppression system prevents a **known** reconstruction signature from reforming while it remains powered and correctly tuned. It removes no Weight and restores no Identity, may need measured Class, Reconstruction or Resonance information, and can fail if the Source develops a new Resonance profile or the topology changes. It is not a universal off switch. EGRESS's calibrated device is :ref[Tuned Suppression]{#rule.tuned-suppression}.
 
 **Methods differ by institution.** The :ref[Order of Theia]{#faction.order-of-theia} primarily **isolates or suppresses Resonance** around known Sources. The :ref[EGRESS Institute]{#faction.egress-institute} can also **measure, classify and route** Weight into engineered containment topologies.
 
@@ -53,7 +53,7 @@ design: >-
 3. The Order's containment severs Resonance across the vessel's boundary, so the Reconstruction Condition cannot be satisfied across it. Each action spent adds Reconstruction Pressure normally; successful Containment takes effect before the threshold check, so the Incursion does not reconstruct.
 4. The Source is now **Contained, unresolved**. Its Class, Source Level and Restored Identity are unchanged.
 
-**Routing Weight (EGRESS).** Routing into a containment vessel or engineered cell is a :ref[Source Transfer]{#rule.source-transfer} and follows that rule, including its checks. It normally requires at least enough information to classify what the Weight recognizes; EGRESS cares intensely about the Source's Class and Resonance Type before attempting it. A routed cell may hold an active Incursion in a stable loop (Weight → engineered Resonance → Incursion → containment boundary → repeat): the Incursion cannot escape, but the Weight is not at Rest.
+**Routing Weight (EGRESS).** Routing into a containment vessel or engineered cell is a :ref[Source Transfer]{#rule.source-transfer}; EGRESS's prerequisites and steps are :ref[Controlled Routing]{#rule.controlled-routing}. It normally requires at least enough information to classify what the Weight recognizes; EGRESS cares intensely about the Source's Class and Resonance Type before attempting it. A routed cell may hold an active Incursion in a stable loop (Weight → engineered Resonance → Incursion → containment boundary → repeat): the Incursion cannot escape, but the Weight is not at Rest.
 
 **Containing during a manifestation.** Containment can be attached while the Source is Breached. Severing Resonance does not Disperse the current Incursion (see :ref[Sources and Resonance]{#rule.sources-and-resonance}); it prevents the next reconstruction.
 
